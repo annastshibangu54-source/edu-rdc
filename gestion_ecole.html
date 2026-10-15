@@ -229,7 +229,7 @@ td.side .sc{text-align:center;margin-top:10px}
                             <i class="fa fa-user-plus me-2 text-primary"></i> 1. Inscriptions (Classes)
                         </a>
                         <a class="list-group-item list-group-item-action fw-bold" data-bs-toggle="list" href="#tab-cotes">
-                            <i class="fa fa-edit me-2 text-primary"></i> 2. Saisie des Cotes
+                            <i class="fa fa-edit me-2 text-primary"></i> 2. Saisie des Cotes & Cours
                         </a>
                         <a class="list-group-item list-group-item-action fw-bold" data-bs-toggle="list" href="#tab-bulletin">
                             <i class="fa fa-file-invoice me-2 text-primary"></i> 3. Bulletins CTEB
@@ -286,9 +286,9 @@ td.side .sc{text-align:center;margin-top:10px}
                             </div>
                         </div>
 
-                        <!-- SAISIE DES COTES (ENREGISTRER, MODIFIER, SUPPRIMER) -->
+                        <!-- SAISIE DES COTES & COURS PAR CLASSE -->
                         <div class="tab-pane fade" id="tab-cotes">
-                            <h4 class="text-primary mb-3">Saisie et Gestion des Cotes par Élève</h4>
+                            <h4 class="text-primary mb-3">Configuration des Cours & Saisie des Cotes</h4>
                             
                             <div class="row g-3 mb-3 bg-light p-3 rounded border">
                                 <div class="col-md-6">
@@ -363,7 +363,7 @@ td.side .sc{text-align:center;margin-top:10px}
 
     <!-- MOTEUR DE GESTION MULTI-ÉCOLES & CRUD -->
     <script>
-        const STORAGE_KEY = "EDURDC_PLATFORM_DATA_V6";
+        const STORAGE_KEY = "EDURDC_PLATFORM_DATA_V7";
         let appData = { currentUserMatricule: null, schools: [] };
 
         window.onload = function() {
@@ -419,7 +419,6 @@ td.side .sc{text-align:center;margin-top:10px}
             showSection('view-create-school');
         }
 
-        // Enregistrer / Modifier École avec Logo
         function handleSaveSchool(e) {
             e.preventDefault();
             const id = document.getElementById('editSchoolId').value;
@@ -444,7 +443,8 @@ td.side .sc{text-align:center;margin-top:10px}
                         province: prov,
                         secrCode: code,
                         logo: logoBase64 || '',
-                        students: []
+                        students: [],
+                        classesConfig: {} // Stocke les cours et structures par classe
                     };
                     appData.schools.push(newSchool);
                     alert("École créée avec succès !");
@@ -597,7 +597,7 @@ td.side .sc{text-align:center;margin-top:10px}
             `).join('');
         }
 
-        // Saisie des Cotes (Enregistrer, Modifier, Supprimer)
+        // Saisie des Cotes & Gestion Dynamique des Cours par Classe
         function loadCotesSheet() {
             const school = appData.schools.find(s => s.id === activeSchoolId);
             const classe = document.getElementById('cotesClassSelect').value;
@@ -606,57 +606,129 @@ td.side .sc{text-align:center;margin-top:10px}
 
             if(filtered.length === 0) {
                 select.innerHTML = `<option value="" disabled selected>Aucun élève</option>`;
-                document.getElementById('cotesEditorContainer').innerHTML = `<p class="text-muted text-center py-4">Aucun élève.</p>`;
+                document.getElementById('cotesEditorContainer').innerHTML = `<p class="text-muted text-center py-4">Aucun élève dans cette classe.</p>`;
                 return;
             }
 
             select.innerHTML = `<option value="" disabled selected>-- Choisir l'élève --</option>` + 
                 filtered.map(s => `<option value="${s.id}">${s.name} (${s.matricule})</option>`).join('');
+            
+            document.getElementById('cotesEditorContainer').innerHTML = `<p class="text-muted text-center py-4">Veuillez sélectionner un élève.</p>`;
+        }
+
+        function getOrCreateClassStruct(school, classe) {
+            if(!school.classesConfig) school.classesConfig = {};
+            if(!school.classesConfig[classe]) {
+                // Structure totalement vierge par défaut pour chaque classe
+                school.classesConfig[classe] = [
+                    { t: 'DOMAINE DES SCIENCES', g: [{ t: 'Sous-domaine des mathématiques', c: [] }] }
+                ];
+            }
+            return school.classesConfig[classe];
         }
 
         function renderCotesEditor() {
             const school = appData.schools.find(s => s.id === activeSchoolId);
             const studentId = document.getElementById('cotesStudentSelect').value;
             const student = school.students.find(s => s.id === studentId);
-            if(!student) return;
+            const classe = document.getElementById('cotesClassSelect').value;
+            if(!student || !classe) return;
+
+            const struct = getOrCreateClassStruct(school, classe);
+
+            let coursesHtml = '';
+            struct.forEach((d, di) => {
+                coursesHtml += `<h6 class="text-secondary mt-3 fw-bold">${d.t}</h6>`;
+                d.g.forEach((g, gi) => {
+                    if(g.t) coursesHtml += `<small class="text-muted fw-bold d-block mb-1">${g.t}</small>`;
+                    if(g.c.length === 0) {
+                        coursesHtml += `<p class="text-muted small fst-italic">Aucun cours configuré dans ce domaine.</p>`;
+                    } else {
+                        g.c.forEach(c => {
+                            const notes = (student.notes[c.id]) || {};
+                            coursesHtml += `
+                                <div class="row align-items-center mb-2 border-bottom pb-2">
+                                    <div class="col-md-3 fw-bold text-dark">${c.name} <span class="badge bg-secondary">Max: ${c.max}</span></div>
+                                    <div class="col-md-8">
+                                        <div class="row g-1">
+                                            <div class="col"><small class="text-muted d-block">P1</small><input type="number" class="form-control form-control-sm text-center" value="${notes.p1||''}" onchange="saveStudentNote('${student.id}','${c.id}','p1',this.value)"></div>
+                                            <div class="col"><small class="text-muted d-block">P2</small><input type="number" class="form-control form-control-sm text-center" value="${notes.p2||''}" onchange="saveStudentNote('${student.id}','${c.id}','p2',this.value)"></div>
+                                            <div class="col"><small class="text-muted d-block">Exam I</small><input type="number" class="form-control form-control-sm text-center" value="${notes.e1||''}" onchange="saveStudentNote('${student.id}','${c.id}','e1',this.value)"></div>
+                                            <div class="col"><small class="text-muted d-block">P3</small><input type="number" class="form-control form-control-sm text-center" value="${notes.p3||''}" onchange="saveStudentNote('${student.id}','${c.id}','p3',this.value)"></div>
+                                            <div class="col"><small class="text-muted d-block">P4</small><input type="number" class="form-control form-control-sm text-center" value="${notes.p4||''}" onchange="saveStudentNote('${student.id}','${c.id}','p4',this.value)"></div>
+                                            <div class="col"><small class="text-muted d-block">Exam II</small><input type="number" class="form-control form-control-sm text-center" value="${notes.e2||''}" onchange="saveStudentNote('${student.id}','${c.id}','e2',this.value)"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 text-end">
+                                        <button class="btn btn-outline-danger btn-sm" onclick="removeCourseFromClass('${classe}','${c.id}')" title="Supprimer le cours"><i class="fa fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+            });
 
             let html = `
                 <div class="card p-3 border-primary">
-                    <h5 class="text-primary fw-bold">Cotes - ${student.name}</h5>
-                    <table class="table table-bordered align-middle mt-2">
-                        <thead class="table-dark text-center">
-                            <tr><th>Matière</th><th>P1</th><th>P2</th><th>Exam I</th><th>P3</th><th>P4</th><th>Exam II</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Mathématiques</td>
-                                <td><input type="number" class="form-control form-control-sm text-center" value="${(student.notes.math||{}).p1||''}" onchange="saveNote('${student.id}','math','p1',this.value)"></td>
-                                <td><input type="number" class="form-control form-control-sm text-center" value="${(student.notes.math||{}).p2||''}" onchange="saveNote('${student.id}','math','p2',this.value)"></td>
-                                <td><input type="number" class="form-control form-control-sm text-center" value="${(student.notes.math||{}).e1||''}" onchange="saveNote('${student.id}','math','e1',this.value)"></td>
-                                <td><input type="number" class="form-control form-control-sm text-center" value="${(student.notes.math||{}).p3||''}" onchange="saveNote('${student.id}','math','p3',this.value)"></td>
-                                <td><input type="number" class="form-control form-control-sm text-center" value="${(student.notes.math||{}).p4||''}" onchange="saveNote('${student.id}','math','p4',this.value)"></td>
-                                <td><input type="number" class="form-control form-control-sm text-center" value="${(student.notes.math||{}).e2||''}" onchange="saveNote('${student.id}','math','e2',this.value)"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="text-primary fw-bold m-0">Notes & Cours de : ${student.name}</h5>
+                        <button class="btn btn-outline-success btn-sm" onclick="addNewCoursePrompt('${classe}')"><i class="fa fa-plus"></i> Ajouter un Cours</button>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">${coursesHtml}</div>
+                    <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-success btn-sm" onclick="alert('Cotes enregistrées / modifiées avec succès !')"><i class="fa fa-save"></i> Enregistrer / Modifier</button>
-                        <button class="btn btn-danger btn-sm" onclick="clearNotes('${student.id}')"><i class="fa fa-trash"></i> Supprimer les cotes</button>
+                        <button class="btn btn-danger btn-sm" onclick="clearStudentNotes('${student.id}')"><i class="fa fa-trash"></i> Supprimer les cotes</button>
                     </div>
                 </div>
             `;
             document.getElementById('cotesEditorContainer').innerHTML = html;
         }
 
-        function saveNote(studentId, subject, period, val) {
+        function addNewCoursePrompt(classe) {
+            const school = appData.schools.find(s => s.id === activeSchoolId);
+            const struct = getOrCreateClassStruct(school, classe);
+            const courseName = prompt("Nom du nouveau cours :");
+            if(!courseName) return;
+            const courseMax = prompt("Max pondération du cours (ex: 20) :", "20");
+            if(courseMax === null) return;
+
+            // Ajout dans le premier sous-domaine du premier domaine par défaut
+            if(struct[0] && struct[0].g[0]) {
+                struct[0].g[0].c.push({
+                    id: 'CRS-' + Date.now(),
+                    name: courseName.trim(),
+                    max: parseFloat(courseMax) || 10
+                });
+                saveData();
+                renderCotesEditor();
+            }
+        }
+
+        function removeCourseFromClass(classe, courseId) {
+            if(confirm("Supprimer ce cours pour toute la classe ?")) {
+                const school = appData.schools.find(s => s.id === activeSchoolId);
+                const struct = getOrCreateClassStruct(school, classe);
+                struct.forEach(d => {
+                    d.g.forEach(g => {
+                        g.c = g.c.filter(c => c.id !== courseId);
+                    });
+                });
+                saveData();
+                renderCotesEditor();
+            }
+        }
+
+        function saveStudentNote(studentId, courseId, period, val) {
             const school = appData.schools.find(s => s.id === activeSchoolId);
             const student = school.students.find(s => s.id === studentId);
-            if(!student.notes[subject]) student.notes[subject] = {};
-            student.notes[subject][period] = val;
+            if(!student.notes[courseId]) student.notes[courseId] = {};
+            student.notes[courseId][period] = val;
             saveData();
         }
 
-        function clearNotes(studentId) {
+        function clearStudentNotes(studentId) {
             if(confirm("Supprimer toutes les cotes de cet élève ?")) {
                 const school = appData.schools.find(s => s.id === activeSchoolId);
                 const student = school.students.find(s => s.id === studentId);
@@ -685,44 +757,28 @@ td.side .sc{text-align:center;margin-top:10px}
             const school = appData.schools.find(s => s.id === activeSchoolId);
             const studentId = document.getElementById('bulletinStudentSelect').value;
             const student = school.students.find(s => s.id === studentId);
+            const classe = document.getElementById('bulletinClassSelect').value;
             if(!student) return;
 
             if(window.loadStudentToBulletinInstance) {
-                window.loadStudentToBulletinInstance(student, school);
+                window.loadStudentToBulletinInstance(student, school, classe);
             }
         }
     </script>
 
-    <!-- VOTRE MOTEUR DE BULLETIN D'ORIGINE INTÉGRÉ -->
+    <!-- VOTRE MOTEUR DE BULLETIN D'ORIGINE INTÉGRÉ & ADAPTÉ -->
     <script>
     (function(){
-    const KEY='bulletin_cteb_v1';
     const uid=()=>Math.random().toString(36).slice(2,9);
-    const C=(name,max)=>({id:uid(),name,max});
     const newSt=()=>({id:uid(),idn:'',eleve:'',sexe:'',nea:'',nele:'',perm:'',rep:'',notes:{},app:{},cond:{},strk:{}});
-    function defaults(){
-      const st=newSt();
-      return{
-        school:{hdr:['REPUBLIQUE DEMOCRATIQUE DU CONGO','MINISTERE DE L’ENSEIGNEMENT PRIMAIRE, SECONDAIRE','ET PROFESSIONNEL'],
-          province:'',ville:'',commune:'',ecole:'',code:'',classe:'',an1:'26',an2:'27',niveau:'7ème',flag:'',logo:''},
-        struct:[
-          {t:'DOMAINE DES SCIENCES',g:[
-            {t:'Sous-domaine des mathématiques',c:[C('Algèbre',40),C('Arithmétique',20),C('Géométrie',10),C('Statistique',10)]},
-            {t:'Sous-domaine des sciences de la vie et de la terre (SVT)',c:[C('Anatomie',10),C('Botanique',10),C('Zoologie',10)]},
-            {t:'Sous-domaine des sciences physique, technologie et TIC',c:[C('Sciences Physiques',10),C('Technologie',10),C('Techno. D’Info. & Com (TIC)',10)]}
-          ]},
-          {t:'DOMAINE DES LANGUES',g:[{t:'',c:[C('Anglais',30),C('Français',70)]}]},
-          {t:'DOMAINE DE L’UNIVERS SOCIAL ET ENVIRONNEMENT',g:[{t:'',c:[C('Éducation à la vie (1)',20),C('Éducation civique et morale',20),C('Géographie',20),C('Histoire',20)]}]},
-          {t:'DOMAINE DES ARTS',g:[{t:'',c:[C('Dessin',20),C('Musique',20)]}]},
-          {t:'DOMAINE DU DEVELOPPEMENT PERSONNEL',g:[{t:'',c:[C('Éducation physique',20)]}]}
-        ],
-        students:[st],cur:st.id
-      };
-    }
-    function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.struct&&o.students&&o.students.length)return o;}}catch(e){}return defaults();}
-    let S=load();
-    function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-    const cur=()=>S.students.find(s=>s.id===S.cur)||S.students[0];
+    
+    let S = {
+        school: {hdr:['REPUBLIQUE DEMOCRATIQUE DU CONGO','MINISTERE DE L’ENSEIGNEMENT PRIMAIRE, SECONDAIRE','ET PROFESSIONNEL'], province:'',ville:'',commune:'',ecole:'',code:'',classe:'',an1:'26',an2:'27',niveau:'7ème',flag:'',logo:''},
+        struct: [], // Initialement vide pour afficher uniquement les cours configurés par l'utilisateur
+        students: [newSt()],
+        cur: null
+    };
+
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const KEYS=['p1','p2','e1','t1','p3','p4','e2','t2','tg'];
     const FAC={p1:1,p2:1,e1:2,t1:4,p3:1,p4:1,e2:2,t2:4,tg:8};
@@ -744,7 +800,9 @@ td.side .sc{text-align:center;margin-top:10px}
     const EMB='<svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="34" ry="26" fill="none" stroke="#666" stroke-dasharray="3 3"/><text x="40" y="34" text-anchor="middle" font-size="11" fill="#666" font-family="Arial">LOGO</text></svg>';
 
     function render(){
-      const st=cur();S.cur=st.id;
+      const st=S.students.find(s=>s.id===S.cur)||S.students[0];
+      if(!st) return;
+      S.cur=st.id;
       const edit=document.body.classList.contains('edit');
       const sc=S.school;
       let h='';
@@ -788,15 +846,19 @@ td.side .sc{text-align:center;margin-top:10px}
         return `<tr class="sub"><td class="nm">SOUS-TOTAL</td>${pr(b)}${gen(s,'p1')}${gen(s,'p2')}${pr(b*2)}${gen(s,'e1')}${tt(b*4,s,'t1')}${pr(b)}${gen(s,'p3')}${gen(s,'p4')}${pr(b*2)}${gen(s,'e2')}${tt(b*4,s,'t2')}${tt(b*8,s,'tg')}${empty}${empty}</tr>`;
       };
 
-      let gi=0;
-      S.struct.forEach((d,di)=>{
-        h+=`<tr class="dom"><td colspan="16">${esc(d.t)}</td></tr>`;
-        d.g.forEach((g,gj)=>{
-          if(g.t){h+=`<tr class="sdom"><td colspan="16">${esc(g.t)}</td></tr>`;}
-          g.c.forEach(c=>{h+=courseRow(c);});
-          h+=subRow('g:'+gi,g.c);gi++;
-        });
-      });
+      if(S.struct.length === 0) {
+          h += `<tr><td colspan="16" class="text-center py-4 text-muted fst-italic">Aucun cours configuré. Veuillez ajouter des cours dans l'onglet « Saisie des Cotes & Cours ».</td></tr>`;
+      } else {
+          let gi=0;
+          S.struct.forEach((d,di)=>{
+            h+=`<tr class="dom"><td colspan="16">${esc(d.t)}</td></tr>`;
+            d.g.forEach((g,gj)=>{
+              if(g.t){h+=`<tr class="sdom"><td colspan="16">${esc(g.t)}</td></tr>`;}
+              g.c.forEach(c=>{h+=courseRow(c);});
+              h+=subRow('g:'+gi,g.c);gi++;
+            });
+          });
+      }
 
       const all=flat();const b=all.reduce((a,c)=>a+Number(c.max||0),0);
       h+=`<tr class="bold"><td class="nm">MAXIMA GENERAUX</td>${pr(b)}${empty}${empty}${pr(b*2)}${empty}${pr(b*4)}${pr(b)}${empty}${empty}${pr(b*2)}${empty}${pr(b*4)}${pr(b*8)}<td colspan="2"></td></tr>`;
@@ -811,7 +873,9 @@ td.side .sc{text-align:center;margin-top:10px}
     }
 
     function refresh(){
-      const st=cur();const courses=flat();
+      const st=S.students.find(s=>s.id===S.cur)||S.students[0];
+      if(!st) return;
+      const courses=flat();
       const groups=[];S.struct.forEach(d=>d.g.forEach(g=>groups.push(g.c)));
       const aggAll=agg(st,courses),mxAll=maxes(courses);
       const everyone=S.students.map(s=>agg(s,courses));
@@ -831,10 +895,18 @@ td.side .sc{text-align:center;margin-top:10px}
       if(sel) sel.innerHTML=S.students.map((s,i)=>`<option value="${s.id}"${s.id===S.cur?' selected':''}>${esc(s.eleve||('Élève '+(i+1)))}</option>`).join('');
     }
 
-    window.loadStudentToBulletinInstance = function(studentObj, schoolObj) {
+    window.loadStudentToBulletinInstance = function(studentObj, schoolObj, classeName) {
       S.school.ecole = schoolObj.name;
       S.school.province = schoolObj.province;
+      S.school.classe = classeName;
       if(schoolObj.logo) S.school.logo = schoolObj.logo;
+
+      // Récupération automatique des cours et structures configurés pour cette classe
+      if(schoolObj.classesConfig && schoolObj.classesConfig[classeName]) {
+          S.struct = schoolObj.classesConfig[classeName];
+      } else {
+          S.struct = []; // Vierge si aucun cours configuré pour la classe
+      }
 
       let found = S.students.find(s => s.id === studentObj.id);
       if(!found) {
@@ -853,23 +925,23 @@ td.side .sc{text-align:center;margin-top:10px}
         found.notes = studentObj.notes || {};
       }
       S.cur = studentObj.id;
-      save();
       render();
     };
 
     document.addEventListener('input',e=>{
-      const t=e.target,st=cur();
+      const t=e.target,st=S.students.find(s=>s.id===S.cur);
+      if(!st) return;
       if(t.matches('input.sc')){
         const c=findCourse(t.dataset.cid);if(!c)return;
         const k=t.dataset.k;let v=t.value.replace(',','.');
-        (st.notes[c.id]=st.notes[c.id]||{})[k]=v;save();refresh();
+        (st.notes[c.id]=st.notes[c.id]||{})[k]=v;
+        saveData(); // Synchronisation globale
+        refresh();
       }
     });
 
     const stsel = document.getElementById('stsel');
-    if(stsel) stsel.addEventListener('change',e=>{S.cur=e.target.value;save();render();});
-    const addSt = document.getElementById('addSt');
-    if(addSt) addSt.addEventListener('click',()=>{const s=newSt();S.students.push(s);S.cur=s.id;save();render();});
+    if(stsel) stsel.addEventListener('change',e=>{S.cur=e.target.value;render();});
     const editBtn = document.getElementById('editBtn');
     if(editBtn) editBtn.addEventListener('click',e=>{document.body.classList.toggle('edit');render();});
     const printBtn = document.getElementById('printBtn');
