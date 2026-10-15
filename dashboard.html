@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <title>EDU-RDC - Tableau de Bord Administratif</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+   <!-- Navigation Principale Harmonisée -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+    <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+        <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a href="index.html" class="nav-item nav-link">Accueil</a>
+            <a href="about.html" class="nav-item nav-link">À propos</a>
+            <a href="courses.html" class="nav-item nav-link">Établissements</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                <div class="dropdown-menu fade-down m-0">
+                    <a href="team.html" class="dropdown-item">Notre Équipe</a>
+                    <a href="testimonial.html" class="dropdown-item">Témoignages</a>
+                    <a href="404.html" class="dropdown-item">Page 404</a>
+                </div>
+            </div>
+            <a href="contact.html" class="nav-item nav-link">Contact</a>
+        </div>
+        <a href="login.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
+    </div>
+</nav>
+
+
+
+    <!-- Dashboard Content Start -->
+    <div class="container-fluid py-5">
+        <div class="container">
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-primary fw-bold mb-1">Tableau de Bord Administratif</h2>
+                    <p class="text-muted mb-0">Ministère de l'Éducation Nationale et Nouvelle Citoyenneté (EDU-NC)</p>
+                </div>
+                <span class="badge bg-success p-2 fs-6"><i class="fa fa-check-circle me-1"></i> Session Ouverte</span>
+            </div>
+
+            <!-- Stats Cards Row -->
+            <div class="row g-4 mb-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="bg-light p-4 rounded shadow-sm border-start border-4 border-primary">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase mb-1">Provinces Éduc.</h6>
+                                <h2 class="fw-bold mb-0">26</h2>
+                            </div>
+                            <i class="fa fa-map-marked-alt fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="bg-light p-4 rounded shadow-sm border-start border-4 border-success">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase mb-1">Écoles Enregistrées</h6>
+                                <h2 class="fw-bold mb-0">18 450</h2>
+                            </div>
+                            <i class="fa fa-school fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="bg-light p-4 rounded shadow-sm border-start border-4 border-warning">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase mb-1">Total Élèves</h6>
+                                <h2 class="fw-bold mb-0">2.4M</h2>
+                            </div>
+                            <i class="fa fa-user-graduate fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="bg-light p-4 rounded shadow-sm border-start border-4 border-info">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase mb-1">Enseignants Matriculés</h6>
+                                <h2 class="fw-bold mb-0">145 200</h2>
+                            </div>
+                            <i class="fa fa-chalkboard-teacher fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="bg-light p-4 rounded shadow-sm">
+                <h4 class="mb-4 text-primary"><i class="fa fa-list me-2"></i>Rapport Récent par Division Provinciale</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Code Province</th>
+                                <th>Province Éducationnelle</th>
+                                <th>Écoles Homologuées</th>
+                                <th>Effectif Élèves</th>
+                                <th>Taux de Couverture</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>PROV-01</strong></td>
+                                <td>Kinshasa - Lukunga</td>
+                                <td>1 250</td>
+                                <td>340 000</td>
+                                <td>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 95%"></div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-success">Conforme</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROV-02</strong></td>
+                                <td>Haut-Katanga 1 (Lubumbashi)</td>
+                                <td>980</td>
+                                <td>280 000</td>
+                                <td>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 88%"></div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-success">Conforme</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROV-03</strong></td>
+                                <td>Kasaï Oriental 1 (Mbuji-Mayi)</td>
+                                <td>740</td>
+                                <td>195 000</td>
+                                <td>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 72%"></div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-warning text-dark">En Audit</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROV-04</strong></td>
+                                <td>Kongo Central 1 (Matadi)</td>
+                                <td>620</td>
+                                <td>160 000</td>
+                                <td>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 91%"></div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-success">Conforme</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dashboard Content End -->
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-light footer pt-3 mt-5">
+        <div class="container text-center py-3">
+            <p class="mb-0">&copy; <a class="border-bottom" href="#">EDU-RDC</a> - Ministère de l'Éducation Nationale. Tous Droits Réservés.</p>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+

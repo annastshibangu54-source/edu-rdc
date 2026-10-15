@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <title>EDU-RDC - Générateur de Cartes & QR Code</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- qrcode.js Library pour la génération dynamique des QR Codes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        .id-card {
+            width: 100%;
+            max-width: 420px;
+            height: 250px;
+            background: linear-gradient(135deg, #06BBCC 0%, #0a58ca 100%);
+            border-radius: 15px;
+            color: white;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            margin: 0 auto;
+        }
+        .id-card header {
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar Harmonisée -->
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
+        </a>
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                <a href="index.html" class="nav-item nav-link">Accueil</a>
+                <a href="dashboard.html" class="nav-item nav-link">Tableau de Bord</a>
+                <a href="qrcode.html" class="nav-item nav-link active">Générateur QR</a>
+                <a href="contact.html" class="nav-item nav-link">Contact</a>
+            </div>
+            <a href="login.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
+        </div>
+    </nav>
+    <!-- Navbar End -->
+
+    <!-- Header Start -->
+    <div class="container-fluid bg-primary py-5 mb-5 page-header">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 text-center">
+                    <h1 class="display-3 text-white animated slideInDown">Module de Certification</h1>
+                    <p class="fs-4 text-white animated slideInDown">Génération de cartes d'identification sécurisées par QR Code</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Header End -->
+
+    <!-- Form & Preview Section Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row g-5">
+                <!-- Formulaire de Saisie -->
+                <div class="col-lg-6">
+                    <div class="bg-light p-5 rounded shadow-sm">
+                        <h3 class="mb-4 text-primary"><i class="fa fa-id-card me-2"></i>Informations de la Carte</h3>
+                        <form id="cardForm">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="cardType" required>
+                                    <option value="ÉLÈVE" selected>Carte d'Élève</option>
+                                    <option value="ENSEIGNANT">Carte d'Enseignant / Matriculé</option>
+                                    <option value="INSPECTEUR">Carte d'Inspecteur / Administratif</option>
+                                </select>
+                                <label for="cardType">Type de Carte</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="fullName" placeholder="Nom complet" required>
+                                <label for="fullName">Nom Complet</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="matriculeID" placeholder="Matricule / ID" required>
+                                <label for="matriculeID">Numéro Matricule ou ID Unique</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="schoolName" placeholder="Établissement ou Province" required>
+                                <label for="schoolName">Établissement / Province Éduc.</label>
+                            </div>
+                            <button type="button" onclick="generateQRCodeCard()" class="btn btn-primary w-100 py-3 fw-bold">
+                                <i class="fa fa-qrcode me-2"></i>Générer le QR Code & la Carte
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Aperçu Visuel de la Carte -->
+                <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center">
+                    <h4 class="mb-4 text-muted">Aperçu Officiel de la Carte</h4>
+                    
+                    <!-- Modèle de Carte Virtuelle -->
+                    <div class="id-card" id="cardPreview">
+                        <header class="d-flex justify-content-between align-items-center">
+                            <span>MINISTÈRE DE L'ÉDUCATION NATIONALE</span>
+                            <span class="badge bg-light text-dark" id="badgeType">ÉLÈVE</span>
+                        </header>
+                        <div class="row align-items-center">
+                            <div class="col-8">
+                                <h5 class="text-white fw-bold mb-1" id="previewName">Nom Prénom</h5>
+                                <p class="mb-1 small text-white-55">Matricule : <span id="previewMatricule" class="text-white fw-bold">---</span></p>
+                                <p class="mb-0 small text-white-55">Rattaché à : <span id="previewSchool" class="text-white">---</span></p>
+                                <div class="mt-2 text-warning small"><i class="fa fa-check-circle me-1"></i>Certifié EDU-RDC</div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <!-- Conteneur du QR Code généré dynamiquement -->
+                                <div id="qrcode" class="bg-white p-1 rounded d-inline-block"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="window.print()" class="btn btn-outline-primary mt-4 py-2 px-4">
+                        <i class="fa fa-print me-2"></i>Imprimer ou Télécharger en PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Form & Preview Section End -->
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-light footer pt-3 mt-5">
+        <div class="container text-center py-3">
+            <p class="mb-0">&copy; <a class="border-bottom" href="#">EDU-RDC</a> - République Démocratique du Congo. Tous Droits Réservés.</p>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- JavaScript Logique de Génération QR Code -->
+    <script>
+        function generateQRCodeCard() {
+            // Récupération des valeurs du formulaire
+            const type = document.getElementById('cardType').value;
+            const name = document.getElementById('fullName').value || 'Nom Prénom';
+            const matricule = document.getElementById('matriculeID').value || 'ID-00000';
+            const school = document.getElementById('schoolName').value || 'Établissement RDC';
+
+            // Mise à jour de l'aperçu visuel
+            document.getElementById('badgeType').innerText = type;
+            document.getElementById('previewName').innerText = name;
+            document.getElementById('previewMatricule').innerText = matricule;
+            document.getElementById('previewSchool').innerText = school;
+
+            // Données encodées dans le QR Code (Vérification officielle)
+            const qrData = `EDU-RDC VERIFICATION\nType: ${type}\nNom: ${name}\nMatricule: ${matricule}\nOrg: ${school}`;
+
+            // Nettoyage et regénération du QR Code
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = "";
+            
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 90,
+                height: 90,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        // Génération automatique par défaut au chargement de la page
+        window.onload = function() {
+            document.getElementById('fullName').value = "Christian Ilunga";
+            document.getElementById('matriculeID').value = "KIN/2026/9842";
+            document.getElementById('schoolName').value = "Institut de la Gombe";
+            generateQRCodeCard();
+        };
+    </script>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
+
