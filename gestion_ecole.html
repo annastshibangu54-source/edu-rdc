@@ -363,7 +363,7 @@ td.side .sc{text-align:center;margin-top:10px}
 
     <!-- MOTEUR DE GESTION MULTI-ÉCOLES & PERSISTANCE COMPLÈTE -->
     <script>
-        const STORAGE_KEY = "EDURDC_PLATFORM_DATA_V8";
+        const STORAGE_KEY = "EDURDC_PLATFORM_DATA_V9";
         let appData = { currentUserMatricule: null, schools: [] };
 
         window.onload = function() {
@@ -479,7 +479,9 @@ td.side .sc{text-align:center;margin-top:10px}
             const container = document.getElementById('userSchoolsContainer');
             container.innerHTML = "";
             const isAdmin = (appData.currentUserMatricule === "ADMIN");
-            const mySchools = isAdmin ? appData.schools : appData.schools.filter(s => s.owner === appData.currentUserMatricule);
+            
+            // Affichage de TOUTES les écoles enregistrées sans restriction
+            const mySchools = appData.schools;
 
             if(mySchools.length === 0) {
                 container.innerHTML = `<div class="col-12"><div class="alert alert-secondary">Aucun établissement disponible.</div></div>`;
@@ -494,7 +496,7 @@ td.side .sc{text-align:center;margin-top:10px}
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="m-0 text-primary fw-bold">${s.name}</h5>
-                                    <small class="text-muted">Province : ${s.province} ${isAdmin ? '(Propriétaire: '+s.owner+')' : ''}</small>
+                                    <small class="text-muted">Province : ${s.province} (Propriétaire: ${s.owner || 'N/A'})</small>
                                 </div>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-outline-primary btn-sm" onclick="showSchoolForm('${s.id}')"><i class="fa fa-edit"></i> Modifier</button>
@@ -780,9 +782,6 @@ td.side .sc{text-align:center;margin-top:10px}
         cur: null
     };
 
-    let activeSchoolContext = null;
-    let activeClasseContext = null;
-
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const KEYS=['p1','p2','e1','t1','p3','p4','e2','t2','tg'];
     const FAC={p1:1,p2:1,e1:2,t1:4,p3:1,p4:1,e2:2,t2:4,tg:8};
@@ -797,17 +796,13 @@ td.side .sc{text-align:center;margin-top:10px}
       const o=st.notes[cid]||{};
       const p1=num(o.p1), p2=num(o.p2), e1=num(o.e1);
       const p3=num(o.p3), p4=num(o.p4), e2=num(o.e2);
-      // Total 1er Semestre = P1 + P2 + Examen 1
       const t1 = sm([p1, p2, e1]);
-      // Total 2e Semestre = P3 + P4 + Examen 2
       const t2 = sm([p3, p4, e2]);
-      // Total Général Annuel = Total 1er S. + Total 2e S.
       const tg = sm([t1, t2]);
       return {p1, p2, e1, t1, p3, p4, e2, t2, tg};
     }
     function agg(st,courses){const r={};KEYS.forEach(k=>r[k]=sm(courses.map(c=>cv(st,c.id)[k])));return r;}
     
-    // Maxima officiels RDC par période et examens
     function maxes(courses){
       const b=courses.reduce((a,c)=>a+Number(c.max||0),0);
       return {
@@ -899,8 +894,6 @@ td.side .sc{text-align:center;margin-top:10px}
       const courses=flat();
       const groups=[];S.struct.forEach(d=>d.g.forEach(g=>groups.push(g.c)));
       const aggAll=agg(st,courses), mxAll=maxes(courses);
-      
-      // Calcul du classement officiel de la classe
       const everyone = S.students.map(s => agg(s, courses));
       
       document.querySelectorAll('[data-sc]').forEach(el=>{
@@ -932,14 +925,12 @@ td.side .sc{text-align:center;margin-top:10px}
       S.school.classe = classeName;
       if(schoolObj.logo) S.school.logo = schoolObj.logo;
 
-      // Synchronisation des cours configurés pour cette classe spécifique
       if(schoolObj.classesConfig && schoolObj.classesConfig[classeName]) {
           S.struct = schoolObj.classesConfig[classeName];
       } else {
           S.struct = [];
       }
 
-      // Récupération de tous les élèves de la même classe pour le calcul des rangs (classement)
       if(schoolObj.students) {
           S.students = schoolObj.students.filter(s => s.classe === classeName);
       }
@@ -963,7 +954,6 @@ td.side .sc{text-align:center;margin-top:10px}
         const k=t.dataset.k; let v=t.value.replace(',','.');
         (st.notes[c.id]=st.notes[c.id]||{})[k]=v;
         
-        // Sauvegarde immédiate dans l'objet global et persistance localStorage
         if(window.activeSchoolId) {
             const school = appData.schools.find(sc => sc.id === window.activeSchoolId);
             if(school) {
