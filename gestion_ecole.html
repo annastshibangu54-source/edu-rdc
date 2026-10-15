@@ -361,9 +361,9 @@ td.side .sc{text-align:center;margin-top:10px}
 
     </div>
 
-    <!-- MOTEUR DE GESTION MULTI-ÉCOLES & CRUD -->
+    <!-- MOTEUR DE GESTION MULTI-ÉCOLES & PERSISTANCE COMPLÈTE -->
     <script>
-        const STORAGE_KEY = "EDURDC_PLATFORM_DATA_V7";
+        const STORAGE_KEY = "EDURDC_PLATFORM_DATA_V8";
         let appData = { currentUserMatricule: null, schools: [] };
 
         window.onload = function() {
@@ -444,7 +444,7 @@ td.side .sc{text-align:center;margin-top:10px}
                         secrCode: code,
                         logo: logoBase64 || '',
                         students: [],
-                        classesConfig: {} // Stocke les cours et structures par classe
+                        classesConfig: {}
                     };
                     appData.schools.push(newSchool);
                     alert("École créée avec succès !");
@@ -521,7 +521,7 @@ td.side .sc{text-align:center;margin-top:10px}
             else { openSchool(appData.schools[0].id); }
         }
 
-        // Inscription (Enregistrer, Modifier, Supprimer)
+        // Inscription (Enregistrer, Modifier, Supprimer) avec persistance
         function handleSaveStudent(e) {
             e.preventDefault();
             const school = appData.schools.find(s => s.id === activeSchoolId);
@@ -576,6 +576,7 @@ td.side .sc{text-align:center;margin-top:10px}
             const school = appData.schools.find(s => s.id === activeSchoolId);
             const classe = document.getElementById('regClass').value;
             const tbody = document.getElementById('studentListBody');
+            if(!school) return;
             const filtered = school.students.filter(s => s.classe === classe);
 
             if(filtered.length === 0) {
@@ -602,6 +603,7 @@ td.side .sc{text-align:center;margin-top:10px}
             const school = appData.schools.find(s => s.id === activeSchoolId);
             const classe = document.getElementById('cotesClassSelect').value;
             const select = document.getElementById('cotesStudentSelect');
+            if(!school) return;
             const filtered = school.students.filter(s => s.classe === classe);
 
             if(filtered.length === 0) {
@@ -619,7 +621,6 @@ td.side .sc{text-align:center;margin-top:10px}
         function getOrCreateClassStruct(school, classe) {
             if(!school.classesConfig) school.classesConfig = {};
             if(!school.classesConfig[classe]) {
-                // Structure totalement vierge par défaut pour chaque classe
                 school.classesConfig[classe] = [
                     { t: 'DOMAINE DES SCIENCES', g: [{ t: 'Sous-domaine des mathématiques', c: [] }] }
                 ];
@@ -694,7 +695,6 @@ td.side .sc{text-align:center;margin-top:10px}
             const courseMax = prompt("Max pondération du cours (ex: 20) :", "20");
             if(courseMax === null) return;
 
-            // Ajout dans le premier sous-domaine du premier domaine par défaut
             if(struct[0] && struct[0].g[0]) {
                 struct[0].g[0].c.push({
                     id: 'CRS-' + Date.now(),
@@ -743,6 +743,7 @@ td.side .sc{text-align:center;margin-top:10px}
             const school = appData.schools.find(s => s.id === activeSchoolId);
             const classe = document.getElementById('bulletinClassSelect').value;
             const select = document.getElementById('bulletinStudentSelect');
+            if(!school) return;
             const filtered = school.students.filter(s => s.classe === classe);
 
             if(filtered.length === 0) {
@@ -766,7 +767,7 @@ td.side .sc{text-align:center;margin-top:10px}
         }
     </script>
 
-    <!-- VOTRE MOTEUR DE BULLETIN D'ORIGINE INTÉGRÉ & ADAPTÉ -->
+    <!-- MOTEUR DE BULLETIN D'ORIGINE INTÉGRÉ & CALCULS OFFICIELS RDC -->
     <script>
     (function(){
     const uid=()=>Math.random().toString(36).slice(2,9);
@@ -774,10 +775,13 @@ td.side .sc{text-align:center;margin-top:10px}
     
     let S = {
         school: {hdr:['REPUBLIQUE DEMOCRATIQUE DU CONGO','MINISTERE DE L’ENSEIGNEMENT PRIMAIRE, SECONDAIRE','ET PROFESSIONNEL'], province:'',ville:'',commune:'',ecole:'',code:'',classe:'',an1:'26',an2:'27',niveau:'7ème',flag:'',logo:''},
-        struct: [], // Initialement vide pour afficher uniquement les cours configurés par l'utilisateur
+        struct: [], 
         students: [newSt()],
         cur: null
     };
+
+    let activeSchoolContext = null;
+    let activeClasseContext = null;
 
     const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const KEYS=['p1','p2','e1','t1','p3','p4','e2','t2','tg'];
@@ -787,14 +791,31 @@ td.side .sc{text-align:center;margin-top:10px}
     const fmt=x=>String(Math.round(x*10)/10);
     const flat=()=>[].concat(...S.struct.map(d=>[].concat(...d.g.map(g=>g.c))));
     const findCourse=id=>flat().find(c=>c.id===id);
+    
+    // Application rigoureuse des règles de calcul RDC
     function cv(st,cid){
       const o=st.notes[cid]||{};
-      const p1=num(o.p1),p2=num(o.p2),e1=num(o.e1),p3=num(o.p3),p4=num(o.p4),e2=num(o.e2);
-      const t1=sm([p1,p2,e1]),t2=sm([p3,p4,e2]);
-      return{p1,p2,e1,t1,p3,p4,e2,t2,tg:sm([t1,t2])};
+      const p1=num(o.p1), p2=num(o.p2), e1=num(o.e1);
+      const p3=num(o.p3), p4=num(o.p4), e2=num(o.e2);
+      // Total 1er Semestre = P1 + P2 + Examen 1
+      const t1 = sm([p1, p2, e1]);
+      // Total 2e Semestre = P3 + P4 + Examen 2
+      const t2 = sm([p3, p4, e2]);
+      // Total Général Annuel = Total 1er S. + Total 2e S.
+      const tg = sm([t1, t2]);
+      return {p1, p2, e1, t1, p3, p4, e2, t2, tg};
     }
     function agg(st,courses){const r={};KEYS.forEach(k=>r[k]=sm(courses.map(c=>cv(st,c.id)[k])));return r;}
-    function maxes(courses){const b=courses.reduce((a,c)=>a+Number(c.max||0),0);const r={};KEYS.forEach(k=>r[k]=b*FAC[k]);return r;}
+    
+    // Maxima officiels RDC par période et examens
+    function maxes(courses){
+      const b=courses.reduce((a,c)=>a+Number(c.max||0),0);
+      return {
+        p1: b, p2: b, e1: b*2, t1: b*4,
+        p3: b, p4: b, e2: b*2, t2: b*4,
+        tg: b*8
+      };
+    }
 
     const FLAG='<svg viewBox="0 0 90 60"><rect width="90" height="60" fill="#007FFF"/><polygon points="0,46 76,0 90,0 90,14 14,60 0,60" fill="#F7D618"/><polygon points="0,52 83,0 90,0 90,6 7,60 0,60" fill="#CE1021"/><polygon points="14,5 15.88,10.41 21.61,10.53 17.04,13.99 18.7,19.47 14,16.2 9.3,19.47 10.96,13.99 6.39,10.53 12.12,10.41" fill="#F7D618"/></svg>';
     const EMB='<svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="34" ry="26" fill="none" stroke="#666" stroke-dasharray="3 3"/><text x="40" y="34" text-anchor="middle" font-size="11" fill="#666" font-family="Arial">LOGO</text></svg>';
@@ -877,16 +898,26 @@ td.side .sc{text-align:center;margin-top:10px}
       if(!st) return;
       const courses=flat();
       const groups=[];S.struct.forEach(d=>d.g.forEach(g=>groups.push(g.c)));
-      const aggAll=agg(st,courses),mxAll=maxes(courses);
-      const everyone=S.students.map(s=>agg(s,courses));
+      const aggAll=agg(st,courses), mxAll=maxes(courses);
+      
+      // Calcul du classement officiel de la classe
+      const everyone = S.students.map(s => agg(s, courses));
+      
       document.querySelectorAll('[data-sc]').forEach(el=>{
-        const s=el.dataset.sc,k=el.dataset.k;let v=null;
-        if(s.startsWith('c:'))v=cv(st,s.slice(2))[k];
-        else if(s.startsWith('g:'))v=agg(st,groups[+s.slice(2)]||[])[k];
-        else if(s==='all')v=aggAll[k];
-        else if(s==='pct'){v=(aggAll[k]==null||!mxAll[k])?null:fmt(aggAll[k]/mxAll[k]*100)+' %';}
-        else if(s==='rank'){if(aggAll[k]!=null){const r=1+everyone.filter(a=>a[k]!=null&&a[k]>aggAll[k]).length;v=r+'/'+S.students.length;}}
-        el.textContent=v==null?'':v;
+        const s=el.dataset.sc, k=el.dataset.k; let v=null;
+        if(s.startsWith('c:')) v=cv(st,s.slice(2))[k];
+        else if(s.startsWith('g:')) v=agg(st,groups[+s.slice(2)]||[])[k];
+        else if(s==='all') v=aggAll[k];
+        else if(s==='pct'){
+            v = (aggAll[k]==null || !mxAll[k]) ? null : fmt((aggAll[k] / mxAll[k]) * 100) + ' %';
+        }
+        else if(s==='rank'){
+            if(aggAll[k]!=null && mxAll[k]){
+                const r = 1 + everyone.filter(a => a[k]!=null && a[k] > aggAll[k]).length;
+                v = r + '/' + S.students.length;
+            }
+        }
+        el.textContent = v == null ? '' : v;
       });
     }
 
@@ -901,41 +932,46 @@ td.side .sc{text-align:center;margin-top:10px}
       S.school.classe = classeName;
       if(schoolObj.logo) S.school.logo = schoolObj.logo;
 
-      // Récupération automatique des cours et structures configurés pour cette classe
+      // Synchronisation des cours configurés pour cette classe spécifique
       if(schoolObj.classesConfig && schoolObj.classesConfig[classeName]) {
           S.struct = schoolObj.classesConfig[classeName];
       } else {
-          S.struct = []; // Vierge si aucun cours configuré pour la classe
+          S.struct = [];
+      }
+
+      // Récupération de tous les élèves de la même classe pour le calcul des rangs (classement)
+      if(schoolObj.students) {
+          S.students = schoolObj.students.filter(s => s.classe === classeName);
+      }
+      if(S.students.length === 0) {
+          S.students = [studentObj];
       }
 
       let found = S.students.find(s => s.id === studentObj.id);
       if(!found) {
-        S.students.push({
-          id: studentObj.id,
-          idn: '',
-          eleve: studentObj.name,
-          sexe: studentObj.sexe,
-          nea: '', nele: '', perm: studentObj.matricule, rep: '',
-          notes: studentObj.notes || {}, app: {}, cond: {}, strk: {}
-        });
-      } else {
-        found.eleve = studentObj.name;
-        found.sexe = studentObj.sexe;
-        found.perm = studentObj.matricule;
-        found.notes = studentObj.notes || {};
+        S.students.push(studentObj);
       }
       S.cur = studentObj.id;
       render();
     };
 
     document.addEventListener('input',e=>{
-      const t=e.target,st=S.students.find(s=>s.id===S.cur);
+      const t=e.target, st=S.students.find(s=>s.id===S.cur);
       if(!st) return;
       if(t.matches('input.sc')){
-        const c=findCourse(t.dataset.cid);if(!c)return;
-        const k=t.dataset.k;let v=t.value.replace(',','.');
+        const c=findCourse(t.dataset.cid); if(!c) return;
+        const k=t.dataset.k; let v=t.value.replace(',','.');
         (st.notes[c.id]=st.notes[c.id]||{})[k]=v;
-        saveData(); // Synchronisation globale
+        
+        // Sauvegarde immédiate dans l'objet global et persistance localStorage
+        if(window.activeSchoolId) {
+            const school = appData.schools.find(sc => sc.id === window.activeSchoolId);
+            if(school) {
+                const targetSt = school.students.find(s => s.id === st.id);
+                if(targetSt) targetSt.notes = st.notes;
+                saveData();
+            }
+        }
         refresh();
       }
     });
