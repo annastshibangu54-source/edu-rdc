@@ -3,407 +3,688 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bulletin CTEB</title>
+<title>EDU-RDC - Plateforme Intégrée de Gestion Scolaire</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#e5e7eb;font-family:Arial,Helvetica,sans-serif;color:#000}
+body{margin:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#1f2937}
+
+/* Barre de sélection globale de l'École active */
+.global-school-bar{background:#0f172a;color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.global-school-bar select{padding:6px 10px;border-radius:4px;border:0;background:#334155;color:#fff;font-weight:bold}
+
+/* Navigation principale */
+.nav-tabs{background:#1e293b;color:#fff;display:flex;gap:4px;padding:8px 12px 0 12px;overflow-x:auto;border-bottom:3px solid #2563eb}
+.tab-btn{background:#334155;color:#cbd5e1;border:0;padding:10px 16px;border-radius:6px 6px 0 0;cursor:pointer;font-weight:bold;font-size:13px;transition:all .2s}
+.tab-btn.active{background:#2563eb;color:#fff}
+.tab-btn:hover:not(.active){background:#475569;color:#fff}
+
+/* Conteneurs de section */
+.container{max-width:1100px;margin:20px auto;padding:0 12px}
+.card{background:#fff;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.1);margin-bottom:20px}
+.card-title{font-size:18px;font-weight:bold;margin-bottom:15px;color:#0f172a;border-bottom:2px solid #e2e8f0;padding-bottom:8px}
+
+/* Formulaires */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12px;font-weight:bold;color:#475569}
+.form-group input,.form-group select{padding:8px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px}
+
+/* Boutons */
+.btn{padding:8px 14px;border:0;border-radius:6px;cursor:pointer;font-weight:bold;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-success{background:#16a34a;color:#fff}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-secondary{background:#64748b;color:#fff}
+.btn:hover{opacity:0.9}
+
+/* Tables */
+table.data-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+table.data-table th,table.data-table td{border:1px solid #cbd5e1;padding:8px;text-align:left}
+table.data-table th{background:#f8fafc;font-weight:bold;color:#334155}
+
+/* Styles du Bulletin */
 .bar{position:sticky;top:0;z-index:10;background:#111827;color:#fff;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
-.bar button,.bar select{font:inherit;padding:6px 10px;border-radius:6px;border:0;background:#374151;color:#fff;cursor:pointer;max-width:48vw}
+.bar button,.bar select{font:inherit;padding:6px 10px;border-radius:6px;border:0;background:#374151;color:#fff;cursor:pointer}
 .bar button.on{background:#b45309}
 .bar button.pri{background:#2563eb}
 .bar .sep{width:1px;height:22px;background:#4b5563}
-#hint{max-width:210mm;margin:8px auto 0;padding:8px 12px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;font-size:13px}
-#hint:empty{display:none}
 .wrap{overflow-x:auto;padding:8px}
 .page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:7mm 8mm;font-size:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
-.logo{width:64px;height:50px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.logo{width:64px;height:50px;display:flex;align-items:center;justify-content:center}
 .logo img,.logo svg{max-width:100%;max-height:100%}
 .ht{text-align:center;font-weight:bold;font-size:11.5px;line-height:1.3;flex:1;padding:0 6px}
 .idn{display:inline-block;border:1px solid #000;padding:1px 4px;font-weight:bold;margin:2px 0}
-.idn input{width:160px}
-input{font:inherit;color:#000;border:0;background:transparent;outline:none;border-radius:0}
-input:disabled{cursor:not-allowed}
+.idn input{width:160px;border:0;outline:none}
 table.ident{width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:2px}
 table.ident td{padding:2px 4px;font-size:8.5px;border:0;vertical-align:bottom;white-space:nowrap}
-table.ident input{border-bottom:1px dotted #000;width:62%}
+table.ident input{border:0;border-bottom:1px dotted #000;width:62%;outline:none}
 table.ident input.s{width:12%}
 table.ident input.d{width:30%}
 table.ident input.bx{width:70%;letter-spacing:5px;border:1px solid #000;padding:1px 3px}
 .title{text-align:center;font-weight:bold;font-size:8.5px;border:1px solid #000;padding:2px;margin-bottom:2px}
-.title input{width:2.2em;border-bottom:1px dotted #000;text-align:center;font-weight:bold}
+.title input{width:2.2em;border:0;border-bottom:1px dotted #000;text-align:center;font-weight:bold;outline:none}
 table.b{width:100%;border-collapse:collapse;table-layout:fixed}
 table.b td,table.b th{border:1px solid #000;padding:0 1px;height:13.5px;text-align:center;font-size:8px;line-height:1.1;overflow:hidden}
 table.b th{font-weight:bold}
 table.b td.nm{text-align:left;padding-left:3px;position:relative}
-table.b tr.dom td{font-weight:bold;font-size:8.5px;position:relative}
-table.b tr.sdom td{font-weight:bold;font-size:8px;position:relative}
-table.b tr.sub td{font-weight:bold}
-table.b tr.bold td{font-weight:bold}
+table.b tr.dom td{font-weight:bold;font-size:8.5px}
+table.b tr.sdom td{font-weight:bold;font-size:8px}
+table.b tr.sub td,table.b tr.bold td{font-weight:bold}
 table.b td.blk{background:#000}
 table.b td.gry{background:#d1d5db}
-table.b td.tt{position:relative;font-weight:bold}
-table.b td.tt i{position:absolute;left:1px;top:0;font-size:6px;color:#444;font-style:normal;font-weight:normal}
-table.b td input{width:100%;border:0;text-align:center;padding:0;height:12px;-moz-appearance:textfield}
-table.b td input::-webkit-outer-spin-button,table.b td input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-table.b td input:focus,table.ident input:focus{background:#fff8c5}
+table.b td input{width:100%;border:0;text-align:center;padding:0;height:12px;outline:none}
 table.b td.nm input.nmi{text-align:left;width:calc(100% - 14px)}
-table.b td input.tti{font-weight:bold;text-align:center;width:60%}
-.xb{border:0;background:#dc2626;color:#fff;font-size:10px;line-height:11px;padding:0 4px;border-radius:2px;cursor:pointer;margin-left:4px}
-.del{position:absolute;right:1px;top:1px;width:12px;height:12px;padding:0;line-height:10px;margin:0;font-size:10px}
-.addrow td{text-align:left !important;background:#f3f4f6}
-.addrow button{font-size:10px;padding:2px 8px;cursor:pointer;margin-right:6px}
-td.side{vertical-align:top;text-align:left !important;padding:3px 4px !important;font-size:8px;line-height:1.6}
-td.side .sc{text-align:center;margin-top:10px}
-.strk.on{text-decoration:line-through}
-.foot{margin-top:3px;font-size:8.5px;line-height:1.7}
-.foot .box{border:1px solid #000;padding:2px 4px}
-.foot input.long{width:38%;border-bottom:1px dotted #000}
-.foot .row{display:flex;justify-content:space-between}
-.foot .c{text-align:center}
-.foot .r{text-align:right}
-.note{font-size:8px;margin-top:3px}
-.note .code{float:right}
-.dots{display:inline-block;min-width:60px;border-bottom:1px dotted #000}
-.lb{outline:none}
-[contenteditable]:focus{outline:1px dashed #2563eb;background:#fff8c5}
 @media print{
  @page{size:A4 portrait;margin:6mm}
  body{background:#fff}
- .no-print,.bar,#hint{display:none !important}
+ .no-print,.global-school-bar,.nav-tabs,.container,.bar{display:none !important}
  .wrap{overflow:visible;padding:0}
  .page{box-shadow:none;margin:0;width:auto;padding:0}
- table.b td input:focus,table.ident input:focus,[contenteditable]:focus{background:transparent;outline:none}
- *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 </head>
 <body>
-<div class="bar no-print">
-  <select id="clsel" title="Classe"></select>
-  <button id="addCl">+ Classe</button>
-  <button id="delCl">Suppr. classe</button>
-  <span class="sep"></span>
-  <select id="stsel" title="Élève"></select>
-  <button id="addSt">+ Élève</button>
-  <button id="delSt">Suppr. élève</button>
-  <span class="sep"></span>
-  <button id="editBtn">Cours &amp; pondération</button>
-  <button id="printBtn" class="pri">Imprimer / PDF</button>
-  <button id="expBtn">Exporter</button>
-  <button id="impBtn">Importer</button>
-  <input type="file" id="impFile" accept="application/json" hidden>
-  <input type="file" id="upFile" accept="image/*" hidden>
+
+<!-- Barre globale : Choix de l'École active -->
+<div class="global-school-bar no-print">
+  <div>🏫 <strong>École Active :</strong> <span id="active-school-display">Aucune</span></div>
+  <div>
+    Changer d'école : <select id="global-school-select" onchange="switchActiveSchool(this.value)"></select>
+  </div>
 </div>
-<div id="hint" class="no-print"></div>
-<div class="wrap"><div class="page" id="page"></div></div>
+
+<!-- Barre de navigation des modules -->
+<div class="nav-tabs no-print">
+  <button class="tab-btn active" onclick="showTab('ecole')">1. Création & Gestion Écoles</button>
+  <button class="tab-btn" onclick="showTab('eleves')">2. Classes & Inscription Élèves</button>
+  <button class="tab-btn" onclick="showTab('cours')">3. Cours & Pondérations</button>
+  <button class="tab-btn" onclick="showTab('bulletin')">4. Générateur de Bulletin</button>
+</div>
+
+<div class="container no-print">
+  
+  <!-- TAB 1 : CRÉATION ÉCOLE -->
+  <div id="tab-ecole" class="card">
+    <div class="card-title">Enregistrer / Créer une Nouvelle École</div>
+    <form id="school-form" class="form-grid" onsubmit="event.preventDefault(); createSchool();">
+      <div class="form-group">
+        <label>Nom de l'École :</label>
+        <input type="text" id="sc-name" placeholder="Ex: CS Les Anges" required>
+      </div>
+      <div class="form-group">
+        <label>Code École :</label>
+        <input type="text" id="sc-code" placeholder="Ex: 100234">
+      </div>
+      <div class="form-group">
+        <label>Province :</label>
+        <input type="text" id="sc-prov" placeholder="Ex: Kinshasa">
+      </div>
+      <div class="form-group">
+        <label>Ville / District :</label>
+        <input type="text" id="sc-ville" placeholder="Ex: Kinshasa">
+      </div>
+      <div class="form-group">
+        <label>Commune / Territoire :</label>
+        <input type="text" id="sc-comm" placeholder="Ex: Kalamu">
+      </div>
+    </form>
+    <div style="margin-top:15px">
+      <button class="btn btn-primary" onclick="createSchool()">+ Enregistrer cette École</button>
+    </div>
+
+    <div style="margin-top:30px">
+      <h3>Liste des Écoles Enregistrées</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Nom de l'École</th><th>Code</th><th>Province</th><th>Commune</th><th>Action</th></tr>
+        </thead>
+        <tbody id="schools-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 2 : CLASSES & ÉLÈVES -->
+  <div id="tab-eleves" class="card" style="display:none">
+    <div class="card-title">Gestion des Classes et Inscription des Élèves (École active)</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Niveau de classe prédéfini :</label>
+        <select id="preset-level" onchange="document.getElementById('cl-name').value=this.value">
+          <option value="">-- Choisir un niveau --</option>
+          <optgroup label="Maternelle">
+            <option value="Maternelle 1">Maternelle 1</option>
+            <option value="Maternelle 2">Maternelle 2</option>
+            <option value="Maternelle 3">Maternelle 3</option>
+          </optgroup>
+          <optgroup label="Primaire">
+            <option value="Primaire 1">Primaire 1</option>
+            <option value="Primaire 2">Primaire 2</option>
+            <option value="Primaire 3">Primaire 3</option>
+            <option value="Primaire 4">Primaire 4</option>
+            <option value="Primaire 5">Primaire 5</option>
+            <option value="Primaire 6">Primaire 6</option>
+          </optgroup>
+          <optgroup label="Secondaire (EB)">
+            <option value="7ème EB">Secondaire 7ème (EB)</option>
+            <option value="8ème EB">Secondaire 8ème (EB)</option>
+          </optgroup>
+          <optgroup label="Humanités">
+            <option value="3ème Humanités">Humanités 3ème</option>
+            <option value="4ème Humanités">Humanités 4ème</option>
+            <option value="5ème Humanités">Humanités 5ème</option>
+            <option value="6ème Humanités">Humanités 6ème</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nom exact de la classe :</label>
+        <input type="text" id="cl-name" placeholder="Ex: 7ème EB A">
+      </div>
+      <div class="form-group">
+        <label>Année Scolaire :</label>
+        <input type="text" id="cl-year" placeholder="Ex: 2025-2026">
+      </div>
+    </div>
+    <button class="btn btn-success" style="margin-top:10px" onclick="addClass()">+ Créer la classe</button>
+
+    <hr style="margin:20px 0;border:0;border-top:1px solid #e2e8f0">
+
+    <div class="card-title">Inscrire un Élève (ou plusieurs)</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Sélectionner la classe :</label>
+        <select id="sel-class-student" onchange="renderStudentList()"></select>
+      </div>
+      <div class="form-group">
+        <label>Nom(s) de l'élève (séparer par point-virgule `;`) :</label>
+        <input type="text" id="st-names" placeholder="Ex: KABONGO Jean; MUKENDI Marie">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:10px" onclick="addStudents()">Inscrire l'Élève / les Élèves</button>
+
+    <table class="data-table" style="margin-top:15px">
+      <thead>
+        <tr><th>Élève</th><th>Sexe</th><th>N° Permanent</th><th>Action</th></tr>
+      </thead>
+      <tbody id="student-table-body">
+        <tr><td colspan="4" style="text-align:center;color:#64748b">Aucune classe sélectionnée ou vide.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TAB 3 : COURS ET PONDÉRATIONS -->
+  <div id="tab-cours" class="card" style="display:none">
+    <div class="card-title">Saisie des Cours et Pondérations par Classe</div>
+    <div class="form-group" style="max-width:300px;margin-bottom:15px">
+      <label>Classe à configurer :</label>
+      <select id="sel-class-course" onchange="renderCourseConfig()"></select>
+    </div>
+    <div id="course-config-area"></div>
+  </div>
+
+</div>
+
+<!-- TAB 4 : BULLETIN -->
+<div id="tab-bulletin" style="display:none">
+  <div class="bar no-print">
+    <select id="clsel" title="Classe" onchange="updateBulletinStudents()"></select>
+    <select id="stsel" title="Élève" onchange="renderBulletin()"></select>
+    <span class="sep"></span>
+    <button class="pri" onclick="window.print()">Imprimer / PDF</button>
+  </div>
+  <div class="wrap"><div class="page" id="page"></div></div>
+</div>
 
 <script>
-(function(){
-const KEY='bulletin_cteb_v3';
+const KEY='edurdc_multischool_db_v1';
 const uid=()=>Math.random().toString(36).slice(2,9);
-const newSt=()=>({id:uid(),idn:'',eleve:'',sexe:'',nea:'',nele:'',perm:'',rep:'',notes:{},app:{},cond:{},strk:{}});
-const emptyStruct=()=>[];
-const VIRGIN={name:'',niveau:'',an1:'',an2:'',struct:emptyStruct(),students:[]};
-const DUMMY=newSt();
-function defaults(){return{
-  school:{hdr:['REPUBLIQUE DEMOCRATIQUE DU CONGO','MINISTERE DE L’ENSEIGNEMENT PRIMAIRE, SECONDAIRE','ET PROFESSIONNEL'],
-    province:'',ville:'',commune:'',ecole:'',code:'',flag:'',logo:''},
-  labels:{},classes:[],cc:null};}
-function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.classes&&o.school)return o;}}catch(e){}return defaults();}
-let S=load();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-const curC=()=>S.classes.find(c=>c.id===S.cc)||S.classes[0]||null;
-const curS=()=>{const c=curC();if(!c)return null;return c.students.find(s=>s.id===c.cs)||c.students[0]||null;};
 
-const LD={
- brn:'BRANCHE',s1:'PREMIER SEMESTRE',s2:'SECOND SEMESTRE',tg:'T.G.',rep:'EXAMEN DE\nREPECHAGE',
- mx:'MAX',trj:'TRAVAUX\nJOURNAL',mxe:'MAX\nEXAMEN',exa:'EXAMEN',tot:'TOT',
- p1:'1ère P',p2:'2ème P',p3:'3ème P',p4:'4ème P',pc:'%',sgp:'Sign. Prof',
- sub:'SOUS-TOTAL',mxg:'MAXIMA GENERAUX',tots:'TOTAUX',pct:'POURCENTAGE',plc:'PLACE/NBRE D’ELEVES',
- app:'APPLICATION',cnd:'CONDUITE',sig:'SIGNATURE',
- lid:'N° ID',lpr:'PROVINCE',lvi:'VILLE',lel:'ELEVE',lsx:'SEXE',lco:'COMMUNE / TER (1)',lne:'NE (E) A',lle:'Le',
- lec:'ECOLE',lcl:'CLASSE',lcd:'CODE',lpm:'N° PERM.',
- t1:'BULLETIN DE LA',t2:'ANNEE CYCLE TERMINAL DE L’EDUCATION DE BASE (CTEB) ANNEE SCOLAIRE 2 0',t3:'2 0',
- passe:'PASSE',double:'DOUBLE',le:'LE',chef:'Le chef d’Etablissement',sceau:'Sceau de l’école',
- f1:'L’élève ne pourra passer dans la classe supérieure (1) s’il n’a subi avec succès un examen de repêchage en',
- f2:'L’élève passe dans la classe supérieure (1)',f3:'L’élève double la classe (1)',
- fait:'Fait à',le2:', le',chef2:'Le Chef d’Etablissement',sceau2:'Sceau de l’école',
- sigel:'Signature de l’élève',nomsig:'Nom et Signature',biff:'(1) Biffer la mention inutile',
- imp:'Note importante : Le Bulletin est sans valeur s’il est raturé ou surchargé',code2:'IDE/P.S./010'
-};
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const L=k=>{const t=(S.labels[k]!=null)?S.labels[k]:LD[k];return `<span class="lb" contenteditable="true" spellcheck="false" data-lbl="${k}">${esc(t).replace(/\n/g,'<br>')}</span>`;};
+let DB = loadDB();
 
-const KEYS=['p1','p2','e1','t1','p3','p4','e2','t2','tg'];
-const FAC={p1:1,p2:1,e1:2,t1:4,p3:1,p4:1,e2:2,t2:4,tg:8};
-const num=v=>(v===''||v==null||isNaN(+v))?null:+v;
-const sm=a=>{const f=a.filter(x=>x!=null);return f.length?f.reduce((x,y)=>x+y,0):null;};
-const fmt=x=>String(Math.round(x*10)/10);
-const flat=c=>[].concat(...c.struct.map(d=>[].concat(...d.g.map(g=>g.c))));
-const findCourse=id=>{const c=curC();return c?flat(c).find(x=>x.id===id):null;};
-function cv(st,cid){
-  const o=st.notes[cid]||{};
-  const p1=num(o.p1),p2=num(o.p2),e1=num(o.e1),p3=num(o.p3),p4=num(o.p4),e2=num(o.e2);
-  const t1=sm([p1,p2,e1]),t2=sm([p3,p4,e2]);
-  return{p1,p2,e1,t1,p3,p4,e2,t2,tg:sm([t1,t2])};
+function defaults(){
+  return {
+    schools: [],
+    activeSchoolId: null
+  };
 }
-function agg(st,courses){const r={};KEYS.forEach(k=>r[k]=sm(courses.map(c=>cv(st,c.id)[k])));return r;}
-function maxes(courses){const b=courses.reduce((a,c)=>a+Number(c.max||0),0);const r={};KEYS.forEach(k=>r[k]=b*FAC[k]);return r;}
 
-const FLAG='<svg viewBox="0 0 90 60"><rect width="90" height="60" fill="#007FFF"/><polygon points="0,46 76,0 90,0 90,14 14,60 0,60" fill="#F7D618"/><polygon points="0,52 83,0 90,0 90,6 7,60 0,60" fill="#CE1021"/><polygon points="14,5 15.88,10.41 21.61,10.53 17.04,13.99 18.7,19.47 14,16.2 9.3,19.47 10.96,13.99 6.39,10.53 12.12,10.41" fill="#F7D618"/></svg>';
-const EMB='<svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="34" ry="26" fill="none" stroke="#666" stroke-dasharray="3 3"/><text x="40" y="34" text-anchor="middle" font-size="11" fill="#666" font-family="Arial">LOGO</text></svg>';
+function loadDB(){
+  try{
+    const r = localStorage.getItem(KEY);
+    if(r) return JSON.parse(r);
+  }catch(e){}
+  return defaults();
+}
 
-function render(){
-  const cls=curC(),stu=curS();
-  const V=cls||VIRGIN,st=stu||DUMMY;
-  const dC=cls?'':'disabled',dS=stu?'':'disabled';
-  const edit=document.body.classList.contains('edit')&&!!cls;
-  const sc=S.school;
-  document.getElementById('hint').innerHTML=!cls?'Bulletin vierge. Commencez par <b>+ Classe</b>, puis ouvrez <b>Cours &amp; pondération</b> pour enregistrer les cours, puis <b>+ Élève</b>.':(!stu?'Classe créée. Ajoutez un élève avec <b>+ Élève</b> pour générer son bulletin.':'');
-  let h='';
-  h+=`<div class="hdr"><div class="logo" data-up="flag" title="Cliquer pour changer l'image">${sc.flag?`<img src="${sc.flag}">`:FLAG}</div>
-  <div class="ht">${sc.hdr.map((t,i)=>`<div contenteditable="true" spellcheck="false" data-h="${i}">${esc(t)}</div>`).join('')}</div>
-  <div class="logo" data-up="logo" title="Cliquer pour changer l'image">${sc.logo?`<img src="${sc.logo}">`:EMB}</div></div>`;
-  h+=`<div class="idn"><b>${L('lid')}</b> <input data-b="t:idn" ${dS} value="${esc(st.idn)}"></div>`;
-  h+=`<table class="ident">
-  <tr><td colspan="2"><b>${L('lpr')}</b> : <input style="width:85%" data-b="s:province" value="${esc(sc.province)}"></td></tr>
-  <tr><td style="width:50%"><b>${L('lvi')}</b> : <input data-b="s:ville" value="${esc(sc.ville)}"></td>
-      <td><b>${L('lel')}</b> : <input style="width:50%" data-b="t:eleve" ${dS} value="${esc(st.eleve)}"> &nbsp;<b>${L('lsx')}</b> : <input class="s" data-b="t:sexe" ${dS} value="${esc(st.sexe)}"></td></tr>
-  <tr><td><b>${L('lco')}</b> : <input style="width:40%" data-b="s:commune" value="${esc(sc.commune)}"></td>
-      <td><b>${L('lne')}</b> : <input style="width:38%" data-b="t:nea" ${dS} value="${esc(st.nea)}"> ${L('lle')} <input class="d" data-b="t:nele" ${dS} value="${esc(st.nele)}" placeholder="..../..../......"></td></tr>
-  <tr><td><b>${L('lec')}</b> : <input data-b="s:ecole" value="${esc(sc.ecole)}"></td>
-      <td><b>${L('lcl')}</b> : <input data-b="c:name" ${dC} value="${esc(V.name)}"></td></tr>
-  <tr><td><b>${L('lcd')}</b> &nbsp;<input class="bx" maxlength="14" data-b="s:code" value="${esc(sc.code)}"></td>
-      <td><b>${L('lpm')}</b> &nbsp;<input class="bx" maxlength="14" data-b="t:perm" ${dS} value="${esc(st.perm)}"></td></tr>
-  </table>
-  <div class="title">${L('t1')} <span contenteditable="true" spellcheck="false" data-niv>${esc(V.niveau)}</span> ${L('t2')} <input maxlength="2" data-b="c:an1" ${dC} value="${esc(V.an1)}"> ${L('t3')} <input maxlength="2" data-b="c:an2" ${dC} value="${esc(V.an2)}"></div>`;
+function saveDB(){
+  localStorage.setItem(KEY, JSON.stringify(DB));
+}
 
-  const bl='<td class="blk"></td>',empty='<td></td>',gry='<td class="gry"></td>';
-  const pr=v=>`<td>${v}</td>`;
-  const prz=v=>v?`<td>${v}</td>`:gry;
-  const gen=(s,k)=>`<td data-sc="${s}" data-k="${k}"></td>`;
-  const tt=(m,s,k)=>`<td class="tt"><i>${m}</i><b data-sc="${s}" data-k="${k}"></b></td>`;
+function getActiveSchool(){
+  return DB.schools.find(s => s.id === DB.activeSchoolId) || null;
+}
 
-  h+='<table class="b"><colgroup><col style="width:14%">'+'<col style="width:5.6%">'.repeat(12)+'<col style="width:5%"><col style="width:6.9%"><col style="width:6.9%"></colgroup><thead>';
-  h+=`<tr><th rowspan="3">${L('brn')}</th><th colspan="6">${L('s1')}</th><th colspan="6">${L('s2')}</th><th rowspan="3">${L('tg')}</th><th colspan="2">${L('rep')}</th></tr>
-  <tr><th rowspan="2">${L('mx')}</th><th colspan="2">${L('trj')}</th><th colspan="2" rowspan="2">${L('mxe')}</th><th rowspan="2">${L('tot')}</th>
-  <th rowspan="2">${L('mx')}</th><th colspan="2">${L('trj')}</th><th colspan="2" rowspan="2">${L('exa')}</th><th rowspan="2">${L('tot')}</th><th rowspan="2">${L('pc')}</th><th rowspan="2">${L('sgp')}</th></tr>
-  <tr><th>${L('p1')}</th><th>${L('p2')}</th><th>${L('p3')}</th><th>${L('p4')}</th></tr></thead><tbody>`;
+// Navigation par Onglets
+function showTab(tabName){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-ecole').style.display='none';
+  document.getElementById('tab-eleves').style.display='none';
+  document.getElementById('tab-cours').style.display='none';
+  document.getElementById('tab-bulletin').style.display='none';
 
-  const courseRow=c=>{
-    const o=st.notes[c.id]||{};const s='c:'+c.id;
-    const inp=k=>`<td><input class="sc" inputmode="decimal" ${dS} data-cid="${c.id}" data-k="${k}" value="${esc(o[k]==null?'':o[k])}"></td>`;
-    const mxc=edit?`<td><input class="mxi" type="number" min="0" data-cid="${c.id}" value="${c.max}"></td>`:pr(c.max);
-    const nm=edit?`<td class="nm"><input class="nmi" data-cid="${c.id}" value="${esc(c.name)}"><button class="xb del no-print" data-cid="${c.id}" title="Supprimer">×</button></td>`:`<td class="nm">${esc(c.name)}</td>`;
-    return `<tr>${nm}${mxc}${inp('p1')}${inp('p2')}${pr(c.max*2)}${inp('e1')}${tt(c.max*4,s,'t1')}${pr(c.max)}${inp('p3')}${inp('p4')}${pr(c.max*2)}${inp('e2')}${tt(c.max*4,s,'t2')}${tt(c.max*8,s,'tg')}${empty}${empty}</tr>`;
+  if(tabName==='ecole'){
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('tab-ecole').style.display='block';
+    renderSchoolsTable();
+  }else if(tabName==='eleves'){
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('tab-eleves').style.display='block';
+    populateClassSelects();
+  }else if(tabName==='cours'){
+    document.querySelectorAll('.tab-btn')[2].classList.add('active');
+    document.getElementById('tab-cours').style.display='block';
+    populateClassSelects();
+  }else if(tabName==='bulletin'){
+    document.querySelectorAll('.tab-btn')[3].classList.add('active');
+    document.getElementById('tab-bulletin').style.display='block';
+    initBulletinTab();
+  }
+}
+
+// 1. Gestion des Écoles
+function createSchool(){
+  const name = document.getElementById('sc-name').value.trim();
+  const code = document.getElementById('sc-code').value.trim();
+  const province = document.getElementById('sc-prov').value.trim();
+  const ville = document.getElementById('sc-ville').value.trim();
+  const commune = document.getElementById('sc-comm').value.trim();
+
+  if(!name){alert('Le nom de l\'école est obligatoire.');return;}
+
+  const newSchool = {
+    id: uid(),
+    name, code, province, ville, commune,
+    classes: []
   };
-  const greyRow=()=>`<tr><td class="nm gry"></td>${gry.repeat(12)}${gry}${empty}${empty}</tr>`;
-  const subRow=(s,courses)=>{
-    if(!courses.length)return `<tr class="sub"><td class="nm">${L('sub')}</td>${gry.repeat(12)}${gry}${empty}${empty}</tr>`;
-    const b=courses.reduce((a,c)=>a+Number(c.max||0),0);
-    return `<tr class="sub"><td class="nm">${L('sub')}</td>${pr(b)}${gen(s,'p1')}${gen(s,'p2')}${pr(b*2)}${gen(s,'e1')}${tt(b*4,s,'t1')}${pr(b)}${gen(s,'p3')}${gen(s,'p4')}${pr(b*2)}${gen(s,'e2')}${tt(b*4,s,'t2')}${tt(b*8,s,'tg')}${empty}${empty}</tr>`;
-  };
 
-  let gi=0;
-  if(V.struct.length===0 && !edit){
-    h+=`<tr><td colspan="16" style="text-align:center;padding:20px;color:#6b7280;font-style:italic;">Aucun cours enregistré. Cliquez sur « Cours &amp; pondération » pour ajouter vos domaines et cours.</td></tr>`;
+  DB.schools.push(newSchool);
+  if(!DB.activeSchoolId) DB.activeSchoolId = newSchool.id;
+  saveDB();
+
+  document.getElementById('school-form').reset();
+  renderGlobalHeader();
+  renderSchoolsTable();
+  alert('École créée avec succès !');
+}
+
+function renderSchoolsTable(){
+  const tbody = document.getElementById('schools-table-body');
+  if(!DB.schools.length){
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b">Aucune école enregistrée.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = DB.schools.map(s=>`
+    <tr>
+      <td><strong>${s.name}</strong> ${s.id===DB.activeSchoolId?'(Active)':''}</td>
+      <td>${s.code||''}</td>
+      <td>${s.province||''}</td>
+      <td>${s.commune||''}</td>
+      <td>
+        <button class="btn btn-primary" style="padding:2px 8px;font-size:11px" onclick="switchActiveSchool('${s.id}')">Définir Active</button>
+        <button class="btn btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteSchool('${s.id}')">Supprimer</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function switchActiveSchool(id){
+  DB.activeSchoolId = id;
+  saveDB();
+  renderGlobalHeader();
+  renderSchoolsTable();
+  alert('École active modifiée !');
+}
+
+function deleteSchool(id){
+  if(confirm('Supprimer cette école et toutes ses données ?')){
+    DB.schools = DB.schools.filter(s=>s.id!==id);
+    if(DB.activeSchoolId===id) DB.activeSchoolId = DB.schools[0]?DB.schools[0].id:null;
+    saveDB();
+    renderGlobalHeader();
+    renderSchoolsTable();
+  }
+}
+
+function renderGlobalHeader(){
+  const select = document.getElementById('global-school-select');
+  const display = document.getElementById('active-school-display');
+  const active = getActiveSchool();
+
+  if(!DB.schools.length){
+    select.innerHTML = '<option>Aucune école</option>';
+    display.textContent = 'Aucune (Veuillez créer une école)';
+    return;
+  }
+
+  select.innerHTML = DB.schools.map(s=>`<option value="${s.id}" ${s.id===DB.activeSchoolId?'selected':''}>${s.name}</option>`).join('');
+  display.textContent = active ? active.name : 'Aucune';
+}
+
+// 2. Classes & Inscription Élèves
+function addClass(){
+  const activeSchool = getActiveSchool();
+  if(!activeSchool){alert('Veuillez d\'abord créer ou sélectionner une école active.');return;}
+
+  const name = document.getElementById('cl-name').value.trim();
+  const yr = document.getElementById('cl-year').value.trim();
+  if(!name){alert('Entrez un nom de classe.');return;}
+
+  let an1='', an2='';
+  if(yr){
+    const m = yr.match(/(\d{2,4})\D+(\d{2,4})/);
+    if(m){an1=m[1].slice(-2);an2=m[2].slice(-2);}
+  }
+
+  activeSchool.classes.push({
+    id: uid(),
+    name, an1, an2,
+    struct: [],
+    students: []
+  });
+
+  saveDB();
+  document.getElementById('cl-name').value='';
+  populateClassSelects();
+  alert('Classe créée avec succès pour cette école !');
+}
+
+function populateClassSelects(){
+  const activeSchool = getActiveSchool();
+  const s1 = document.getElementById('sel-class-student');
+  const s2 = document.getElementById('sel-class-course');
+
+  const options = (activeSchool && activeSchool.classes.length) 
+    ? activeSchool.classes.map(c=>`<option value="${c.id}">${c.name}</option>`).join('') 
+    : '<option>Aucune classe</option>';
+
+  if(s1) s1.innerHTML = options;
+  if(s2) s2.innerHTML = options;
+
+  renderStudentList();
+  renderCourseConfig();
+}
+
+function addStudents(){
+  const activeSchool = getActiveSchool();
+  if(!activeSchool) return;
+
+  const classId = document.getElementById('sel-class-student').value;
+  const rawNames = document.getElementById('st-names').value.trim();
+  const cls = activeSchool.classes.find(c=>c.id===classId);
+
+  if(!cls){alert('Sélectionnez une classe.');return;}
+  if(!rawNames){alert('Entrez au moins un nom d\'élève.');return;}
+
+  rawNames.split(';').map(n=>n.trim()).filter(Boolean).forEach(name=>{
+    cls.students.push({
+      id: uid(),
+      eleve: name,
+      sexe: '',
+      perm: '',
+      notes: {}
+    });
+  });
+
+  saveDB();
+  document.getElementById('st-names').value='';
+  renderStudentList();
+}
+
+function renderStudentList(){
+  const activeSchool = getActiveSchool();
+  const tbody = document.getElementById('student-table-body');
+  if(!activeSchool){tbody.innerHTML='';return;}
+
+  const classId = document.getElementById('sel-class-student').value;
+  const cls = activeSchool.classes.find(c=>c.id===classId);
+
+  if(!cls || !cls.students.length){
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b">Aucun élève dans cette classe.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = cls.students.map(s=>`
+    <tr>
+      <td>${s.eleve}</td>
+      <td><input style="width:40px" value="${s.sexe||''}" onchange="updateSt('${s.id}','sexe',this.value)"></td>
+      <td><input value="${s.perm||''}" onchange="updateSt('${s.id}','perm',this.value)"></td>
+      <td><button class="btn btn-danger" style="padding:2px 6px;font-size:11px" onclick="deleteSt('${s.id}')">Supprimer</button></td>
+    </tr>
+  `).join('');
+}
+
+function updateSt(stId, field, val){
+  const activeSchool = getActiveSchool();
+  const classId = document.getElementById('sel-class-student').value;
+  const cls = activeSchool.classes.find(c=>c.id===classId);
+  const st = cls.students.find(s=>s.id===stId);
+  if(st){st[field]=val;saveDB();}
+}
+
+function deleteSt(stId){
+  const activeSchool = getActiveSchool();
+  const classId = document.getElementById('sel-class-student').value;
+  const cls = activeSchool.classes.find(c=>c.id===classId);
+  if(cls && confirm('Supprimer cet élève ?')){
+    cls.students = cls.students.filter(s=>s.id!==stId);
+    saveDB();renderStudentList();
+  }
+}
+
+// 3. Cours & Pondérations
+function renderCourseConfig(){
+  const activeSchool = getActiveSchool();
+  const area = document.getElementById('course-config-area');
+  if(!activeSchool){area.innerHTML='';return;}
+
+  const classId = document.getElementById('sel-class-course').value;
+  const cls = activeSchool.classes.find(c=>c.id===classId);
+
+  if(!cls){area.innerHTML='<p style="color:#64748b">Sélectionnez une classe.</p>';return;}
+
+  let html = `<button class="btn btn-secondary" onclick="addDomain()">+ Ajouter un Domaine</button><br><br>`;
+  if(!cls.struct.length){
+    html += '<p style="color:#64748b;font-style:italic">Aucun domaine ni cours configuré pour cette classe.</p>';
   } else {
-    V.struct.forEach((d,di)=>{
-      h+=`<tr class="dom"><td colspan="16">${edit?`<input class="tti" data-d="${di}" value="${esc(d.t)}"><button class="xb adg no-print" data-d="${di}">+ sous-domaine</button><button class="xb rmd no-print" data-d="${di}">× domaine</button>`:esc(d.t)}</td></tr>`;
-      d.g.forEach((g,gj)=>{
-        if(g.t||edit){h+=`<tr class="sdom"><td colspan="16">${edit?`<input class="tti" data-gd="${di}:${gj}" placeholder="(sans titre de sous-domaine)" value="${esc(g.t)}"><button class="xb rmg no-print" data-d="${di}" data-g="${gj}">× sous-domaine</button>`:esc(g.t)}</td></tr>`;}
-        if(g.c.length){g.c.forEach(c=>{h+=courseRow(c);});}else{h+=greyRow();}
-        if(edit)h+=`<tr class="addrow no-print"><td colspan="16"><button class="add" data-d="${di}" data-g="${gj}">+ Ajouter un cours</button></td></tr>`;
-        h+=subRow('g:'+gi,g.c);gi++;
+    cls.struct.forEach((d,di)=>{
+      html += `<div style="background:#f8fafc;border:1px solid #cbd5e1;padding:10px;border-radius:6px;margin-bottom:10px">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <strong>Domaine ${di+1} :</strong>
+          <input type="text" value="${d.t}" style="flex:1;padding:4px" onchange="updateDom(${di},this.value)">
+          <button class="btn btn-danger" style="padding:2px 6px" onclick="removeDom(${di})">×</button>
+        </div>`;
+      
+      d.g.forEach((g,gi)=>{
+        html += `<div style="margin-left:15px;padding:6px;border-left:2px solid #2563eb;margin-bottom:6px">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px">Sous-domaine :</span>
+            <input type="text" value="${g.t}" placeholder="(Optionnel)" style="flex:1;padding:2px" onchange="updateSubDom(${di},${gi},this.value)">
+            <button class="btn btn-primary" style="padding:2px 6px;font-size:11px" onclick="addCourse(${di},${gi})">+ Cours</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Intitulé du Cours</th><th style="width:100px">Max Pondération</th><th style="width:60px">Action</th></tr></thead>
+            <tbody>`;
+        if(!g.c.length){
+          html += '<tr><td colspan="3" style="color:#94a3b8;font-style:italic">Aucun cours.</td></tr>';
+        } else {
+          g.c.forEach((c,ci)=>{
+            html += `<tr>
+              <td><input type="text" value="${c.name}" style="width:100%" onchange="updateCName(${di},${gi},${ci},this.value)"></td>
+              <td><input type="number" value="${c.max}" style="width:100%" onchange="updateCMax(${di},${gi},${ci},this.value)"></td>
+              <td><button class="btn btn-danger" style="padding:1px 4px;font-size:10px" onclick="removeCourse(${di},${gi},${ci})">×</button></td>
+            </tr>`;
+          });
+        }
+        html += `</tbody></table></div>`;
+      });
+      html += `<button class="btn btn-secondary" style="padding:2px 6px;font-size:11px;margin-top:4px" onclick="addSubDom(${di})">+ Sous-Domaine</button></div>`;
+    });
+  }
+  area.innerHTML = html;
+}
+
+function addDomain(){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls){cls.struct.push({t:'DOMAINE',g:[{t:'',c:[]}]});saveDB();renderCourseConfig();}
+}
+function updateDom(di,val){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls){cls.struct[di].t=val;saveDB();}
+}
+function removeDom(di){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls && confirm('Supprimer ce domaine ?')){cls.struct.splice(di,1);saveDB();renderCourseConfig();}
+}
+function addSubDom(di){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls){cls.struct[di].g.push({t:'',c:[]});saveDB();renderCourseConfig();}
+}
+function updateSubDom(di,gi,val){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls){cls.struct[di].g[gi].t=val;saveDB();}
+}
+function addCourse(di,gi){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls){cls.struct[di].g[gi].c.push({id:uid(),name:'Nouveau cours',max:10});saveDB();renderCourseConfig();}
+}
+function updateCName(di,gi,ci,val){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls){cls.struct[di].g[gi].c[ci].name=val;saveDB();}
+}
+function updateCMax(di,gi,ci,val){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls){cls.struct[di].g[gi].c[ci].max=+val||0;saveDB();}
+}
+function removeCourse(di,gi,ci){
+  const cls = getActiveSchool().classes.find(c=>c.id===document.getElementById('sel-class-course').value);
+  if(cls){cls.struct[di].g[gi].c.splice(ci,1);saveDB();renderCourseConfig();}
+}
+
+// 4. Générateur de Bulletin (lié à l'école active)
+function initBulletinTab(){
+  const activeSchool = getActiveSchool();
+  const cs = document.getElementById('clsel');
+  if(!activeSchool || !activeSchool.classes.length){
+    cs.innerHTML = '<option>— Aucune classe —</option>';
+    document.getElementById('stsel').innerHTML = '<option>— Aucun élève —</option>';
+    renderBulletin();
+    return;
+  }
+  cs.innerHTML = activeSchool.classes.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  updateBulletinStudents();
+}
+
+function updateBulletinStudents(){
+  const activeSchool = getActiveSchool();
+  if(!activeSchool) return;
+  const classId = document.getElementById('clsel').value;
+  const cls = activeSchool.classes.find(c=>c.id===classId);
+  const ss = document.getElementById('stsel');
+
+  if(cls && cls.students.length){
+    ss.innerHTML = cls.students.map(s=>`<option value="${s.id}">${s.eleve}</option>`).join('');
+  } else {
+    ss.innerHTML = '<option>— Aucun élève —</option>';
+  }
+  renderBulletin();
+}
+
+function renderBulletin(){
+  const activeSchool = getActiveSchool();
+  const page = document.getElementById('page');
+  if(!activeSchool){page.innerHTML='<p style="text-align:center;padding:50px">Veuillez sélectionner une école active.</p>';return;}
+
+  const classId = document.getElementById('clsel').value;
+  const studentId = document.getElementById('stsel').value;
+  const cls = activeSchool.classes.find(c=>c.id===classId);
+  const st = cls ? cls.students.find(s=>s.id===studentId) : null;
+
+  let h = `<div class="hdr">
+    <div class="logo"><svg viewBox="0 0 90 60"><rect width="90" height="60" fill="#007FFF"/><polygon points="0,46 76,0 90,0 90,14 14,60 0,60" fill="#F7D618"/><polygon points="0,52 83,0 90,0 90,6 7,60 0,60" fill="#CE1021"/></svg></div>
+    <div class="ht"><div>REPUBLIQUE DEMOCRATIQUE DU CONGO</div><div>MINISTERE DE L’ENSEIGNEMENT PRIMAIRE, SECONDAIRE ET TECHNIQUE</div></div>
+    <div class="logo"><svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="34" ry="26" fill="none" stroke="#666"/><text x="40" y="34" text-anchor="middle" font-size="11" fill="#666">LOGO</text></svg></div>
+  </div>`;
+
+  h += `<div class="idn"><b>N° ID :</b> <input value="${st?st.id:''}" disabled></div>`;
+  h += `<table class="ident">
+  <tr><td colspan="2"><b>PROVINCE :</b> <input value="${activeSchool.province||''}" disabled></td></tr>
+  <tr><td style="width:50%"><b>VILLE :</b> <input value="${activeSchool.ville||''}" disabled></td>
+      <td><b>ELEVE :</b> <input style="width:50%" value="${st?st.eleve:''}" disabled> &nbsp;<b>SEXE :</b> <input class="s" value="${st?st.sexe:''}" disabled></td></tr>
+  <tr><td><b>COMMUNE :</b> <input style="width:40%" value="${activeSchool.commune||''}" disabled></td>
+      <td><b>NE(E) A :</b> <input style="width:38%" disabled> Le <input class="d" disabled></td></tr>
+  <tr><td><b>ECOLE :</b> <input value="${activeSchool.name||''}" disabled></td>
+      <td><b>CLASSE :</b> <input value="${cls?cls.name:''}" disabled></td></tr>
+  <tr><td><b>CODE :</b> &nbsp;<input class="bx" value="${activeSchool.code||''}" disabled></td>
+      <td><b>N° PERM. :</b> &nbsp;<input class="bx" value="${st?st.perm:''}" disabled></td></tr>
+  </table>
+  <div class="title">BULLETIN DE LA CLASSE DE ${cls?cls.name.toUpperCase():'............'} ANNEE SCOLAIRE 20${cls?cls.an1:'__'} - 20${cls?cls.an2:'__'}</div>`;
+
+  h += `<table class="b"><colgroup><col style="width:14%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5%"><col style="width:6.9%"><col style="width:6.9%"></colgroup><thead>
+  <tr><th rowspan="3">BRANCHE</th><th colspan="6">PREMIER SEMESTRE</th><th colspan="6">SECOND SEMESTRE</th><th rowspan="3">T.G.</th><th colspan="2">REPECHAGE</th></tr>
+  <tr><th rowspan="2">MAX</th><th colspan="2">TR. JOURN.</th><th colspan="2" rowspan="2">MAX EXAM</th><th rowspan="2">TOT</th>
+  <th rowspan="2">MAX</th><th colspan="2">TR. JOURN.</th><th colspan="2" rowspan="2">EXAMEN</th><th rowspan="2">TOT</th><th rowspan="2">%</th><th rowspan="2">SIGN</th></tr>
+  <tr><th>1ère P</th><th>2ème P</th><th>3ème P</th><th>4ème P</th></tr></thead><tbody>`;
+
+  if(!cls || !cls.struct.length){
+    h += `<tr><td colspan="16" style="text-align:center;padding:30px;color:#94a3b8;font-style:italic">BULLETIN VIERGE<br>Aucun cours enregistré pour cette classe dans cette école.</td></tr>`;
+  } else {
+    cls.struct.forEach(d=>{
+      h += `<tr class="dom"><td colspan="16">${d.t}</td></tr>`;
+      d.g.forEach(g=>{
+        if(g.t) h += `<tr class="sdom"><td colspan="16">${g.t}</td></tr>`;
+        g.c.forEach(c=>{
+          const notes = (st && st.notes[c.id]) ? st.notes[c.id] : {};
+          h += `<tr>
+            <td class="nm">${c.name}</td>
+            <td>${c.max}</td>
+            <td><input value="${notes.p1||''}" onchange="saveNote('${cls.id}','${st?st.id:''}','${c.id}','p1',this.value)"></td>
+            <td><input value="${notes.p2||''}" onchange="saveNote('${cls.id}','${st?st.id:''}','${c.id}','p2',this.value)"></td>
+            <td>${c.max*2}</td>
+            <td><input value="${notes.e1||''}" onchange="saveNote('${cls.id}','${st?st.id:''}','${c.id}','e1',this.value)"></td>
+            <td><b>${(+notes.p1||0)+(+notes.p2||0)+(+notes.e1||0)}</b></td>
+            <td>${c.max}</td>
+            <td><input value="${notes.p3||''}" onchange="saveNote('${cls.id}','${st?st.id:''}','${c.id}','p3',this.value)"></td>
+            <td><input value="${notes.p4||''}" onchange="saveNote('${cls.id}','${st?st.id:''}','${c.id}','p4',this.value)"></td>
+            <td>${c.max*2}</td>
+            <td><input value="${notes.e2||''}" onchange="saveNote('${cls.id}','${st?st.id:''}','${c.id}','e2',this.value)"></td>
+            <td><b>${(+notes.p3||0)+(+notes.p4||0)+(+notes.e2||0)}</b></td>
+            <td><b>${(+notes.p1||0)+(+notes.p2||0)+(+notes.e1||0)+(+notes.p3||0)+(+notes.p4||0)+(+notes.e2||0)}</b></td>
+            <td></td><td></td>
+          </tr>`;
+        });
       });
     });
   }
-  if(edit)h+=`<tr class="addrow no-print"><td colspan="16"><button id="addDom">+ Ajouter un domaine</button></td></tr>`;
-
-  const all=flat(V);const b=all.reduce((a,c)=>a+Number(c.max||0),0);
-  h+=`<tr class="bold"><td class="nm">${L('mxg')}</td>${prz(b)}${b?empty:gry}${b?empty:gry}${prz(b*2)}${b?empty:gry}${prz(b*4)}${prz(b)}${b?empty:gry}${b?empty:gry}${prz(b*2)}${b?empty:gry}${prz(b*4)}${prz(b*8)}<td colspan="2"></td></tr>`;
-
-  const sk=(key,lbl)=>`<span class="strk${st.strk[key]?' on':''}" data-s="${key}" title="Double-clic pour biffer">${L(lbl)}</span>`;
-  const sidecell=`<td colspan="2" rowspan="6" class="side">
-   <div>◆${sk('passe','passe')} (1)</div>
-   <div>◆${sk('double','double')} (1)</div>
-   <div>${L('le')} <span contenteditable="true" spellcheck="false">..../..../20..</span></div>
-   <div>${L('chef')}</div>
-   <div class="sc">${L('sceau')}</div></td>`;
-
-  h+=`<tr class="bold"><td class="nm">${L('tots')}</td>${bl}${gen('all','p1')}${gen('all','p2')}${bl}${gen('all','e1')}${gen('all','t1')}${bl}${gen('all','p3')}${gen('all','p4')}${bl}${gen('all','e2')}${gen('all','t2')}${gen('all','tg')}${sidecell}</tr>`;
-  h+=`<tr class="bold"><td class="nm">${L('pct')}</td>${bl}${gen('pct','p1')}${gen('pct','p2')}${bl}${gen('pct','e1')}${gen('pct','t1')}${bl}${gen('pct','p3')}${gen('pct','p4')}${bl}${gen('pct','e2')}${gen('pct','t2')}${gen('pct','tg')}</tr>`;
-  h+=`<tr class="bold"><td class="nm">${L('plc')}</td>${bl}${gen('rank','p1')}${gen('rank','p2')}${bl}${gen('rank','e1')}${gen('rank','t1')}${bl}${gen('rank','p3')}${gen('rank','p4')}${bl}${gen('rank','e2')}${gen('rank','t2')}${gen('rank','tg')}</tr>`;
-  const ap=(t,k)=>`<td><input class="ap" ${dS} data-t="${t}" data-k="${k}" value="${esc((st[t]||{})[k]||'')}"></td>`;
-  const txtRow=(lbl,t)=>`<tr class="bold"><td class="nm">${L(lbl)}</td>${bl}${ap(t,'p1')}${ap(t,'p2')}${bl}${bl}${bl}${bl}${ap(t,'p3')}${ap(t,'p4')}${bl}${bl}${bl}${bl}</tr>`;
-  h+=txtRow('app','app');
-  h+=txtRow('cnd','cond');
-  h+=`<tr class="bold"><td class="nm">${L('sig')}</td>${bl}${empty}${empty}${bl}${empty}${bl}${bl}${empty}${empty}${bl}${empty}${bl}${bl}</tr>`;
-  h+='</tbody></table>';
-
-  h+=`<div class="foot">
-   <div class="box">- <span class="strk${st.strk.f1?' on':''}" data-s="f1" title="Double-clic pour biffer">${L('f1')}</span> <input class="long" data-b="t:rep" ${dS} value="${esc(st.rep)}"> (1)</div>
-   <div>- <span class="strk${st.strk.f2?' on':''}" data-s="f2" title="Double-clic pour biffer">${L('f2')}</span></div>
-   <div>- <span class="strk${st.strk.f3?' on':''}" data-s="f3" title="Double-clic pour biffer">${L('f3')}</span></div>
-   <div class="row"><div>&nbsp;</div><div>${L('fait')} <span class="dots" contenteditable="true" spellcheck="false"></span>${L('le2')} <span contenteditable="true" spellcheck="false">..../..../.......</span></div><div class="r">${L('chef2')}</div></div>
-   <div class="c">${L('sceau2')}</div>
-   <div class="row"><div><b>${L('sigel')}</b></div><div class="r"><b>${L('nomsig')}</b></div></div>
-  </div>
-  <div class="note">${L('biff')}<br><i>${L('imp')}</i><span class="code">${L('code2')}</span></div>`;
-
-  document.getElementById('page').innerHTML=h;
-  updateSels();refresh();
+  h += `</tbody></table>`;
+  page.innerHTML = h;
 }
 
-function refresh(){
-  const cls=curC(),stu=curS();
-  if(!cls||!stu){document.querySelectorAll('[data-sc]').forEach(el=>el.textContent='');return;}
-  const courses=flat(cls);
-  const groups=[];cls.struct.forEach(d=>d.g.forEach(g=>groups.push(g.c)));
-  const aggAll=agg(stu,courses),mxAll=maxes(courses);
-  const everyone=cls.students.map(s=>agg(s,courses));
-  document.querySelectorAll('[data-sc]').forEach(el=>{
-    const s=el.dataset.sc,k=el.dataset.k;let v=null;
-    if(s.startsWith('c:'))v=cv(stu,s.slice(2))[k];
-    else if(s.startsWith('g:'))v=agg(stu,groups[+s.slice(2)]||[])[k];
-    else if(s==='all')v=aggAll[k];
-    else if(s==='pct'){v=(aggAll[k]==null||!mxAll[k])?null:fmt(aggAll[k]/mxAll[k]*100)+' %';}
-    else if(s==='rank'){if(aggAll[k]!=null){const r=1+everyone.filter(a=>a[k]!=null&&a[k]>aggAll[k]).length;v=r+'/'+cls.students.length;}}
-    el.textContent=v==null?'':v;
-  });
+function saveNote(clId, stId, cId, field, val){
+  const activeSchool = getActiveSchool();
+  const cls = activeSchool.classes.find(c=>c.id===clId);
+  const st = cls.students.find(s=>s.id===stId);
+  if(st){
+    if(!st.notes[cId]) st.notes[cId] = {};
+    st.notes[cId][field] = val;
+    saveDB();
+    renderBulletin();
+  }
 }
 
-function updateSels(){
-  const cs=document.getElementById('clsel'),ss=document.getElementById('stsel');
-  const cls=curC();
-  cs.innerHTML=S.classes.length?S.classes.map(c=>`<option value="${c.id}"${cls&&c.id===cls.id?' selected':''}>${esc((c.name||'Classe')+(c.an1&&c.an2?' · 20'+c.an1+'-20'+c.an2:''))}</option>`).join(''):'<option>— Aucune classe —</option>';
-  const stu=curS();
-  ss.innerHTML=cls&&cls.students.length?cls.students.map((s,i)=>`<option value="${s.id}"${stu&&s.id===stu.id?' selected':''}>${esc(s.eleve||('Élève '+(i+1)))}</option>`).join(''):'<option>— Aucun élève —</option>';
-}
-
-document.addEventListener('input',e=>{
-  const t=e.target,cls=curC(),st=curS();
-  if(t.matches('input.sc')){
-    if(!st)return;
-    const c=findCourse(t.dataset.cid);if(!c)return;
-    const k=t.dataset.k;let v=t.value.replace(',','.');
-    if(v!==''&&!isNaN(+v)){const m=(k[0]==='e'?2:1)*c.max;if(+v>m){v=String(m);t.value=v;}if(+v<0){v='0';t.value=v;}}
-    (st.notes[c.id]=st.notes[c.id]||{})[k]=v;save();refresh();
-  }else if(t.matches('input.ap')){
-    if(!st)return;(st[t.dataset.t]=st[t.dataset.t]||{})[t.dataset.k]=t.value;save();
-  }else if(t.matches('input.nmi')){
-    const c=findCourse(t.dataset.cid);if(c){c.name=t.value;save();}
-  }else if(t.matches('input.tti')){
-    if(!cls)return;
-    if(t.dataset.d!=null&&t.dataset.d!==''&&t.dataset.gd==null)cls.struct[+t.dataset.d].t=t.value;
-    else if(t.dataset.gd){const[a,b]=t.dataset.gd.split(':').map(Number);cls.struct[a].g[b].t=t.value;}
-    save();
-  }else if(t.matches('input[data-b]')){
-    const[w,f]=t.dataset.b.split(':');
-    if(w==='s')S.school[f]=t.value;
-    else if(w==='c'){if(!cls)return;cls[f]=t.value;if(f==='name'||f==='an1'||f==='an2')updateSels();}
-    else{if(!st)return;st[f]=t.value;if(f==='eleve')updateSels();}
-    save();
-  }else if(t.matches('[data-lbl]')){
-    S.labels[t.dataset.lbl]=t.innerText;save();
-  }else if(t.matches('[data-h]')){
-    S.school.hdr[+t.dataset.h]=t.innerText;save();
-  }else if(t.matches('[data-niv]')){
-    if(cls){cls.niveau=t.innerText;save();}
-  }
-});
-document.addEventListener('change',e=>{
-  const t=e.target;
-  if(t.matches('input.mxi')){
-    const c=findCourse(t.dataset.cid);if(c){c.max=Math.max(0,+t.value||0);save();render();}
-  }
-});
-let upTarget=null;
-document.addEventListener('click',e=>{
-  const t=e.target,cls=curC();
-  const q=s=>t.closest(s);
-  if(q('.del')){
-    const id=q('.del').dataset.cid;
-    cls.struct.forEach(d=>d.g.forEach(g=>{g.c=g.c.filter(c=>c.id!==id);}));
-    cls.students.forEach(s=>delete s.notes[id]);
-    save();render();return;
-  }
-  if(q('.add')){const b=q('.add');cls.struct[+b.dataset.d].g[+b.dataset.g].c.push(C('',10));save();render();
-    setTimeout(()=>{const l=[...document.querySelectorAll('input.nmi')];const m=l.find(x=>x.value==='');if(m)m.focus();},0);return;}
-  if(q('.adg')){cls.struct[+q('.adg').dataset.d].g.push({t:'',c:[]});save();render();return;}
-  if(q('.rmg')){if(confirm('Supprimer ce sous-domaine et ses cours ?')){const b=q('.rmg');cls.struct[+b.dataset.d].g.splice(+b.dataset.g,1);save();render();}return;}
-  if(q('.rmd')){if(confirm('Supprimer ce domaine et ses cours ?')){cls.struct.splice(+q('.rmd').dataset.d,1);save();render();}return;}
-  if(q('#addDom')){cls.struct.push({t:'DOMAINE',g:[{t:'',c:[]}]});save();render();return;}
-  if(q('[data-up]')){upTarget=q('[data-up]').dataset.up;document.getElementById('upFile').click();}
-});
-document.addEventListener('dblclick',e=>{
-  const el=e.target.closest('.strk');const st=curS();
-  if(!el||!st)return;
-  const k=el.dataset.s;st.strk[k]=!st.strk[k];el.classList.toggle('on',st.strk[k]);save();
-});
-document.getElementById('upFile').addEventListener('change',e=>{
-  const f=e.target.files[0];if(!f||!upTarget)return;
-  const r=new FileReader();r.onload=()=>{S.school[upTarget]=r.result;save();render();};r.readAsDataURL(f);e.target.value='';
-});
-document.getElementById('clsel').addEventListener('change',e=>{if(S.classes.length){S.cc=e.target.value;save();render();}});
-document.getElementById('stsel').addEventListener('change',e=>{const c=curC();if(c&&c.students.length){c.cs=e.target.value;save();render();}});
-
-document.getElementById('addCl').addEventListener('click',()=>{
-  const name=prompt('Nom de la classe (ex. : 7ème A)');if(name==null||!name.trim())return;
-  const y=new Date().getFullYear();
-  const yr=prompt('Année scolaire (ex. : '+y+'-'+(y+1)+')',y+'-'+(y+1));
-  let an1='',an2='';
-  if(yr){const m=yr.match(/(\d{2,4})\D+(\d{2,4})/);if(m){an1=m[1].slice(-2);an2=m[2].slice(-2);}}
-  let struct=emptyStruct();
-  const prev=curC();
-  if(prev&&confirm('Copier les cours et la pondération de la classe « '+(prev.name||'actuelle')+' » ?')){
-    struct=JSON.parse(JSON.stringify(prev.struct));
-    struct.forEach(d=>d.g.forEach(g=>g.c.forEach(c=>{c.id=uid();})));
-  }
-  const c={id:uid(),name:name.trim(),niveau:name.trim().split(/\s+/)[0],an1,an2,struct,students:[],cs:null};
-  S.classes.push(c);S.cc=c.id;save();render();
-});
-document.getElementById('delCl').addEventListener('click',()=>{
-  const c=curC();if(!c)return;
-  if(!confirm('Supprimer la classe « '+(c.name||'')+' » avec ses élèves et leurs points ?'))return;
-  S.classes=S.classes.filter(x=>x.id!==c.id);S.cc=S.classes[0]?S.classes[0].id:null;save();render();
-});
-document.getElementById('addSt').addEventListener('click',()=>{
-  const c=curC();if(!c){alert('Créez d’abord une classe.');return;}
-  const r=prompt('Nom(s) de l’élève (séparez plusieurs noms par ;)');if(r==null)return;
-  const names=r.split(';').map(x=>x.trim()).filter(Boolean);
-  if(!names.length)names.push('');
-  names.forEach(n=>{const s=newSt();s.eleve=n;c.students.push(s);c.cs=s.id;});
-  save();render();
-});
-document.getElementById('delSt').addEventListener('click',()=>{
-  const c=curC(),s=curS();if(!c||!s)return;
-  if(!confirm('Supprimer cet élève et ses points ?'))return;
-  c.students=c.students.filter(x=>x.id!==s.id);c.cs=c.students[0]?c.students[0].id:null;save();render();
-});
-document.getElementById('editBtn').addEventListener('click',e=>{
-  if(!curC()){alert('Créez d’abord une classe pour enregistrer ses cours.');return;}
-  document.body.classList.toggle('edit');
-  const on=document.body.classList.contains('edit');
-  e.target.classList.toggle('on',on);e.target.textContent=on?'Terminer':'Cours & pondération';render();
-});
-document.getElementById('printBtn').addEventListener('click',()=>{
-  if(document.body.classList.contains('edit'))document.getElementById('editBtn').click();
-  window.print();
-});
-document.getElementById('expBtn').addEventListener('click',()=>{
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));
-  a.download='bulletins_cteb.json';a.click();
-});
-document.getElementById('impBtn').addEventListener('click',()=>document.getElementById('impFile').click());
-document.getElementById('impFile').addEventListener('change',e=>{
-  const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(o.classes&&o.school){S=o;if(!S.labels)S.labels={};save();render();}else alert('Fichier invalide');}catch(x){alert('Fichier invalide');}};
-  r.readAsText(f);e.target.value='';
-});
-render();
-})();
+// Initialisation globale au chargement de la page
+renderGlobalHeader();
+renderSchoolsTable();
 </script>
 </body>
 </html>
