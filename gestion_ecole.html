@@ -365,7 +365,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                                 </select>
                                             </div>
                                             <div class="col-md-2">
-                                                <label class="fw-bold">Somme à Payer ($) :</label>
+                                                <label class="fw-bold">Somme Générale ($) :</label>
                                                 <input type="number" id="payTotal" class="form-control" required placeholder="Ex: 150" oninput="calcStudentReste()">
                                             </div>
                                             <div class="col-md-2">
@@ -383,7 +383,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                         </div>
                                     </form>
                                     <h6 class="fw-bold text-secondary">Liste des Paiements Élèves & Factures :</h6>
-                                    <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Élève</th><th>Classe</th><th>À Payer</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="studentPayTableBody"></tbody></table>
+                                    <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Élève</th><th>Classe</th><th>Générale</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="studentPayTableBody"></tbody></table>
                                 </div>
 
                                 <!-- 2. PAIEMENT AGENTS -->
@@ -408,7 +408,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                                 <input type="number" id="agentSalaire" class="form-control" required placeholder="Ex: 300" oninput="calcAgentReste()">
                                             </div>
                                             <div class="col-md-2">
-                                                <label class="fw-bold">Prime ($) :</label>
+                                                <label class="fw-bold">Prime d'Enc. ($) :</label>
                                                 <input type="number" id="agentPrime" class="form-control" required placeholder="Ex: 50" oninput="calcAgentReste()">
                                             </div>
                                             <div class="col-md-2">
@@ -610,13 +610,19 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     <!-- SCRIPT JS DE GESTION COMPLÈTE CORRIGÉ ET PERSISTANT -->
     <script>
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V11";
+        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         let appData = { schools: [] };
         let activeSchoolId = null;
 
         window.onload = function() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) { try { appData = JSON.parse(saved); } catch(e){} }
+            // Restauration des données stockées
+            let saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) {
+                saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
+            }
+            if (saved) { 
+                try { appData = JSON.parse(saved); } catch(e){} 
+            }
             renderSchoolsList();
         };
 
@@ -630,7 +636,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(id === 'view-portal') renderSchoolsList();
         }
 
-        // Fonction pour afficher / cacher le sous-menu Paramètres et fermer tous les onglets si on ferme les paramètres
         function toggleParamsSubmenu() {
             const submenu = document.getElementById('paramsSubmenu');
             const arrow = document.getElementById('arrowIcon');
@@ -731,7 +736,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function renderSchoolsList() {
             const container = document.getElementById('schoolsListContainer');
             container.innerHTML = "";
-            if(!appData.schools.length) {
+            if(!appData.schools || !appData.schools.length) {
                 container.innerHTML = `<div class="col-12"><div class="alert alert-secondary text-center">Aucune école enregistrée pour le moment. Cliquez sur « 1. Créer une École » ci-dessus.</div></div>`;
                 return;
             }
@@ -758,7 +763,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function openDirectRegistration() {
-            if(!appData.schools.length) { alert("Créez d'abord une école."); openSchoolForm(); }
+            if(!appData.schools || !appData.schools.length) { alert("Créez d'abord une école."); openSchoolForm(); }
             else openSchoolDashboard(appData.schools[0].id);
         }
 
@@ -1016,7 +1021,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             tbody.innerHTML = s.caisse.length ? s.caisse.map((c, i) => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucune opération de caisse enregistrée.</td></tr>`;
         }
 
-        // --- NOUVEAUX MODULES PAIEMENT ÉLÈVES & AGENTS ---
+        // --- PAIEMENT ÉLÈVES & AGENTS ---
         function refreshPaymentOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
@@ -1067,8 +1072,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             saveData();
             renderStudentPayTable();
-            document.getElementById('formStudentPay').reset();
-            document.getElementById('payReste').value = "";
+            resetStudentPayForm();
         }
 
         function editStudentPayment(i) {
@@ -1131,7 +1135,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <p><b>Nom de l'élève :</b> ${p.studentName}</p>
                     <p><b>Classe :</b> ${p.classe}</p>
                     <table class="table table-bordered mt-3">
-                        <tr><th>Somme Totale à Payer</th><td>${p.total} $</td></tr>
+                        <tr><th>Somme Générale à Payer</th><td>${p.total} $</td></tr>
                         <tr><th>Somme Payée</th><td class="text-success fw-bold">${p.paye} $</td></tr>
                         <tr><th>Reste à Payer</th><td class="text-danger fw-bold">${p.reste} $</td></tr>
                     </table>
@@ -1156,7 +1160,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         // Paiement Agents
         function loadTeachersForAgentPay(cl) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const filtered = s.teachers.filter(x => x.titulaireClass === cl || !x.titulaireClass);
             document.getElementById('agentPayTeacherSelect').innerHTML = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, idx) => `<option value="${idx}">${t.name} (${t.titulaireClass || 'Enseignant'})</option>`).join('');
         }
 
@@ -1197,8 +1200,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             saveData();
             renderAgentPayTable();
-            document.getElementById('formAgentPay').reset();
-            document.getElementById('agentReste').value = "";
+            resetAgentPayForm();
         }
 
         function editAgentPayment(i) {
