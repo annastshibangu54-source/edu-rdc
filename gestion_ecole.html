@@ -386,7 +386,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
                                 <!-- 2. PRÉSENCE PROFESSEURS -->
                                 <div class="tab-pane fade" id="p-profs" role="tabpanel">
-                                    <form onsubmit="handleSaveStaffPresence(event, 'prof')" class="p-3 bg-light rounded border mb-3">
+                                    <form id="formPresProf" onsubmit="handleSaveStaffPresence(event, 'prof')" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editProfPresIndex">
                                         <div class="row g-2">
                                             <div class="col-md-4">
@@ -431,7 +431,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
                                 <!-- 3. PRÉSENCE ADMINISTRATION -->
                                 <div class="tab-pane fade" id="p-admin" role="tabpanel">
-                                    <form onsubmit="handleSaveStaffPresence(event, 'admin')" class="p-3 bg-light rounded border mb-3">
+                                    <form id="formPresAdmin" onsubmit="handleSaveStaffPresence(event, 'admin')" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editAdminPresIndex">
                                         <div class="row g-2">
                                             <div class="col-md-4">
@@ -1174,22 +1174,20 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function resetProfPresForm() {
+            const form = document.getElementById('formPresProf');
+            if(form) form.reset();
             document.getElementById('editProfPresIndex').value = "";
             document.getElementById('presProfName').value = "";
             document.getElementById('presProfClass').value = "";
-            document.getElementById('presProfSelect').selectedIndex = 0;
-            document.getElementById('presProfArrivee').value = "";
-            document.getElementById('presProfDepart').value = "";
             document.getElementById('btnProfPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
 
         function resetAdminPresForm() {
+            const form = document.getElementById('formPresAdmin');
+            if(form) form.reset();
             document.getElementById('editAdminPresIndex').value = "";
             document.getElementById('presAdminName').value = "";
             document.getElementById('presAdminRole').value = "";
-            document.getElementById('presAdminSelect').selectedIndex = 0;
-            document.getElementById('presAdminArrivee').value = "";
-            document.getElementById('presAdminDepart').value = "";
             document.getElementById('btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
 
