@@ -27,6 +27,79 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .params-submenu.show { display: block; }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
+
+/* STYLES BULLETIN INTEGRE */
+.bulletin-container *{box-sizing:border-box}
+.bulletin-container .bar{position:sticky;top:0;z-index:10;background:#111827;color:#fff;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;border-radius:6px;margin-bottom:10px}
+.bulletin-container .bar button,.bulletin-container .bar select{font:inherit;padding:6px 10px;border-radius:6px;border:0;background:#374151;color:#fff;cursor:pointer;max-width:48vw}
+.bulletin-container .bar button.on{background:#b45309}
+.bulletin-container .bar button.pri{background:#2563eb}
+.bulletin-container .bar .sep{width:1px;height:22px;background:#4b5563}
+#hint{max-width:210mm;margin:8px auto 0;padding:8px 12px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;font-size:13px}
+#hint:empty{display:none}
+.bulletin-container .wrap{overflow-x:auto;padding:8px}
+.bulletin-container .page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:7mm 8mm;font-size:8px;box-shadow:0 2px 10px rgba(0,0,0,.25);color:#000;font-family:Arial,Helvetica,sans-serif}
+.bulletin-container .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.bulletin-container .logo{width:64px;height:50px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bulletin-container .logo img,.bulletin-container .logo svg{max-width:100%;max-height:100%}
+.bulletin-container .ht{text-align:center;font-weight:bold;font-size:11.5px;line-height:1.3;flex:1;padding:0 6px}
+.bulletin-container .idn{display:inline-block;border:1px solid #000;padding:1px 4px;font-weight:bold;margin:2px 0}
+.bulletin-container .idn input{width:160px}
+.bulletin-container input{font:inherit;color:#000;border:0;background:transparent;outline:none;border-radius:0}
+.bulletin-container input:disabled{cursor:not-allowed}
+.bulletin-container table.ident{width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:2px}
+.bulletin-container table.ident td{padding:2px 4px;font-size:8.5px;border:0;vertical-align:bottom;white-space:nowrap}
+.bulletin-container table.ident input{border-bottom:1px dotted #000;width:62%}
+.bulletin-container table.ident input.s{width:12%}
+.bulletin-container table.ident input.d{width:30%}
+.bulletin-container table.ident input.bx{width:70%;letter-spacing:5px;border:1px solid #000;padding:1px 3px}
+.bulletin-container .title{text-align:center;font-weight:bold;font-size:8.5px;border:1px solid #000;padding:2px;margin-bottom:2px}
+.bulletin-container .title input{width:2.2em;border-bottom:1px dotted #000;text-align:center;font-weight:bold}
+.bulletin-container table.b{width:100%;border-collapse:collapse;table-layout:fixed}
+.bulletin-container table.b td,.bulletin-container table.b th{border:1px solid #000;padding:0 1px;height:13.5px;text-align:center;font-size:8px;line-height:1.1;overflow:hidden}
+.bulletin-container table.b th{font-weight:bold}
+.bulletin-container table.b td.nm{text-align:left;padding-left:3px;position:relative}
+.bulletin-container table.b tr.dom td{font-weight:bold;font-size:8.5px;position:relative}
+.bulletin-container table.b tr.sdom td{font-weight:bold;font-size:8px;position:relative}
+.bulletin-container table.b tr.sub td{font-weight:bold}
+.bulletin-container table.b tr.bold td{font-weight:bold}
+.bulletin-container table.b td.blk{background:#000}
+.bulletin-container table.b td.gry{background:#d1d5db}
+.bulletin-container table.b td.tt{position:relative;font-weight:bold}
+.bulletin-container table.b td.tt i{position:absolute;left:1px;top:0;font-size:6px;color:#444;font-style:normal;font-weight:normal}
+.bulletin-container table.b td input{width:100%;border:0;text-align:center;padding:0;height:12px;-moz-appearance:textfield}
+.bulletin-container table.b td input::-webkit-outer-spin-button,.bulletin-container table.b td input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.bulletin-container table.b td input:focus,.bulletin-container table.ident input:focus{background:#fff8c5}
+.bulletin-container table.b td.nm input.nmi{text-align:left;width:calc(100% - 14px)}
+.bulletin-container table.b td input.tti{font-weight:bold;text-align:center;width:60%}
+.bulletin-container .xb{border:0;background:#dc2626;color:#fff;font-size:10px;line-height:11px;padding:0 4px;border-radius:2px;cursor:pointer;margin-left:4px}
+.bulletin-container .del{position:absolute;right:1px;top:1px;width:12px;height:12px;padding:0;line-height:10px;margin:0;font-size:10px}
+.bulletin-container .addrow td{text-align:left !important;background:#f3f4f6}
+.bulletin-container .addrow button{font-size:10px;padding:2px 8px;cursor:pointer;margin-right:6px}
+.bulletin-container td.side{vertical-align:top;text-align:left !important;padding:3px 4px !important;font-size:8px;line-height:1.6}
+.bulletin-container td.side .sc{text-align:center;margin-top:10px}
+.bulletin-container .strk.on{text-decoration:line-through}
+.bulletin-container .foot{margin-top:3px;font-size:8.5px;line-height:1.7}
+.bulletin-container .foot .box{border:1px solid #000;padding:2px 4px}
+.bulletin-container .foot input.long{width:38%;border-bottom:1px dotted #000}
+.bulletin-container .foot .row{display:flex;justify-content:space-between}
+.bulletin-container .foot .c{text-align:center}
+.bulletin-container .foot .r{text-align:right}
+.bulletin-container .note{font-size:8px;margin-top:3px}
+.bulletin-container .note .code{float:right}
+.bulletin-container .dots{display:inline-block;min-width:60px;border-bottom:1px dotted #000}
+.bulletin-container .lb{outline:none}
+.bulletin-container [contenteditable]:focus{outline:1px dashed #2563eb;background:#fff8c5}
+
+@media print{
+ @page{size:A4 portrait;margin:6mm}
+ body{background:#fff}
+ .no-print,.bar,#hint,.navbar,.sidebar-menu{display:none !important}
+ .wrap{overflow:visible;padding:0}
+ .bulletin-container .page{box-shadow:none;margin:0;width:auto;padding:0}
+ .bulletin-container table.b td input:focus,.bulletin-container table.ident input:focus,.bulletin-container [contenteditable]:focus{background:transparent;outline:none}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -249,7 +322,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                         <option value="Humanités">Humanités</option>
                                     </select>
                                 </div>
-                                <div class="col-md-5"><label class="fw-bold">Nom de la Classe :</label><input type="text" id="className" class="form-control" placeholder="Ex: 7ème EB A, 3ème Scientific A" required></div>
+                                <div class="col-md-5"><label class="fw-bold">Nom de la Classe :</label><input type="text" id="className" class="form-control" placeholder="Ex: 7ème EB A, 3ème Scientific A, 1ère Maternelle" required></div>
                                 <div class="col-md-3 d-flex align-items-end">
                                     <button type="submit" id="btnClassSubmit" class="btn btn-success w-100 fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
                                 </div>
@@ -319,15 +392,30 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <div id="notesSheetContainer" class="p-3 bg-light rounded border"></div>
                         </div>
 
-                        <!-- 7. BULLETINS -->
+                        <!-- 7. BULLETINS (CODE BULLETIN SPÉCIFIQUE RECONDUCTEUR COMPLET) -->
                         <div class="tab-pane" id="tab-bulletins">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-file-invoice me-2"></i>7. Bulletin de cotes (Génération & Affichage)</h5>
-                            <div class="row g-2 mb-3">
-                                <div class="col-md-6"><label class="fw-bold">Classe :</label><select id="bulletinClassSelect" class="form-select" onchange="loadStudentsForBulletin()"></select></div>
-                                <div class="col-md-6"><label class="fw-bold">Élève :</label><select id="bulletinStudentSelect" class="form-select" onchange="generateBulletin()"></select></div>
+                            
+                            <div class="bulletin-container">
+                                <div class="bar no-print">
+                                  <select id="clsel" title="Classe"></select>
+                                  <button id="addCl">+ Classe</button>
+                                  <button id="delCl">Suppr. classe</button>
+                                  <span class="sep"></span>
+                                  <select id="stsel" title="Élève"></select>
+                                  <button id="addSt">+ Élève</button>
+                                  <button id="delSt">Suppr. élève</button>
+                                  <span class="sep"></span>
+                                  <button id="editBtn">Cours &amp; pondération</button>
+                                  <button id="printBtn" class="pri">Imprimer / PDF</button>
+                                  <button id="expBtn">Exporter</button>
+                                  <button id="impBtn">Importer</button>
+                                  <input type="file" id="impFile" accept="application/json" hidden>
+                                  <input type="file" id="upFile" accept="image/*" hidden>
+                                </div>
+                                <div id="hint" class="no-print"></div>
+                                <div class="wrap"><div class="page" id="page"></div></div>
                             </div>
-                            <h6 class="fw-bold text-secondary">Aperçu du Bulletin :</h6>
-                            <div id="bulletinDisplayArea" class="border p-3 bg-white"></div>
                         </div>
 
                         <!-- 8. FRAIS SCOLAIRES & PAIEMENTS -->
@@ -608,14 +696,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     </div>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE CORRIGÉ ET PERSISTANT -->
+    <!-- SCRIPT JS DE GESTION COMPLÈTE AVEC LE MOTEUR DU BULLETIN INTEGRÉ -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         let appData = { schools: [] };
         let activeSchoolId = null;
 
         window.onload = function() {
-            // Restauration des données stockées
             let saved = localStorage.getItem(STORAGE_KEY);
             if (!saved) {
                 saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
@@ -662,6 +749,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 refreshPresenceOptions();
             } else if(tabId === 'tab-frais') {
                 refreshPaymentOptions();
+            } else if(tabId === 'tab-bulletins') {
+                if(window.initBulletinModule) window.initBulletinModule();
             }
         }
 
@@ -808,7 +897,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('studentClass').innerHTML = classOptions;
             document.getElementById('courseClassSelect').innerHTML = classOptions;
             document.getElementById('notesClassSelect').innerHTML = classOptions;
-            document.getElementById('bulletinClassSelect').innerHTML = classOptions;
             document.getElementById('presClassSelect').innerHTML = classOptions;
             document.getElementById('payClassSelect').innerHTML = classOptions;
             document.getElementById('agentPayClassSelect').innerHTML = classOptions;
@@ -1328,54 +1416,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             saveData();
         }
 
-        // 7. Bulletins
-        function loadStudentsForBulletin() {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = document.getElementById('bulletinClassSelect').value;
-            const filtered = s.students.filter(x => x.classe === cl);
-            document.getElementById('bulletinStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name}</option>`).join('');
-        }
-
-        function generateBulletin() {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = document.getElementById('bulletinClassSelect').value;
-            const stId = document.getElementById('bulletinStudentSelect').value;
-            const student = s.students.find(x => x.id === stId);
-            const courses = s.courses[cl] || [];
-            const area = document.getElementById('bulletinDisplayArea');
-
-            if(!student || !courses.length) { area.innerHTML = `<p class="text-center text-muted">Sélectionnez un élève et assurez-vous que les cours sont enregistrés.</p>`; return; }
-
-            let totalObtenu = 0, totalMax = 0;
-            let rows = courses.map(c => {
-                const n = (s.notes[stId] && s.notes[stId][c.id]) ? s.notes[stId][c.id] : {};
-                const p1 = n.p1||0, p2 = n.p2||0, e1 = n.e1||0, p3 = n.p3||0, p4 = n.p4||0, e2 = n.e2||0;
-                const tot = p1 + p2 + e1 + p3 + p4 + e2;
-                const maxAnnuel = c.max * 8;
-                totalObtenu += tot; totalMax += maxAnnuel;
-                return `<tr><td>${c.name}</td><td>${c.max}</td><td>${p1}</td><td>${p2}</td><td>${e1}</td><td>${p3}</td><td>${p4}</td><td>${e2}</td><td><b>${tot} / ${maxAnnuel}</b></td></tr>`;
-            }).join('');
-
-            const pct = totalMax ? ((totalObtenu / totalMax) * 100).toFixed(2) : 0;
-
-            area.innerHTML = `
-                <div class="text-center border-bottom pb-2 mb-3">
-                    <h4 class="fw-bold m-0">${s.name}</h4>
-                    <small>${s.province} - ${s.commune}</small>
-                    <h5 class="mt-2 text-primary fw-bold">BULLETIN DE NOTES — CLASSE : ${cl}</h5>
-                    <h6>ÉLÈVE : <b>${student.name}</b> (${student.sexe}) — MATRICULE : ${student.mat}</h6>
-                </div>
-                <table class="table table-bordered text-center align-middle">
-                    <thead class="table-dark"><tr><th>Branche</th><th>Max Période</th><th>P1</th><th>P2</th><th>Ex1</th><th>P3</th><th>P4</th><th>Ex2</th><th>Total Général</th></tr></thead>
-                    <tbody>${rows}</tbody>
-                </table>
-                <div class="d-flex justify-content-between align-items-center mt-3 p-2 bg-light rounded">
-                    <h5>TOTAL GÉNÉRAL : <b>${totalObtenu} / ${totalMax}</b></h5>
-                    <h4 class="text-success fw-bold">POURCENTAGE : ${pct} %</h4>
-                </div>
-            `;
-        }
-
         // --- 9. GESTION DE PRÉSENCE ---
         function refreshPresenceOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1596,6 +1636,351 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </tr>
             `).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence enregistrée.</td></tr>`;
         }
+
+        // =========================================================
+        // MOTEUR DU BULLETIN INTEGRÉ ET AUTONOME
+        // =========================================================
+        (function(){
+            const KEY='bulletin_cteb_v2';
+            const uid=()=>Math.random().toString(36).slice(2,9);
+            const C=(name,max)=>({id:uid(),name,max});
+            const newSt=()=>({id:uid(),idn:'',eleve:'',sexe:'',nea:'',nele:'',perm:'',rep:'',notes:{},app:{},cond:{},strk:{}});
+            const newStruct=()=>[
+              {t:'DOMAINE DES SCIENCES',g:[
+                {t:'Sous-domaine des mathématiques',c:[]},
+                {t:'Sous-domaine des sciences de la vie et de la terre (SVT)',c:[]},
+                {t:'Sous-domaine des sciences physique, technologie et TIC',c:[]}]},
+              {t:'DOMAINE DES LANGUES',g:[{t:'',c:[]}]},
+              {t:'DOMAINE DE L’UNIVERS SOCIAL ET ENVIRONNEMENT',g:[{t:'',c:[]}]},
+              {t:'DOMAINE DES ARTS',g:[{t:'',c:[]}]},
+              {t:'DOMAINE DU DEVELOPPEMENT PERSONNEL',g:[{t:'',c:[]}]}
+            ];
+            const VIRGIN={name:'',niveau:'7ème',an1:'',an2:'',struct:newStruct(),students:[]};
+            const DUMMY=newSt();
+            function defaults(){return{
+              school:{hdr:['REPUBLIQUE DEMOCRATIQUE DU CONGO','MINISTERE DE L’ENSEIGNEMENT PRIMAIRE, SECONDAIRE','ET PROFESSIONNEL'],
+                province:'',ville:'',commune:'',ecole:'',code:'',flag:'',logo:''},
+              labels:{},classes:[],cc:null};}
+            function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.classes&&o.school)return o;}}catch(e){}return defaults();}
+            let S=load();
+            function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+            const curC=()=>S.classes.find(c=>c.id===S.cc)||S.classes[0]||null;
+            const curS=()=>{const c=curC();if(!c)return null;return c.students.find(s=>s.id===c.cs)||c.students[0]||null;};
+
+            const LD={
+             brn:'BRANCHE',s1:'PREMIER SEMESTRE',s2:'SECOND SEMESTRE',tg:'T.G.',rep:'EXAMEN DE\nREPECHAGE',
+             mx:'MAX',trj:'TRAVAUX\nJOURNAL',mxe:'MAX\nEXAMEN',exa:'EXAMEN',tot:'TOT',
+             p1:'1ère P',p2:'2ème P',p3:'3ème P',p4:'4ème P',pc:'%',sgp:'Sign. Prof',
+             sub:'SOUS-TOTAL',mxg:'MAXIMA GENERAUX',tots:'TOTAUX',pct:'POURCENTAGE',plc:'PLACE/NBRE D’ELEVES',
+             app:'APPLICATION',cnd:'CONDUITE',sig:'SIGNATURE',
+             lid:'N° ID',lpr:'PROVINCE',lvi:'VILLE',lel:'ELEVE',lsx:'SEXE',lco:'COMMUNE / TER (1)',lne:'NE (E) A',lle:'Le',
+             lec:'ECOLE',lcl:'CLASSE',lcd:'CODE',lpm:'N° PERM.',
+             t1:'BULLETIN DE LA',t2:'ANNEE CYCLE TERMINAL DE L’EDUCATION DE BASE (CTEB) ANNEE SCOLAIRE 2 0',t3:'2 0',
+             passe:'PASSE',double:'DOUBLE',le:'LE',chef:'Le chef d’Etablissement',sceau:'Sceau de l’école',
+             f1:'L’élève ne pourra passer dans la classe supérieure (1) s’il n’a subi avec succès un examen de repêchage en',
+             f2:'L’élève passe dans la classe supérieure (1)',f3:'L’élève double la classe (1)',
+             fait:'Fait à',le2:', le',chef2:'Le Chef d’Etablissement',sceau2:'Sceau de l’école',
+             sigel:'Signature de l’élève',nomsig:'Nom et Signature',biff:'(1) Biffer la mention inutile',
+             imp:'Note importante : Le Bulletin est sans valeur s’il est raturé ou surchargé',code2:'IDE/P.S./010'
+            };
+            const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+            const L=k=>{const t=(S.labels[k]!=null)?S.labels[k]:LD[k];return `<span class="lb" contenteditable="true" spellcheck="false" data-lbl="${k}">${esc(t).replace(/\n/g,'<br>')}</span>`;};
+
+            const KEYS=['p1','p2','e1','t1','p3','p4','e2','t2','tg'];
+            const FAC={p1:1,p2:1,e1:2,t1:4,p3:1,p4:1,e2:2,t2:4,tg:8};
+            const num=v=>(v===''||v==null||isNaN(+v))?null:+v;
+            const sm=a=>{const f=a.filter(x=>x!=null);return f.length?f.reduce((x,y)=>x+y,0):null;};
+            const fmt=x=>String(Math.round(x*10)/10);
+            const flat=c=>[].concat(...c.struct.map(d=>[].concat(...d.g.map(g=>g.c))));
+            const findCourse=id=>{const c=curC();return c?flat(c).find(x=>x.id===id):null;};
+            function cv(st,cid){
+              const o=st.notes[cid]||{};
+              const p1=num(o.p1),p2=num(o.p2),e1=num(o.e1),p3=num(o.p3),p4=num(o.p4),e2=num(o.e2);
+              const t1=sm([p1,p2,e1]),t2=sm([p3,p4,e2]);
+              return{p1,p2,e1,t1,p3,p4,e2,t2,tg:sm([t1,t2])};
+            }
+            function agg(st,courses){const r={};KEYS.forEach(k=>r[k]=sm(courses.map(c=>cv(st,c.id)[k])));return r;}
+            function maxes(courses){const b=courses.reduce((a,c)=>a+Number(c.max||0),0);const r={};KEYS.forEach(k=>r[k]=b*FAC[k]);return r;}
+
+            const FLAG='<svg viewBox="0 0 90 60"><rect width="90" height="60" fill="#007FFF"/><polygon points="0,46 76,0 90,0 90,14 14,60 0,60" fill="#F7D618"/><polygon points="0,52 83,0 90,0 90,6 7,60 0,60" fill="#CE1021"/><polygon points="14,5 15.88,10.41 21.61,10.53 17.04,13.99 18.7,19.47 14,16.2 9.3,19.47 10.96,13.99 6.39,10.53 12.12,10.41" fill="#F7D618"/></svg>';
+            const EMB='<svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="34" ry="26" fill="none" stroke="#666" stroke-dasharray="3 3"/><text x="40" y="34" text-anchor="middle" font-size="11" fill="#666" font-family="Arial">LOGO</text></svg>';
+
+            function render(){
+              const cls=curC(),stu=curS();
+              const V=cls||VIRGIN,st=stu||DUMMY;
+              const dC=cls?'':'disabled',dS=stu?'':'disabled';
+              const edit=document.body.classList.contains('edit')&&!!cls;
+              const sc=S.school;
+              const hintEl=document.getElementById('hint');
+              if(hintEl) hintEl.innerHTML=!cls?'Bulletin vierge. Commencez par <b>+ Classe</b>, puis ouvrez <b>Cours &amp; pondération</b> pour enregistrer les cours, puis <b>+ Élève</b>.':(!stu?'Classe créée. Ajoutez un élève avec <b>+ Élève</b> pour générer son bulletin.':'');
+              
+              let h='';
+              h+=`<div class="hdr"><div class="logo" data-up="flag" title="Cliquer pour changer l'image">${sc.flag?`<img src="${sc.flag}">`:FLAG}</div>
+              <div class="ht">${sc.hdr.map((t,i)=>`<div contenteditable="true" spellcheck="false" data-h="${i}">${esc(t)}</div>`).join('')}</div>
+              <div class="logo" data-up="logo" title="Cliquer pour changer l'image">${sc.logo?`<img src="${sc.logo}">`:EMB}</div></div>`;
+              h+=`<div class="idn"><b>${L('lid')}</b> <input data-b="t:idn" ${dS} value="${esc(st.idn)}"></div>`;
+              h+=`<table class="ident">
+              <tr><td colspan="2"><b>${L('lpr')}</b> : <input style="width:85%" data-b="s:province" value="${esc(sc.province)}"></td></tr>
+              <tr><td style="width:50%"><b>${L('lvi')}</b> : <input data-b="s:ville" value="${esc(sc.ville)}"></td>
+                  <td><b>${L('lel')}</b> : <input style="width:50%" data-b="t:eleve" ${dS} value="${esc(st.eleve)}"> &nbsp;<b>${L('lsx')}</b> : <input class="s" data-b="t:sexe" ${dS} value="${esc(st.sexe)}"></td></tr>
+              <tr><td><b>${L('lco')}</b> : <input style="width:40%" data-b="s:commune" value="${esc(sc.commune)}"></td>
+                  <td><b>${L('lne')}</b> : <input style="width:38%" data-b="t:nea" ${dS} value="${esc(st.nea)}"> ${L('lle')} <input class="d" data-b="t:nele" ${dS} value="${esc(st.nele)}" placeholder="..../..../......"></td></tr>
+              <tr><td><b>${L('lec')}</b> : <input data-b="s:ecole" value="${esc(sc.ecole)}"></td>
+                  <td><b>${L('lcl')}</b> : <input data-b="c:name" ${dC} value="${esc(V.name)}"></td></tr>
+              <tr><td><b>${L('lcd')}</b> &nbsp;<input class="bx" maxlength="14" data-b="s:code" value="${esc(sc.code)}"></td>
+                  <td><b>${L('lpm')}</b> &nbsp;<input class="bx" maxlength="14" data-b="t:perm" ${dS} value="${esc(st.perm)}"></td></tr>
+              </table>
+              <div class="title">${L('t1')} <span contenteditable="true" spellcheck="false" data-niv>${esc(V.niveau)}</span> ${L('t2')} <input maxlength="2" data-b="c:an1" ${dC} value="${esc(V.an1)}"> ${L('t3')} <input maxlength="2" data-b="c:an2" ${dC} value="${esc(V.an2)}"></div>`;
+
+              const bl='<td class="blk"></td>',empty='<td></td>',gry='<td class="gry"></td>';
+              const pr=v=>`<td>${v}</td>`;
+              const prz=v=>v?`<td>${v}</td>`:gry;
+              const gen=(s,k)=>`<td data-sc="${s}" data-k="${k}"></td>`;
+              const tt=(m,s,k)=>`<td class="tt"><i>${m}</i><b data-sc="${s}" data-k="${k}"></b></td>`;
+
+              h+='<table class="b"><colgroup><col style="width:14%">'+'<col style="width:5.6%">'.repeat(12)+'<col style="width:5%"><col style="width:6.9%"><col style="width:6.9%"></colgroup><thead>';
+              h+=`<tr><th rowspan="3">${L('brn')}</th><th colspan="6">${L('s1')}</th><th colspan="6">${L('s2')}</th><th rowspan="3">${L('tg')}</th><th colspan="2">${L('rep')}</th></tr>
+              <tr><th rowspan="2">${L('mx')}</th><th colspan="2">${L('trj')}</th><th colspan="2" rowspan="2">${L('mxe')}</th><th rowspan="2">${L('tot')}</th>
+              <th rowspan="2">${L('mx')}</th><th colspan="2">${L('trj')}</th><th colspan="2" rowspan="2">${L('exa')}</th><th rowspan="2">${L('tot')}</th><th rowspan="2">${L('pc')}</th><th rowspan="2">${L('sgp')}</th></tr>
+              <tr><th>${L('p1')}</th><th>${L('p2')}</th><th>${L('p3')}</th><th>${L('p4')}</th></tr></thead><tbody>`;
+
+              const courseRow=c=>{
+                const o=st.notes[c.id]||{};const s='c:'+c.id;
+                const inp=k=>`<td><input class="sc" inputmode="decimal" ${dS} data-cid="${c.id}" data-k="${k}" value="${esc(o[k]==null?'':o[k])}"></td>`;
+                const mxc=edit?`<td><input class="mxi" type="number" min="0" data-cid="${c.id}" value="${c.max}"></td>`:pr(c.max);
+                const nm=edit?`<td class="nm"><input class="nmi" data-cid="${c.id}" value="${esc(c.name)}"><button class="xb del no-print" data-cid="${c.id}" title="Supprimer">×</button></td>`:`<td class="nm">${esc(c.name)}</td>`;
+                return `<tr>${nm}${mxc}${inp('p1')}${inp('p2')}${pr(c.max*2)}${inp('e1')}${tt(c.max*4,s,'t1')}${pr(c.max)}${inp('p3')}${inp('p4')}${pr(c.max*2)}${inp('e2')}${tt(c.max*4,s,'t2')}${tt(c.max*8,s,'tg')}${empty}${empty}</tr>`;
+              };
+              const greyRow=()=>`<tr><td class="nm gry"></td>${gry.repeat(12)}${gry}${empty}${empty}</tr>`;
+              const subRow=(s,courses)=>{
+                if(!courses.length)return `<tr class="sub"><td class="nm">${L('sub')}</td>${gry.repeat(12)}${gry}${empty}${empty}</tr>`;
+                const b=courses.reduce((a,c)=>a+Number(c.max||0),0);
+                return `<tr class="sub"><td class="nm">${L('sub')}</td>${pr(b)}${gen(s,'p1')}${gen(s,'p2')}${pr(b*2)}${gen(s,'e1')}${tt(b*4,s,'t1')}${pr(b)}${gen(s,'p3')}${gen(s,'p4')}${pr(b*2)}${gen(s,'e2')}${tt(b*4,s,'t2')}${tt(b*8,s,'tg')}${empty}${empty}</tr>`;
+              };
+
+              let gi=0;
+              V.struct.forEach((d,di)=>{
+                h+=`<tr class="dom"><td colspan="16">${edit?`<input class="tti" data-d="${di}" value="${esc(d.t)}"><button class="xb adg no-print" data-d="${di}">+ sous-domaine</button><button class="xb rmd no-print" data-d="${di}">× domaine</button>`:esc(d.t)}</td></tr>`;
+                d.g.forEach((g,gj)=>{
+                  if(g.t||edit){h+=`<tr class="sdom"><td colspan="16">${edit?`<input class="tti" data-gd="${di}:${gj}" placeholder="(sans titre de sous-domaine)" value="${esc(g.t)}"><button class="xb rmg no-print" data-d="${di}" data-g="${gj}">× sous-domaine</button>`:esc(g.t)}</td></tr>`;}
+                  if(g.c.length){g.c.forEach(c=>{h+=courseRow(c);});}else{h+=greyRow();}
+                  if(edit)h+=`<tr class="addrow no-print"><td colspan="16"><button class="add" data-d="${di}" data-g="${gj}">+ Ajouter un cours</button></td></tr>`;
+                  h+=subRow('g:'+gi,g.c);gi++;
+                });
+              });
+              if(edit)h+=`<tr class="addrow no-print"><td colspan="16"><button id="addDom">+ Ajouter un domaine</button></td></tr>`;
+
+              const all=flat(V);const b=all.reduce((a,c)=>a+Number(c.max||0),0);
+              h+=`<tr class="bold"><td class="nm">${L('mxg')}</td>${prz(b)}${b?empty:gry}${b?empty:gry}${prz(b*2)}${b?empty:gry}${prz(b*4)}${prz(b)}${b?empty:gry}${b?empty:gry}${prz(b*2)}${b?empty:gry}${prz(b*4)}${prz(b*8)}<td colspan="2"></td></tr>`;
+
+              const sk=(key,lbl)=>`<span class="strk${st.strk[key]?' on':''}" data-s="${key}" title="Double-clic pour biffer">${L(lbl)}</span>`;
+              const sidecell=`<td colspan="2" rowspan="6" class="side">
+               <div>◆${sk('passe','passe')} (1)</div>
+               <div>◆${sk('double','double')} (1)</div>
+               <div>${L('le')} <span contenteditable="true" spellcheck="false">..../..../20..</span></div>
+               <div>${L('chef')}</div>
+               <div class="sc">${L('sceau')}</div></td>`;
+
+              h+=`<tr class="bold"><td class="nm">${L('tots')}</td>${bl}${gen('all','p1')}${gen('all','p2')}${bl}${gen('all','e1')}${gen('all','t1')}${bl}${gen('all','p3')}${gen('all','p4')}${bl}${gen('all','e2')}${gen('all','t2')}${gen('all','tg')}${sidecell}</tr>`;
+              h+=`<tr class="bold"><td class="nm">${L('pct')}</td>${bl}${gen('pct','p1')}${gen('pct','p2')}${bl}${gen('pct','e1')}${gen('pct','t1')}${bl}${gen('pct','p3')}${gen('pct','p4')}${bl}${gen('pct','e2')}${gen('pct','t2')}${gen('pct','tg')}</tr>`;
+              h+=`<tr class="bold"><td class="nm">${L('plc')}</td>${bl}${gen('rank','p1')}${gen('rank','p2')}${bl}${gen('rank','e1')}${gen('rank','t1')}${bl}${gen('rank','p3')}${gen('rank','p4')}${bl}${gen('rank','e2')}${gen('rank','t2')}${gen('rank','tg')}</tr>`;
+              const ap=(t,k)=>`<td><input class="ap" ${dS} data-t="${t}" data-k="${k}" value="${esc((st[t]||{})[k]||'')}"></td>`;
+              const txtRow=(lbl,t)=>`<tr class="bold"><td class="nm">${L(lbl)}</td>${bl}${ap(t,'p1')}${ap(t,'p2')}${bl}${bl}${bl}${bl}${ap(t,'p3')}${ap(t,'p4')}${bl}${bl}${bl}${bl}</tr>`;
+              h+=txtRow('app','app');
+              h+=txtRow('cnd','cond');
+              h+=`<tr class="bold"><td class="nm">${L('sig')}</td>${bl}${empty}${empty}${bl}${empty}${bl}${bl}${empty}${empty}${bl}${empty}${bl}${bl}</tr>`;
+              h+='</tbody></table>';
+
+              h+=`<div class="foot">
+               <div class="box">- <span class="strk${st.strk.f1?' on':''}" data-s="f1" title="Double-clic pour biffer">${L('f1')}</span> <input class="long" data-b="t:rep" ${dS} value="${esc(st.rep)}"> (1)</div>
+               <div>- <span class="strk${st.strk.f2?' on':''}" data-s="f2" title="Double-clic pour biffer">${L('f2')}</span></div>
+               <div>- <span class="strk${st.strk.f3?' on':''}" data-s="f3" title="Double-clic pour biffer">${L('f3')}</span></div>
+               <div class="row"><div>&nbsp;</div><div>${L('fait')} <span class="dots" contenteditable="true" spellcheck="false"></span>${L('le2')} <span contenteditable="true" spellcheck="false">..../..../.......</span></div><div class="r">${L('chef2')}</div></div>
+               <div class="c">${L('sceau2')}</div>
+               <div class="row"><div><b>${L('sigel')}</b></div><div class="r"><b>${L('nomsig')}</b></div></div>
+              </div>
+              <div class="note">${L('biff')}<br><i>${L('imp')}</i><span class="code">${L('code2')}</span></div>`;
+
+              const pg = document.getElementById('page');
+              if(pg) pg.innerHTML=h;
+              updateSels();refresh();
+            }
+
+            function refresh(){
+              const cls=curC(),stu=curS();
+              if(!cls||!stu){document.querySelectorAll('[data-sc]').forEach(el=>el.textContent='');return;}
+              const courses=flat(cls);
+              const groups=[];cls.struct.forEach(d=>d.g.forEach(g=>groups.push(g.c)));
+              const aggAll=agg(stu,courses),mxAll=maxes(courses);
+              const everyone=cls.students.map(s=>agg(s,courses));
+              document.querySelectorAll('[data-sc]').forEach(el=>{
+                const s=el.dataset.sc,k=el.dataset.k;let v=null;
+                if(s.startsWith('c:'))v=cv(stu,s.slice(2))[k];
+                else if(s.startsWith('g:'))v=agg(stu,groups[+s.slice(2)]||[])[k];
+                else if(s==='all')v=aggAll[k];
+                else if(s==='pct'){v=(aggAll[k]==null||!mxAll[k])?null:fmt(aggAll[k]/mxAll[k]*100)+' %';}
+                else if(s==='rank'){if(aggAll[k]!=null){const r=1+everyone.filter(a=>a[k]!=null&&a[k]>aggAll[k]).length;v=r+'/'+cls.students.length;}}
+                el.textContent=v==null?'':v;
+              });
+            }
+
+            function updateSels(){
+              const cs=document.getElementById('clsel'),ss=document.getElementById('stsel');
+              if(!cs || !ss) return;
+              const cls=curC();
+              cs.innerHTML=S.classes.length?S.classes.map(c=>`<option value="${c.id}"${cls&&c.id===cls.id?' selected':''}>${esc((c.name||'Classe')+(c.an1&&c.an2?' · 20'+c.an1+'-20'+c.an2:''))}</option>`).join(''):'<option>— Aucune classe —</option>';
+              const stu=curS();
+              ss.innerHTML=cls&&cls.students.length?cls.students.map((s,i)=>`<option value="${s.id}"${stu&&s.id===stu.id?' selected':''}>${esc(s.eleve||('Élève '+(i+1)))}</option>`).join(''):'<option>— Aucun élève —</option>';
+            }
+
+            document.addEventListener('input',e=>{
+              const t=e.target,cls=curC(),st=curS();
+              if(t.matches('input.sc')){
+                if(!st)return;
+                const c=findCourse(t.dataset.cid);if(!c)return;
+                const k=t.dataset.k;let v=t.value.replace(',','.');
+                if(v!==''&&!isNaN(+v)){const m=(k[0]==='e'?2:1)*c.max;if(+v>m){v=String(m);t.value=v;}if(+v<0){v='0';t.value=v;}}
+                (st.notes[c.id]=st.notes[c.id]||{})[k]=v;save();refresh();
+              }else if(t.matches('input.ap')){
+                if(!st)return;(st[t.dataset.t]=st[t.dataset.t]||{})[t.dataset.k]=t.value;save();
+              }else if(t.matches('input.nmi')){
+                const c=findCourse(t.dataset.cid);if(c){c.name=t.value;save();}
+              }else if(t.matches('input.tti')){
+                if(!cls)return;
+                if(t.dataset.d!=null&&t.dataset.d!==''&&t.dataset.gd==null)cls.struct[+t.dataset.d].t=t.value;
+                else if(t.dataset.gd){const[a,b]=t.dataset.gd.split(':').map(Number);cls.struct[a].g[b].t=t.value;}
+                save();
+              }else if(t.matches('input[data-b]')){
+                const[w,f]=t.dataset.b.split(':');
+                if(w==='s')S.school[f]=t.value;
+                else if(w==='c'){if(!cls)return;cls[f]=t.value;if(f==='name'||f==='an1'||f==='an2')updateSels();}
+                else{if(!st)return;st[f]=t.value;if(f==='eleve')updateSels();}
+                save();
+              }else if(t.matches('[data-lbl]')){
+                S.labels[t.dataset.lbl]=t.innerText;save();
+              }else if(t.matches('[data-h]')){
+                S.school.hdr[+t.dataset.h]=t.innerText;save();
+              }else if(t.matches('[data-niv]')){
+                if(cls){cls.niveau=t.innerText;save();}
+              }
+            });
+            document.addEventListener('change',e=>{
+              const t=e.target;
+              if(t.matches('input.mxi')){
+                const c=findCourse(t.dataset.cid);if(c){c.max=Math.max(0,+t.value||0);save();render();}
+              }
+            });
+            let upTarget=null;
+            document.addEventListener('click',e=>{
+              const t=e.target,cls=curC();
+              const q=s=>t.closest(s);
+              if(q('.del')){
+                const id=q('.del').dataset.cid;
+                cls.struct.forEach(d=>d.g.forEach(g=>{g.c=g.c.filter(c=>c.id!==id);}));
+                cls.students.forEach(s=>delete s.notes[id]);
+                save();render();return;
+              }
+              if(q('.add')){const b=q('.add');cls.struct[+b.dataset.d].g[+b.dataset.g].c.push(C('',10));save();render();
+                setTimeout(()=>{const l=[...document.querySelectorAll('input.nmi')];const m=l.find(x=>x.value==='');if(m)m.focus();},0);return;}
+              if(q('.adg')){cls.struct[+q('.adg').dataset.d].g.push({t:'',c:[]});save();render();return;}
+              if(q('.rmg')){if(confirm('Supprimer ce sous-domaine et ses cours ?')){const b=q('.rmg');cls.struct[+b.dataset.d].g.splice(+b.dataset.g,1);save();render();}return;}
+              if(q('.rmd')){if(confirm('Supprimer ce domaine et ses cours ?')){cls.struct.splice(+q('.rmd').dataset.d,1);save();render();}return;}
+              if(q('#addDom')){cls.struct.push({t:'DOMAINE',g:[{t:'',c:[]}]});save();render();return;}
+              if(q('[data-up]')){upTarget=q('[data-up]').dataset.up;const uf=document.getElementById('upFile');if(uf)uf.click();}
+            });
+            document.addEventListener('dblclick',e=>{
+              const el=e.target.closest('.strk');const st=curS();
+              if(!el||!st)return;
+              const k=el.dataset.s;st.strk[k]=!st.strk[k];el.classList.toggle('on',st.strk[k]);save();
+            });
+
+            const upFileEl = document.getElementById('upFile');
+            if(upFileEl) upFileEl.addEventListener('change',e=>{
+              const f=e.target.files[0];if(!f||!upTarget)return;
+              const r=new FileReader();r.onload=()=>{S.school[upTarget]=r.result;save();render();};r.readAsDataURL(f);e.target.value='';
+            });
+
+            const clselEl = document.getElementById('clsel');
+            if(clselEl) clselEl.addEventListener('change',e=>{if(S.classes.length){S.cc=e.target.value;save();render();}});
+            
+            const stselEl = document.getElementById('stsel');
+            if(stselEl) stselEl.addEventListener('change',e=>{const c=curC();if(c&&c.students.length){c.cs=e.target.value;save();render();}});
+
+            const addClEl = document.getElementById('addCl');
+            if(addClEl) addClEl.addEventListener('click',()=>{
+              const name=prompt('Nom de la classe (ex. : 7ème A ou 1ère Maternelle)');if(name==null||!name.trim())return;
+              const y=new Date().getFullYear();
+              const yr=prompt('Année scolaire (ex. : '+y+'-'+(y+1)+')',y+'-'+(y+1));
+              let an1='',an2='';
+              if(yr){const m=yr.match(/(\d{2,4})\D+(\d{2,4})/);if(m){an1=m[1].slice(-2);an2=m[2].slice(-2);}}
+              let struct=newStruct();
+              const prev=curC();
+              if(prev&&confirm('Copier les cours et la pondération de la classe « '+(prev.name||'actuelle')+' » ?')){
+                struct=JSON.parse(JSON.stringify(prev.struct));
+                struct.forEach(d=>d.g.forEach(g=>g.c.forEach(c=>{c.id=uid();})));
+              }
+              const c={id:uid(),name:name.trim(),niveau:name.trim().split(/\s+/)[0],an1,an2,struct,students:[],cs:null};
+              S.classes.push(c);S.cc=c.id;save();render();
+            });
+
+            const delClEl = document.getElementById('delCl');
+            if(delClEl) delClEl.addEventListener('click',()=>{
+              const c=curC();if(!c)return;
+              if(!confirm('Supprimer la classe « '+(c.name||'')+' » avec ses élèves et leurs points ?'))return;
+              S.classes=S.classes.filter(x=>x.id!==c.id);S.cc=S.classes[0]?S.classes[0].id:null;save();render();
+            });
+
+            const addStEl = document.getElementById('addSt');
+            if(addStEl) addStEl.addEventListener('click',()=>{
+              const c=curC();if(!c){alert('Créez d’abord une classe.');return;}
+              const r=prompt('Nom(s) de l’élève (séparez plusieurs noms par ;)');if(r==null)return;
+              const names=r.split(';').map(x=>x.trim()).filter(Boolean);
+              if(!names.length)names.push('');
+              names.forEach(n=>{const s=newSt();s.eleve=n;c.students.push(s);c.cs=s.id;});
+              save();render();
+            });
+
+            const delStEl = document.getElementById('delSt');
+            if(delStEl) delStEl.addEventListener('click',()=>{
+              const c=curC(),s=curS();if(!c||!s)return;
+              if(!confirm('Supprimer cet élève et ses points ?'))return;
+              c.students=c.students.filter(x=>x.id!==s.id);c.cs=c.students[0]?c.students[0].id:null;save();render();
+            });
+
+            const editBtnEl = document.getElementById('editBtn');
+            if(editBtnEl) editBtnEl.addEventListener('click',e=>{
+              if(!curC()){alert('Créez d’abord une classe pour enregistrer ses cours.');return;}
+              document.body.classList.toggle('edit');
+              const on=document.body.classList.contains('edit');
+              e.target.classList.toggle('on',on);e.target.textContent=on?'Terminer':'Cours & pondération';render();
+            });
+
+            const printBtnEl = document.getElementById('printBtn');
+            if(printBtnEl) printBtnEl.addEventListener('click',()=>{
+              if(document.body.classList.contains('edit'))document.getElementById('editBtn').click();
+              window.print();
+            });
+
+            const expBtnEl = document.getElementById('expBtn');
+            if(expBtnEl) expBtnEl.addEventListener('click',()=>{
+              const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));
+              a.download='bulletins_cteb.json';a.click();
+            });
+
+            const impBtnEl = document.getElementById('impBtn');
+            if(impBtnEl) impBtnEl.addEventListener('click',()=>document.getElementById('impFile').click());
+
+            const impFileEl = document.getElementById('impFile');
+            if(impFileEl) impFileEl.addEventListener('change',e=>{
+              const f=e.target.files[0];if(!f)return;
+              const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(o.classes&&o.school){S=o;if(!S.labels)S.labels={};save();render();}else alert('Fichier invalide');}catch(x){alert('Fichier invalide');}};
+              r.readAsText(f);e.target.value='';
+            });
+
+            window.initBulletinModule = function() {
+                render();
+            };
+        })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
