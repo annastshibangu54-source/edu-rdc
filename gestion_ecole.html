@@ -348,13 +348,131 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
                         <!-- 9. GESTION DES PRÉSENCES -->
                         <div class="tab-pane" id="tab-presences">
-                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-clipboard-check me-2"></i>9. Gestion de présence (Formulaire & Liste)</h5>
-                            <form onsubmit="event.preventDefault(); alert('Registre de présence enregistré !');" class="p-3 bg-light rounded border mb-3">
-                                <div class="mb-3"><label class="fw-bold">Observations Présence Personnel & Élèves :</label><textarea class="form-control" rows="3" placeholder="Saisir les observations..."></textarea></div>
-                                <button type="submit" class="btn btn-primary fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
-                            </form>
-                            <h6 class="fw-bold text-secondary">Liste des présences enregistrées :</h6>
-                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Observations</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td>Aujourd'hui</td><td>RAS - Effectif complet</td><td><span class="badge bg-success">Validé</span></td><td><button class="btn btn-sm btn-outline-primary"><i class="fa fa-edit"></i></button> <button class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i></button></td></tr></tbody></table>
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-clipboard-check me-2"></i>9. Gestion de présence</h5>
+                            
+                            <!-- ONGLETS INTERNES POUR PRÉSENCES -->
+                            <ul class="nav nav-tabs mb-3" id="presenceTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active fw-bold" id="p-eleves-tab" data-bs-toggle="tab" data-bs-target="#p-eleves" type="button" role="tab">1. Élèves</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link fw-bold" id="p-profs-tab" data-bs-toggle="tab" data-bs-target="#p-profs" type="button" role="tab">2. Professeurs / Enseignants</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link fw-bold" id="p-admin-tab" data-bs-toggle="tab" data-bs-target="#p-admin" type="button" role="tab">3. Administration</button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" id="presenceTabsContent">
+                                <!-- 1. PRÉSENCE ÉLÈVES -->
+                                <div class="tab-pane fade show active" id="p-eleves" role="tabpanel">
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold">Choisir la Classe :</label>
+                                            <select id="presClassSelect" class="form-select" onchange="loadStudentsForPresence()"></select>
+                                        </div>
+                                    </div>
+                                    <form onsubmit="handleSaveStudentPresence(event)">
+                                        <div id="studentsPresenceContainer" class="table-responsive mb-3">
+                                            <p class="text-muted">Veuillez sélectionner une classe pour afficher les élèves.</p>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn btn-success fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
+                                            <button type="button" class="btn btn-secondary fw-bold" onclick="closePresenceForm('p-eleves')">Fermer</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- 2. PRÉSENCE PROFESSEURS -->
+                                <div class="tab-pane fade" id="p-profs" role="tabpanel">
+                                    <form onsubmit="handleSaveStaffPresence(event, 'prof')" class="p-3 bg-light rounded border mb-3">
+                                        <input type="hidden" id="editProfPresIndex">
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Choisir Agent / Enseignant :</label>
+                                                <select id="presProfSelect" class="form-select" required onchange="fillProfInfo(this.value)">
+                                                    <option value="" disabled selected>Choisir...</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Nom Complet :</label>
+                                                <input type="text" id="presProfName" class="form-control" readonly required>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Classe / Fonction :</label>
+                                                <input type="text" id="presProfClass" class="form-control" readonly required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="fw-bold">Statut :</label>
+                                                <select id="presProfStatus" class="form-select" required>
+                                                    <option value="Présent">Présent</option>
+                                                    <option value="Absent">Absent</option>
+                                                    <option value="Malade">Malade</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="fw-bold">Heure d'Arrivée :</label>
+                                                <input type="time" id="presProfArrivee" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="fw-bold">Heure de Départ :</label>
+                                                <input type="time" id="presProfDepart" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-3 d-flex align-items-end gap-1">
+                                                <button type="submit" id="btnProfPresSubmit" class="btn btn-success w-100 fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
+                                                <button type="button" class="btn btn-secondary fw-bold" onclick="resetProfPresForm()">Fermer</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <h6 class="fw-bold text-secondary">Liste des Présences Enseignants :</h6>
+                                    <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom</th><th>Fonction/Classe</th><th>Statut</th><th>Arrivée</th><th>Départ</th><th>Actions</th></tr></thead><tbody id="profPresTableBody"></tbody></table>
+                                </div>
+
+                                <!-- 3. PRÉSENCE ADMINISTRATION -->
+                                <div class="tab-pane fade" id="p-admin" role="tabpanel">
+                                    <form onsubmit="handleSaveStaffPresence(event, 'admin')" class="p-3 bg-light rounded border mb-3">
+                                        <input type="hidden" id="editAdminPresIndex">
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Choisir École / Agent :</label>
+                                                <select id="presAdminSelect" class="form-select" required onchange="fillAdminInfo(this.value)">
+                                                    <option value="" disabled selected>Choisir...</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Nom Complet :</label>
+                                                <input type="text" id="presAdminName" class="form-control" readonly required>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Fonction :</label>
+                                                <input type="text" id="presAdminRole" class="form-control" readonly required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="fw-bold">Statut :</label>
+                                                <select id="presAdminStatus" class="form-select" required>
+                                                    <option value="Présent">Présent</option>
+                                                    <option value="Absent">Absent</option>
+                                                    <option value="Malade">Malade</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="fw-bold">Heure d'Arrivée :</label>
+                                                <input type="time" id="presAdminArrivee" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="fw-bold">Heure de Départ :</label>
+                                                <input type="time" id="presAdminDepart" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-3 d-flex align-items-end gap-1">
+                                                <button type="submit" id="btnAdminPresSubmit" class="btn btn-success w-100 fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
+                                                <button type="button" class="btn btn-secondary fw-bold" onclick="resetAdminPresForm()">Fermer</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <h6 class="fw-bold text-secondary">Liste des Présences Administration :</h6>
+                                    <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom</th><th>Fonction</th><th>Statut</th><th>Arrivée</th><th>Départ</th><th>Actions</th></tr></thead><tbody id="adminPresTableBody"></tbody></table>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- 10. PROGRAMME & CALENDRIER -->
@@ -435,6 +553,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
+
+            if(tabId === 'tab-presences') {
+                refreshPresenceOptions();
+            }
         }
 
         // 1.1 CRÉER / MODIFIER ÉCOLE
@@ -479,7 +601,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         id: 'SCH-' + Date.now(),
                         name, appartenance, province, district, commune, adresse,
                         logo: logoBase64 || '',
-                        staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: []
+                        staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: [], presenceStudents: {}, presenceStaff: []
                     });
                     alert("École créée avec succès !");
                 }
@@ -543,6 +665,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             activeSchoolId = id;
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
+            if(!s.presenceStudents) s.presenceStudents = {};
+            if(!s.presenceStaff) s.presenceStaff = [];
+
             document.getElementById('dashSchoolTitle').innerText = s.name;
             document.getElementById('dashSchoolSub').innerText = `${s.appartenance} | ${s.province}, ${s.commune} (${s.adresse || 'Adresse non spécifiée'})`;
             document.getElementById('dashSchoolLogo').src = s.logo || 'https://via.placeholder.com/70?text=LOGO';
@@ -580,6 +705,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('courseClassSelect').innerHTML = classOptions;
             document.getElementById('notesClassSelect').innerHTML = classOptions;
             document.getElementById('bulletinClassSelect').innerHTML = classOptions;
+            document.getElementById('presClassSelect').innerHTML = classOptions;
 
             // Rendu Profs
             const profTbody = document.getElementById('teachersTableBody');
@@ -588,6 +714,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderStudentsTable();
             renderCoursesTable();
             renderCaisseTable();
+            refreshPresenceOptions();
         }
 
         // --- FONCTIONS AVEC ENREGISTRER, MODIFIER ET SUPPRIMER ---
@@ -877,6 +1004,219 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <h4 class="text-success fw-bold">POURCENTAGE : ${pct} %</h4>
                 </div>
             `;
+        }
+
+        // --- 9. GESTION DE PRÉSENCE (NOUVELLES SPÉCIFICATIONS) ---
+        function refreshPresenceOptions() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+
+            // Remplir select Profs (depuis s.teachers)
+            const profOptions = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, i) => `<option value="T-${i}">${t.name} (Enseignant)</option>`).join('');
+            document.getElementById('presProfSelect').innerHTML = profOptions;
+
+            // Remplir select Admin (depuis s.staff)
+            const adminOptions = `<option value="" disabled selected>Choisir cadre admin...</option>` + s.staff.map((st, i) => `<option value="S-${i}">${st.name} (${st.role})</option>`).join('');
+            document.getElementById('presAdminSelect').innerHTML = adminOptions;
+
+            renderStaffPresenceTables();
+        }
+
+        // 1. Présence Élèves par classe
+        function loadStudentsForPresence() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('presClassSelect').value;
+            const container = document.getElementById('studentsPresenceContainer');
+            if(!cl) { container.innerHTML = `<p class="text-muted">Veuillez sélectionner une classe.</p>`; return; }
+
+            const students = s.students.filter(x => x.classe === cl);
+            if(!students.length) { container.innerHTML = `<p class="text-muted">Aucun élève inscrit dans cette classe.</p>`; return; }
+
+            if(!s.presenceStudents[cl]) s.presenceStudents[cl] = {};
+
+            let html = `<table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Matricule</th><th>Nom & Prénom</th><th>Statut de Présence</th></tr></thead><tbody>`;
+            students.forEach(st => {
+                const status = s.presenceStudents[cl][st.id] || 'Présent';
+                html += `<tr>
+                    <td><b>${st.mat}</b></td>
+                    <td>${st.name}</td>
+                    <td>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pres_${st.id}" value="Présent" ${status==='Présent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Présent')">
+                                <label class="form-check-label text-success fw-bold">Présent</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pres_${st.id}" value="Absent" ${status==='Absent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Absent')">
+                                <label class="form-check-label text-danger fw-bold">Absent</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pres_${st.id}" value="Malade" ${status==='Malade'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Malade')">
+                                <label class="form-check-label text-warning fw-bold">Malade</label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function setStudentPres(cl, stId, val) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s.presenceStudents[cl]) s.presenceStudents[cl] = {};
+            s.presenceStudents[cl][stId] = val;
+            saveData();
+        }
+
+        function handleSaveStudentPresence(e) {
+            e.preventDefault();
+            const cl = document.getElementById('presClassSelect').value;
+            if(!cl) { alert("Veuillez choisir une classe !"); return; }
+            saveData();
+            alert("Présences des élèves enregistrées avec succès !");
+        }
+
+        function closePresenceForm(tabName) {
+            if(tabName === 'p-eleves') {
+                document.getElementById('presClassSelect').value = "";
+                document.getElementById('studentsPresenceContainer').innerHTML = `<p class="text-muted">Veuillez sélectionner une classe pour afficher les élèves.</p>`;
+            }
+        }
+
+        // 2 & 3. Remplissage automatique et sauvegarde pour Profs / Administration
+        function fillProfInfo(val) {
+            if(!val) return;
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const idx = parseInt(val.split('-')[1]);
+            const t = s.teachers[idx];
+            document.getElementById('presProfName').value = t.name;
+            document.getElementById('presProfClass').value = t.titulaireClass ? `Titulaire: ${t.titulaireClass}` : 'Enseignant';
+        }
+
+        function fillAdminInfo(val) {
+            if(!val) return;
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const idx = parseInt(val.split('-')[1]);
+            const st = s.staff[idx];
+            document.getElementById('presAdminName').value = st.name;
+            document.getElementById('presAdminRole').value = st.role;
+        }
+
+        function handleSaveStaffPresence(e, type) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const isProf = (type === 'prof');
+            const editIdx = document.getElementById(isProf ? 'editProfPresIndex' : 'editAdminPresIndex').value;
+
+            const name = document.getElementById(isProf ? 'presProfName' : 'presAdminName').value;
+            const fonc = document.getElementById(isProf ? 'presProfClass' : 'presAdminRole').value;
+            const statut = document.getElementById(isProf ? 'presProfStatus' : 'presAdminStatus').value;
+            const arrivee = document.getElementById(isProf ? 'presProfArrivee' : 'presAdminArrivee').value;
+            const depart = document.getElementById(isProf ? 'presProfDepart' : 'presAdminDepart').value;
+            const date = new Date().toLocaleDateString('fr-FR');
+
+            const record = { date, type: (isProf ? 'Professeur' : 'Administration'), name, fonction: fonc, statut, arrivee, depart };
+
+            if(editIdx !== "") {
+                s.presenceStaff[editIdx] = record;
+                document.getElementById(isProf ? 'editProfPresIndex' : 'editAdminPresIndex').value = "";
+                document.getElementById(isProf ? 'btnProfPresSubmit' : 'btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+            } else {
+                s.presenceStaff.push(record);
+            }
+
+            saveData();
+            renderStaffPresenceTables();
+            e.target.reset();
+            if(isProf) document.getElementById('presProfName').value = "", document.getElementById('presProfClass').value = "";
+            else document.getElementById('presAdminName').value = "", document.getElementById('presAdminRole').value = "";
+        }
+
+        function editStaffPres(i) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const p = s.presenceStaff[i];
+            const isProf = (p.type === 'Professeur');
+            
+            if(isProf) {
+                document.getElementById('editProfPresIndex').value = i;
+                document.getElementById('presProfName').value = p.name;
+                document.getElementById('presProfClass').value = p.fonction;
+                document.getElementById('presProfStatus').value = p.statut;
+                document.getElementById('presProfArrivee').value = p.arrivee;
+                document.getElementById('presProfDepart').value = p.depart;
+                document.getElementById('btnProfPresSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
+            } else {
+                document.getElementById('editAdminPresIndex').value = i;
+                document.getElementById('presAdminName').value = p.name;
+                document.getElementById('presAdminRole').value = p.fonction;
+                document.getElementById('presAdminStatus').value = p.statut;
+                document.getElementById('presAdminArrivee').value = p.arrivee;
+                document.getElementById('presAdminDepart').value = p.depart;
+                document.getElementById('btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
+            }
+        }
+
+        function deleteStaffPres(i) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            s.presenceStaff.splice(i, 1);
+            saveData();
+            renderStaffPresenceTables();
+        }
+
+        function resetProfPresForm() {
+            document.getElementById('editProfPresIndex').value = "";
+            document.getElementById('presProfName').value = "";
+            document.getElementById('presProfClass').value = "";
+            document.getElementById('presProfSelect').selectedIndex = 0;
+            document.getElementById('btnProfPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+
+        function resetAdminPresForm() {
+            document.getElementById('editAdminPresIndex').value = "";
+            document.getElementById('presAdminName').value = "";
+            document.getElementById('presAdminRole').value = "";
+            document.getElementById('presAdminSelect').selectedIndex = 0;
+            document.getElementById('btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+
+        function renderStaffPresenceTables() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s || !s.presenceStaff) return;
+
+            const profsTbody = document.getElementById('profPresTableBody');
+            const adminTbody = document.getElementById('adminPresTableBody');
+
+            const profsList = s.presenceStaff.map((p, idx) => ({...p, originalIndex: idx})).filter(x => x.type === 'Professeur');
+            const adminList = s.presenceStaff.map((p, idx) => ({...p, originalIndex: idx})).filter(x => x.type === 'Administration');
+
+            profsTbody.innerHTML = profsList.length ? profsList.map(p => `
+                <tr>
+                    <td><b>${p.name}</b></td>
+                    <td>${p.fonction}</td>
+                    <td><span class="badge bg-${p.statut==='Présent'?'success':(p.statut==='Absent'?'danger':'warning')}">${p.statut}</span></td>
+                    <td>${p.arrivee}</td>
+                    <td>${p.depart}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteStaffPres(${p.originalIndex})"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence enregistrée.</td></tr>`;
+
+            adminTbody.innerHTML = adminList.length ? adminList.map(p => `
+                <tr>
+                    <td><b>${p.name}</b></td>
+                    <td>${p.fonction}</td>
+                    <td><span class="badge bg-${p.statut==='Présent'?'success':(p.statut==='Absent'?'danger':'warning')}">${p.statut}</span></td>
+                    <td>${p.arrivee}</td>
+                    <td>${p.depart}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteStaffPres(${p.originalIndex})"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence enregistrée.</td></tr>`;
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
