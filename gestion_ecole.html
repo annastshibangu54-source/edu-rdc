@@ -411,13 +411,20 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(id === 'view-portal') renderSchoolsList();
         }
 
-        // Fonction pour afficher / cacher le sous-menu Paramètres
+        // Fonction pour afficher / cacher le sous-menu Paramètres et fermer tous les onglets si on ferme les paramètres
         function toggleParamsSubmenu() {
             const submenu = document.getElementById('paramsSubmenu');
             const arrow = document.getElementById('arrowIcon');
             submenu.classList.toggle('show');
             arrow.classList.toggle('fa-chevron-up');
             arrow.classList.toggle('fa-chevron-down');
+
+            // Si le menu paramètres est fermé, on ferme aussi tous les formulaires/sections ouvertes
+            if (!submenu.classList.contains('show')) {
+                document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+                document.getElementById('defaultWelcomeMessage').style.display = 'block';
+                document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
+            }
         }
 
         // Fonction pour basculer entre les onglets des rubriques (masque le message d'accueil initial)
@@ -540,10 +547,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('dashSchoolSub').innerText = `${s.appartenance} | ${s.province}, ${s.commune} (${s.adresse || 'Adresse non spécifiée'})`;
             document.getElementById('dashSchoolLogo').src = s.logo || 'https://via.placeholder.com/70?text=LOGO';
             
-            // Réinitialiser l'affichage sur le message d'accueil initial
+            // Réinitialiser l'affichage sur le message d'accueil initial et fermer les paramètres
             document.getElementById('defaultWelcomeMessage').style.display = 'block';
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.getElementById('paramsSubmenu').classList.remove('show');
+            const arrow = document.getElementById('arrowIcon');
+            if(arrow) {
+                arrow.classList.remove('fa-chevron-up');
+                arrow.classList.add('fa-chevron-down');
+            }
 
             refreshDashboardViews();
             showSection('view-school-dashboard');
