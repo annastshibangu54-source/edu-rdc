@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EDU-RDC – Système Intégré de Gestion Scolaire & Bulletin Officiel CTEB</title>
+<title>EDU-RDC – Plateforme Intégrée de Gestion Scolaire</title>
 
 <!-- Fonts & Icons -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,162 +12,89 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
 <!-- Bootstrap Styles -->
-<link href="css/bootstrap.min.css" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- CSS DU BULLETIN OFFICIEL CTEB (EXACT) -->
 <style>
 .view-section { display: none; }
 .view-section.active { display: block; }
 .school-card { cursor: pointer; transition: transform 0.2s; }
 .school-card:hover { transform: translateY(-3px); }
-
-/* VOS STYLES EXACTS DE BULLETIN */
-*{box-sizing:border-box}
-body{margin:0;background:#e5e7eb;font-family:Arial,Helvetica,sans-serif;color:#000}
-.bar{position:sticky;top:0;z-index:10;background:#111827;color:#fff;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
-.bar button,.bar select{font:inherit;padding:6px 10px;border-radius:6px;border:0;background:#374151;color:#fff;cursor:pointer}
-.bar button.on{background:#b45309}
-.bar button.pri{background:#2563eb}
-.wrap{overflow-x:auto;padding:8px 0}
-.page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:7mm 8mm;font-size:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
-.logo{width:64px;height:50px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.logo img,.logo svg{max-width:100%;max-height:100%}
-.ht{text-align:center;font-weight:bold;font-size:11.5px;line-height:1.3;flex:1;padding:0 6px}
-.idn{display:inline-block;border:1px solid #000;padding:1px 4px;font-weight:bold;margin:2px 0}
-.idn input{width:160px}
-input{font:inherit;color:#000;border:0;background:transparent;outline:none}
-table.ident{width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:2px}
-table.ident td{padding:2px 4px;font-size:8.5px;border:0;vertical-align:bottom;white-space:nowrap}
-table.ident input{border-bottom:1px dotted #000;width:62%}
-table.ident input.s{width:12%}
-table.ident input.d{width:30%}
-table.ident input.bx{width:70%;letter-spacing:5px;border:1px solid #000;padding:1px 3px}
-.title{text-align:center;font-weight:bold;font-size:8.5px;border:1px solid #000;padding:2px;margin-bottom:2px}
-.title input{width:2.2em;border-bottom:1px dotted #000;text-align:center;font-weight:bold}
-table.b{width:100%;border-collapse:collapse;table-layout:fixed}
-table.b td,table.b th{border:1px solid #000;padding:0 1px;height:13.5px;text-align:center;font-size:8px;line-height:1.1;overflow:hidden}
-table.b th{font-weight:bold}
-table.b td.nm{text-align:left;padding-left:3px;position:relative}
-table.b tr.dom td{font-weight:bold;border-left:1px solid #000;font-size:8.5px}
-table.b tr.sdom td{font-weight:bold;font-size:8px}
-table.b tr.sub td,table.b tr.sub td.nm,tr.bold td{font-weight:bold}
-table.b td.blk{background:#000}
-table.b td.pr{font-weight:normal}
-table.b td.tt{position:relative;font-weight:bold}
-table.b td.tt i{position:absolute;left:1px;top:0;font-size:6px;color:#444;font-style:normal;font-weight:normal}
-table.b td input{width:100%;border:0;text-align:center;padding:0;height:12px;-moz-appearance:textfield}
-table.b td input::-webkit-outer-spin-button,table.b td input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-table.b td input:focus,table.ident input:focus{background:#fff8c5}
-table.b td.nm input.nmi{text-align:left;width:calc(100% - 14px)}
-.del{position:absolute;right:1px;top:1px;border:0;background:#dc2626;color:#fff;width:12px;height:12px;line-height:10px;font-size:10px;padding:0;border-radius:2px;cursor:pointer}
-.addrow button{font-size:10px;padding:2px 8px;cursor:pointer}
-td.side{vertical-align:top;text-align:left;padding:3px 4px !important;font-size:8px;line-height:1.6}
-td.side .sc{text-align:center;margin-top:10px}
-.strk{cursor:pointer}
-.strk.on{text-decoration:line-through}
-.foot{margin-top:3px;font-size:8.5px;line-height:1.7}
-.foot .box{border:1px solid #000;padding:2px 4px}
-.foot input.long{width:42%;border-bottom:1px dotted #000}
-.foot .row{display:flex;justify-content:space-between}
-.foot .c{text-align:center}
-.foot .r{text-align:right}
-.note{font-size:8px;margin-top:3px}
-.note .code{float:right}
-.dots{display:inline-block;min-width:60px;border-bottom:1px dotted #000}
-[contenteditable]:focus{outline:1px dashed #2563eb;background:#fff8c5}
-
-@media print {
- @page{size:A4 portrait;margin:6mm}
- body{background:#fff}
- .no-print,.bar{display:none !important}
- .wrap{overflow:visible;padding:0}
- .page{box-shadow:none;margin:0;width:auto;padding:0}
- table.b td input:focus,table.ident input:focus{background:transparent}
- *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
+body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
+.sidebar-menu .list-group-item { font-weight: 600; font-size: 14px; border: 0; border-radius: 6px; margin-bottom: 4px; }
+.sidebar-menu .list-group-item.active { background-color: #0d6efd; color: #fff; }
+.logo-preview { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #dee2e6; }
 </style>
 </head>
-<body class="bg-light">
+<body>
 
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0 no-print">
-        <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow-sm sticky-top p-0 no-print">
+        <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5" onclick="showSection('view-portal')">
+            <h2 class="m-0 text-primary"><i class="fa fa-school me-3"></i>EDU-RDC</h2>
         </a>
-        <div class="ms-auto p-4 d-flex align-items-center gap-3">
-            <span id="userInfoLabel" class="fw-bold text-secondary"></span>
-            <button class="btn btn-outline-danger btn-sm" onclick="logout()"><i class="fa fa-sign-out-alt me-1"></i> Déconnexion</button>
+        <div class="ms-auto p-3 d-flex align-items-center gap-3">
+            <button class="btn btn-outline-primary btn-sm fw-bold" onclick="showSection('view-portal')"><i class="fa fa-home me-1"></i> Accueil Portail</button>
         </div>
     </nav>
 
-    <div class="container py-4">
+    <div class="container-fluid py-4 px-lg-5">
 
-        <!-- 0. CONNEXION -->
-        <div id="view-login" class="view-section active">
-            <div class="row justify-content-center mt-5">
-                <div class="col-md-5">
-                    <div class="card shadow border-0">
-                        <div class="card-body p-4 text-center">
-                            <h3 class="text-primary mb-3"><i class="fa fa-user-shield me-2"></i>Connexion Plateforme</h3>
-                            <p class="text-muted small">Entrez votre matricule (Entrez <b>ADMIN</b> pour les privilèges administrateur)</p>
-                            <form onsubmit="handleLogin(event)">
-                                <div class="mb-3">
-                                    <input type="text" id="loginMatricule" class="form-control text-center fw-bold fs-5" placeholder="Ex: MAT-2026 ou ADMIN" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Ouvrir ma Session</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 1. PORTAIL PRINCIPAL -->
-        <div id="view-portal" class="view-section">
+        <!-- ========================================================= -->
+        <!-- 1. PAGE D'ACCUEIL / PORTAIL PRINCIPAL (3 ZONES) -->
+        <!-- ========================================================= -->
+        <div id="view-portal" class="view-section active">
             <div class="text-center mb-4">
-                <h2 class="text-primary fw-bold">Portail EDU-RDC</h2>
-                <p class="text-muted">Sélectionnez une option :</p>
+                <h2 class="text-primary fw-bold">Plateforme de Gestion Scolaire EDU-RDC</h2>
+                <p class="text-muted">Sélectionnez un service ci-dessous :</p>
             </div>
 
+            <!-- LES 3 ZONES DE DÉPART -->
             <div class="row g-4 mb-5">
+                <!-- ZONE 1 : CRÉER ÉCOLE -->
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="showSchoolForm()">
-                        <i class="fa fa-school fa-3x text-primary mb-3"></i>
-                        <h4>1. Créer une École</h4>
-                        <p class="text-muted small">Configurer un établissement avec logo et code secret.</p>
-                        <button class="btn btn-outline-primary btn-sm mt-2">Créer</button>
+                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openSchoolForm()">
+                        <i class="fa fa-university fa-3x text-primary mb-3"></i>
+                        <h4 class="fw-bold">1. Créer une École</h4>
+                        <p class="text-muted small">Enregistrer un nouvel établissement scolaire avec son identité complète.</p>
+                        <button class="btn btn-outline-primary btn-sm mt-2 fw-bold">Accéder à la création</button>
                     </div>
                 </div>
+                <!-- ZONE 2 : INSCRIPTION ÉLÈVES -->
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openDirectRegistration()">
                         <i class="fa fa-user-plus fa-3x text-success mb-3"></i>
-                        <h4>2. Inscrire un Élève</h4>
-                        <p class="text-muted small">Accéder au registre des inscriptions par classe.</p>
-                        <button class="btn btn-outline-success btn-sm mt-2">Inscrire</button>
+                        <h4 class="fw-bold">2. Inscription Élèves</h4>
+                        <p class="text-muted small">Inscrire directement un élève dans une école active.</p>
+                        <button class="btn btn-outline-success btn-sm mt-2 fw-bold">Procéder à l'inscription</button>
                     </div>
                 </div>
+                <!-- ZONE 3 : DEMANDE D'EMPLOI -->
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="showSection('view-job-application')">
                         <i class="fa fa-briefcase fa-3x text-warning mb-3"></i>
-                        <h4>3. Demande d'Emploi</h4>
-                        <p class="text-muted small">Soumettre une candidature professionnelle.</p>
-                        <button class="btn btn-outline-warning btn-sm mt-2">Postuler</button>
+                        <h4 class="fw-bold">3. Demande d'Emploi</h4>
+                        <p class="text-muted small">Postuler à un poste d'enseignant ou d'administratif.</p>
+                        <button class="btn btn-outline-warning btn-sm mt-2 fw-bold">Soumettre candidature</button>
                     </div>
                 </div>
             </div>
 
-            <h4 class="mb-3 text-primary"><i class="fa fa-university me-2"></i>Mes Établissements & Gestion</h4>
-            <div id="userSchoolsContainer" class="row g-3"></div>
+            <!-- LISTE DES ÉCOLES CRÉÉES -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="m-0 text-primary fw-bold"><i class="fa fa-list me-2"></i>Liste des Écoles Enregistrées</h4>
+                <button class="btn btn-primary btn-sm" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter une École</button>
+            </div>
+            <div id="schoolsListContainer" class="row g-3"></div>
         </div>
 
-        <!-- 2. CRÉATION / MODIFICATION D'UNE ÉCOLE AVEC LOGO -->
+        <!-- ========================================================= -->
+        <!-- 1.1 FORMULAIRE DE CRÉATION / MODIFICATION ÉCOLE -->
+        <!-- ========================================================= -->
         <div id="view-create-school" class="view-section">
-            <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
+            <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour au Portail</button>
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="m-0 text-white" id="schoolFormTitle"><i class="fa fa-plus-circle me-2"></i>Nouveau Établissement Scolaire</h4>
+                    <h4 class="m-0 text-white" id="schoolFormTitle"><i class="fa fa-plus-circle me-2"></i>1.1 Créer / Configurer une École</h4>
                 </div>
                 <div class="card-body p-4">
                     <form id="formCreateSchool" onsubmit="handleSaveSchool(event)">
@@ -175,22 +102,42 @@ td.side .sc{text-align:center;margin-top:10px}
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Nom Officiel de l'École :</label>
-                                <input type="text" id="newSchoolName" class="form-control" placeholder="Ex: C.S. LA REVOLUTION" required>
+                                <input type="text" id="schoolName" class="form-control" placeholder="Ex: C.S. LA REVOLUTION" required>
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label fw-bold">Appartenance / Régime :</label>
+                                <select id="schoolAppartenance" class="form-select" required>
+                                    <option value="Non Conventionnée (Privée)">Non Conventionnée (Privée / Laïque)</option>
+                                    <option value="Conventionnée Catholique">Conventionnée Catholique</option>
+                                    <option value="Conventionnée Protestante">Conventionnée Protestante</option>
+                                    <option value="Conventionnée Kimbanguiste">Conventionnée Kimbanguiste</option>
+                                    <option value="Conventionnée Islamique">Conventionnée Islamique</option>
+                                    <option value="Officielle / Publique">Officielle / Publique</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold">Province Éducationnelle :</label>
-                                <input type="text" id="newSchoolProvince" class="form-control" placeholder="Ex: KINSHASA" required>
+                                <input type="text" id="schoolProvince" class="form-control" placeholder="Ex: KINSHASA-LUKUNGA" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Logo de l'École (Image) :</label>
-                                <input type="file" id="newSchoolLogoFile" class="form-control" accept="image/*">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">District / Territoire :</label>
+                                <input type="text" id="schoolDistrict" class="form-control" placeholder="Ex: LUKUNGA" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-danger">Code Secret (Chargé Inscriptions) :</label>
-                                <input type="password" id="newSchoolSecrCode" class="form-control" placeholder="Ex: 1234" required>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Commune :</label>
+                                <input type="text" id="schoolCommune" class="form-control" placeholder="Ex: KALAMU" required>
                             </div>
-                            <div class="col-12 mt-4">
-                                <button type="submit" id="btnSchoolSubmit" class="btn btn-success py-2 px-4 fw-bold"><i class="fa fa-save me-2"></i>Enregistrer</button>
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Adresse Physique Complète :</label>
+                                <input type="text" id="schoolAdresse" class="form-control" placeholder="Ex: N° 12, Av. des Écoles, Q/ Matonge">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Logo de l'École :</label>
+                                <input type="file" id="schoolLogoFile" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-12 mt-4 d-flex gap-2">
+                                <button type="submit" id="btnSaveSchool" class="btn btn-success fw-bold px-4"><i class="fa fa-save me-1"></i> Enregistrer l'École</button>
+                                <button type="button" class="btn btn-light border fw-bold" onclick="showSection('view-portal')">Annuler</button>
                             </div>
                         </div>
                     </form>
@@ -198,160 +145,185 @@ td.side .sc{text-align:center;margin-top:10px}
             </div>
         </div>
 
+        <!-- ========================================================= -->
         <!-- 3. DEMANDE D'EMPLOI -->
+        <!-- ========================================================= -->
         <div id="view-job-application" class="view-section">
             <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-warning text-dark"><h4 class="m-0 fw-bold">Demande d'Emploi</h4></div>
+                <div class="card-header bg-warning text-dark"><h4 class="m-0 fw-bold"><i class="fa fa-briefcase me-2"></i>3. Demande d'Emploi</h4></div>
                 <div class="card-body p-4">
-                    <form onsubmit="event.preventDefault(); alert('Candidature transmise !'); showSection('view-portal');">
+                    <form onsubmit="event.preventDefault(); alert('Candidature transmise avec succès !'); showSection('view-portal');">
                         <div class="row g-3">
-                            <div class="col-md-6"><input type="text" class="form-control" placeholder="Nom complet" required></div>
-                            <div class="col-md-6"><input type="text" class="form-control" placeholder="Poste souhaité" required></div>
-                            <div class="col-12"><button type="submit" class="btn btn-warning fw-bold">Soumettre</button></div>
+                            <div class="col-md-6"><label class="fw-bold">Nom Complet :</label><input type="text" class="form-control" required></div>
+                            <div class="col-md-6"><label class="fw-bold">Poste Souhaité :</label><input type="text" class="form-control" placeholder="Ex: Enseignant de Mathématiques, Secrétaire..." required></div>
+                            <div class="col-md-6"><label class="fw-bold">Téléphone / WhatsApp :</label><input type="tel" class="form-control" required></div>
+                            <div class="col-md-6"><label class="fw-bold">Niveau d'Études / Diplôme :</label><input type="text" class="form-control" placeholder="Ex: Gradué / Licencié en Pédagogie" required></div>
+                            <div class="col-12"><button type="submit" class="btn btn-warning fw-bold px-4">Soumettre Candidature</button></div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- 4. ESPACE INTERNE DE L'ÉCOLE -->
+        <!-- ========================================================= -->
+        <!-- ESPACE INTERNE ET CONFIGURATION COMPLÈTE DE L'ÉCOLE -->
+        <!-- ========================================================= -->
         <div id="view-school-dashboard" class="view-section">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <button class="btn btn-secondary btn-sm" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Portail</button>
-                <h3 id="activeSchoolTitle" class="text-primary m-0 fw-bold"></h3>
+            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <img id="dashSchoolLogo" src="" class="logo-preview" alt="Logo">
+                    <div>
+                        <h3 id="dashSchoolTitle" class="text-primary m-0 fw-bold"></h3>
+                        <small id="dashSchoolSub" class="text-muted"></small>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour aux Écoles</button>
             </div>
 
             <div class="row">
+                <!-- MENU LATÉRAL DE CONFIGURATION -->
                 <div class="col-lg-3 mb-4">
-                    <div class="list-group shadow-sm" role="tablist">
-                        <a class="list-group-item list-group-item-action active fw-bold" data-bs-toggle="list" href="#tab-inscriptions">
-                            <i class="fa fa-user-plus me-2 text-primary"></i> 1. Inscriptions (Classes)
-                        </a>
-                        <a class="list-group-item list-group-item-action fw-bold" data-bs-toggle="list" href="#tab-cotes">
-                            <i class="fa fa-edit me-2 text-primary"></i> 2. Saisie des Cotes & Cours
-                        </a>
-                        <a class="list-group-item list-group-item-action fw-bold" data-bs-toggle="list" href="#tab-bulletin">
-                            <i class="fa fa-file-invoice me-2 text-primary"></i> 3. Bulletins CTEB
-                        </a>
+                    <div class="list-group sidebar-menu shadow-sm" role="tablist">
+                        <a class="list-group-item list-group-item-action active" data-bs-toggle="list" href="#tab-hierarchie"><i class="fa fa-sitemap me-2 text-primary"></i> 1. Hiérarchie & Direction</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-classes"><i class="fa fa-door-open me-2 text-primary"></i> 2. Enregistrement Classes</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-profs"><i class="fa fa-chalkboard-teacher me-2 text-primary"></i> 3. Enseignants & Titulaires</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-eleves-reg"><i class="fa fa-user-graduate me-2 text-primary"></i> 4. Inscription des Élèves</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-cours"><i class="fa fa-book-open me-2 text-primary"></i> 5. Cours & Pondérations</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-notes"><i class="fa fa-edit me-2 text-primary"></i> 6. Saisie des Notes</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-bulletins"><i class="fa fa-file-invoice me-2 text-primary"></i> 7. Bulletins de Cotes</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-frais"><i class="fa fa-wallet me-2 text-primary"></i> 8. Frais Scolaires & Caisse</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-presences"><i class="fa fa-clipboard-check me-2 text-primary"></i> 9. Gestion des Présences</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-programme"><i class="fa fa-calendar-alt me-2 text-primary"></i> 10. Programme & Calendrier</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-communication"><i class="fa fa-bullhorn me-2 text-primary"></i> 11. Communication / Contact</a>
                     </div>
                 </div>
 
+                <!-- CONTENU DES PANNEAUX -->
                 <div class="col-lg-9">
                     <div class="tab-content bg-white p-4 rounded shadow-sm">
 
-                        <!-- INSCRIPTION (ENREGISTRER, MODIFIER, SUPPRIMER) -->
-                        <div class="tab-pane fade show active" id="tab-inscriptions">
-                            <h4 class="text-primary mb-3">Gestion des Inscriptions par Classe</h4>
-                            <p class="text-muted small">Classes disponibles : Maternelle (1-3), Primaire (1-6), Secondaire (7-8), Humanités (3-6).</p>
-                            
-                            <form id="formRegisterStudent" onsubmit="handleSaveStudent(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
-                                <input type="hidden" id="editStudentId">
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold">Classe :</label>
-                                    <select id="regClass" class="form-select" required onchange="renderStudentsList()">
-                                        <option value="" disabled selected>Choisir classe...</option>
-                                        <optgroup label="Maternelle"><option value="Maternelle 1">Maternelle 1</option><option value="Maternelle 2">Maternelle 2</option><option value="Maternelle 3">Maternelle 3</option></optgroup>
-                                        <optgroup label="Primaire"><option value="Primaire 1">Primaire 1</option><option value="Primaire 2">Primaire 2</option><option value="Primaire 3">Primaire 3</option><option value="Primaire 4">Primaire 4</option><option value="Primaire 5">Primaire 5</option><option value="Primaire 6">Primaire 6</option></optgroup>
-                                        <optgroup label="Secondaire"><option value="Secondaire 7">Secondaire 7</option><option value="Secondaire 8">Secondaire 8</option></optgroup>
-                                        <optgroup label="Humanités"><option value="Humanités 3">Humanités 3</option><option value="Humanités 4">Humanités 4</option><option value="Humanités 5">Humanités 5</option><option value="Humanités 6">Humanités 6</option></optgroup>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold">Nom Complet :</label>
-                                    <input type="text" id="regName" class="form-control" placeholder="Nom et Prénom" required>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label fw-bold">Sexe :</label>
-                                    <select id="regSexe" class="form-select"><option value="M">M</option><option value="F">F</option></select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label fw-bold text-danger">Code Secret :</label>
-                                    <input type="password" id="regSecretCode" class="form-control" placeholder="Code" required>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button type="submit" id="btnStudentSubmit" class="btn btn-success w-100 fw-bold">Enregistrer</button>
-                                </div>
+                        <!-- 1. HIÉRARCHIE ADMINISTRATIVE -->
+                        <div class="tab-pane fade show active" id="tab-hierarchie">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-sitemap me-2"></i>Enregistrement du Personnel Administratif et Cadres</h5>
+                            <form onsubmit="handleSaveAdminStaff(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
+                                <div class="col-md-4"><label class="fw-bold">Poste / Fonction :</label><input type="text" id="staffRole" class="form-control" placeholder="Ex: Préfet, Directeur, Comptable" required></div>
+                                <div class="col-md-5"><label class="fw-bold">Nom Complet :</label><input type="text" id="staffName" class="form-control" placeholder="Nom et Prénom" required></div>
+                                <div class="col-md-3 d-flex align-items-end"><button type="submit" class="btn btn-success w-100 fw-bold"><i class="fa fa-plus"></i> Enregistrer Cadre</button></div>
                             </form>
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered align-middle">
-                                    <thead class="table-primary">
-                                        <tr><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th>Classe</th><th>Actions</th></tr>
-                                    </thead>
-                                    <tbody id="studentListBody">
-                                        <tr><td colspan="5" class="text-center text-muted">Sélectionnez une classe.</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Fonction</th><th>Nom Complet</th><th>Action</th></tr></thead><tbody id="adminStaffTableBody"></tbody></table>
                         </div>
 
-                        <!-- SAISIE DES COTES & COURS PAR CLASSE -->
-                        <div class="tab-pane fade" id="tab-cotes">
-                            <h4 class="text-primary mb-3">Configuration des Cours & Saisie des Cotes</h4>
-                            
-                            <div class="row g-3 mb-3 bg-light p-3 rounded border">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">1. Choisir la Classe :</label>
-                                    <select id="cotesClassSelect" class="form-select" onchange="loadCotesSheet()">
-                                        <option value="" disabled selected>Choisir classe...</option>
-                                        <option value="Maternelle 1">Maternelle 1</option><option value="Maternelle 2">Maternelle 2</option><option value="Maternelle 3">Maternelle 3</option>
-                                        <option value="Primaire 1">Primaire 1</option><option value="Primaire 2">Primaire 2</option><option value="Primaire 3">Primaire 3</option><option value="Primaire 4">Primaire 4</option><option value="Primaire 5">Primaire 5</option><option value="Primaire 6">Primaire 6</option>
-                                        <option value="Secondaire 7">Secondaire 7</option><option value="Secondaire 8">Secondaire 8</option>
-                                        <option value="Humanités 3">Humanités 3</option><option value="Humanités 4">Humanités 4</option><option value="Humanités 5">Humanités 5</option><option value="Humanités 6">Humanités 6</option>
+                        <!-- 2. ENREGISTREMENT DES CLASSES -->
+                        <div class="tab-pane fade" id="tab-classes">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-door-open me-2"></i>Enregistrement et Gestion des Classes</h5>
+                            <form onsubmit="handleSaveClass(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
+                                <div class="col-md-4"><label class="fw-bold">Niveau :</label>
+                                    <select id="classNiveau" class="form-select" required>
+                                        <option value="Maternelle">Maternelle</option>
+                                        <option value="Primaire">Primaire</option>
+                                        <option value="Secondaire / EB">Secondaire (7è/8è EB)</option>
+                                        <option value="Humanités">Humanités</option>
                                     </select>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">2. Choisir l'Élève :</label>
-                                    <select id="cotesStudentSelect" class="form-select border-primary fw-bold" onchange="renderCotesEditor()">
-                                        <option value="" disabled selected>-- Choisir la classe d'abord --</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div id="cotesEditorContainer">
-                                <p class="text-muted text-center py-4">Sélectionnez une classe et un élève.</p>
-                            </div>
+                                <div class="col-md-5"><label class="fw-bold">Nom de la Classe :</label><input type="text" id="className" class="form-control" placeholder="Ex: 7ème EB A, 3ème Scientific A" required></div>
+                                <div class="col-md-3 d-flex align-items-end"><button type="submit" class="btn btn-success w-100 fw-bold"><i class="fa fa-plus"></i> Créer la Classe</button></div>
+                            </form>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Niveau</th><th>Nom Classe</th><th>Action</th></tr></thead><tbody id="classesTableBody"></tbody></table>
                         </div>
 
-                        <!-- BULLETIN SCOLAIRE (SÉLECTION CLASSE + ÉLÈVE + CODE ORIGINAL) -->
-                        <div class="tab-pane fade" id="tab-bulletin">
-                            <h4 class="text-primary mb-3">Génération du Bulletin Officiel</h4>
-                            
-                            <div class="row g-3 mb-3 bg-light p-3 rounded border">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">1. Choisir la Classe :</label>
-                                    <select id="bulletinClassSelect" class="form-select" onchange="updateBulletinStudents()">
-                                        <option value="" disabled selected>Choisir classe...</option>
-                                        <option value="Maternelle 1">Maternelle 1</option><option value="Maternelle 2">Maternelle 2</option><option value="Maternelle 3">Maternelle 3</option>
-                                        <option value="Primaire 1">Primaire 1</option><option value="Primaire 2">Primaire 2</option><option value="Primaire 3">Primaire 3</option><option value="Primaire 4">Primaire 4</option><option value="Primaire 5">Primaire 5</option><option value="Primaire 6">Primaire 6</option>
-                                        <option value="Secondaire 7">Secondaire 7</option><option value="Secondaire 8">Secondaire 8</option>
-                                        <option value="Humanités 3">Humanités 3</option><option value="Humanités 4">Humanités 4</option><option value="Humanités 5">Humanités 5</option><option value="Humanités 6">Humanités 6</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">2. Choisir l'Élève :</label>
-                                    <select id="bulletinStudentSelect" class="form-select border-success fw-bold" onchange="loadStudentIntoBulletin()">
-                                        <option value="" disabled selected>-- Choisir la classe d'abord --</option>
-                                    </select>
-                                </div>
-                            </div>
+                        <!-- 3. ENSEIGNANTS & TITULAIRES -->
+                        <div class="tab-pane fade" id="tab-profs">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-chalkboard-teacher me-2"></i>Enregistrement des Enseignants & Attribution par Classe</h5>
+                            <form onsubmit="handleSaveTeacher(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
+                                <div class="col-md-4"><label class="fw-bold">Nom de l'Enseignant :</label><input type="text" id="teacherName" class="form-control" placeholder="Nom complet" required></div>
+                                <div class="col-md-3"><label class="fw-bold">Téléphone :</label><input type="tel" id="teacherPhone" class="form-control" placeholder="Ex: 0810000000"></div>
+                                <div class="col-md-3"><label class="fw-bold">Titulaire de la Classe :</label><select id="teacherClass" class="form-select"></select></div>
+                                <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-success w-100 fw-bold">Ajouter Prof</button></div>
+                            </form>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Action</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
+                        </div>
 
-                            <!-- BULLETIN OFFICIEL INTEGRÉ (VOTRE CODE EXACT) -->
-                            <div class="bulletin-scope">
-                                <div class="bar no-print">
-                                  <select id="stsel" title="Élève"></select>
-                                  <button id="addSt">+ Élève</button>
-                                  <button id="delSt">Supprimer l'élève</button>
-                                  <button id="editBtn">Modifier les cours</button>
-                                  <button id="printBtn" class="pri">Imprimer / PDF</button>
-                                  <button id="expBtn">Exporter</button>
-                                  <button id="impBtn">Importer</button>
-                                  <input type="file" id="impFile" accept="application/json" hidden>
-                                  <input type="file" id="upFile" accept="image/*" hidden>
-                                </div>
-                                <div class="wrap"><div class="page" id="page"></div></div>
+                        <!-- 4. INSCRIPTION ÉLÈVES -->
+                        <div class="tab-pane fade" id="tab-eleves-reg">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-user-graduate me-2"></i>Inscription des Élèves par Classe</h5>
+                            <form onsubmit="handleSaveStudent(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
+                                <div class="col-md-3"><label class="fw-bold">Classe :</label><select id="studentClass" class="form-select" required onchange="renderStudentsTable()"></select></div>
+                                <div class="col-md-4"><label class="fw-bold">Nom Complet Élève :</label><input type="text" id="studentName" class="form-control" placeholder="Nom, Postnom, Prénom" required></div>
+                                <div class="col-md-2"><label class="fw-bold">Sexe :</label><select id="studentSexe" class="form-select"><option value="M">M</option><option value="F">F</option></select></div>
+                                <div class="col-md-3 d-flex align-items-end"><button type="submit" class="btn btn-success w-100 fw-bold">Inscrire l'Élève</button></div>
+                            </form>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th>Classe</th><th>Action</th></tr></thead><tbody id="studentsTableBody"></tbody></table>
+                        </div>
+
+                        <!-- 5. COURS & PONDÉRATIONS -->
+                        <div class="tab-pane fade" id="tab-cours">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-book-open me-2"></i>Gestion des Cours et Pondérations</h5>
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-4"><label class="fw-bold">Sélectionner la classe :</label><select id="courseClassSelect" class="form-select" onchange="renderCoursesTable()"></select></div>
                             </div>
+                            <form onsubmit="handleSaveCourse(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
+                                <div class="col-md-5"><label class="fw-bold">Intitulé du Cours :</label><input type="text" id="courseName" class="form-control" placeholder="Ex: Mathématiques, Botanique" required></div>
+                                <div class="col-md-3"><label class="fw-bold">Max / Pondération :</label><input type="number" id="courseMax" class="form-control" placeholder="Ex: 20" required></div>
+                                <div class="col-md-4 d-flex align-items-end"><button type="submit" class="btn btn-success w-100 fw-bold">Ajouter le Cours</button></div>
+                            </form>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom du Cours</th><th>Max Période</th><th>Max Examen</th><th>Action</th></tr></thead><tbody id="coursesTableBody"></tbody></table>
+                        </div>
+
+                        <!-- 6. SAISIE DES NOTES -->
+                        <div class="tab-pane fade" id="tab-notes">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-edit me-2"></i>Saisie des Notes par Élève et Classe</h5>
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6"><label class="fw-bold">Classe :</label><select id="notesClassSelect" class="form-select" onchange="loadStudentsForNotes()"></select></div>
+                                <div class="col-md-6"><label class="fw-bold">Élève :</label><select id="notesStudentSelect" class="form-select" onchange="renderNotesSheet()"></select></div>
+                            </div>
+                            <div id="notesSheetContainer" class="p-3 bg-light rounded border"></div>
+                        </div>
+
+                        <!-- 7. BULLETINS -->
+                        <div class="tab-pane fade" id="tab-bulletins">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-file-invoice me-2"></i>Génération des Bulletins de Cotes</h5>
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6"><label class="fw-bold">Classe :</label><select id="bulletinClassSelect" class="form-select" onchange="loadStudentsForBulletin()"></select></div>
+                                <div class="col-md-6"><label class="fw-bold">Élève :</label><select id="bulletinStudentSelect" class="form-select" onchange="generateBulletin()"></select></div>
+                            </div>
+                            <div id="bulletinDisplayArea" class="border p-3 bg-white"></div>
+                        </div>
+
+                        <!-- 8. FRAIS SCOLAIRES & CAISSE -->
+                        <div class="tab-pane fade" id="tab-frais">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-wallet me-2"></i>Gestion des Frais Scolaires & Caisse</h5>
+                            <form onsubmit="handleSaveTransaction(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
+                                <div class="col-md-3"><label class="fw-bold">Type :</label><select id="transType" class="form-select"><option value="Recette (Paiement Frais)">Recette (Paiement Frais)</option><option value="Dépense">Dépense Caisse</option></select></div>
+                                <div class="col-md-4"><label class="fw-bold">Libellé / Motif :</label><input type="text" id="transMotif" class="form-control" placeholder="Ex: Minerval KABONGO Jean" required></div>
+                                <div class="col-md-3"><label class="fw-bold">Montant ($ / FC) :</label><input type="number" id="transMontant" class="form-control" required></div>
+                                <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-success w-100 fw-bold">Enregistrer</button></div>
+                            </form>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Type</th><th>Motif</th><th>Montant</th></tr></thead><tbody id="caisseTableBody"></tbody></table>
+                        </div>
+
+                        <!-- 9. GESTION DES PRÉSENCES -->
+                        <div class="tab-pane fade" id="tab-presences">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-clipboard-check me-2"></i>Gestion des Présences (Administratifs, Profeurs & Élèves)</h5>
+                            <p class="text-muted small">Cochez la présence du jour :</p>
+                            <form onsubmit="event.preventDefault(); alert('Registre de présence enregistré !');">
+                                <div class="mb-3"><label class="fw-bold">Présence Personnel Administratif & Enseignants :</label><textarea class="form-control" rows="3" placeholder="Saisir les observations ou absences du personnel..."></textarea></div>
+                                <button type="submit" class="btn btn-primary fw-bold">Sauvegarder Présences</button>
+                            </form>
+                        </div>
+
+                        <!-- 10. PROGRAMME & CALENDRIER -->
+                        <div class="tab-pane fade" id="tab-programme">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-calendar-alt me-2"></i>Programme de l'Année Scolaire</h5>
+                            <textarea id="schoolProgram" class="form-control mb-3" rows="6" placeholder="Saisissez le calendrier des examens, congés et activités..."></textarea>
+                            <button class="btn btn-success fw-bold" onclick="alert('Programme sauvegardé !')">Sauvegarder Programme</button>
+                        </div>
+
+                        <!-- 11. COMMUNICATION & CONTACT -->
+                        <div class="tab-pane fade" id="tab-communication">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-bullhorn me-2"></i>Publication d'Annonces & Communication Extérieure</h5>
+                            <div class="mb-3"><label class="fw-bold">Message / Avis aux Parents :</label><textarea id="announcementText" class="form-control" rows="3" placeholder="Message à diffuser..."></textarea></div>
+                            <button class="btn btn-warning fw-bold" onclick="alert('Annonce publiée sur le portail de l\'école !')">Publier l'Annonce</button>
                         </div>
 
                     </div>
@@ -361,60 +333,41 @@ td.side .sc{text-align:center;margin-top:10px}
 
     </div>
 
-    <!-- MOTEUR DE GESTION MULTI-ÉCOLES & PERSISTANCE COMPLÈTE -->
+    <!-- SCRIPT JS DE GESTION COMPLÈTE -->
     <script>
-        const STORAGE_KEY = "EDURDC_PLATFORM_DATA_V9";
-        let appData = { currentUserMatricule: null, schools: [] };
+        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+        let appData = { schools: [] };
+        let activeSchoolId = null;
 
         window.onload = function() {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if(saved) { try { appData = JSON.parse(saved); } catch(e){} }
-
-            if(appData.currentUserMatricule) {
-                document.getElementById('userInfoLabel').innerText = "Matricule : " + appData.currentUserMatricule;
-                showSection('view-portal');
-                renderUserSchools();
-            } else {
-                showSection('view-login');
-            }
+            if (saved) { try { appData = JSON.parse(saved); } catch(e){} }
+            renderSchoolsList();
         };
 
         function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
+
         function showSection(id) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            if(id === 'view-portal') renderSchoolsList();
         }
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const mat = document.getElementById('loginMatricule').value.trim().toUpperCase();
-            if(!mat) return;
-            appData.currentUserMatricule = mat;
-            saveData();
-            document.getElementById('userInfoLabel').innerText = "Matricule : " + mat;
-            showSection('view-portal');
-            renderUserSchools();
-        }
-
-        function logout() {
-            appData.currentUserMatricule = null;
-            saveData();
-            showSection('view-login');
-        }
-
-        function showSchoolForm(id = null) {
+        // 1.1 CRÉER / MODIFIER ÉCOLE
+        function openSchoolForm(id = null) {
             document.getElementById('formCreateSchool').reset();
             document.getElementById('editSchoolId').value = "";
-            document.getElementById('schoolFormTitle').innerHTML = '<i class="fa fa-plus-circle me-2"></i>Nouveau Établissement Scolaire';
-            document.getElementById('btnSchoolSubmit').innerHTML = '<i class="fa fa-save me-2"></i>Enregistrer';
+            document.getElementById('schoolFormTitle').innerText = "1.1 Créer une École";
             if(id) {
-                const school = appData.schools.find(s => s.id === id);
-                document.getElementById('editSchoolId').value = school.id;
-                document.getElementById('newSchoolName').value = school.name;
-                document.getElementById('newSchoolProvince').value = school.province;
-                document.getElementById('newSchoolSecrCode').value = school.secrCode;
-                document.getElementById('schoolFormTitle').innerHTML = '<i class="fa fa-edit me-2"></i>Modifier l\'Établissement';
-                document.getElementById('btnSchoolSubmit').innerHTML = '<i class="fa fa-save me-2"></i>Modifier';
+                const s = appData.schools.find(x => x.id === id);
+                document.getElementById('editSchoolId').value = s.id;
+                document.getElementById('schoolName').value = s.name;
+                document.getElementById('schoolAppartenance').value = s.appartenance;
+                document.getElementById('schoolProvince').value = s.province;
+                document.getElementById('schoolDistrict').value = s.district;
+                document.getElementById('schoolCommune').value = s.commune;
+                document.getElementById('schoolAdresse').value = s.adresse;
+                document.getElementById('schoolFormTitle').innerText = "1.1 Modifier l'École";
             }
             showSection('view-create-school');
         }
@@ -422,86 +375,72 @@ td.side .sc{text-align:center;margin-top:10px}
         function handleSaveSchool(e) {
             e.preventDefault();
             const id = document.getElementById('editSchoolId').value;
-            const name = document.getElementById('newSchoolName').value.trim();
-            const prov = document.getElementById('newSchoolProvince').value.trim();
-            const code = document.getElementById('newSchoolSecrCode').value.trim();
-            const fileInput = document.getElementById('newSchoolLogoFile');
+            const name = document.getElementById('schoolName').value.trim();
+            const appartenance = document.getElementById('schoolAppartenance').value;
+            const province = document.getElementById('schoolProvince').value.trim();
+            const district = document.getElementById('schoolDistrict').value.trim();
+            const commune = document.getElementById('schoolCommune').value.trim();
+            const adresse = document.getElementById('schoolAdresse').value.trim();
+            const logoFile = document.getElementById('schoolLogoFile').files[0];
 
-            const processSchoolData = (logoBase64) => {
+            const processSave = (logoBase64) => {
                 if(id) {
-                    const school = appData.schools.find(s => s.id === id);
-                    school.name = name;
-                    school.province = prov;
-                    school.secrCode = code;
-                    if(logoBase64) school.logo = logoBase64;
+                    const s = appData.schools.find(x => x.id === id);
+                    s.name = name; s.appartenance = appartenance; s.province = province;
+                    s.district = district; s.commune = commune; s.adresse = adresse;
+                    if(logoBase64) s.logo = logoBase64;
                     alert("École modifiée avec succès !");
                 } else {
-                    const newSchool = {
+                    appData.schools.push({
                         id: 'SCH-' + Date.now(),
-                        owner: appData.currentUserMatricule,
-                        name: name,
-                        province: prov,
-                        secrCode: code,
+                        name, appartenance, province, district, commune, adresse,
                         logo: logoBase64 || '',
-                        students: [],
-                        classesConfig: {}
-                    };
-                    appData.schools.push(newSchool);
+                        staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: []
+                    });
                     alert("École créée avec succès !");
                 }
                 saveData();
                 showSection('view-portal');
-                renderUserSchools();
             };
 
-            if(fileInput.files && fileInput.files[0]) {
+            if(logoFile) {
                 const reader = new FileReader();
-                reader.onload = function(evt) { processSchoolData(evt.target.result); };
-                reader.readAsDataURL(fileInput.files[0]);
+                reader.onload = function(evt) { processSave(evt.target.result); };
+                reader.readAsDataURL(logoFile);
             } else {
-                processSchoolData(null);
+                processSave(null);
             }
         }
 
         function deleteSchool(id) {
-            if(appData.currentUserMatricule !== "ADMIN") {
-                alert("Action refusée : Seul l'Administrateur (ADMIN) peut supprimer une école !");
-                return;
-            }
             if(confirm("Voulez-vous vraiment supprimer cette école ?")) {
-                appData.schools = appData.schools.filter(s => s.id !== id);
+                appData.schools = appData.schools.filter(x => x.id !== id);
                 saveData();
-                renderUserSchools();
+                renderSchoolsList();
             }
         }
 
-        function renderUserSchools() {
-            const container = document.getElementById('userSchoolsContainer');
+        function renderSchoolsList() {
+            const container = document.getElementById('schoolsListContainer');
             container.innerHTML = "";
-            const isAdmin = (appData.currentUserMatricule === "ADMIN");
-            
-            // Affichage de TOUTES les écoles enregistrées sans restriction
-            const mySchools = appData.schools;
-
-            if(mySchools.length === 0) {
-                container.innerHTML = `<div class="col-12"><div class="alert alert-secondary">Aucun établissement disponible.</div></div>`;
+            if(!appData.schools.length) {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-secondary text-center">Aucune école enregistrée pour le moment. Cliquez sur « 1. Créer une École » ci-dessus.</div></div>`;
                 return;
             }
-
-            mySchools.forEach(s => {
-                let deleteBtn = isAdmin ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSchool('${s.id}')"><i class="fa fa-trash"></i> Supprimer</button>` : '';
+            appData.schools.forEach(s => {
                 container.innerHTML += `
                     <div class="col-md-6">
                         <div class="card shadow-sm border-start border-4 border-primary p-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="m-0 text-primary fw-bold">${s.name}</h5>
-                                    <small class="text-muted">Province : ${s.province} (Propriétaire: ${s.owner || 'N/A'})</small>
+                            <div class="d-flex align-items-center gap-3">
+                                ${s.logo ? `<img src="${s.logo}" class="logo-preview">` : `<i class="fa fa-school fa-2x text-primary"></i>`}
+                                <div class="flex-grow-1">
+                                    <h5 class="m-0 fw-bold text-primary">${s.name}</h5>
+                                    <small class="text-muted d-block">${s.appartenance} — ${s.province} / ${s.commune}</small>
                                 </div>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-primary btn-sm" onclick="showSchoolForm('${s.id}')"><i class="fa fa-edit"></i> Modifier</button>
-                                    ${deleteBtn}
-                                    <button class="btn btn-primary btn-sm fw-bold" onclick="openSchool('${s.id}')">Ouvrir <i class="fa fa-arrow-right"></i></button>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="openSchoolForm('${s.id}')"><i class="fa fa-edit"></i></button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteSchool('${s.id}')"><i class="fa fa-trash"></i></button>
+                                    <button class="btn btn-primary btn-sm fw-bold" onclick="openSchoolDashboard('${s.id}')">Ouvrir <i class="fa fa-arrow-right"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -510,474 +449,215 @@ td.side .sc{text-align:center;margin-top:10px}
             });
         }
 
-        let activeSchoolId = null;
-        function openSchool(id) {
+        function openDirectRegistration() {
+            if(!appData.schools.length) { alert("Créez d'abord une école."); openSchoolForm(); }
+            else openSchoolDashboard(appData.schools[0].id);
+        }
+
+        // CHARGER LE TABLEAU DE BORD DE L'ÉCOLE
+        function openSchoolDashboard(id) {
             activeSchoolId = id;
-            const school = appData.schools.find(s => s.id === id);
-            document.getElementById('activeSchoolTitle').innerText = school.name + " (" + school.province + ")";
+            const s = appData.schools.find(x => x.id === id);
+            document.getElementById('dashSchoolTitle').innerText = s.name;
+            document.getElementById('dashSchoolSub').innerText = `${s.appartenance} | ${s.province}, ${s.commune} (${s.adresse || 'Adresse non spécifiée'})`;
+            document.getElementById('dashSchoolLogo').src = s.logo || 'https://via.placeholder.com/70?text=LOGO';
+            
+            refreshDashboardViews();
             showSection('view-school-dashboard');
         }
 
-        function openDirectRegistration() {
-            if(appData.schools.length === 0) { alert("Créez d'abord une école."); showSchoolForm(); }
-            else { openSchool(appData.schools[0].id); }
+        function refreshDashboardViews() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+
+            // Rendu Hiérarchie
+            const staffTbody = document.getElementById('adminStaffTableBody');
+            staffTbody.innerHTML = s.staff.length ? s.staff.map((st, i) => `<tr><td><b>${st.role}</b></td><td>${st.name}</td><td><button class="btn btn-sm btn-danger" onclick="deleteStaff(${i})">×</button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucun cadre enregistré.</td></tr>`;
+
+            // Rendu Classes
+            const classTbody = document.getElementById('classesTableBody');
+            classTbody.innerHTML = s.classes.length ? s.classes.map((c, i) => `<tr><td>${c.niveau}</td><td><b>${c.name}</b></td><td><button class="btn btn-sm btn-danger" onclick="deleteClass(${i})">×</button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune classe enregistrée.</td></tr>`;
+
+            // Options des selects de classes
+            const classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            document.getElementById('teacherClass').innerHTML = classOptions;
+            document.getElementById('studentClass').innerHTML = classOptions;
+            document.getElementById('courseClassSelect').innerHTML = classOptions;
+            document.getElementById('notesClassSelect').innerHTML = classOptions;
+            document.getElementById('bulletinClassSelect').innerHTML = classOptions;
+
+            // Rendu Profs
+            const profTbody = document.getElementById('teachersTableBody');
+            profTbody.innerHTML = s.teachers.length ? s.teachers.map((t, i) => `<tr><td><b>${t.name}</b></td><td>${t.phone||'-'}</td><td>${t.titulaireClass||'Aucune'}</td><td><button class="btn btn-sm btn-danger" onclick="deleteTeacher(${i})">×</button></td></tr>`).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucun enseignant enregistré.</td></tr>`;
+
+            renderStudentsTable();
+            renderCoursesTable();
+            renderCaisseTable();
         }
 
-        // Inscription (Enregistrer, Modifier, Supprimer) avec persistance
+        // FONCTIONS D'ENREGISTREMENT INTERNES
+        function handleSaveAdminStaff(e) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            s.staff.push({ role: document.getElementById('staffRole').value.trim(), name: document.getElementById('staffName').value.trim() });
+            saveData(); refreshDashboardViews(); e.target.reset();
+        }
+        function deleteStaff(i) { const s = appData.schools.find(x => x.id === activeSchoolId); s.staff.splice(i,1); saveData(); refreshDashboardViews(); }
+
+        function handleSaveClass(e) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            s.classes.push({ niveau: document.getElementById('classNiveau').value, name: document.getElementById('className').value.trim() });
+            saveData(); refreshDashboardViews(); e.target.reset();
+        }
+        function deleteClass(i) { const s = appData.schools.find(x => x.id === activeSchoolId); s.classes.splice(i,1); saveData(); refreshDashboardViews(); }
+
+        function handleSaveTeacher(e) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            s.teachers.push({ name: document.getElementById('teacherName').value.trim(), phone: document.getElementById('teacherPhone').value.trim(), titulaireClass: document.getElementById('teacherClass').value });
+            saveData(); refreshDashboardViews(); e.target.reset();
+        }
+        function deleteTeacher(i) { const s = appData.schools.find(x => x.id === activeSchoolId); s.teachers.splice(i,1); saveData(); refreshDashboardViews(); }
+
         function handleSaveStudent(e) {
             e.preventDefault();
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const code = document.getElementById('regSecretCode').value;
-            if(code !== school.secrCode) { alert("Code secret erroné !"); return; }
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            s.students.push({ id: 'STU-'+Date.now(), mat: 'ELV-'+Math.floor(1000+Math.random()*9000), name: document.getElementById('studentName').value.trim(), sexe: document.getElementById('studentSexe').value, classe: document.getElementById('studentClass').value });
+            saveData(); renderStudentsTable(); e.target.reset();
+        }
+        function deleteStudent(i) { const s = appData.schools.find(x => x.id === activeSchoolId); s.students.splice(i,1); saveData(); renderStudentsTable(); }
 
-            const editId = document.getElementById('editStudentId').value;
-            const classe = document.getElementById('regClass').value;
-            const name = document.getElementById('regName').value.toUpperCase();
-            const sexe = document.getElementById('regSexe').value;
-
-            if(editId) {
-                const st = school.students.find(s => s.id === editId);
-                st.name = name; st.sexe = sexe; st.classe = classe;
-                alert("Élève modifié avec succès !");
-                document.getElementById('editStudentId').value = "";
-                document.getElementById('btnStudentSubmit').innerText = "Enregistrer";
-            } else {
-                school.students.push({
-                    id: 'STU-' + Date.now(),
-                    matricule: 'ELV-' + Math.floor(100000 + Math.random() * 900000),
-                    name: name, sexe: sexe, classe: classe, notes: {}
-                });
-                alert("Élève inscrit avec succès !");
-            }
-            saveData();
-            document.getElementById('regName').value = "";
-            document.getElementById('regSecretCode').value = "";
-            renderStudentsList();
+        function renderStudentsTable() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('studentClass').value;
+            const filtered = s.students.filter(x => x.classe === cl);
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = filtered.length ? filtered.map((st, i) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td><button class="btn btn-sm btn-danger" onclick="deleteStudent(${i})">×</button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucun élève inscrit dans cette classe.</td></tr>`;
         }
 
-        function editStudent(id) {
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const st = school.students.find(s => s.id === id);
-            document.getElementById('editStudentId').value = st.id;
-            document.getElementById('regName').value = st.name;
-            document.getElementById('regSexe').value = st.sexe;
-            document.getElementById('regClass').value = st.classe;
-            document.getElementById('btnStudentSubmit').innerText = "Modifier";
+        function handleSaveCourse(e) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('courseClassSelect').value;
+            if(!cl) { alert("Choisissez une classe !"); return; }
+            if(!s.courses[cl]) s.courses[cl] = [];
+            const max = parseFloat(document.getElementById('courseMax').value) || 10;
+            s.courses[cl].push({ id: 'CRS-'+Date.now(), name: document.getElementById('courseName').value.trim(), max: max });
+            saveData(); renderCoursesTable(); e.target.reset();
         }
 
-        function deleteStudent(id) {
-            if(confirm("Voulez-vous supprimer cet élève ?")) {
-                const school = appData.schools.find(s => s.id === activeSchoolId);
-                school.students = school.students.filter(s => s.id !== id);
-                saveData();
-                renderStudentsList();
-            }
+        function renderCoursesTable() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('courseClassSelect').value;
+            const tbody = document.getElementById('coursesTableBody');
+            const list = s.courses[cl] || [];
+            tbody.innerHTML = list.length ? list.map((c, i) => `<tr><td><b>${c.name}</b></td><td>${c.max}</td><td>${c.max*2}</td><td><button class="btn btn-sm btn-danger" onclick="deleteCourse('${cl}',${i})">×</button></td></tr>`).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucun cours configuré.</td></tr>`;
+        }
+        function deleteCourse(cl, i) { const s = appData.schools.find(x => x.id === activeSchoolId); s.courses[cl].splice(i,1); saveData(); renderCoursesTable(); }
+
+        // CAISSE
+        function handleSaveTransaction(e) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            s.caisse.push({ date: new Date().toLocaleDateString('fr-FR'), type: document.getElementById('transType').value, motif: document.getElementById('transMotif').value, montant: document.getElementById('transMontant').value });
+            saveData(); renderCaisseTable(); e.target.reset();
+        }
+        function renderCaisseTable() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const tbody = document.getElementById('caisseTableBody');
+            tbody.innerHTML = s.caisse.length ? s.caisse.map(c => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td></tr>`).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucune opération de caisse enregistrée.</td></tr>`;
         }
 
-        function renderStudentsList() {
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const classe = document.getElementById('regClass').value;
-            const tbody = document.getElementById('studentListBody');
-            if(!school) return;
-            const filtered = school.students.filter(s => s.classe === classe);
-
-            if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Aucun élève.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = filtered.map(s => `
-                <tr>
-                    <td><strong>${s.matricule}</strong></td>
-                    <td>${s.name}</td>
-                    <td>${s.sexe}</td>
-                    <td><span class="badge bg-primary">${s.classe}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary" onclick="editStudent('${s.id}')"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteStudent('${s.id}')"><i class="fa fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
+        // BULLETIN & NOTES
+        function loadStudentsForNotes() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('notesClassSelect').value;
+            const filtered = s.students.filter(x => x.classe === cl);
+            document.getElementById('notesStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name}</option>`).join('');
         }
 
-        // Saisie des Cotes & Gestion Dynamique des Cours par Classe
-        function loadCotesSheet() {
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const classe = document.getElementById('cotesClassSelect').value;
-            const select = document.getElementById('cotesStudentSelect');
-            if(!school) return;
-            const filtered = school.students.filter(s => s.classe === classe);
+        function renderNotesSheet() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('notesClassSelect').value;
+            const stId = document.getElementById('notesStudentSelect').value;
+            const courses = s.courses[cl] || [];
+            const container = document.getElementById('notesSheetContainer');
 
-            if(filtered.length === 0) {
-                select.innerHTML = `<option value="" disabled selected>Aucun élève</option>`;
-                document.getElementById('cotesEditorContainer').innerHTML = `<p class="text-muted text-center py-4">Aucun élève dans cette classe.</p>`;
-                return;
-            }
+            if(!stId || !courses.length) { container.innerHTML = `<p class="text-muted text-center m-0">Sélectionnez une classe avec des cours et un élève.</p>`; return; }
 
-            select.innerHTML = `<option value="" disabled selected>-- Choisir l'élève --</option>` + 
-                filtered.map(s => `<option value="${s.id}">${s.name} (${s.matricule})</option>`).join('');
-            
-            document.getElementById('cotesEditorContainer').innerHTML = `<p class="text-muted text-center py-4">Veuillez sélectionner un élève.</p>`;
-        }
-
-        function getOrCreateClassStruct(school, classe) {
-            if(!school.classesConfig) school.classesConfig = {};
-            if(!school.classesConfig[classe]) {
-                school.classesConfig[classe] = [
-                    { t: 'DOMAINE DES SCIENCES', g: [{ t: 'Sous-domaine des mathématiques', c: [] }] }
-                ];
-            }
-            return school.classesConfig[classe];
-        }
-
-        function renderCotesEditor() {
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const studentId = document.getElementById('cotesStudentSelect').value;
-            const student = school.students.find(s => s.id === studentId);
-            const classe = document.getElementById('cotesClassSelect').value;
-            if(!student || !classe) return;
-
-            const struct = getOrCreateClassStruct(school, classe);
-
-            let coursesHtml = '';
-            struct.forEach((d, di) => {
-                coursesHtml += `<h6 class="text-secondary mt-3 fw-bold">${d.t}</h6>`;
-                d.g.forEach((g, gi) => {
-                    if(g.t) coursesHtml += `<small class="text-muted fw-bold d-block mb-1">${g.t}</small>`;
-                    if(g.c.length === 0) {
-                        coursesHtml += `<p class="text-muted small fst-italic">Aucun cours configuré dans ce domaine.</p>`;
-                    } else {
-                        g.c.forEach(c => {
-                            const notes = (student.notes[c.id]) || {};
-                            coursesHtml += `
-                                <div class="row align-items-center mb-2 border-bottom pb-2">
-                                    <div class="col-md-3 fw-bold text-dark">${c.name} <span class="badge bg-secondary">Max: ${c.max}</span></div>
-                                    <div class="col-md-8">
-                                        <div class="row g-1">
-                                            <div class="col"><small class="text-muted d-block">P1</small><input type="number" class="form-control form-control-sm text-center" value="${notes.p1||''}" onchange="saveStudentNote('${student.id}','${c.id}','p1',this.value)"></div>
-                                            <div class="col"><small class="text-muted d-block">P2</small><input type="number" class="form-control form-control-sm text-center" value="${notes.p2||''}" onchange="saveStudentNote('${student.id}','${c.id}','p2',this.value)"></div>
-                                            <div class="col"><small class="text-muted d-block">Exam I</small><input type="number" class="form-control form-control-sm text-center" value="${notes.e1||''}" onchange="saveStudentNote('${student.id}','${c.id}','e1',this.value)"></div>
-                                            <div class="col"><small class="text-muted d-block">P3</small><input type="number" class="form-control form-control-sm text-center" value="${notes.p3||''}" onchange="saveStudentNote('${student.id}','${c.id}','p3',this.value)"></div>
-                                            <div class="col"><small class="text-muted d-block">P4</small><input type="number" class="form-control form-control-sm text-center" value="${notes.p4||''}" onchange="saveStudentNote('${student.id}','${c.id}','p4',this.value)"></div>
-                                            <div class="col"><small class="text-muted d-block">Exam II</small><input type="number" class="form-control form-control-sm text-center" value="${notes.e2||''}" onchange="saveStudentNote('${student.id}','${c.id}','e2',this.value)"></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 text-end">
-                                        <button class="btn btn-outline-danger btn-sm" onclick="removeCourseFromClass('${classe}','${c.id}')" title="Supprimer le cours"><i class="fa fa-trash"></i></button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-                });
+            if(!s.notes[stId]) s.notes[stId] = {};
+            let html = `<table class="table table-sm table-bordered"><thead><tr><th>Branche</th><th>P1</th><th>P2</th><th>Ex1</th><th>P3</th><th>P4</th><th>Ex2</th></tr></thead><tbody>`;
+            courses.forEach(c => {
+                const n = s.notes[stId][c.id] || {};
+                html += `<tr><td><b>${c.name}</b> (Max ${c.max})</td>
+                    <td><input type="number" class="form-control form-control-sm" value="${n.p1||''}" onchange="saveNote('${stId}','${c.id}','p1',this.value)"></td>
+                    <td><input type="number" class="form-control form-control-sm" value="${n.p2||''}" onchange="saveNote('${stId}','${c.id}','p2',this.value)"></td>
+                    <td><input type="number" class="form-control form-control-sm" value="${n.e1||''}" onchange="saveNote('${stId}','${c.id}','e1',this.value)"></td>
+                    <td><input type="number" class="form-control form-control-sm" value="${n.p3||''}" onchange="saveNote('${stId}','${c.id}','p3',this.value)"></td>
+                    <td><input type="number" class="form-control form-control-sm" value="${n.p4||''}" onchange="saveNote('${stId}','${c.id}','p4',this.value)"></td>
+                    <td><input type="number" class="form-control form-control-sm" value="${n.e2||''}" onchange="saveNote('${stId}','${c.id}','e2',this.value)"></td>
+                </tr>`;
             });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
 
-            let html = `
-                <div class="card p-3 border-primary">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="text-primary fw-bold m-0">Notes & Cours de : ${student.name}</h5>
-                        <button class="btn btn-outline-success btn-sm" onclick="addNewCoursePrompt('${classe}')"><i class="fa fa-plus"></i> Ajouter un Cours</button>
-                    </div>
-                    <hr>
-                    <div class="table-responsive">${coursesHtml}</div>
-                    <div class="d-flex justify-content-between mt-3">
-                        <button class="btn btn-success btn-sm" onclick="alert('Cotes enregistrées / modifiées avec succès !')"><i class="fa fa-save"></i> Enregistrer / Modifier</button>
-                        <button class="btn btn-danger btn-sm" onclick="clearStudentNotes('${student.id}')"><i class="fa fa-trash"></i> Supprimer les cotes</button>
-                    </div>
+        function saveNote(stId, crsId, period, val) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s.notes[stId]) s.notes[stId] = {};
+            if(!s.notes[stId][crsId]) s.notes[stId][crsId] = {};
+            s.notes[stId][crsId][period] = parseFloat(val) || 0;
+            saveData();
+        }
+
+        function loadStudentsForBulletin() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('bulletinClassSelect').value;
+            const filtered = s.students.filter(x => x.classe === cl);
+            document.getElementById('bulletinStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+        }
+
+        function generateBulletin() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('bulletinClassSelect').value;
+            const stId = document.getElementById('bulletinStudentSelect').value;
+            const student = s.students.find(x => x.id === stId);
+            const courses = s.courses[cl] || [];
+            const area = document.getElementById('bulletinDisplayArea');
+
+            if(!student || !courses.length) { area.innerHTML = `<p class="text-center text-muted">Sélectionnez un élève et assurez-vous que les cours sont enregistrés.</p>`; return; }
+
+            let totalObtenu = 0, totalMax = 0;
+            let rows = courses.map(c => {
+                const n = (s.notes[stId] && s.notes[stId][c.id]) ? s.notes[stId][c.id] : {};
+                const p1 = n.p1||0, p2 = n.p2||0, e1 = n.e1||0, p3 = n.p3||0, p4 = n.p4||0, e2 = n.e2||0;
+                const tot = p1 + p2 + e1 + p3 + p4 + e2;
+                const maxAnnuel = c.max * 8;
+                totalObtenu += tot; totalMax += maxAnnuel;
+                return `<tr><td>${c.name}</td><td>${c.max}</td><td>${p1}</td><td>${p2}</td><td>${e1}</td><td>${p3}</td><td>${p4}</td><td>${e2}</td><td><b>${tot} / ${maxAnnuel}</b></td></tr>`;
+            }).join('');
+
+            const pct = totalMax ? ((totalObtenu / totalMax) * 100).toFixed(2) : 0;
+
+            area.innerHTML = `
+                <div class="text-center border-bottom pb-2 mb-3">
+                    <h4 class="fw-bold m-0">${s.name}</h4>
+                    <small>${s.province} - ${s.commune}</small>
+                    <h5 class="mt-2 text-primary fw-bold">BULLETIN DE NOTES — CLASSE : ${cl}</h5>
+                    <h6>ÉLÈVE : <b>${student.name}</b> (${student.sexe}) — MATRICULE : ${student.mat}</h6>
+                </div>
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-dark"><tr><th>Branche</th><th>Max Période</th><th>P1</th><th>P2</th><th>Ex1</th><th>P3</th><th>P4</th><th>Ex2</th><th>Total Général</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <div class="d-flex justify-content-between align-items-center mt-3 p-2 bg-light rounded">
+                    <h5>TOTAL GÉNÉRAL : <b>${totalObtenu} / ${totalMax}</b></h5>
+                    <h4 class="text-success fw-bold">POURCENTAGE : ${pct} %</h4>
                 </div>
             `;
-            document.getElementById('cotesEditorContainer').innerHTML = html;
-        }
-
-        function addNewCoursePrompt(classe) {
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const struct = getOrCreateClassStruct(school, classe);
-            const courseName = prompt("Nom du nouveau cours :");
-            if(!courseName) return;
-            const courseMax = prompt("Max pondération du cours (ex: 20) :", "20");
-            if(courseMax === null) return;
-
-            if(struct[0] && struct[0].g[0]) {
-                struct[0].g[0].c.push({
-                    id: 'CRS-' + Date.now(),
-                    name: courseName.trim(),
-                    max: parseFloat(courseMax) || 10
-                });
-                saveData();
-                renderCotesEditor();
-            }
-        }
-
-        function removeCourseFromClass(classe, courseId) {
-            if(confirm("Supprimer ce cours pour toute la classe ?")) {
-                const school = appData.schools.find(s => s.id === activeSchoolId);
-                const struct = getOrCreateClassStruct(school, classe);
-                struct.forEach(d => {
-                    d.g.forEach(g => {
-                        g.c = g.c.filter(c => c.id !== courseId);
-                    });
-                });
-                saveData();
-                renderCotesEditor();
-            }
-        }
-
-        function saveStudentNote(studentId, courseId, period, val) {
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const student = school.students.find(s => s.id === studentId);
-            if(!student.notes[courseId]) student.notes[courseId] = {};
-            student.notes[courseId][period] = val;
-            saveData();
-        }
-
-        function clearStudentNotes(studentId) {
-            if(confirm("Supprimer toutes les cotes de cet élève ?")) {
-                const school = appData.schools.find(s => s.id === activeSchoolId);
-                const student = school.students.find(s => s.id === studentId);
-                student.notes = {};
-                saveData();
-                renderCotesEditor();
-            }
-        }
-
-        // Sélection Classe + Élève pour le Bulletin
-        function updateBulletinStudents() {
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const classe = document.getElementById('bulletinClassSelect').value;
-            const select = document.getElementById('bulletinStudentSelect');
-            if(!school) return;
-            const filtered = school.students.filter(s => s.classe === classe);
-
-            if(filtered.length === 0) {
-                select.innerHTML = `<option value="" disabled selected>Aucun élève</option>`;
-                return;
-            }
-            select.innerHTML = `<option value="" disabled selected>-- Cliquer sur l'élève --</option>` + 
-                filtered.map(s => `<option value="${s.id}">${s.name} (${s.matricule})</option>`).join('');
-        }
-
-        function loadStudentIntoBulletin() {
-            const school = appData.schools.find(s => s.id === activeSchoolId);
-            const studentId = document.getElementById('bulletinStudentSelect').value;
-            const student = school.students.find(s => s.id === studentId);
-            const classe = document.getElementById('bulletinClassSelect').value;
-            if(!student) return;
-
-            if(window.loadStudentToBulletinInstance) {
-                window.loadStudentToBulletinInstance(student, school, classe);
-            }
         }
     </script>
-
-    <!-- MOTEUR DE BULLETIN D'ORIGINE INTÉGRÉ & CALCULS OFFICIELS RDC -->
-    <script>
-    (function(){
-    const uid=()=>Math.random().toString(36).slice(2,9);
-    const newSt=()=>({id:uid(),idn:'',eleve:'',sexe:'',nea:'',nele:'',perm:'',rep:'',notes:{},app:{},cond:{},strk:{}});
-    
-    let S = {
-        school: {hdr:['REPUBLIQUE DEMOCRATIQUE DU CONGO','MINISTERE DE L’ENSEIGNEMENT PRIMAIRE, SECONDAIRE','ET PROFESSIONNEL'], province:'',ville:'',commune:'',ecole:'',code:'',classe:'',an1:'26',an2:'27',niveau:'7ème',flag:'',logo:''},
-        struct: [], 
-        students: [newSt()],
-        cur: null
-    };
-
-    const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    const KEYS=['p1','p2','e1','t1','p3','p4','e2','t2','tg'];
-    const FAC={p1:1,p2:1,e1:2,t1:4,p3:1,p4:1,e2:2,t2:4,tg:8};
-    const num=v=>(v===''||v==null||isNaN(+v))?null:+v;
-    const sm=a=>{const f=a.filter(x=>x!=null);return f.length?f.reduce((x,y)=>x+y,0):null;};
-    const fmt=x=>String(Math.round(x*10)/10);
-    const flat=()=>[].concat(...S.struct.map(d=>[].concat(...d.g.map(g=>g.c))));
-    const findCourse=id=>flat().find(c=>c.id===id);
-    
-    // Application rigoureuse des règles de calcul RDC
-    function cv(st,cid){
-      const o=st.notes[cid]||{};
-      const p1=num(o.p1), p2=num(o.p2), e1=num(o.e1);
-      const p3=num(o.p3), p4=num(o.p4), e2=num(o.e2);
-      const t1 = sm([p1, p2, e1]);
-      const t2 = sm([p3, p4, e2]);
-      const tg = sm([t1, t2]);
-      return {p1, p2, e1, t1, p3, p4, e2, t2, tg};
-    }
-    function agg(st,courses){const r={};KEYS.forEach(k=>r[k]=sm(courses.map(c=>cv(st,c.id)[k])));return r;}
-    
-    function maxes(courses){
-      const b=courses.reduce((a,c)=>a+Number(c.max||0),0);
-      return {
-        p1: b, p2: b, e1: b*2, t1: b*4,
-        p3: b, p4: b, e2: b*2, t2: b*4,
-        tg: b*8
-      };
-    }
-
-    const FLAG='<svg viewBox="0 0 90 60"><rect width="90" height="60" fill="#007FFF"/><polygon points="0,46 76,0 90,0 90,14 14,60 0,60" fill="#F7D618"/><polygon points="0,52 83,0 90,0 90,6 7,60 0,60" fill="#CE1021"/><polygon points="14,5 15.88,10.41 21.61,10.53 17.04,13.99 18.7,19.47 14,16.2 9.3,19.47 10.96,13.99 6.39,10.53 12.12,10.41" fill="#F7D618"/></svg>';
-    const EMB='<svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="34" ry="26" fill="none" stroke="#666" stroke-dasharray="3 3"/><text x="40" y="34" text-anchor="middle" font-size="11" fill="#666" font-family="Arial">LOGO</text></svg>';
-
-    function render(){
-      const st=S.students.find(s=>s.id===S.cur)||S.students[0];
-      if(!st) return;
-      S.cur=st.id;
-      const edit=document.body.classList.contains('edit');
-      const sc=S.school;
-      let h='';
-      h+=`<div class="hdr"><div class="logo" data-up="flag">${sc.flag?`<img src="${sc.flag}">`:FLAG}</div>
-      <div class="ht">${sc.hdr.map((t,i)=>`<div contenteditable="true" spellcheck="false" data-h="${i}">${esc(t)}</div>`).join('')}</div>
-      <div class="logo" data-up="logo">${sc.logo?`<img src="${sc.logo}">`:EMB}</div></div>`;
-      h+=`<div class="idn">N° ID <input data-b="t:idn" value="${esc(st.idn)}"></div>`;
-      h+=`<table class="ident">
-      <tr><td colspan="2"><b>PROVINCE</b> : <input style="width:85%" data-b="s:province" value="${esc(sc.province)}"></td></tr>
-      <tr><td style="width:50%"><b>VILLE</b> : <input data-b="s:ville" value="${esc(sc.ville)}"></td>
-          <td><b>ELEVE</b> : <input style="width:58%" data-b="t:eleve" value="${esc(st.eleve)}"> &nbsp;<b>SEXE</b> : <input class="s" data-b="t:sexe" value="${esc(st.sexe)}"></td></tr>
-      <tr><td><b>COMMUNE / TER</b> (1) : <input style="width:45%" data-b="s:commune" value="${esc(sc.commune)}"></td>
-          <td><b>NE (E) A</b> : <input style="width:42%" data-b="t:nea" value="${esc(st.nea)}"> Le <input class="d" data-b="t:nele" value="${esc(st.nele)}"></td></tr>
-      <tr><td><b>ECOLE</b> : <input data-b="s:ecole" value="${esc(sc.ecole)}"></td>
-          <td><b>CLASSE</b> : <input data-b="t:classeX" data-s="classe" value="${esc(sc.classe)}"></td></tr>
-      <tr><td><b>CODE</b> &nbsp;<input class="bx" maxlength="14" data-b="s:code" value="${esc(sc.code)}"></td>
-          <td><b>N° PERM.</b> &nbsp;<input class="bx" maxlength="14" data-b="t:perm" value="${esc(st.perm)}"></td></tr>
-      </table>
-      <div class="title">BULLETIN DE LA <span contenteditable="true" spellcheck="false" data-niv>${esc(sc.niveau)}</span> ANNEE CYCLE TERMINAL DE L’EDUCATION DE BASE (CTEB) ANNEE SCOLAIRE 2 0 <input maxlength="2" data-b="s:an1" value="${esc(sc.an1)}"> 2 0 <input maxlength="2" data-b="s:an2" value="${esc(sc.an2)}"></div>`;
-
-      const bl='<td class="blk"></td>',empty='<td></td>';
-      const pr=v=>`<td class="pr">${v}</td>`;
-      const gen=(s,k)=>`<td data-sc="${s}" data-k="${k}"></td>`;
-      const tt=(m,s,k)=>`<td class="tt"><i>${m}</i><b data-sc="${s}" data-k="${k}"></b></td>`;
-
-      h+='<table class="b"><colgroup><col style="width:14%">'+'<col style="width:5.6%">'.repeat(12)+'<col style="width:5%"><col style="width:6.9%"><col style="width:6.9%"></colgroup><thead>';
-      h+=`<tr><th rowspan="3">BRANCHE</th><th colspan="6">PREMIER SEMESTRE</th><th colspan="6">SECOND SEMESTRE</th><th rowspan="3">T.G.</th><th colspan="2">REPECHAGE</th></tr>
-      <tr><th rowspan="2">MAX</th><th colspan="2">TRAVAUX</th><th colspan="2" rowspan="2">EXAMEN</th><th rowspan="2">TOT</th>
-      <th rowspan="2">MAX</th><th colspan="2">TRAVAUX</th><th colspan="2" rowspan="2">EXAMEN</th><th rowspan="2">TOT</th><th rowspan="2">%</th><th rowspan="2">Sign.</th></tr>
-      <tr><th>1<sup>ère</sup> P</th><th>2<sup>ème</sup> P</th><th>3<sup>ème</sup> P</th><th>4<sup>ème</sup> P</th></tr></thead><tbody>`;
-
-      const courseRow=c=>{
-        const o=st.notes[c.id]||{};const s='c:'+c.id;
-        const inp=k=>`<td><input class="sc" inputmode="decimal" data-cid="${c.id}" data-k="${k}" value="${esc(o[k]==null?'':o[k])}"></td>`;
-        const mxc=edit?`<td><input class="mxi" type="number" min="0" data-cid="${c.id}" value="${c.max}"></td>`:pr(c.max);
-        const nm=edit?`<td class="nm"><input class="nmi" data-cid="${c.id}" value="${esc(c.name)}"><button class="del no-print" data-cid="${c.id}">×</button></td>`:`<td class="nm">${esc(c.name)}</td>`;
-        return `<tr>${nm}${mxc}${inp('p1')}${inp('p2')}${pr(c.max*2)}${inp('e1')}${tt(c.max*4,s,'t1')}${pr(c.max)}${inp('p3')}${inp('p4')}${pr(c.max*2)}${inp('e2')}${tt(c.max*4,s,'t2')}${tt(c.max*8,s,'tg')}${empty}${empty}</tr>`;
-      };
-      const subRow=(s,courses)=>{
-        const b=courses.reduce((a,c)=>a+Number(c.max||0),0);
-        return `<tr class="sub"><td class="nm">SOUS-TOTAL</td>${pr(b)}${gen(s,'p1')}${gen(s,'p2')}${pr(b*2)}${gen(s,'e1')}${tt(b*4,s,'t1')}${pr(b)}${gen(s,'p3')}${gen(s,'p4')}${pr(b*2)}${gen(s,'e2')}${tt(b*4,s,'t2')}${tt(b*8,s,'tg')}${empty}${empty}</tr>`;
-      };
-
-      if(S.struct.length === 0) {
-          h += `<tr><td colspan="16" class="text-center py-4 text-muted fst-italic">Aucun cours configuré. Veuillez ajouter des cours dans l'onglet « Saisie des Cotes & Cours ».</td></tr>`;
-      } else {
-          let gi=0;
-          S.struct.forEach((d,di)=>{
-            h+=`<tr class="dom"><td colspan="16">${esc(d.t)}</td></tr>`;
-            d.g.forEach((g,gj)=>{
-              if(g.t){h+=`<tr class="sdom"><td colspan="16">${esc(g.t)}</td></tr>`;}
-              g.c.forEach(c=>{h+=courseRow(c);});
-              h+=subRow('g:'+gi,g.c);gi++;
-            });
-          });
-      }
-
-      const all=flat();const b=all.reduce((a,c)=>a+Number(c.max||0),0);
-      h+=`<tr class="bold"><td class="nm">MAXIMA GENERAUX</td>${pr(b)}${empty}${empty}${pr(b*2)}${empty}${pr(b*4)}${pr(b)}${empty}${empty}${pr(b*2)}${empty}${pr(b*4)}${pr(b*8)}<td colspan="2"></td></tr>`;
-
-      const sidecell=`<td colspan="2" rowspan="6" class="side"><div>◆ PASSE</div><div>◆ DOUBLE</div></td>`;
-      h+=`<tr class="bold"><td class="nm">TOTAUX</td>${bl}${gen('all','p1')}${gen('all','p2')}${bl}${gen('all','e1')}${gen('all','t1')}${bl}${gen('all','p3')}${gen('all','p4')}${bl}${gen('all','e2')}${gen('all','t2')}${gen('all','tg')}${sidecell}</tr>`;
-      h+=`<tr class="bold"><td class="nm">POURCENTAGE</td>${bl}${gen('pct','p1')}${gen('pct','p2')}${bl}${gen('pct','e1')}${gen('pct','t1')}${bl}${gen('pct','p3')}${gen('pct','p4')}${bl}${gen('pct','e2')}${gen('pct','t2')}${gen('pct','tg')}</tr>`;
-      h+=`<tr class="bold"><td class="nm">PLACE</td>${bl}${gen('rank','p1')}${gen('rank','p2')}${bl}${gen('rank','e1')}${gen('rank','t1')}${bl}${gen('rank','p3')}${gen('rank','p4')}${bl}${gen('rank','e2')}${gen('rank','t2')}${gen('rank','tg')}</tr>`;
-      
-      document.getElementById('page').innerHTML=h;
-      updateSel();refresh();
-    }
-
-    function refresh(){
-      const st=S.students.find(s=>s.id===S.cur)||S.students[0];
-      if(!st) return;
-      const courses=flat();
-      const groups=[];S.struct.forEach(d=>d.g.forEach(g=>groups.push(g.c)));
-      const aggAll=agg(st,courses), mxAll=maxes(courses);
-      const everyone = S.students.map(s => agg(s, courses));
-      
-      document.querySelectorAll('[data-sc]').forEach(el=>{
-        const s=el.dataset.sc, k=el.dataset.k; let v=null;
-        if(s.startsWith('c:')) v=cv(st,s.slice(2))[k];
-        else if(s.startsWith('g:')) v=agg(st,groups[+s.slice(2)]||[])[k];
-        else if(s==='all') v=aggAll[k];
-        else if(s==='pct'){
-            v = (aggAll[k]==null || !mxAll[k]) ? null : fmt((aggAll[k] / mxAll[k]) * 100) + ' %';
-        }
-        else if(s==='rank'){
-            if(aggAll[k]!=null && mxAll[k]){
-                const r = 1 + everyone.filter(a => a[k]!=null && a[k] > aggAll[k]).length;
-                v = r + '/' + S.students.length;
-            }
-        }
-        el.textContent = v == null ? '' : v;
-      });
-    }
-
-    function updateSel(){
-      const sel=document.getElementById('stsel');
-      if(sel) sel.innerHTML=S.students.map((s,i)=>`<option value="${s.id}"${s.id===S.cur?' selected':''}>${esc(s.eleve||('Élève '+(i+1)))}</option>`).join('');
-    }
-
-    window.loadStudentToBulletinInstance = function(studentObj, schoolObj, classeName) {
-      S.school.ecole = schoolObj.name;
-      S.school.province = schoolObj.province;
-      S.school.classe = classeName;
-      if(schoolObj.logo) S.school.logo = schoolObj.logo;
-
-      if(schoolObj.classesConfig && schoolObj.classesConfig[classeName]) {
-          S.struct = schoolObj.classesConfig[classeName];
-      } else {
-          S.struct = [];
-      }
-
-      if(schoolObj.students) {
-          S.students = schoolObj.students.filter(s => s.classe === classeName);
-      }
-      if(S.students.length === 0) {
-          S.students = [studentObj];
-      }
-
-      let found = S.students.find(s => s.id === studentObj.id);
-      if(!found) {
-        S.students.push(studentObj);
-      }
-      S.cur = studentObj.id;
-      render();
-    };
-
-    document.addEventListener('input',e=>{
-      const t=e.target, st=S.students.find(s=>s.id===S.cur);
-      if(!st) return;
-      if(t.matches('input.sc')){
-        const c=findCourse(t.dataset.cid); if(!c) return;
-        const k=t.dataset.k; let v=t.value.replace(',','.');
-        (st.notes[c.id]=st.notes[c.id]||{})[k]=v;
-        
-        if(window.activeSchoolId) {
-            const school = appData.schools.find(sc => sc.id === window.activeSchoolId);
-            if(school) {
-                const targetSt = school.students.find(s => s.id === st.id);
-                if(targetSt) targetSt.notes = st.notes;
-                saveData();
-            }
-        }
-        refresh();
-      }
-    });
-
-    const stsel = document.getElementById('stsel');
-    if(stsel) stsel.addEventListener('change',e=>{S.cur=e.target.value;render();});
-    const editBtn = document.getElementById('editBtn');
-    if(editBtn) editBtn.addEventListener('click',e=>{document.body.classList.toggle('edit');render();});
-    const printBtn = document.getElementById('printBtn');
-    if(printBtn) printBtn.addEventListener('click',()=>window.print());
-
-    render();
-    })();
-    </script>
-
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
