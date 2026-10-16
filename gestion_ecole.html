@@ -40,17 +40,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     <div class="container-fluid py-4 px-lg-5">
 
         <!-- ========================================================= -->
-        <!-- 1. PAGE D'ACCUEIL / PORTAIL PRINCIPAL (3 ZONES) -->
+        <!-- PORTAIL PRINCIPAL (3 ZONES) -->
         <!-- ========================================================= -->
         <div id="view-portal" class="view-section active">
             <div class="text-center mb-4">
                 <h2 class="text-primary fw-bold">Plateforme de Gestion Scolaire EDU-RDC</h2>
-                <p class="text-muted">Sélectionnez un service ci-dessous :</p>
+                <p class="text-muted">Sélectionnez une option :</p>
             </div>
 
             <!-- LES 3 ZONES DE DÉPART -->
             <div class="row g-4 mb-5">
-                <!-- ZONE 1 : CRÉER ÉCOLE -->
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openSchoolForm()">
                         <i class="fa fa-university fa-3x text-primary mb-3"></i>
@@ -59,16 +58,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         <button class="btn btn-outline-primary btn-sm mt-2 fw-bold">Accéder à la création</button>
                     </div>
                 </div>
-                <!-- ZONE 2 : INSCRIPTION ÉLÈVES -->
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openDirectRegistration()">
+                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="alert('Veuillez d\'abord ouvrir une école existante pour gérer les inscriptions.')">
                         <i class="fa fa-user-plus fa-3x text-success mb-3"></i>
                         <h4 class="fw-bold">2. Inscription Élèves</h4>
-                        <p class="text-muted small">Inscrire directement un élève dans une école active.</p>
-                        <button class="btn btn-outline-success btn-sm mt-2 fw-bold">Procéder à l'inscription</button>
+                        <p class="text-muted small">Gérer le registre des élèves par classe au sein de l'école.</p>
+                        <button class="btn btn-outline-success btn-sm mt-2 fw-bold">Voir les écoles</button>
                     </div>
                 </div>
-                <!-- ZONE 3 : DEMANDE D'EMPLOI -->
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="showSection('view-job-application')">
                         <i class="fa fa-briefcase fa-3x text-warning mb-3"></i>
@@ -79,16 +76,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </div>
             </div>
 
-            <!-- LISTE DES ÉCOLES CRÉÉES -->
+            <!-- LISTE DES ÉCOLES ENREGISTRÉES -->
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="m-0 text-primary fw-bold"><i class="fa fa-list me-2"></i>Liste des Écoles Enregistrées</h4>
-                <button class="btn btn-primary btn-sm" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter une École</button>
+                <button class="btn btn-primary btn-sm" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Créer une École</button>
             </div>
             <div id="schoolsListContainer" class="row g-3"></div>
         </div>
 
         <!-- ========================================================= -->
-        <!-- 1.1 FORMULAIRE DE CRÉATION / MODIFICATION ÉCOLE -->
+        <!-- 1.1 FORMULAIRE DE CRÉATION / MODIFICATION D'UNE ÉCOLE -->
         <!-- ========================================================= -->
         <div id="view-create-school" class="view-section">
             <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour au Portail</button>
@@ -146,7 +143,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         </div>
 
         <!-- ========================================================= -->
-        <!-- 3. DEMANDE D'EMPLOI -->
+        <!-- DEMANDE D'EMPLOI -->
         <!-- ========================================================= -->
         <div id="view-job-application" class="view-section">
             <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
@@ -167,7 +164,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         </div>
 
         <!-- ========================================================= -->
-        <!-- ESPACE INTERNE ET CONFIGURATION COMPLÈTE DE L'ÉCOLE -->
+        <!-- ESPACE INTERNE DE L'ÉCOLE (TABLEAU DE BORD ÉTAPE 1.1) -->
         <!-- ========================================================= -->
         <div id="view-school-dashboard" class="view-section">
             <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
@@ -182,7 +179,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             </div>
 
             <div class="row">
-                <!-- MENU LATÉRAL DE CONFIGURATION -->
+                <!-- MENU LATÉRAL DE CONFIGURATION DE L'ÉCOLE -->
                 <div class="col-lg-3 mb-4">
                     <div class="list-group sidebar-menu shadow-sm" role="tablist">
                         <a class="list-group-item list-group-item-action active" data-bs-toggle="list" href="#tab-hierarchie"><i class="fa fa-sitemap me-2 text-primary"></i> 1. Hiérarchie & Direction</a>
@@ -199,7 +196,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     </div>
                 </div>
 
-                <!-- CONTENU DES PANNEAUX -->
+                <!-- CONTENU DES PANNEAUX DE CONFIGURATION -->
                 <div class="col-lg-9">
                     <div class="tab-content bg-white p-4 rounded shadow-sm">
 
@@ -244,7 +241,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Action</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
                         </div>
 
-                        <!-- 4. INSCRIPTION ÉLÈVES -->
+                        <!-- 4. INSCRIPTION DES ÉLÈVES -->
                         <div class="tab-pane fade" id="tab-eleves-reg">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-user-graduate me-2"></i>Inscription des Élèves par Classe</h5>
                             <form onsubmit="handleSaveStudent(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
@@ -304,26 +301,25 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
                         <!-- 9. GESTION DES PRÉSENCES -->
                         <div class="tab-pane fade" id="tab-presences">
-                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-clipboard-check me-2"></i>Gestion des Présences (Administratifs, Profeurs & Élèves)</h5>
-                            <p class="text-muted small">Cochez la présence du jour :</p>
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-clipboard-check me-2"></i>Gestion des Présences</h5>
                             <form onsubmit="event.preventDefault(); alert('Registre de présence enregistré !');">
-                                <div class="mb-3"><label class="fw-bold">Présence Personnel Administratif & Enseignants :</label><textarea class="form-control" rows="3" placeholder="Saisir les observations ou absences du personnel..."></textarea></div>
-                                <button type="submit" class="btn btn-primary fw-bold">Sauvegarder Présences</button>
+                                <div class="mb-3"><label class="fw-bold">Observations Présence Personnel & Élèves :</label><textarea class="form-control" rows="3" placeholder="Saisir les observations..."></textarea></div>
+                                <button type="submit" class="btn btn-primary fw-bold">Sauvegarder</button>
                             </form>
                         </div>
 
                         <!-- 10. PROGRAMME & CALENDRIER -->
                         <div class="tab-pane fade" id="tab-programme">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-calendar-alt me-2"></i>Programme de l'Année Scolaire</h5>
-                            <textarea id="schoolProgram" class="form-control mb-3" rows="6" placeholder="Saisissez le calendrier des examens, congés et activités..."></textarea>
-                            <button class="btn btn-success fw-bold" onclick="alert('Programme sauvegardé !')">Sauvegarder Programme</button>
+                            <textarea id="schoolProgram" class="form-control mb-3" rows="6" placeholder="Calendrier des examens..."></textarea>
+                            <button class="btn btn-success fw-bold" onclick="alert('Programme sauvegardé !')">Sauvegarder</button>
                         </div>
 
                         <!-- 11. COMMUNICATION & CONTACT -->
                         <div class="tab-pane fade" id="tab-communication">
-                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-bullhorn me-2"></i>Publication d'Annonces & Communication Extérieure</h5>
-                            <div class="mb-3"><label class="fw-bold">Message / Avis aux Parents :</label><textarea id="announcementText" class="form-control" rows="3" placeholder="Message à diffuser..."></textarea></div>
-                            <button class="btn btn-warning fw-bold" onclick="alert('Annonce publiée sur le portail de l\'école !')">Publier l'Annonce</button>
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-bullhorn me-2"></i>Communication Extérieure</h5>
+                            <div class="mb-3"><label class="fw-bold">Message aux Parents :</label><textarea id="announcementText" class="form-control" rows="3" placeholder="Message..."></textarea></div>
+                            <button class="btn btn-warning fw-bold" onclick="alert('Annonce publiée !')">Publier</button>
                         </div>
 
                     </div>
@@ -333,7 +329,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     </div>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE CORRIGÉ ET PERSISTANT -->
+    <!-- SCRIPTS JS -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         let appData = { schools: [] };
@@ -345,9 +341,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderSchoolsList();
         };
 
-        function saveData() { 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); 
-        }
+        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
 
         function showSection(id) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -355,7 +349,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(id === 'view-portal') renderSchoolsList();
         }
 
-        // 1.1 CRÉER / MODIFIER ÉCOLE
         function openSchoolForm(id = null) {
             document.getElementById('formCreateSchool').reset();
             document.getElementById('editSchoolId').value = "";
@@ -451,12 +444,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             });
         }
 
-        function openDirectRegistration() {
-            if(!appData.schools.length) { alert("Créez d'abord une école."); openSchoolForm(); }
-            else openSchoolDashboard(appData.schools[0].id);
-        }
-
-        // CHARGER LE TABLEAU DE BORD DE L'ÉCOLE
         function openSchoolDashboard(id) {
             activeSchoolId = id;
             const s = appData.schools.find(x => x.id === id);
@@ -498,7 +485,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderCaisseTable();
         }
 
-        // FONCTIONS D'ENREGISTREMENT INTERNES AVEC PERSISTANCE CORRIGÉE
         function handleSaveAdminStaff(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -559,7 +545,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
         function deleteCourse(cl, i) { const s = appData.schools.find(x => x.id === activeSchoolId); s.courses[cl].splice(i,1); saveData(); renderCoursesTable(); }
 
-        // CAISSE
         function handleSaveTransaction(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -572,7 +557,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             tbody.innerHTML = s.caisse.length ? s.caisse.map(c => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td></tr>`).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucune opération de caisse enregistrée.</td></tr>`;
         }
 
-        // BULLETIN & NOTES
         function loadStudentsForNotes() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('notesClassSelect').value;
