@@ -1209,8 +1209,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <td>${p.arrivee}</td>
                     <td>${p.depart}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteStaffPres(${p.originalIndex})"><i class="fa fa-trash"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteStaffPres(${p.originalIndex})"><i class="fa fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence enregistrée.</td></tr>`;
@@ -1223,8 +1223,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <td>${p.arrivee}</td>
                     <td>${p.depart}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteStaffPres(${p.originalIndex})"><i class="fa fa-trash"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteStaffPres(${p.originalIndex})"><i class="fa fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence enregistrée.</td></tr>`;
