@@ -377,7 +377,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                             <p class="text-muted">Veuillez sélectionner une classe pour afficher les élèves.</p>
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <button type="submit" class="btn btn-success fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
+                                            <button type="submit" id="btnStudentPresSubmit" class="btn btn-success fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
+                                            <button type="button" class="btn btn-warning fw-bold text-dark" onclick="editStudentPresence()"><i class="fa fa-edit"></i> Modifier</button>
                                             <button type="button" class="btn btn-secondary fw-bold" onclick="closePresenceForm('p-eleves')">Fermer</button>
                                         </div>
                                     </form>
@@ -1006,23 +1007,21 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             `;
         }
 
-        // --- 9. GESTION DE PRÉSENCE (NOUVELLES SPÉCIFICATIONS) ---
+        // --- 9. GESTION DE PRÉSENCE (AVEC ENREGISTRER, MODIFIER, FERMER POUR TOUTES LES SECTIONS) ---
         function refreshPresenceOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
 
-            // Remplir select Profs (depuis s.teachers)
             const profOptions = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, i) => `<option value="T-${i}">${t.name} (Enseignant)</option>`).join('');
             document.getElementById('presProfSelect').innerHTML = profOptions;
 
-            // Remplir select Admin (depuis s.staff)
             const adminOptions = `<option value="" disabled selected>Choisir cadre admin...</option>` + s.staff.map((st, i) => `<option value="S-${i}">${st.name} (${st.role})</option>`).join('');
             document.getElementById('presAdminSelect').innerHTML = adminOptions;
 
             renderStaffPresenceTables();
         }
 
-        // 1. Présence Élèves par classe
+        // 1. Élèves
         function loadStudentsForPresence() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('presClassSelect').value;
@@ -1043,15 +1042,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <td>
                         <div class="d-flex gap-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="pres_${st.id}" value="Présent" ${status==='Présent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Présent')">
+                                <input class="form-check-input student-pres-input" type="radio" name="pres_${st.id}" value="Présent" ${status==='Présent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Présent')">
                                 <label class="form-check-label text-success fw-bold">Présent</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="pres_${st.id}" value="Absent" ${status==='Absent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Absent')">
+                                <input class="form-check-input student-pres-input" type="radio" name="pres_${st.id}" value="Absent" ${status==='Absent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Absent')">
                                 <label class="form-check-label text-danger fw-bold">Absent</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="pres_${st.id}" value="Malade" ${status==='Malade'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Malade')">
+                                <input class="form-check-input student-pres-input" type="radio" name="pres_${st.id}" value="Malade" ${status==='Malade'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Malade')">
                                 <label class="form-check-label text-warning fw-bold">Malade</label>
                             </div>
                         </div>
@@ -1075,16 +1074,25 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!cl) { alert("Veuillez choisir une classe !"); return; }
             saveData();
             alert("Présences des élèves enregistrées avec succès !");
+            document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+
+        function editStudentPresence() {
+            const cl = document.getElementById('presClassSelect').value;
+            if(!cl) { alert("Veuillez sélectionner une classe à modifier !"); return; }
+            alert("Mode modification activé pour la classe " + cl + ". Vous pouvez changer les statuts directement dans le tableau.");
+            document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
         }
 
         function closePresenceForm(tabName) {
             if(tabName === 'p-eleves') {
                 document.getElementById('presClassSelect').value = "";
                 document.getElementById('studentsPresenceContainer').innerHTML = `<p class="text-muted">Veuillez sélectionner une classe pour afficher les élèves.</p>`;
+                document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
             }
         }
 
-        // 2 & 3. Remplissage automatique et sauvegarde pour Profs / Administration
+        // 2 & 3. Profs et Administration (Enregistrer, Modifier, Fermer)
         function fillProfInfo(val) {
             if(!val) return;
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1121,16 +1129,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(editIdx !== "") {
                 s.presenceStaff[editIdx] = record;
                 document.getElementById(isProf ? 'editProfPresIndex' : 'editAdminPresIndex').value = "";
-                document.getElementById(isProf ? 'btnProfPresSubmit' : 'btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+                alert("Présence modifiée avec succès !");
             } else {
                 s.presenceStaff.push(record);
+                alert("Présence enregistrée avec succès !");
             }
 
             saveData();
             renderStaffPresenceTables();
-            e.target.reset();
-            if(isProf) document.getElementById('presProfName').value = "", document.getElementById('presProfClass').value = "";
-            else document.getElementById('presAdminName').value = "", document.getElementById('presAdminRole').value = "";
+            if(isProf) resetProfPresForm(); else resetAdminPresForm();
         }
 
         function editStaffPres(i) {
@@ -1158,10 +1165,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function deleteStaffPres(i) {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            s.presenceStaff.splice(i, 1);
-            saveData();
-            renderStaffPresenceTables();
+            if(confirm("Voulez-vous vraiment supprimer cet enregistrement de présence ?")) {
+                const s = appData.schools.find(x => x.id === activeSchoolId);
+                s.presenceStaff.splice(i, 1);
+                saveData();
+                renderStaffPresenceTables();
+            }
         }
 
         function resetProfPresForm() {
@@ -1169,6 +1178,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('presProfName').value = "";
             document.getElementById('presProfClass').value = "";
             document.getElementById('presProfSelect').selectedIndex = 0;
+            document.getElementById('presProfArrivee').value = "";
+            document.getElementById('presProfDepart').value = "";
             document.getElementById('btnProfPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
 
@@ -1177,6 +1188,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('presAdminName').value = "";
             document.getElementById('presAdminRole').value = "";
             document.getElementById('presAdminSelect').selectedIndex = 0;
+            document.getElementById('presAdminArrivee').value = "";
+            document.getElementById('presAdminDepart').value = "";
             document.getElementById('btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
 
