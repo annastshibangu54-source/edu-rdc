@@ -333,7 +333,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     </div>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE -->
+    <!-- SCRIPT JS DE GESTION COMPLÈTE CORRIGÉ ET PERSISTANT -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         let appData = { schools: [] };
@@ -345,7 +345,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderSchoolsList();
         };
 
-        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
+        function saveData() { 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); 
+        }
 
         function showSection(id) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -458,6 +460,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function openSchoolDashboard(id) {
             activeSchoolId = id;
             const s = appData.schools.find(x => x.id === id);
+            if(!s) return;
             document.getElementById('dashSchoolTitle').innerText = s.name;
             document.getElementById('dashSchoolSub').innerText = `${s.appartenance} | ${s.province}, ${s.commune} (${s.adresse || 'Adresse non spécifiée'})`;
             document.getElementById('dashSchoolLogo').src = s.logo || 'https://via.placeholder.com/70?text=LOGO';
@@ -495,7 +498,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderCaisseTable();
         }
 
-        // FONCTIONS D'ENREGISTREMENT INTERNES
+        // FONCTIONS D'ENREGISTREMENT INTERNES AVEC PERSISTANCE CORRIGÉE
         function handleSaveAdminStaff(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
