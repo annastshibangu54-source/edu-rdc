@@ -387,7 +387,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 </div>
                             </form>
                             <h6 class="fw-bold text-secondary">Liste des enseignants enregistrés :</h6>
-                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Actions</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Secret</th><th>Actions</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
                         </div>
 
                         <!-- 4. INSCRIPTION DES ÉLÈVES -->
@@ -765,7 +765,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026"; 
         let appData = { schools: [], adminRequests: [] };
         let activeSchoolId = null;
-        let currentUserSession = { role: null, name: null, assignedClass: null };
+        let currentUserSession = { role: null, name: null, assignedClass: null, secretCode: null };
 
         window.onload = function() {
             let saved = localStorage.getItem(STORAGE_KEY);
@@ -807,6 +807,24 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function switchTab(tabId, element) {
+            // REGLE 3: RESTRICTION STRICTE DE LA RUBRIQUE FRAIS ET CAISSE (RUBRIQUE 8) POUR LES ENSEIGNANTS / PROFESSEURS
+            if(tabId === 'tab-frais' && currentUserSession.role === 'teacher') {
+                alert("ACCÈS REFUSÉ !\n\nLa rubrique '8. Frais scolaire & Caisse' est une zone strictement réservée au Chargé de Paiement et au Caissier.\nEn tant qu'enseignant, vous n'avez pas l'autorisation d'y accéder.");
+                return;
+            }
+
+            // REGLE 2: VERIFICATION DU CODE SECRET DU PROFESSEUR AVANT TOUTE ACTIVITE SUR UNE RUBRIQUE
+            if(currentUserSession.role === 'teacher') {
+                const s = appData.schools.find(x => x.id === activeSchoolId);
+                const inputCode = prompt(`[SÉCURITÉ ENSEIGNANT - Prof. ${currentUserSession.name}]\nVeuillez saisir votre code secret pour accéder à cette rubrique :`);
+                if(inputCode === null) return;
+                
+                if(inputCode.trim() !== currentUserSession.secretCode) {
+                    alert("Code secret incorrect ! Accès refusé.");
+                    return;
+                }
+            }
+
             document.getElementById('defaultWelcomeMessage').style.display = 'none';
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
@@ -1103,12 +1121,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             
             const code = inputCode.trim();
             if(code === s.secretCode) {
-                currentUserSession = { role: 'owner', name: 'Propriétaire', assignedClass: null };
+                currentUserSession = { role: 'owner', name: 'Propriétaire', assignedClass: null, secretCode: s.secretCode };
                 openSchoolDashboard(id);
             } else {
                 const teacherMatch = s.teachers.find(t => t.secretCode === code);
                 if(teacherMatch) {
-                    currentUserSession = { role: 'teacher', name: teacherMatch.name, assignedClass: teacherMatch.titulaireClass || null };
+                    currentUserSession = { role: 'teacher', name: teacherMatch.name, assignedClass: teacherMatch.titulaireClass || null, secretCode: teacherMatch.secretCode };
                     if(!teacherMatch.titulaireClass) {
                         alert(`Attention Prof. ${teacherMatch.name} : Vous n'avez pas de classe titulaire assignée. Accès restreint.`);
                     } else {
@@ -1198,12 +1216,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <td><b>${t.name}</b></td>
                     <td>${t.phone||'-'}</td>
                     <td>${t.titulaireClass||'Aucune'}</td>
+                    <td><span class="badge bg-dark text-warning p-2 fs-6"><i class="fa fa-key me-1"></i> ${t.secretCode||'Non généré'}</span></td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary me-1" onclick="editTeacher(${i})" title="Modifier"><i class="fa fa-edit"></i></button>
                         <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteTeacher(${i})" title="Supprimer"><i class="fa fa-trash"></i></button>
                     </td>
                 </tr>
-            `).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucun enseignant enregistré.</td></tr>`;
+            `).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucun enseignant enregistré.</td></tr>`;
 
             renderStudentsTable();
             renderCoursesTable();
@@ -1302,6 +1321,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         // --- 3. ENSEIGNANTS ---
+        // REGLE 1: GENERATION DU CODE SECRET INDIVIDUEL POUR CHAQUE ENSEIGNANT / PROFESSEUR
         function handleSaveTeacher(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1318,7 +1338,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             } else {
                 const secretCode = generateSecretCode('PROF');
                 s.teachers.push({ name, phone, titulaireClass, secretCode });
-                alert(`Enseignant enregistré avec succès !\n\nCODE SECRET ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre.`);
+                alert(`Enseignant enregistré avec succès !\n\nCODE SECRET INDIVIDUEL ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre pour qu'il puisse se connecter.`);
             }
             saveData(); 
             refreshDashboardViews(); 
