@@ -613,6 +613,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                             </div>
                                             <div class="col-12 mt-2 d-flex gap-2">
                                                 <button type="submit" id="btnStudentPaySubmit" class="btn btn-success fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
+                                                <button type="button" class="btn btn-primary fw-bold" onclick="printPaymentList('eleves')"><i class="fa fa-print me-1"></i> Imprimer la Liste</button>
                                                 <button type="button" class="btn btn-secondary fw-bold" onclick="resetStudentPayForm()">Fermer</button>
                                             </div>
                                         </div>
@@ -656,6 +657,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                             </div>
                                             <div class="col-12 mt-2 d-flex gap-2">
                                                 <button type="submit" id="btnAgentPaySubmit" class="btn btn-success fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
+                                                <button type="button" class="btn btn-primary fw-bold" onclick="printPaymentList('agents')"><i class="fa fa-print me-1"></i> Imprimer la Liste</button>
                                                 <button type="button" class="btn btn-secondary fw-bold" onclick="resetAgentPayForm()">Fermer</button>
                                             </div>
                                         </div>
@@ -697,6 +699,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                             </div>
                                             <div class="col-12 mt-2 d-flex gap-2">
                                                 <button type="submit" id="btnAdminPaySubmit" class="btn btn-success fw-bold"><i class="fa fa-save"></i> Enregistrer Paiement Admin</button>
+                                                <button type="button" class="btn btn-primary fw-bold" onclick="printPaymentList('admin')"><i class="fa fa-print me-1"></i> Imprimer la Liste</button>
                                                 <button type="button" class="btn btn-secondary fw-bold" onclick="resetAdminPayForm()">Fermer</button>
                                             </div>
                                         </div>
@@ -714,6 +717,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                         <div class="col-md-3"><label class="fw-bold">Montant ($ / FC) :</label><input type="number" id="transMontant" class="form-control" required></div>
                                         <div class="col-md-2 d-flex align-items-end gap-1">
                                             <button type="submit" id="btnTransSubmit" class="btn btn-success w-100 fw-bold">Enregistrer</button>
+                                            <button type="button" class="btn btn-primary fw-bold w-100" onclick="printPaymentList('caisse')"><i class="fa fa-print me-1"></i> Imprimer</button>
                                             <button type="button" class="btn btn-secondary fw-bold" onclick="resetCaisseForm()">Fermer</button>
                                         </div>
                                     </form>
@@ -2185,6 +2189,158 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!s || !s.caisse) return;
             const tbody = document.getElementById('caisseTableBody');
             tbody.innerHTML = s.caisse.length ? s.caisse.map((c, i) => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucune opération de caisse enregistrée.</td></tr>`;
+        }
+
+        /* FONCTION D'IMPRESSION DES LISTES DE PAIEMENTS ET CAISSE */
+        function printPaymentList(type) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+
+            const dateStr = new Date().toLocaleDateString('fr-FR');
+            let title = "";
+            let tableContent = "";
+
+            if(type === 'eleves') {
+                title = `LISTE DES PAIEMENTS FRAIS SCOLAIRES — ÉLÈVES`;
+                const list = s.studentPayments || [];
+                tableContent = `
+                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
+                        <thead>
+                            <tr style="background:#f2f2f2;">
+                                <th style="padding:6px;">Date</th>
+                                <th style="padding:6px;">Élève</th>
+                                <th style="padding:6px;">Classe</th>
+                                <th style="padding:6px;">Générale</th>
+                                <th style="padding:6px;">Payé</th>
+                                <th style="padding:6px;">Reste</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${list.length ? list.map(p => `
+                                <tr>
+                                    <td style="padding:5px; text-align:center;">${p.date}</td>
+                                    <td style="padding:5px;"><b>${p.studentName}</b></td>
+                                    <td style="padding:5px; text-align:center;">${p.classe}</td>
+                                    <td style="padding:5px; text-align:right;">${p.total} $</td>
+                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td>
+                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td>
+                                </tr>
+                            `).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'agents') {
+                title = `LISTE DES PAIEMENTS — AGENTS / PROFS`;
+                const list = s.agentPayments || [];
+                tableContent = `
+                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
+                        <thead>
+                            <tr style="background:#f2f2f2;">
+                                <th style="padding:6px;">Date</th>
+                                <th style="padding:6px;">Enseignant</th>
+                                <th style="padding:6px;">Salaire</th>
+                                <th style="padding:6px;">Prime</th>
+                                <th style="padding:6px;">Payé</th>
+                                <th style="padding:6px;">Reste</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${list.length ? list.map(p => `
+                                <tr>
+                                    <td style="padding:5px; text-align:center;">${p.date}</td>
+                                    <td style="padding:5px;"><b>${p.teacherName}</b></td>
+                                    <td style="padding:5px; text-align:right;">${p.salaire}$</td>
+                                    <td style="padding:5px; text-align:right;">${p.prime}$</td>
+                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye}$</b></td>
+                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste}$</b></td>
+                                </tr>
+                            `).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'admin') {
+                title = `LISTE DES PAIEMENTS — CADRES ADMINISTRATION`;
+                const list = s.adminPayments || [];
+                tableContent = `
+                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
+                        <thead>
+                            <tr style="background:#f2f2f2;">
+                                <th style="padding:6px;">Date</th>
+                                <th style="padding:6px;">Nom Admin</th>
+                                <th style="padding:6px;">Fonction</th>
+                                <th style="padding:6px;">Salaire Dû</th>
+                                <th style="padding:6px;">Prime</th>
+                                <th style="padding:6px;">Payé</th>
+                                <th style="padding:6px;">Reste</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${list.length ? list.map(p => `
+                                <tr>
+                                    <td style="padding:5px; text-align:center;">${p.date}</td>
+                                    <td style="padding:5px;"><b>${p.name}</b></td>
+                                    <td style="padding:5px;">${p.role}</td>
+                                    <td style="padding:5px; text-align:right;">${p.salaire}$</td>
+                                    <td style="padding:5px; text-align:right;">${p.prime}$</td>
+                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye}$</b></td>
+                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste}$</b></td>
+                                </tr>
+                            `).join('') : `<tr><td colspan="7" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'caisse') {
+                title = `JOURNAL DE CAISSE — RECETTES ET DÉPENSES`;
+                const list = s.caisse || [];
+                tableContent = `
+                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
+                        <thead>
+                            <tr style="background:#f2f2f2;">
+                                <th style="padding:6px;">Date</th>
+                                <th style="padding:6px;">Type</th>
+                                <th style="padding:6px;">Motif / Libellé</th>
+                                <th style="padding:6px;">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${list.length ? list.map(c => `
+                                <tr>
+                                    <td style="padding:5px; text-align:center;">${c.date}</td>
+                                    <td style="padding:5px;"><b>${c.type}</b></td>
+                                    <td style="padding:5px;">${c.motif}</td>
+                                    <td style="padding:5px; text-align:right; font-weight:bold;">${c.montant}$</td>
+                                </tr>
+                            `).join('') : `<tr><td colspan="4" style="padding:10px; text-align:center;">Aucune opération de caisse enregistrée.</td></tr>`}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            let html = `
+                <div style="padding:15px; font-family:Arial, sans-serif; background:#fff; color:#000;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #000; padding-bottom:10px;">
+                        <div>
+                            <h4 style="margin:0; font-weight:bold;">${s.name}</h4>
+                            <small>${s.province} / ${s.commune}</small>
+                        </div>
+                        <div>
+                            <small>Date du jour : ${dateStr}</small>
+                        </div>
+                    </div>
+                    <h5 style="text-align:center; margin-top:15px; font-weight:bold; text-decoration:underline;">${title}</h5>
+                    ${tableContent}
+                    <div style="display:flex; justify-content:space-between; margin-top:30px; font-size:12px;">
+                        <div><b>Service Financier / Caisse</b></div>
+                        <div><b>Direction de l'Établissement</b></div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Rapport Imprimable`;
+            document.getElementById('invoicePrintArea').innerHTML = html;
+            const modalEl = document.getElementById('invoiceModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
         }
 
         function generateInvoice(data) {
