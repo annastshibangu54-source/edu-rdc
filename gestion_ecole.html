@@ -387,7 +387,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 </div>
                             </form>
                             <h6 class="fw-bold text-secondary">Liste des enseignants enregistrés :</h6>
-                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Secret</th><th>Actions</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Agent</th><th>Actions</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
                         </div>
 
                         <!-- 4. INSCRIPTION DES ÉLÈVES -->
@@ -762,7 +762,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     <!-- SCRIPT JS DE GESTION COMPLÈTE CORRIGÉ ET PERSISTANT -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
-        const ADMIN_MASTER_PASSWORD = "ADMIN-2026"; 
+        const ADMIN_MASTER_PASSWORD = "ADMIN-2026"; // 1. Code central ou Admin Central pour la plateforme
         let appData = { schools: [], adminRequests: [] };
         let activeSchoolId = null;
         let currentUserSession = { role: null, name: null, assignedClass: null, secretCode: null };
@@ -792,18 +792,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(id === 'view-portal') renderSchoolsList();
         }
 
+        // --- GESTION DES PARAMÈTRES ET RESTRICTIONS SELON LES RÔLES ---
         function toggleParamsSubmenu() {
-            const roleInput = prompt("Administrateur ou Agent ?\n(Tapez 'Administrateur' ou 'Agent')");
-            if (roleInput === null) return;
-            
-            const roleVal = roleInput.trim().toLowerCase();
             const items = document.querySelectorAll('.rubric-item');
 
-            if (roleVal === 'administrateur' || roleVal === 'admin') {
-                // Afficher toutes les rubriques
+            // 2. Code secret Admin ou Code École (Propriétaire) -> Accès complet aux 11 rubriques
+            if (currentUserSession.role === 'owner') {
                 items.forEach(el => el.style.display = 'block');
-            } else if (roleVal === 'agent') {
-                // Afficher uniquement les 3 rubriques demandées : Cours et Pondération, Saisie de note, Bulletin de note
+            } 
+            // 3. Code Agent (Professeur / Enseignant) -> Accès restreint uniquement aux rubriques 5, 6, 7
+            else if (currentUserSession.role === 'teacher') {
                 items.forEach(el => {
                     if (el.id === 'r-cours' || el.id === 'r-notes' || el.id === 'r-bulletins') {
                         el.style.display = 'block';
@@ -812,8 +810,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     }
                 });
             } else {
-                alert("Choix non reconnu. Veuillez taper 'Administrateur' ou 'Agent'.");
-                return;
+                items.forEach(el => el.style.display = 'block');
             }
 
             const submenu = document.getElementById('paramsSubmenu');
@@ -856,15 +853,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
         }
 
-        // --- GESTION ESPACE ADMIN CENTRAL CONFIDENTIEL ---
+        // --- 1. GESTION ESPACE ADMIN CENTRAL CONFIDENTIEL (CODE CENTRAL) ---
         function openAdminCentralPanel() {
-            const pass = prompt("[ACCÈS ADMINISTRATEUR CENTRAL]\nVeuillez saisir le mot de passe Administrateur Confidentiel :");
+            const pass = prompt("[ACCÈS ADMIN CENTRAL]\nVeuillez saisir le Code Central de la plateforme :");
             if(pass === null) return;
             if(pass.trim() === ADMIN_MASTER_PASSWORD) {
                 renderAdminCentralData();
                 showSection('view-admin-central');
             } else {
-                alert("Mot de passe Administrateur incorrect ! Accès refusé.");
+                alert("Code Central incorrect ! Accès refusé.");
             }
         }
 
@@ -921,7 +918,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function copyCodeToClipboard(code) {
             navigator.clipboard.writeText(code);
-            alert(`Code secret "${code}" copié dans le presse-papier !`);
+            alert(`Code "${code}" copié dans le presse-papier !`);
         }
 
         function deleteAdminRequest(i) {
@@ -952,10 +949,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const targetName = isTeacher ? s.teachers[teacherIndex].name : s.name;
 
             const option = prompt(
-                `[RÉCUPÉRATION DU CODE SECRET - ${targetName.toUpperCase()}]\n\n` +
+                `[RÉCUPÉRATION DU CODE - ${targetName.toUpperCase()}]\n\n` +
                 `Choisissez une option :\n` +
-                `1 : Envoyer une demande de récupération à l'Administrateur Central\n` +
-                `2 : Utiliser le mot de passe de secours Administrateur\n\n` +
+                `1 : Envoyer une demande de récupération à l'Admin Central\n` +
+                `2 : Utiliser le Code Central de la plateforme\n\n` +
                 `Entrez 1 ou 2 :`
             );
 
@@ -977,19 +974,19 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     teacherIndex: isTeacher ? teacherIndex : null,
                     applicantName,
                     contact,
-                    message: message || 'Récupération de code secret'
+                    message: message || 'Récupération de code'
                 });
 
                 saveData();
-                alert(`Votre demande a été transmise à l'Administrateur Central avec succès ! Vous serez contacté au : ${contact}.`);
+                alert(`Votre demande a été transmise à l'Admin Central avec succès ! Vous serez contacté au : ${contact}.`);
             } 
             else if(option.trim() === "2") {
-                const adminPass = prompt("Saisissez le mot de passe de secours Administrateur :");
+                const adminPass = prompt("Saisissez le Code Central de la plateforme :");
                 if(adminPass === ADMIN_MASTER_PASSWORD) {
                     const code = isTeacher ? s.teachers[teacherIndex].secretCode : s.secretCode;
-                    alert(`[ACCÈS AUTORISÉ]\nLe code secret est : ${code}`);
+                    alert(`[ACCÈS AUTORISÉ]\nLe code est : ${code}`);
                 } else {
-                    alert("Mot de passe de secours incorrect !");
+                    alert("Code Central incorrect !");
                 }
             }
         }
@@ -1029,7 +1026,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     const s = appData.schools.find(x => x.id === id);
                     s.name = name; s.appartenance = appartenance; s.province = province;
                     s.district = district; s.commune = commune; s.adresse = adresse;
-                    if(logoBase64) s.logo = logoBase64;
+                    if(logoFile) s.logo = logoBase64;
                     alert("École modifiée avec succès !");
                 } else {
                     const secretCode = generateSecretCode('SEC');
@@ -1041,7 +1038,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         presenceStudents: {}, presenceStaff: [], studentPayments: [], agentPayments: [],
                         program: '', communications: []
                     });
-                    alert(`École créée avec succès !\n\nCODE SECRET DE L'ÉCOLE : ${secretCode}\n\nConservez-le précieusement.`);
+                    alert(`École créée avec succès !\n\nCODE ÉCOLE (Propriétaire) : ${secretCode}\n\nConservez-le précieusement.`);
                 }
                 saveData();
                 showSection('view-portal');
@@ -1059,10 +1056,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function deleteSchool(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez saisir le code secret de l'école "${s.name}" pour confirmer la suppression :`);
+            const inputCode = prompt(`Veuillez saisir le code école de "${s.name}" pour confirmer la suppression :`);
             if(inputCode === null) return;
             if(inputCode.trim() !== s.secretCode) {
-                if(confirm("Code secret incorrect !\nVoulez-vous lancer la procédure de récupération de code ?")) {
+                if(confirm("Code incorrect !\nVoulez-vous lancer la procédure de récupération de code ?")) {
                     handleForgottenCode(id);
                 }
                 return;
@@ -1106,40 +1103,37 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function openSchoolFormWithCode(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez entrer le code secret de l'école "${s.name}" pour modifier :`);
+            const inputCode = prompt(`Veuillez entrer le code école de "${s.name}" pour modifier :`);
             if(inputCode === null) return;
             if(inputCode.trim() === s.secretCode) {
                 openSchoolForm(id);
             } else {
-                if(confirm("Code secret incorrect !\nAvez-vous oublié votre code secret ? Cliquez sur OK pour contacter l'Administrateur Central.")) {
+                if(confirm("Code incorrect !\nAvez-vous oublié votre code ? Cliquez sur OK pour contacter l'Admin Central.")) {
                     handleForgottenCode(id);
                 }
             }
         }
 
-        // --- AUTHENTIFICATION PAR CODE (PROPRIÉTAIRE OU ENSEIGNANT) ---
+        // --- AUTHENTIFICATION PAR CODE (PROPRIÉTAIRE OU AGENT) ---
         function promptLoginCode(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`[ACCÈS SÉCURISÉ]\nEntrez votre code secret (Propriétaire de l'école ou Enseignant) pour ouvrir "${s.name}" :`);
+            const inputCode = prompt(`[ACCÈS SÉCURISÉ]\nEntrez votre code :\n- Code École (Propriétaire)\n- Code Agent (Professeur / Enseignant)\n\npour ouvrir "${s.name}" :`);
             if(inputCode === null) return;
             
             const code = inputCode.trim();
             if(code === s.secretCode) {
                 currentUserSession = { role: 'owner', name: 'Propriétaire', assignedClass: null, secretCode: s.secretCode };
+                alert("Accès autorisé en tant que Propriétaire / École.");
                 openSchoolDashboard(id);
             } else {
                 const teacherMatch = s.teachers.find(t => t.secretCode === code);
                 if(teacherMatch) {
                     currentUserSession = { role: 'teacher', name: teacherMatch.name, assignedClass: teacherMatch.titulaireClass || null, secretCode: teacherMatch.secretCode };
-                    if(!teacherMatch.titulaireClass) {
-                        alert(`Attention Prof. ${teacherMatch.name} : Vous n'avez pas de classe titulaire assignée. Accès restreint.`);
-                    } else {
-                        alert(`Accès autorisé !\nBienvenue Prof. ${teacherMatch.name}.`);
-                    }
+                    alert(`Accès autorisé !\nBienvenue Agent / Prof. ${teacherMatch.name}.`);
                     openSchoolDashboard(id);
                 } else {
-                    if(confirm("Code secret incorrect !\nAvez-vous oublié votre code secret ? Cliquez sur OK pour contacter l'Administrateur Central.")) {
+                    if(confirm("Code incorrect !\nAvez-vous oublié votre code ? Cliquez sur OK pour contacter l'Admin Central.")) {
                         handleForgottenCode(id);
                     }
                 }
@@ -1313,7 +1307,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             closeRubricTab();
         }
 
-        // --- 3. ENSEIGNANTS ---
+        // --- 3. ENSEIGNANTS (CODE AGENT) ---
         function handleSaveTeacher(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1328,9 +1322,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.teachers[editIdx].titulaireClass = titulaireClass;
                 alert("Enseignant modifié avec succès !");
             } else {
-                const secretCode = generateSecretCode('PROF');
+                const secretCode = generateSecretCode('AGT');
                 s.teachers.push({ name, phone, titulaireClass, secretCode });
-                alert(`Enseignant enregistré avec succès !\n\nCODE SECRET INDIVIDUEL ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre pour qu'il puisse se connecter.`);
+                alert(`Enseignant enregistré avec succès !\n\nCODE AGENT ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre pour qu'il puisse se connecter.`);
             }
             saveData(); 
             refreshDashboardViews(); 
