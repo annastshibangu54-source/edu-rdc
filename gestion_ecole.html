@@ -323,7 +323,82 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         </div>
                     </div>
                 </div>
-             
+             <!-- NOUVEAU DESIGN TABLEAU DE BORD (Différent de Paramètres) -->
+<div class="dashboard-section mt-4 p-3 bg-white rounded shadow-sm border border-top-4 border-indigo">
+    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+        <h6 class="m-0 fw-bold text-indigo"><i class="fa fa-tachometer-alt me-2"></i>TABLEAU DE BORD</h6>
+        <span class="badge bg-indigo text-white">Accès Sécurisé</span>
+    </div>
+    <div class="row g-2">
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-hierarchie')">
+                <i class="fa fa-sitemap text-indigo"></i>
+                <span>Direction</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-classes')">
+                <i class="fa fa-door-open text-indigo"></i>
+                <span>Classes</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-profs')">
+                <i class="fa fa-chalkboard-teacher text-indigo"></i>
+                <span>Enseignants</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-eleves-reg')">
+                <i class="fa fa-user-graduate text-indigo"></i>
+                <span>Élèves</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-cours')">
+                <i class="fa fa-book-open text-indigo"></i>
+                <span>Cours</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-notes')">
+                <i class="fa fa-edit text-indigo"></i>
+                <span>Notes</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-bulletins')">
+                <i class="fa fa-file-invoice text-indigo"></i>
+                <span>Bulletins</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-frais')">
+                <i class="fa fa-wallet text-indigo"></i>
+                <span>Caisse</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-presences')">
+                <i class="fa fa-clipboard-check text-indigo"></i>
+                <span>Présences</span>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-programme')">
+                <i class="fa fa-calendar-alt text-indigo"></i>
+                <span>Programme</span>
+            </button>
+        </div>
+        <div class="col-12">
+            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-communication')">
+                <i class="fa fa-bullhorn text-indigo"></i>
+                <span>Communication / Contact</span>
+            </button>
+        </div>
+    </div>
+</div>
+
                 <!-- CONTENU DES PANNEAUX -->
                 <div class="col-lg-9">
                     <div class="bg-white p-4 rounded shadow-sm">
