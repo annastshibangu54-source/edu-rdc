@@ -309,17 +309,17 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         
                         <!-- SOUS-MENU DES 11 RUBRIQUES -->
                         <div id="paramsSubmenu" class="params-submenu">
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-hierarchie', this)"><i class="fa fa-sitemap me-2 text-primary"></i> 1. Hie & Direction</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-classes', this)"><i class="fa fa-door-open me-2 text-primary"></i> 2. Enregistrement Classe</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-profs', this)"><i class="fa fa-chalkboard-teacher me-2 text-primary"></i> 3. Enseignants & Titulaires</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-eleves-reg', this)"><i class="fa fa-user-graduate me-2 text-primary"></i> 4. Inscription des élèves</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-cours', this)"><i class="fa fa-book-open me-2 text-primary"></i> 5. Cours & Pondération</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-notes', this)"><i class="fa fa-edit me-2 text-primary"></i> 6. Saisie de note</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-bulletins', this)"><i class="fa fa-file-invoice me-2 text-primary"></i> 7. Bulletin de cotes</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-frais', this)"><i class="fa fa-wallet me-2 text-primary"></i> 8. Frais scolaire & Caisse</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-presences', this)"><i class="fa fa-clipboard-check me-2 text-primary"></i> 9. Gestion de présence</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-programme', this)"><i class="fa fa-calendar-alt me-2 text-primary"></i> 10. Programme & Calendrier</a>
-                            <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchTab('tab-communication', this)"><i class="fa fa-bullhorn me-2 text-primary"></i> 11. Communication / Contact</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-hierarchie" href="javascript:void(0);" onclick="switchTab('tab-hierarchie', this)"><i class="fa fa-sitemap me-2 text-primary"></i> 1. Hie & Direction</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-classes" href="javascript:void(0);" onclick="switchTab('tab-classes', this)"><i class="fa fa-door-open me-2 text-primary"></i> 2. Enregistrement Classe</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-profs" href="javascript:void(0);" onclick="switchTab('tab-profs', this)"><i class="fa fa-chalkboard-teacher me-2 text-primary"></i> 3. Enseignants & Titulaires</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-eleves-reg" href="javascript:void(0);" onclick="switchTab('tab-eleves-reg', this)"><i class="fa fa-user-graduate me-2 text-primary"></i> 4. Inscription des élèves</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-cours" href="javascript:void(0);" onclick="switchTab('tab-cours', this)"><i class="fa fa-book-open me-2 text-primary"></i> 5. Cours & Pondération</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-notes" href="javascript:void(0);" onclick="switchTab('tab-notes', this)"><i class="fa fa-edit me-2 text-primary"></i> 6. Saisie de note</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-bulletins" href="javascript:void(0);" onclick="switchTab('tab-bulletins', this)"><i class="fa fa-file-invoice me-2 text-primary"></i> 7. Bulletin de cotes</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-frais" href="javascript:void(0);" onclick="switchTab('tab-frais', this)"><i class="fa fa-wallet me-2 text-primary"></i> 8. Frais scolaire & Caisse</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-presences" href="javascript:void(0);" onclick="switchTab('tab-presences', this)"><i class="fa fa-clipboard-check me-2 text-primary"></i> 9. Gestion de présence</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-programme" href="javascript:void(0);" onclick="switchTab('tab-programme', this)"><i class="fa fa-calendar-alt me-2 text-primary"></i> 10. Programme & Calendrier</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-communication" href="javascript:void(0);" onclick="switchTab('tab-communication', this)"><i class="fa fa-bullhorn me-2 text-primary"></i> 11. Communication / Contact</a>
                         </div>
                     </div>
                 </div>
@@ -793,6 +793,29 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function toggleParamsSubmenu() {
+            const roleInput = prompt("Administrateur ou Agent ?\n(Tapez 'Administrateur' ou 'Agent')");
+            if (roleInput === null) return;
+            
+            const roleVal = roleInput.trim().toLowerCase();
+            const items = document.querySelectorAll('.rubric-item');
+
+            if (roleVal === 'administrateur' || roleVal === 'admin') {
+                // Afficher toutes les rubriques
+                items.forEach(el => el.style.display = 'block');
+            } else if (roleVal === 'agent') {
+                // Afficher uniquement les 3 rubriques demandées : Cours et Pondération, Saisie de note, Bulletin de note
+                items.forEach(el => {
+                    if (el.id === 'r-cours' || el.id === 'r-notes' || el.id === 'r-bulletins') {
+                        el.style.display = 'block';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                });
+            } else {
+                alert("Choix non reconnu. Veuillez taper 'Administrateur' ou 'Agent'.");
+                return;
+            }
+
             const submenu = document.getElementById('paramsSubmenu');
             const arrow = document.getElementById('arrowIcon');
             submenu.classList.toggle('show');
@@ -807,27 +830,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function switchTab(tabId, element) {
-            // RESTRICTION STRICTE : SI C'EST UN ENSEIGNANT, IL N'A DROIT QU'À LA SAISIE DE NOTE (tab-notes) ET AU BULLETIN DE COTES (tab-bulletins)
-            if(currentUserSession.role === 'teacher') {
-                if(tabId !== 'tab-notes' && tabId !== 'tab-bulletins') {
-                    alert("ACCÈS REFUSÉ !\n\nEn tant qu'enseignant, vous avez uniquement accès à :\n- 6. Saisie de note\n- 7. Bulletin de cotes\n\nLes autres rubriques sont réservées exclusivement au créateur de l'école.");
-                    return;
-                }
-            }
-
-            // VERIFICATION DU CODE SECRET DU PROFESSEUR AVANT TOUTE ACTIVITE SUR UNE RUBRIQUE AUTORISÉE
-            if(currentUserSession.role === 'teacher') {
-                const s = appData.schools.find(x => x.id === activeSchoolId);
-                const inputCode = prompt(`[SÉCURITÉ ENSEIGNANT - Prof. ${currentUserSession.name}]\nVeuillez saisir votre code secret pour accéder à cette rubrique :`);
-                if(inputCode === null) return;
-                
-                if(inputCode.trim() !== currentUserSession.secretCode) {
-                    alert("Code secret incorrect ! Accès refusé.");
-                    return;
-                }
-            }
-
-            document.getElementById('defaultWelcomeMessage').style.display = 'none';
+            document.getElementById('defaultWelcomeMessage').style.display = 'block';
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
 
@@ -1132,7 +1135,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     if(!teacherMatch.titulaireClass) {
                         alert(`Attention Prof. ${teacherMatch.name} : Vous n'avez pas de classe titulaire assignée. Accès restreint.`);
                     } else {
-                        alert(`Accès autorisé !\nBienvenue Prof. ${teacherMatch.name}. Vous avez accès uniquement aux rubriques "Saisie de note" et "Bulletin de cotes" pour votre classe : ${teacherMatch.titulaireClass}.`);
+                        alert(`Accès autorisé !\nBienvenue Prof. ${teacherMatch.name}.`);
                     }
                     openSchoolDashboard(id);
                 } else {
@@ -1162,7 +1165,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!s.agentPayments) s.agentPayments = [];
             if(!s.communications) s.communications = [];
 
-            document.getElementById('dashSchoolTitle').innerText = s.name + (currentUserSession.role === 'teacher' ? ` (Prof: ${currentUserSession.name} - Classe: ${currentUserSession.assignedClass || 'Aucune'})` : '');
+            document.getElementById('dashSchoolTitle').innerText = s.name;
             document.getElementById('dashSchoolSub').innerText = `${s.appartenance} | ${s.province}, ${s.commune} (${s.adresse || 'Adresse non spécifiée'})`;
             document.getElementById('dashSchoolLogo').src = s.logo || 'https://via.placeholder.com/70?text=LOGO';
             
@@ -1190,10 +1193,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             classTbody.innerHTML = s.classes.length ? s.classes.map((c, i) => `<tr><td>${c.niveau}</td><td><b>${c.name}</b></td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editClass(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteClass(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune classe enregistrée.</td></tr>`;
 
             let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            
-            if(currentUserSession.role === 'teacher' && currentUserSession.assignedClass) {
-                classOptions = `<option value="${currentUserSession.assignedClass}">${currentUserSession.assignedClass}</option>`;
-            }
 
             document.getElementById('teacherClass').innerHTML = classOptions;
             document.getElementById('studentClass').innerHTML = classOptions;
@@ -1203,14 +1202,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('payClassSelect').innerHTML = classOptions;
             document.getElementById('agentPayClassSelect').innerHTML = classOptions;
             document.getElementById('bulletinClassSelect').innerHTML = classOptions;
-
-            if(currentUserSession.role === 'teacher' && currentUserSession.assignedClass) {
-                document.getElementById('studentClass').value = currentUserSession.assignedClass;
-                document.getElementById('courseClassSelect').value = currentUserSession.assignedClass;
-                document.getElementById('notesClassSelect').value = currentUserSession.assignedClass;
-                document.getElementById('presClassSelect').value = currentUserSession.assignedClass;
-                document.getElementById('bulletinClassSelect').value = currentUserSession.assignedClass;
-            }
 
             const profTbody = document.getElementById('teachersTableBody');
             profTbody.innerHTML = s.teachers.length ? s.teachers.map((t, i) => `
@@ -1380,18 +1371,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const editIdx = document.getElementById('editStudentIndex').value;
             const classe = document.getElementById('studentClass').value;
-            const targetClass = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : classe;
-
             const name = document.getElementById('studentName').value.trim();
             const sexe = document.getElementById('studentSexe').value;
 
             if(editIdx !== "") {
                 s.students[editIdx].name = name;
                 s.students[editIdx].sexe = sexe;
-                s.students[editIdx].classe = targetClass;
+                s.students[editIdx].classe = classe;
                 alert("Élève modifié avec succès !");
             } else {
-                s.students.push({ id: 'STU-'+Date.now(), mat: 'ELV-'+Math.floor(1000+Math.random()*9000), name, sexe, classe: targetClass });
+                s.students.push({ id: 'STU-'+Date.now(), mat: 'ELV-'+Math.floor(1000+Math.random()*9000), name, sexe, classe });
                 alert("Élève inscrit avec succès !");
             }
             saveData(); 
@@ -1426,7 +1415,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function renderStudentsTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('studentClass').value;
+            const cl = document.getElementById('studentClass').value;
             const tbody = document.getElementById('studentsTableBody');
             if(!cl) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Sélectionnez une classe.</td></tr>`; return; }
             
@@ -1438,7 +1427,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function handleSaveCourse(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('courseClassSelect').value;
+            const cl = document.getElementById('courseClassSelect').value;
             if(!cl) { alert("Choisissez une classe !"); return; }
             if(!s.courses[cl]) s.courses[cl] = [];
 
@@ -1459,7 +1448,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
         function editCourse(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('courseClassSelect').value;
+            const cl = document.getElementById('courseClassSelect').value;
             const c = s.courses[cl][i];
             document.getElementById('editCourseIndex').value = i;
             document.getElementById('courseName').value = c.name;
@@ -1469,7 +1458,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function deleteCourse(i) {
             if(confirm("Supprimer ce cours ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
-                const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('courseClassSelect').value;
+                const cl = document.getElementById('courseClassSelect').value;
                 s.courses[cl].splice(i,1);
                 saveData(); renderCoursesTable();
             }
@@ -1487,7 +1476,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function renderCoursesTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('courseClassSelect').value;
+            const cl = document.getElementById('courseClassSelect').value;
             const tbody = document.getElementById('coursesTableBody');
             if(!cl) { tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Sélectionnez une classe.</td></tr>`; return; }
             const list = s.courses[cl] || [];
@@ -1497,14 +1486,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         // --- 6. NOTES ---
         function loadStudentsForNotes() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('notesClassSelect').value;
+            const cl = document.getElementById('notesClassSelect').value;
             const filtered = s.students.filter(x => x.classe === cl);
             document.getElementById('notesStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name}</option>`).join('');
         }
 
         function renderNotesSheet() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('notesClassSelect').value;
+            const cl = document.getElementById('notesClassSelect').value;
             const stId = document.getElementById('notesStudentSelect').value;
             const courses = s.courses[cl] || [];
             const container = document.getElementById('notesSheetContainer');
@@ -1541,24 +1530,19 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
             let classOptions = `<option value="" disabled selected>— Sélectionner Classe —</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            if(currentUserSession.role === 'teacher' && currentUserSession.assignedClass) {
-                classOptions = `<option value="${currentUserSession.assignedClass}">${currentUserSession.assignedClass}</option>`;
-                document.getElementById('bulletinClassSelect').value = currentUserSession.assignedClass;
-                loadStudentsForBulletin();
-            }
             document.getElementById('bulletinClassSelect').innerHTML = classOptions;
         }
 
         function loadStudentsForBulletin() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('bulletinClassSelect').value;
+            const cl = document.getElementById('bulletinClassSelect').value;
             const filtered = s.students.filter(x => x.classe === cl);
             document.getElementById('bulletinStudentSelect').innerHTML = `<option value="" disabled selected>— Sélectionner Élève —</option>` + filtered.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
         }
 
         function renderBulletinFromSystem() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const clName = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('bulletinClassSelect').value;
+            const clName = document.getElementById('bulletinClassSelect').value;
             const stId = document.getElementById('bulletinStudentSelect').value;
             const student = s.students.find(x => x.id === stId);
             const courses = s.courses[clName] || [];
@@ -1678,9 +1662,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
             let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            if(currentUserSession.role === 'teacher' && currentUserSession.assignedClass) {
-                classOptions = `<option value="${currentUserSession.assignedClass}">${currentUserSession.assignedClass}</option>`;
-            }
             document.getElementById('payClassSelect').innerHTML = classOptions;
             document.getElementById('agentPayClassSelect').innerHTML = classOptions;
             renderStudentPayTable();
@@ -1705,7 +1686,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const editIdx = document.getElementById('editStudentPayIndex').value;
-            const classe = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('payClassSelect').value;
+            const classe = document.getElementById('payClassSelect').value;
             const studentId = document.getElementById('payStudentSelect').value;
             const studentObj = s.students.find(x => x.id === studentId);
             const studentName = studentObj ? studentObj.name : 'Inconnu';
@@ -1935,11 +1916,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!s) return;
 
             let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            if(currentUserSession.role === 'teacher' && currentUserSession.assignedClass) {
-                classOptions = `<option value="${currentUserSession.assignedClass}">${currentUserSession.assignedClass}</option>`;
-                document.getElementById('presClassSelect').value = currentUserSession.assignedClass;
-                loadStudentsForPresence();
-            }
             document.getElementById('presClassSelect').innerHTML = classOptions;
 
             const profOptions = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, i) => `<option value="T-${i}">${t.name} (Enseignant)</option>`).join('');
@@ -1953,7 +1929,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function loadStudentsForPresence() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('presClassSelect').value;
+            const cl = document.getElementById('presClassSelect').value;
             const container = document.getElementById('studentsPresenceContainer');
             if(!cl) { container.innerHTML = `<p class="text-muted">Veuillez sélectionner une classe.</p>`; return; }
 
@@ -1999,7 +1975,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function handleSaveStudentPresence(e) {
             e.preventDefault();
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('presClassSelect').value;
+            const cl = document.getElementById('presClassSelect').value;
             if(!cl) { alert("Veuillez choisir une classe !"); return; }
             saveData();
             alert("Présences des élèves enregistrées avec succès !");
@@ -2007,7 +1983,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function editStudentPresence() {
-            const cl = (currentUserSession.role === 'teacher') ? currentUserSession.assignedClass : document.getElementById('presClassSelect').value;
+            const cl = document.getElementById('presClassSelect').value;
             if(!cl) { alert("Veuillez sélectionner une classe à modifier !"); return; }
             alert("Mode modification activé pour la classe " + cl + ". Vous pouvez changer les statuts directement dans le tableau.");
             document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
@@ -2015,7 +1991,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function closePresenceForm(tabName) {
             if(tabName === 'p-eleves') {
-                if(currentUserSession.role !== 'teacher') document.getElementById('presClassSelect').value = "";
+                document.getElementById('presClassSelect').value = "";
                 document.getElementById('studentsPresenceContainer').innerHTML = `<p class="text-muted">Veuillez sélectionner une classe pour afficher les élèves.</p>`;
                 document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
             }
