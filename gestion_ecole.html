@@ -91,6 +91,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             <h2 class="m-0 text-primary"><i class="fa fa-school me-3"></i>EDU-RDC</h2>
         </a>
         <div class="ms-auto p-3 d-flex align-items-center gap-3">
+            <button class="btn btn-outline-danger btn-sm fw-bold" onclick="openAdminCentralPanel()"><i class="fa fa-user-shield me-1"></i> Admin Central (Confidentiel)</button>
             <button class="btn btn-outline-primary btn-sm fw-bold" onclick="showSection('view-portal')"><i class="fa fa-home me-1"></i> Accueil Portail</button>
         </div>
     </nav>
@@ -199,6 +200,61 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- ESPACE ADMIN CENTRAL CONFIDENTIEL (OPTION 2) -->
+        <!-- ========================================================= -->
+        <div id="view-admin-central" class="view-section">
+            <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour au Portail</button>
+            <div class="card shadow-sm border-0 border-start border-4 border-danger">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="m-0 text-white"><i class="fa fa-user-shield me-2 text-danger"></i>Espace Administrateur Central (Confidentiel)</h4>
+                    <span class="badge bg-danger">ACCÈS RESTREINT ADMIN</span>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- DEMANDES ENVOYÉES AU CENTRAL -->
+                    <h5 class="fw-bold text-primary mb-3"><i class="fa fa-envelope-open-text me-2"></i>1. Demandes de Récupération de Code Secret Reçues</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>École Concernée</th>
+                                    <th>Nom du Demandeur</th>
+                                    <th>Téléphone / Contact</th>
+                                    <th>Message / Justification</th>
+                                    <th>Code Secret de l'École</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminRequestsTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- FORMULAIRE / TABLEAU DE TOUTES LES ÉCOLES ENREGISTRÉES ET LEURS CODES SECRETS -->
+                    <h5 class="fw-bold text-primary mb-3"><i class="fa fa-database me-2"></i>2. Registre des Écoles Enregistrées & Codes Secrets</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID École</th>
+                                    <th>Nom de l'École</th>
+                                    <th>Province / Commune</th>
+                                    <th>Adresse</th>
+                                    <th>Code Secret (Confidentiel)</th>
+                                    <th>Action Admin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminSchoolsTableBody"></tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -688,7 +744,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     <!-- SCRIPT JS DE GESTION COMPLÈTE CORRIGÉ ET PERSISTANT -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
-        let appData = { schools: [] };
+        const ADMIN_MASTER_PASSWORD = "ADMIN-2026"; // Mot de passe confidentiel de l'Administrateur Central
+        let appData = { schools: [], adminRequests: [] };
         let activeSchoolId = null;
 
         window.onload = function() {
@@ -697,7 +754,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
             }
             if (saved) { 
-                try { appData = JSON.parse(saved); } catch(e){} 
+                try { 
+                    appData = JSON.parse(saved); 
+                    if(!appData.adminRequests) appData.adminRequests = [];
+                } catch(e){} 
             }
             renderSchoolsList();
         };
@@ -744,6 +804,133 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 refreshPaymentOptions();
             } else if(tabId === 'tab-bulletins') {
                 refreshBulletinOptions();
+            }
+        }
+
+        // --- GESTION ESPACE ADMIN CENTRAL CONFIDENTIEL (OPTION 2) ---
+        function openAdminCentralPanel() {
+            const pass = prompt("[ACCÈS ADMINISTRATEUR CENTRAL]\nVeuillez saisir le mot de passe Administrateur Confidentiel :");
+            if(pass === null) return;
+            if(pass.trim() === ADMIN_MASTER_PASSWORD) {
+                renderAdminCentralData();
+                showSection('view-admin-central');
+            } else {
+                alert("Mot de passe Administrateur incorrect ! Accès refusé.");
+            }
+        }
+
+        function renderAdminCentralData() {
+            // 1. Table des Demandes reçues
+            const reqTbody = document.getElementById('adminRequestsTableBody');
+            if(!appData.adminRequests || !appData.adminRequests.length) {
+                reqTbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">Aucune demande de récupération reçue pour le moment.</td></tr>`;
+            } else {
+                reqTbody.innerHTML = appData.adminRequests.map((r, i) => {
+                    const sch = appData.schools.find(s => s.id === r.schoolId);
+                    const currentCode = sch ? sch.secretCode : 'Inconnu';
+                    return `
+                        <tr>
+                            <td><small>${r.date}</small></td>
+                            <td><b class="text-primary">${r.schoolName}</b></td>
+                            <td>${r.applicantName}</td>
+                            <td><b>${r.contact}</b></td>
+                            <td><small>${r.message}</small></td>
+                            <td><span class="badge bg-danger p-2 fs-6">${currentCode}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-success fw-bold mb-1" onclick="copyCodeToClipboard('${currentCode}')"><i class="fa fa-copy me-1"></i> Copier Code</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRequest(${i})"><i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // 2. Table de toutes les écoles enregistrées et leurs codes secrets
+            const schTbody = document.getElementById('adminSchoolsTableBody');
+            if(!appData.schools || !appData.schools.length) {
+                schTbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">Aucune école enregistrée dans le système.</td></tr>`;
+            } else {
+                schTbody.innerHTML = appData.schools.map((s, i) => `
+                    <tr>
+                        <td><small class="text-muted">${s.id}</small></td>
+                        <td><b class="text-primary">${s.name}</b> <br><small class="text-muted">${s.appartenance}</small></td>
+                        <td>${s.province} / ${s.commune}</td>
+                        <td><small>${s.adresse || 'N/A'}</small></td>
+                        <td><span class="badge bg-dark p-2 fs-6 text-warning"><i class="fa fa-key me-1"></i> ${s.secretCode}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-warning fw-bold" onclick="resetSchoolSecretCode('${s.id}')"><i class="fa fa-sync me-1"></i> Régénérer Code</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function copyCodeToClipboard(code) {
+            navigator.clipboard.writeText(code);
+            alert(`Code secret "${code}" copié dans le presse-papier ! Vous pouvez maintenant l'envoyer au demandeur.`);
+        }
+
+        function deleteAdminRequest(i) {
+            if(confirm("Supprimer cette demande du registre ?")) {
+                appData.adminRequests.splice(i, 1);
+                saveData();
+                renderAdminCentralData();
+            }
+        }
+
+        function resetSchoolSecretCode(schoolId) {
+            const sch = appData.schools.find(s => s.id === schoolId);
+            if(!sch) return;
+            if(confirm(`Voulez-vous générer un NOUVEAU code secret pour l'école "${sch.name}" ?`)) {
+                sch.secretCode = generateSecretCode();
+                saveData();
+                renderAdminCentralData();
+                alert(`Nouveau code secret généré pour "${sch.name}" : ${sch.secretCode}`);
+            }
+        }
+
+        // --- PROCÉDURE DE RÉCUPÉRATION DU CODE SECRET POUR L'UTILISATEUR ---
+        function handleForgottenCode(schoolId) {
+            const s = appData.schools.find(x => x.id === schoolId);
+            if(!s) return;
+
+            const option = prompt(
+                `[RÉCUPÉRATION DU CODE SECRET - ${s.name.toUpperCase()}]\n\n` +
+                `Choisissez une option :\n` +
+                `1 : Envoyer une demande de récupération à l'Administrateur Central\n` +
+                `2 : Réinitialiser avec le mot de passe de secours Administrateur\n\n` +
+                `Entrez 1 ou 2 :`
+            );
+
+            if(!option) return;
+
+            if(option.trim() === "1") {
+                const applicantName = prompt("Entrez votre nom complet :");
+                if(!applicantName) return;
+                const contact = prompt("Entrez votre numéro de téléphone ou WhatsApp pour recevoir le code :");
+                if(!contact) return;
+                const message = prompt("Entrez un court motif/justification de votre demande :");
+
+                if(!appData.adminRequests) appData.adminRequests = [];
+                appData.adminRequests.push({
+                    date: new Date().toLocaleDateString('fr-FR') + ' ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
+                    schoolId: s.id,
+                    schoolName: s.name,
+                    applicantName,
+                    contact,
+                    message: message || 'Récupération de code secret'
+                });
+
+                saveData();
+                alert(`Votre demande a été envoyée avec succès à l'Administrateur Central !\n\nL'Administrateur traitera votre demande et vous transmettra le code secret au numéro : ${contact}.`);
+            } 
+            else if(option.trim() === "2") {
+                const adminPass = prompt("Saisissez le mot de passe de secours Administrateur :");
+                if(adminPass === ADMIN_MASTER_PASSWORD) {
+                    alert(`[ACCÈS AUTORISÉ]\nLe code secret actuel de l'école "${s.name}" est : ${s.secretCode}`);
+                } else {
+                    alert("Mot de passe de secours incorrect !");
+                }
             }
         }
 
@@ -861,7 +1048,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(inputCode.trim() === s.secretCode) {
                 openSchoolForm(id);
             } else {
-                alert("Code secret incorrect ! Accès refusé.");
+                if(confirm("Code secret incorrect !\nAvez-vous oublié votre code secret ? Cliquez sur OK pour envoyer une demande de récupération à l'Administrateur Central.")) {
+                    handleForgottenCode(id);
+                }
             }
         }
 
@@ -873,7 +1062,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(inputCode.trim() === s.secretCode) {
                 openSchoolDashboard(id);
             } else {
-                alert("Code secret incorrect ! Accès refusé.");
+                if(confirm("Code secret incorrect !\nAvez-vous oublié votre code secret ? Cliquez sur OK pour contacter l'Administrateur Central.")) {
+                    handleForgottenCode(id);
+                }
             }
         }
 
