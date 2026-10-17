@@ -193,11 +193,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <label class="form-label fw-bold">Logo de l'École :</label>
                                 <input type="file" id="schoolLogoFile" class="form-control" accept="image/*">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-danger"><i class="fa fa-lock me-1"></i> Code Secret de l'École (Confidentiel) :</label>
-                                <input type="password" id="schoolSecretCode" class="form-control border-danger" placeholder="Entrez un code secret d'accès" required>
-                                <small class="text-muted">Ce code sera demandé pour ouvrir et gérer cette école.</small>
-                            </div>
                             <div class="col-12 mt-4 d-flex gap-2">
                                 <button type="submit" id="btnSaveSchool" class="btn btn-success fw-bold px-4"><i class="fa fa-save me-1"></i> Enregistrer l'École</button>
                                 <button type="button" class="btn btn-light border fw-bold" onclick="showSection('view-portal')">Annuler</button>
@@ -711,6 +706,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); 
         }
 
+        function generateSecretCode() {
+            return 'SEC-' + Math.floor(1000 + Math.random() * 9000);
+        }
+
         function showSection(id) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -762,7 +761,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 document.getElementById('schoolDistrict').value = s.district;
                 document.getElementById('schoolCommune').value = s.commune;
                 document.getElementById('schoolAdresse').value = s.adresse;
-                document.getElementById('schoolSecretCode').value = s.secretCode || '';
                 document.getElementById('schoolFormTitle').innerText = "1.1 Modifier l'École";
             }
             showSection('view-create-school');
@@ -777,23 +775,17 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const district = document.getElementById('schoolDistrict').value.trim();
             const commune = document.getElementById('schoolCommune').value.trim();
             const adresse = document.getElementById('schoolAdresse').value.trim();
-            const secretCode = document.getElementById('schoolSecretCode').value.trim();
             const logoFile = document.getElementById('schoolLogoFile').files[0];
-
-            if(!secretCode) {
-                alert("Veuillez saisir un code secret pour sécuriser votre école !");
-                return;
-            }
 
             const processSave = (logoBase64) => {
                 if(id) {
                     const s = appData.schools.find(x => x.id === id);
                     s.name = name; s.appartenance = appartenance; s.province = province;
                     s.district = district; s.commune = commune; s.adresse = adresse;
-                    s.secretCode = secretCode;
                     if(logoBase64) s.logo = logoBase64;
                     alert("École modifiée avec succès !");
                 } else {
+                    const secretCode = generateSecretCode();
                     appData.schools.push({
                         id: 'SCH-' + Date.now(),
                         name, appartenance, province, district, commune, adresse, secretCode,
@@ -801,7 +793,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: [], 
                         presenceStudents: {}, presenceStaff: [], studentPayments: [], agentPayments: []
                     });
-                    alert("École créée avec succès ! Votre code secret d'accès a été enregistré.");
+                    alert(`École créée avec succès !\n\nIMPORTANT : Le système a attribué le CODE SECRET suivant à votre école : ${secretCode}\n\nVeuillez le conserver précieusement. Il vous sera demandé pour ouvrir ou gérer votre école.`);
                 }
                 saveData();
                 showSection('view-portal');
@@ -819,7 +811,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function deleteSchool(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez saisir le code secret de l'école "${s.name}" pour confirmer la suppression :`);
+            const inputCode = prompt(`Veuillez saisir le code secret attribué par le système pour l'école "${s.name}" afin de confirmer la suppression :`);
             if(inputCode === null) return;
             if(inputCode.trim() !== s.secretCode) {
                 alert("Code secret incorrect ! Suppression annulée.");
@@ -864,7 +856,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function openSchoolFormWithCode(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez entrer le code secret pour modifier l'école "${s.name}" :`);
+            const inputCode = prompt(`Veuillez entrer le code secret généré par le système pour modifier l'école "${s.name}" :`);
             if(inputCode === null) return;
             if(inputCode.trim() === s.secretCode) {
                 openSchoolForm(id);
@@ -876,7 +868,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function verifySchoolCodeAndOpen(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`[ACCÈS SÉCURISÉ]\nEntrez le code secret pour ouvrir l'école "${s.name}" :`);
+            const inputCode = prompt(`[ACCÈS SÉCURISÉ]\nEntrez le code secret généré par le système pour ouvrir l'école "${s.name}" :`);
             if(inputCode === null) return;
             if(inputCode.trim() === s.secretCode) {
                 openSchoolDashboard(id);
