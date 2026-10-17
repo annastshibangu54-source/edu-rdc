@@ -323,6 +323,26 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         </div>
                     </div>
                 </div>
+             <!-- BOUTON TABLEAU DE BORD (À insérer juste en dessous de Paramètres) -->
+<a class="list-group-item list-group-item-action bg-primary text-white fw-bold mt-2" href="javascript:void(0);" onclick="toggleDashboardSubmenu()">
+    <i class="fa fa-tachometer-alt me-2"></i> Tableau de bord <i class="fa fa-chevron-down float-end mt-1" id="dashArrowIcon"></i>
+</a>
+
+<!-- SOUS-MENU DES 11 RUBRIQUES POUR LE TABLEAU DE BORD -->
+<div id="dashSubmenu" class="params-submenu">
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-hierarchie', this)"><i class="fa fa-sitemap me-2 text-primary"></i> 1. Hie & Direction</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-classes', this)"><i class="fa fa-door-open me-2 text-primary"></i> 2. Enregistrement Classe</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-profs', this)"><i class="fa fa-chalkboard-teacher me-2 text-primary"></i> 3. Enseignants & Titulaires</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-eleves-reg', this)"><i class="fa fa-user-graduate me-2 text-primary"></i> 4. Inscription des élèves</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-cours', this)"><i class="fa fa-book-open me-2 text-primary"></i> 5. Cours & Pondération</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-notes', this)"><i class="fa fa-edit me-2 text-primary"></i> 6. Saisie de note</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-bulletins', this)"><i class="fa fa-file-invoice me-2 text-primary"></i> 7. Bulletin de cotes</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-frais', this)"><i class="fa fa-wallet me-2 text-primary"></i> 8. Frais scolaire & Caisse</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-presences', this)"><i class="fa fa-clipboard-check me-2 text-primary"></i> 9. Gestion de présence</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-programme', this)"><i class="fa fa-calendar-alt me-2 text-primary"></i> 10. Programme & Calendrier</a>
+    <a class="list-group-item list-group-item-action" href="javascript:void(0);" onclick="switchDashboardTab('tab-communication', this)"><i class="fa fa-bullhorn me-2 text-primary"></i> 11. Communication / Contact</a>
+</div>
+
 
                 <!-- CONTENU DES PANNEAUX -->
                 <div class="col-lg-9">
@@ -2230,6 +2250,42 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </tr>
             `).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune communication enregistrée.</td></tr>`;
         }
+     // Ouvre ou ferme le sous-menu du Tableau de bord
+function toggleDashboardSubmenu() {
+    const submenu = document.getElementById('dashSubmenu');
+    const arrow = document.getElementById('dashArrowIcon');
+    submenu.classList.toggle('show');
+    arrow.classList.toggle('fa-chevron-up');
+    arrow.classList.toggle('fa-chevron-down');
+}
+
+// Affiche exceptionnellement la rubrique sélectionnée depuis le Tableau de bord
+function switchDashboardTab(tabId, element) {
+    // Masque le message d'accueil par défaut
+    document.getElementById('defaultWelcomeMessage').style.display = 'none';
+
+    // Désactive tous les panneaux et active uniquement celui demandé
+    document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+
+    // Met à jour l'élément actif dans le sous-menu
+    document.querySelectorAll('#dashSubmenu .list-group-item').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+
+    // Exécute les fonctions de rafraîchissement spécifiques si nécessaire
+    if(tabId === 'tab-presences') {
+        refreshPresenceOptions();
+    } else if(tabId === 'tab-frais') {
+        refreshPaymentOptions();
+    } else if(tabId === 'tab-bulletins') {
+        refreshBulletinOptions();
+    } else if(tabId === 'tab-cours') {
+        renderCoursesTable();
+    } else if(tabId === 'tab-eleves-reg') {
+        renderStudentsTable();
+    }
+}
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
