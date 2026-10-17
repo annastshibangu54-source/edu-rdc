@@ -76,10 +76,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 @media print{
  @page{size:A4 portrait;margin:6mm}
  body{background:#fff}
- .no-print,.navbar,.sidebar-menu{display:none !important}
+ .no-print,.navbar,.sidebar-menu,.dashboard-section,.nav-tabs{display:none !important}
  .wrap{overflow:visible;padding:0}
  .bulletin-container .page{box-shadow:none;margin:0;width:auto;padding:0}
  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .printable-area { display: block !important; }
 }
  /* Style personnalisé pour le Tableau de bord (Grille moderne) */
 .border-top-4 { border-top-width: 4px !important; }
@@ -137,18 +138,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     <div class="container-fluid py-4 px-lg-5">
 
-        <!-- ========================================================= -->
-        <!-- 1. PAGE D'ACCUEIL / PORTAIL PRINCIPAL (3 ZONES) -->
-        <!-- ========================================================= -->
+        <!-- PORTAIL PRINCIPAL -->
         <div id="view-portal" class="view-section active">
             <div class="text-center mb-4">
                 <h2 class="text-primary fw-bold">Plateforme de Gestion Scolaire EDU-RDC</h2>
                 <p class="text-muted">Sélectionnez un service ci-dessous :</p>
             </div>
 
-            <!-- LES 3 ZONES DE DÉPART -->
             <div class="row g-4 mb-5">
-                <!-- ZONE 1 : CRÉER ÉCOLE -->
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openSchoolForm()">
                         <i class="fa fa-university fa-3x text-primary mb-3"></i>
@@ -157,7 +154,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         <button class="btn btn-outline-primary btn-sm mt-2 fw-bold">Accéder à la création</button>
                     </div>
                 </div>
-                <!-- ZONE 2 : INSCRIPTION ÉLÈVES -->
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openDirectRegistration()">
                         <i class="fa fa-user-plus fa-3x text-success mb-3"></i>
@@ -166,7 +162,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         <button class="btn btn-outline-success btn-sm mt-2 fw-bold">Procéder à l'inscription</button>
                     </div>
                 </div>
-                <!-- ZONE 3 : DEMANDE D'EMPLOI -->
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="showSection('view-job-application')">
                         <i class="fa fa-briefcase fa-3x text-warning mb-3"></i>
@@ -177,7 +172,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </div>
             </div>
 
-            <!-- LISTE DES ÉCOLES CRÉÉES -->
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="m-0 text-primary fw-bold"><i class="fa fa-list me-2"></i>Liste des Écoles Enregistrées</h4>
                 <button class="btn btn-primary btn-sm" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter une École</button>
@@ -185,9 +179,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             <div id="schoolsListContainer" class="row g-3"></div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- 1.1 FORMULAIRE DE CRÉATION / MODIFICATION ÉCOLE -->
-        <!-- ========================================================= -->
+        <!-- FORMULAIRE ÉCOLE -->
         <div id="view-create-school" class="view-section">
             <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour au Portail</button>
             <div class="card shadow-sm border-0">
@@ -243,9 +235,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- ESPACE ADMIN CENTRAL CONFIDENTIEL -->
-        <!-- ========================================================= -->
+        <!-- ADMIN CENTRAL -->
         <div id="view-admin-central" class="view-section">
             <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour au Portail</button>
             <div class="card shadow-sm border-0 border-start border-4 border-danger">
@@ -254,8 +244,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <span class="badge bg-danger">ACCÈS RESTREINT ADMIN</span>
                 </div>
                 <div class="card-body p-4">
-
-                    <!-- DEMANDES ENVOYÉES AU CENTRAL -->
                     <h5 class="fw-bold text-primary mb-3"><i class="fa fa-envelope-open-text me-2"></i>1. Demandes de Récupération Reçues</h5>
                     <div class="table-responsive mb-4">
                         <table class="table table-bordered table-hover align-middle">
@@ -274,10 +262,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <tbody id="adminRequestsTableBody"></tbody>
                         </table>
                     </div>
-
                     <hr class="my-4">
-
-                    <!-- REGISTRE DE TOUTES LES ÉCOLES -->
                     <h5 class="fw-bold text-primary mb-3"><i class="fa fa-database me-2"></i>2. Registre des Écoles & Codes Secrets</h5>
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle">
@@ -293,14 +278,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <tbody id="adminSchoolsTableBody"></tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- 3. DEMANDE D'EMPLOI -->
-        <!-- ========================================================= -->
+        <!-- DEMANDE EMPLOI -->
         <div id="view-job-application" class="view-section">
             <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
             <div class="card shadow-sm border-0">
@@ -322,9 +304,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- ESPACE INTERNE ET CONFIGURATION COMPLÈTE DE L'ÉCOLE -->
-        <!-- ========================================================= -->
+        <!-- DASHBOARD ESPACE ÉCOLE -->
         <div id="view-school-dashboard" class="view-section">
             <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
                 <div class="d-flex align-items-center gap-3">
@@ -338,15 +318,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             </div>
 
             <div class="row">
-                <!-- MENU LATÉRAL DE CONFIGURATION -->
                 <div class="col-lg-3 mb-4">
                     <div class="list-group sidebar-menu shadow-sm">
-                        <!-- BOUTON PARAMÈTRES PRINCIPAL -->
                         <a class="list-group-item list-group-item-action bg-dark text-white fw-bold" href="javascript:void(0);" onclick="toggleParamsSubmenu()">
                             <i class="fa fa-cogs me-2"></i> Paramètres <i class="fa fa-chevron-down float-end mt-1" id="arrowIcon"></i>
                         </a>
-                        
-                        <!-- SOUS-MENU DES 11 RUBRIQUES -->
                         <div id="paramsSubmenu" class="params-submenu">
                             <a class="list-group-item list-group-item-action rubric-item" id="r-hierarchie" href="javascript:void(0);" onclick="switchTab('tab-hierarchie', this)"><i class="fa fa-sitemap me-2 text-primary"></i> 1. Hie & Direction</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-classes" href="javascript:void(0);" onclick="switchTab('tab-classes', this)"><i class="fa fa-door-open me-2 text-primary"></i> 2. Enregistrement Classe</a>
@@ -361,94 +337,94 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <a class="list-group-item list-group-item-action rubric-item" id="r-communication" href="javascript:void(0);" onclick="switchTab('tab-communication', this)"><i class="fa fa-bullhorn me-2 text-primary"></i> 11. Communication / Contact</a>
                         </div>
                     </div>
-             <!-- NOUVEAU DESIGN TABLEAU DE BORD (Différent de Paramètres) -->
-<div class="dashboard-section mt-4 p-3 bg-white rounded shadow-sm border border-top-4 border-indigo">
-    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
-        <h6 class="m-0 fw-bold text-indigo"><i class="fa fa-tachometer-alt me-2"></i>TABLEAU DE BORD</h6>
-        <span class="badge bg-indigo text-white">Accès Sécurisé</span>
-    </div>
-    <div class="row g-2">
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-hierarchie')">
-                <i class="fa fa-sitemap text-indigo"></i>
-                <span>Direction</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-classes')">
-                <i class="fa fa-door-open text-indigo"></i>
-                <span>Classes</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-profs')">
-                <i class="fa fa-chalkboard-teacher text-indigo"></i>
-                <span>Enseignants</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-eleves-reg')">
-                <i class="fa fa-user-graduate text-indigo"></i>
-                <span>Élèves</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-cours')">
-                <i class="fa fa-book-open text-indigo"></i>
-                <span>Cours</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-notes')">
-                <i class="fa fa-edit text-indigo"></i>
-                <span>Notes</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-bulletins')">
-                <i class="fa fa-file-invoice text-indigo"></i>
-                <span>Bulletins</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-frais')">
-                <i class="fa fa-wallet text-indigo"></i>
-                <span>Caisse</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-presences')">
-                <i class="fa fa-clipboard-check text-indigo"></i>
-                <span>Présences</span>
-            </button>
-        </div>
-        <div class="col-6">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-programme')">
-                <i class="fa fa-calendar-alt text-indigo"></i>
-                <span>Programme</span>
-            </button>
-        </div>
-        <div class="col-12">
-            <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-communication')">
-                <i class="fa fa-bullhorn text-indigo"></i>
-                <span>Communication / Contact</span>
-            </button>
-        </div>
-    </div>
-</div>
+
+                    <!-- TABLEAU DE BORD MODERNE -->
+                    <div class="dashboard-section mt-4 p-3 bg-white rounded shadow-sm border border-top-4 border-indigo">
+                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                            <h6 class="m-0 fw-bold text-indigo"><i class="fa fa-tachometer-alt me-2"></i>TABLEAU DE BORD</h6>
+                            <span class="badge bg-indigo text-white">Accès Sécurisé</span>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-hierarchie')">
+                                    <i class="fa fa-sitemap text-indigo"></i>
+                                    <span>Direction</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-classes')">
+                                    <i class="fa fa-door-open text-indigo"></i>
+                                    <span>Classes</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-profs')">
+                                    <i class="fa fa-chalkboard-teacher text-indigo"></i>
+                                    <span>Enseignants</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-eleves-reg')">
+                                    <i class="fa fa-user-graduate text-indigo"></i>
+                                    <span>Élèves</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-cours')">
+                                    <i class="fa fa-book-open text-indigo"></i>
+                                    <span>Cours</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-notes')">
+                                    <i class="fa fa-edit text-indigo"></i>
+                                    <span>Notes</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-bulletins')">
+                                    <i class="fa fa-file-invoice text-indigo"></i>
+                                    <span>Bulletins</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-frais')">
+                                    <i class="fa fa-wallet text-indigo"></i>
+                                    <span>Caisse & Paiements</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-presences')">
+                                    <i class="fa fa-clipboard-check text-indigo"></i>
+                                    <span>Présences</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-programme')">
+                                    <i class="fa fa-calendar-alt text-indigo"></i>
+                                    <span>Programme</span>
+                                </button>
+                            </div>
+                            <div class="col-12">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-communication')">
+                                    <i class="fa fa-bullhorn text-indigo"></i>
+                                    <span>Communication / Contact</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- CONTENU DES PANNEAUX -->
                 <div class="col-lg-9">
                     <div class="bg-white p-4 rounded shadow-sm">
 
-                        <!-- MESSAGE D'ACCUEIL PAR DÉFAUT -->
                         <div id="defaultWelcomeMessage" class="text-center py-5 text-muted">
                             <i class="fa fa-hand-pointer fa-3x mb-3 text-primary"></i>
-                            <h5>Veuillez cliquer sur <b>Paramètres</b> dans le menu de gauche, puis sélectionnez une rubrique pour afficher son formulaire et sa liste.</h5>
+                            <h5>Veuillez cliquer sur <b>Paramètres</b> dans le menu de gauche ou sur un bouton du <b>Tableau de Bord</b> pour afficher une rubrique.</h5>
                         </div>
 
-                        <!-- 1. HIÉRARCHIE ADMINISTRATIVE -->
+                        <!-- 1. HIÉRARCHIE -->
                         <div class="tab-pane" id="tab-hierarchie">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-sitemap me-2"></i>1. Hie & Direction (Formulaire & Liste)</h5>
                             <form onsubmit="handleSaveAdminStaff(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
@@ -464,7 +440,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Fonction</th><th>Nom Complet</th><th>Actions</th></tr></thead><tbody id="adminStaffTableBody"></tbody></table>
                         </div>
 
-                        <!-- 2. ENREGISTREMENT DES CLASSES -->
+                        <!-- 2. CLASSES -->
                         <div class="tab-pane" id="tab-classes">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-door-open me-2"></i>2. Enregistrement Classe (Formulaire & Liste)</h5>
                             <form onsubmit="handleSaveClass(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
@@ -487,7 +463,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Niveau</th><th>Nom Classe</th><th>Actions</th></tr></thead><tbody id="classesTableBody"></tbody></table>
                         </div>
 
-                        <!-- 3. ENSEIGNANTS & TITULAIRES -->
+                        <!-- 3. ENSEIGNANTS -->
                         <div class="tab-pane" id="tab-profs">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-chalkboard-teacher me-2"></i>3. Enseignants & Titulaires (Formulaire & Liste)</h5>
                             <form onsubmit="handleSaveTeacher(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
@@ -504,7 +480,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Agent</th><th>Actions</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
                         </div>
 
-                        <!-- 4. INSCRIPTION DES ÉLÈVES -->
+                        <!-- 4. INSCRIPTION ÉLÈVES -->
                         <div class="tab-pane" id="tab-eleves-reg">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-user-graduate me-2"></i>4. Inscription des élèves (Formulaire & Liste)</h5>
                             <form onsubmit="handleSaveStudent(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
@@ -521,7 +497,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th>Classe</th><th>Actions</th></tr></thead><tbody id="studentsTableBody"></tbody></table>
                         </div>
 
-                        <!-- 5. COURS & PONDÉRATIONS -->
+                        <!-- 5. COURS -->
                         <div class="tab-pane" id="tab-cours">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-book-open me-2"></i>5. Cours & Pondération (Formulaire & Liste)</h5>
                             <div class="row g-2 mb-3">
@@ -540,7 +516,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom du Cours</th><th>Max Période</th><th>Max Examen</th><th>Actions</th></tr></thead><tbody id="coursesTableBody"></tbody></table>
                         </div>
 
-                        <!-- 6. SAISIE DES NOTES -->
+                        <!-- 6. NOTES -->
                         <div class="tab-pane" id="tab-notes">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-edit me-2"></i>6. Saisie de note (Formulaire & Saisie)</h5>
                             <div class="row g-2 mb-3">
@@ -552,7 +528,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <div class="mt-3"><button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button></div>
                         </div>
 
-                        <!-- 7. BULLETINS (GÉNÉRATION ET AFFICHAGE AUTOMATIQUE) -->
+                        <!-- 7. BULLETINS -->
                         <div class="tab-pane" id="tab-bulletins">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-file-invoice me-2"></i>7. Bulletin de cotes (Génération & Affichage)</h5>
                             
@@ -575,7 +551,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 </div>
                             </div>
 
-                            <!-- ZONE DE RENDU DU BULLETIN -->
                             <div class="bulletin-container">
                                 <div class="wrap">
                                     <div class="page" id="page">
@@ -587,7 +562,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </div>
                         </div>
 
-                        <!-- 8. FRAIS SCOLAIRES & PAIEMENTS -->
+                        <!-- 8. FRAIS SCOLAIRES & PAIEMENTS (ÉLÈVE, AGENT & ADMIN) -->
                         <div class="tab-pane" id="tab-frais">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-wallet me-2"></i>8. Gestion des Paiements & Caisse</h5>
                             
@@ -599,7 +574,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <button class="nav-link fw-bold" id="p-agents-frais-tab" data-bs-toggle="tab" data-bs-target="#p-agents-frais" type="button" role="tab">2. Paiement Agents / Profs</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link fw-bold" id="p-caisse-tab" data-bs-toggle="tab" data-bs-target="#p-caisse" type="button" role="tab">3. Journal Caisse</button>
+                                    <button class="nav-link fw-bold" id="p-admin-frais-tab" data-bs-toggle="tab" data-bs-target="#p-admin-frais" type="button" role="tab">3. Paiement Administration</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link fw-bold" id="p-caisse-tab" data-bs-toggle="tab" data-bs-target="#p-caisse" type="button" role="tab">4. Journal Caisse</button>
                                 </li>
                             </ul>
 
@@ -643,7 +621,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Élève</th><th>Classe</th><th>Générale</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="studentPayTableBody"></tbody></table>
                                 </div>
 
-                                <!-- 2. PAIEMENT AGENTS -->
+                                <!-- 2. PAIEMENT AGENTS / PROFS -->
                                 <div class="tab-pane fade" id="p-agents-frais" role="tabpanel">
                                     <form id="formAgentPay" onsubmit="handleSaveAgentPayment(event)" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editAgentPayIndex">
@@ -686,7 +664,48 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Enseignant</th><th>Salaire</th><th>Prime</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="agentPayTableBody"></tbody></table>
                                 </div>
 
-                                <!-- 3. JOURNAL CAISSE -->
+                                <!-- 3. PAIEMENT ADMINISTRATION (NOUVEAU) -->
+                                <div class="tab-pane fade" id="p-admin-frais" role="tabpanel">
+                                    <form id="formAdminPay" onsubmit="handleSaveAdminPayment(event)" class="p-3 bg-light rounded border mb-3">
+                                        <input type="hidden" id="editAdminPayIndex">
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Choisir Cadre Admin :</label>
+                                                <select id="adminPayStaffSelect" class="form-select" required onchange="fillAdminPayInfo(this.value)">
+                                                    <option value="" disabled selected>Choisir...</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Fonction :</label>
+                                                <input type="text" id="adminPayRole" class="form-control" readonly placeholder="Ex: Préfet, Directeur">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Traitement / Salaire Fixé ($) :</label>
+                                                <input type="number" id="adminSalaire" class="form-control" required placeholder="Ex: 500" oninput="calcAdminReste()">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Prime / Allocations ($) :</label>
+                                                <input type="number" id="adminPrime" class="form-control" placeholder="Ex: 100" oninput="calcAdminReste()">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Somme Payée ($) :</label>
+                                                <input type="number" id="adminMontantPaye" class="form-control" required placeholder="Ex: 400" oninput="calcAdminReste()">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="fw-bold">Reste à Payer ($) :</label>
+                                                <input type="number" id="adminReste" class="form-control bg-white" readonly>
+                                            </div>
+                                            <div class="col-12 mt-2 d-flex gap-2">
+                                                <button type="submit" id="btnAdminPaySubmit" class="btn btn-success fw-bold"><i class="fa fa-save"></i> Enregistrer Paiement Admin</button>
+                                                <button type="button" class="btn btn-secondary fw-bold" onclick="resetAdminPayForm()">Fermer</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <h6 class="fw-bold text-secondary">Liste des Paiements Cadres Administration :</h6>
+                                    <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Nom Admin</th><th>Fonction</th><th>Salaire Dû</th><th>Prime</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="adminPayTableBody"></tbody></table>
+                                </div>
+
+                                <!-- 4. JOURNAL CAISSE -->
                                 <div class="tab-pane fade" id="p-caisse-tab" role="tabpanel">
                                     <form id="formCaisse" onsubmit="handleSaveTransaction(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
                                         <input type="hidden" id="editTransIndex">
@@ -704,11 +723,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </div>
                         </div>
 
-                        <!-- 9. GESTION DES PRÉSENCES -->
+                        <!-- 9. PRÉSENCES (ÉLÈVE, AGENT & ADMIN + LISTES IMPRIMABLES) -->
                         <div class="tab-pane" id="tab-presences">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-clipboard-check me-2"></i>9. Gestion de présence</h5>
                             
-                            <!-- ONGLETS INTERNES POUR PRÉSENCES -->
                             <ul class="nav nav-tabs mb-3" id="presenceTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active fw-bold" id="p-eleves-tab" data-bs-toggle="tab" data-bs-target="#p-eleves" type="button" role="tab">1. Élèves</button>
@@ -737,6 +755,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                         <div class="d-flex gap-2">
                                             <button type="submit" id="btnStudentPresSubmit" class="btn btn-success fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
                                             <button type="button" class="btn btn-warning fw-bold text-dark" onclick="editStudentPresence()"><i class="fa fa-edit"></i> Modifier</button>
+                                            <button type="button" class="btn btn-primary fw-bold" onclick="printPresenceList('eleves')"><i class="fa fa-print me-1"></i> Imprimer la Liste</button>
                                             <button type="button" class="btn btn-secondary fw-bold" onclick="closePresenceForm('p-eleves')">Fermer</button>
                                         </div>
                                     </form>
@@ -783,7 +802,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                             </div>
                                         </div>
                                     </form>
-                                    <h6 class="fw-bold text-secondary">Liste des Présences Enseignants :</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold text-secondary m-0">Liste des Présences Enseignants :</h6>
+                                        <button class="btn btn-sm btn-primary fw-bold" onclick="printPresenceList('profs')"><i class="fa fa-print me-1"></i> Imprimer Liste Présence Enseignants</button>
+                                    </div>
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom</th><th>Fonction/Classe</th><th>Statut</th><th>Arrivée</th><th>Départ</th><th>Actions</th></tr></thead><tbody id="profPresTableBody"></tbody></table>
                                 </div>
 
@@ -793,7 +815,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                         <input type="hidden" id="editAdminPresIndex">
                                         <div class="row g-2">
                                             <div class="col-md-4">
-                                                <label class="fw-bold">Choisir École / Agent :</label>
+                                                <label class="fw-bold">Choisir Cadre Admin :</label>
                                                 <select id="presAdminSelect" class="form-select" required onchange="fillAdminInfo(this.value)">
                                                     <option value="" disabled selected>Choisir...</option>
                                                 </select>
@@ -828,13 +850,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                             </div>
                                         </div>
                                     </form>
-                                    <h6 class="fw-bold text-secondary">Liste des Présences Administration :</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold text-secondary m-0">Liste des Présences Administration :</h6>
+                                        <button class="btn btn-sm btn-primary fw-bold" onclick="printPresenceList('admin')"><i class="fa fa-print me-1"></i> Imprimer Liste Présence Administration</button>
+                                    </div>
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom</th><th>Fonction</th><th>Statut</th><th>Arrivée</th><th>Départ</th><th>Actions</th></tr></thead><tbody id="adminPresTableBody"></tbody></table>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 10. PROGRAMME & CALENDRIER -->
+                        <!-- 10. PROGRAMME -->
                         <div class="tab-pane" id="tab-programme">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-calendar-alt me-2"></i>10. Programme & Calendrier (Formulaire & Affichage)</h5>
                             <div class="p-3 bg-light rounded border mb-3">
@@ -851,7 +876,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </div>
                         </div>
 
-                        <!-- 11. COMMUNICATION & CONTACT -->
+                        <!-- 11. COMMUNICATION -->
                         <div class="tab-pane" id="tab-communication">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-bullhorn me-2"></i>11. Communication / Contact (Formulaire & Liste)</h5>
                             <div class="p-3 bg-light rounded border mb-3">
@@ -873,29 +898,28 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     </div>
 
-    <!-- MODAL FACTURE / REÇU DE PAIEMENT -->
+    <!-- MODAL FACTURE / REÇU DE PAIEMENT & IMPRESSION DE LISTE -->
     <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header bg-primary text-white no-print">
-            <h5 class="modal-title fw-bold"><i class="fa fa-file-invoice me-2"></i>Facture / Reçu de Paiement</h5>
+            <h5 class="modal-title fw-bold" id="modalPrintTitle"><i class="fa fa-file-invoice me-2"></i>Document / Imprimable</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body p-4" id="invoicePrintArea">
-            <!-- Contenu dynamique de la facture -->
           </div>
           <div class="modal-footer no-print">
             <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Fermer</button>
-            <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer / Enregistrer en PDF</button>
+            <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer / Télécharger PDF</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE CORRIGÉ ET PERSISTANT -->
+    <!-- SCRIPT JS DE GESTION COMPLÈTE -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
-        const ADMIN_MASTER_PASSWORD = "ADMIN-2026"; // 1. Code central ou Admin Central pour la plateforme
+        const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
         let appData = { schools: [], adminRequests: [] };
         let activeSchoolId = null;
         let currentUserSession = { role: null, name: null, assignedClass: null, secretCode: null };
@@ -925,15 +949,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(id === 'view-portal') renderSchoolsList();
         }
 
-        // --- GESTION DES PARAMÈTRES ET RESTRICTIONS SELON LES RÔLES ---
         function toggleParamsSubmenu() {
             const items = document.querySelectorAll('.rubric-item');
 
-            // 2. Code secret Admin ou Code École (Propriétaire) -> Accès complet aux 11 rubriques
             if (currentUserSession.role === 'owner') {
                 items.forEach(el => el.style.display = 'block');
             } 
-            // 3. Code Agent (Professeur / Enseignant) -> Accès restreint uniquement aux rubriques 5, 6, 7
             else if (currentUserSession.role === 'teacher') {
                 items.forEach(el => {
                     if (el.id === 'r-cours' || el.id === 'r-notes' || el.id === 'r-bulletins') {
@@ -965,7 +986,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById(tabId).classList.add('active');
 
             document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+            if(element) element.classList.add('active');
 
             if(tabId === 'tab-presences') {
                 refreshPresenceOptions();
@@ -986,7 +1007,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
         }
 
-        // --- 1. GESTION ESPACE ADMIN CENTRAL CONFIDENTIEL (CODE CENTRAL) ---
         function openAdminCentralPanel() {
             const pass = prompt("[ACCÈS ADMIN CENTRAL]\nVeuillez saisir le Code Central de la plateforme :");
             if(pass === null) return;
@@ -1073,7 +1093,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-        // --- RÉCUPÉRATION CODE SECRET ---
         function handleForgottenCode(schoolId, teacherIndex = null) {
             const s = appData.schools.find(x => x.id === schoolId);
             if(!s) return;
@@ -1124,7 +1143,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-        // 1.1 CRÉER / MODIFIER ÉCOLE
         function openSchoolForm(id = null) {
             document.getElementById('formCreateSchool').reset();
             document.getElementById('editSchoolId').value = "";
@@ -1168,7 +1186,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         name, appartenance, province, district, commune, adresse, secretCode,
                         logo: logoBase64 || '',
                         staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: [], 
-                        presenceStudents: {}, presenceStaff: [], studentPayments: [], agentPayments: [],
+                        presenceStudents: {}, presenceStaff: [], studentPayments: [], agentPayments: [], adminPayments: [],
                         program: '', communications: []
                     });
                     alert(`École créée avec succès !\n\nCODE ÉCOLE (Propriétaire) : ${secretCode}\n\nConservez-le précieusement.`);
@@ -1247,7 +1265,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-        // --- AUTHENTIFICATION PAR CODE (PROPRIÉTAIRE OU AGENT) ---
         function promptLoginCode(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
@@ -1290,6 +1307,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!s.presenceStaff) s.presenceStaff = [];
             if(!s.studentPayments) s.studentPayments = [];
             if(!s.agentPayments) s.agentPayments = [];
+            if(!s.adminPayments) s.adminPayments = [];
             if(!s.communications) s.communications = [];
 
             document.getElementById('dashSchoolTitle').innerText = s.name;
@@ -1392,10 +1410,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('staffName').value = "";
             document.getElementById('btnStaffSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
-        function resetStaffForm() {
-            clearAdminStaffForm();
-            closeRubricTab();
-        }
 
         // --- 2. CLASSES ---
         function handleSaveClass(e) {
@@ -1435,12 +1449,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('className').value = "";
             document.getElementById('btnClassSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
-        function resetClassForm() {
-            clearClassForm();
-            closeRubricTab();
-        }
 
-        // --- 3. ENSEIGNANTS (CODE AGENT) ---
+        // --- 3. ENSEIGNANTS ---
         function handleSaveTeacher(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1487,10 +1497,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('teacherPhone').value = "";
             document.getElementById('btnTeacherSubmit').innerText = "Enregistrer";
         }
-        function resetTeacherForm() {
-            clearTeacherForm();
-            closeRubricTab();
-        }
 
         // --- 4. ÉLÈVES ---
         function handleSaveStudent(e) {
@@ -1534,10 +1540,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('editStudentIndex').value = "";
             document.getElementById('studentName').value = "";
             document.getElementById('btnStudentSubmit').innerText = "Enregistrer";
-        }
-        function resetStudentForm() {
-            clearStudentForm();
-            closeRubricTab();
         }
 
         function renderStudentsTable() {
@@ -1595,10 +1597,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('courseName').value = "";
             document.getElementById('courseMax').value = "";
             document.getElementById('btnCourseSubmit').innerText = "Enregistrer";
-        }
-        function resetCourseForm() {
-            clearCourseForm();
-            closeRubricTab();
         }
 
         function renderCoursesTable() {
@@ -1784,15 +1782,20 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             pageContainer.innerHTML = h;
         }
 
-        // --- 8. FRAIS SCOLAIRES & CAISSE ---
+        // --- 8. FRAIS SCOLAIRES & PAIEMENTS (ÉLÈVE, AGENT & ADMIN) ---
         function refreshPaymentOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
             let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             document.getElementById('payClassSelect').innerHTML = classOptions;
             document.getElementById('agentPayClassSelect').innerHTML = classOptions;
+
+            const adminStaffOptions = `<option value="" disabled selected>Choisir cadre admin...</option>` + s.staff.map((st, idx) => `<option value="${idx}">${st.name} (${st.role})</option>`).join('');
+            document.getElementById('adminPayStaffSelect').innerHTML = adminStaffOptions;
+
             renderStudentPayTable();
             renderAgentPayTable();
+            renderAdminPayTable();
             renderCaisseTable();
         }
 
@@ -1836,7 +1839,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderStudentPayTable();
             clearStudentPayForm();
 
-            // Génération de la facture / reçu PDF
             generateInvoice({
                 typeOp: "RECETTE (Frais Scolaires Élève)",
                 concerne: "Élève",
@@ -1944,7 +1946,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderAgentPayTable();
             clearAgentPayForm();
 
-            // Génération de la facture / reçu PDF
             generateInvoice({
                 typeOp: "DÉPENSE (Paiement Salaire / Prime Agent)",
                 concerne: "Enseignant / Personnel",
@@ -2010,6 +2011,120 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             closeRubricTab();
         }
 
+        /* --- PAIEMENT ADMINISTRATION --- */
+        function fillAdminPayInfo(val) {
+            if(val === "") return;
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const staffObj = s.staff[val];
+            if(staffObj) {
+                document.getElementById('adminPayRole').value = staffObj.role;
+            }
+        }
+
+        function calcAdminReste() {
+            const salaire = parseFloat(document.getElementById('adminSalaire').value) || 0;
+            const prime = parseFloat(document.getElementById('adminPrime').value) || 0;
+            const paye = parseFloat(document.getElementById('adminMontantPaye').value) || 0;
+            const totalDu = salaire + prime;
+            const reste = totalDu - paye;
+            document.getElementById('adminReste').value = reste >= 0 ? reste : 0;
+        }
+
+        function handleSaveAdminPayment(e) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s.adminPayments) s.adminPayments = [];
+
+            const editIdx = document.getElementById('editAdminPayIndex').value;
+            const staffIdx = document.getElementById('adminPayStaffSelect').value;
+            const staffObj = s.staff[staffIdx];
+            const name = staffObj ? staffObj.name : 'Inconnu';
+            const role = document.getElementById('adminPayRole').value;
+            const salaire = parseFloat(document.getElementById('adminSalaire').value) || 0;
+            const prime = parseFloat(document.getElementById('adminPrime').value) || 0;
+            const paye = parseFloat(document.getElementById('adminMontantPaye').value) || 0;
+            const reste = parseFloat(document.getElementById('adminReste').value) || 0;
+            const date = new Date().toLocaleDateString('fr-FR');
+
+            const record = { date, name, role, salaire, prime, paye, reste };
+
+            if(editIdx !== "") {
+                s.adminPayments[editIdx] = record;
+                alert("Paiement admin modifié avec succès !");
+            } else {
+                s.adminPayments.push(record);
+                alert("Paiement admin enregistré avec succès !");
+            }
+
+            saveData();
+            renderAdminPayTable();
+            clearAdminPayForm();
+
+            generateInvoice({
+                typeOp: "DÉPENSE (Paiement Cadre Administration)",
+                concerne: "Administration",
+                nom: name,
+                detail: role,
+                motif: `Traitement Administration (${salaire}$) + Primes (${prime}$)`,
+                total: (salaire + prime),
+                paye: paye,
+                reste: reste
+            });
+        }
+
+        function editAdminPayment(i) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const p = s.adminPayments[i];
+            document.getElementById('editAdminPayIndex').value = i;
+            document.getElementById('adminPayRole').value = p.role;
+            document.getElementById('adminSalaire').value = p.salaire;
+            document.getElementById('adminPrime').value = p.prime;
+            document.getElementById('adminMontantPaye').value = p.paye;
+            document.getElementById('adminReste').value = p.reste;
+            document.getElementById('btnAdminPaySubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
+        }
+
+        function deleteAdminPayment(i) {
+            if(confirm("Supprimer ce paiement administratif ?")) {
+                const s = appData.schools.find(x => x.id === activeSchoolId);
+                s.adminPayments.splice(i, 1);
+                saveData();
+                renderAdminPayTable();
+            }
+        }
+
+        function renderAdminPayTable() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s || !s.adminPayments) return;
+            const tbody = document.getElementById('adminPayTableBody');
+            tbody.innerHTML = s.adminPayments.length ? s.adminPayments.map((p, i) => `
+                <tr>
+                    <td>${p.date}</td>
+                    <td><b>${p.name}</b></td>
+                    <td>${p.role}</td>
+                    <td>${p.salaire} $</td>
+                    <td>${p.prime} $</td>
+                    <td class="text-success fw-bold">${p.paye} $</td>
+                    <td class="text-danger fw-bold">${p.reste} $</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editAdminPayment(${i})" title="Modifier"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteAdminPayment(${i})" title="Supprimer"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td colspan="8" class="text-center text-muted">Aucun paiement d'administration enregistré.</td></tr>`;
+        }
+
+        function clearAdminPayForm() {
+            document.getElementById('formAdminPay').reset();
+            document.getElementById('editAdminPayIndex').value = "";
+            document.getElementById('adminReste').value = "";
+            document.getElementById('btnAdminPaySubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer Paiement Admin';
+        }
+        function resetAdminPayForm() {
+            clearAdminPayForm();
+            closeRubricTab();
+        }
+
         function handleSaveTransaction(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2028,7 +2143,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
             saveData(); renderCaisseTable(); clearCaisseForm();
 
-            // Génération de la facture / reçu PDF
             generateInvoice({
                 typeOp: type,
                 concerne: "Administration / Caisse",
@@ -2073,7 +2187,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             tbody.innerHTML = s.caisse.length ? s.caisse.map((c, i) => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucune opération de caisse enregistrée.</td></tr>`;
         }
 
-        // --- FONCTION DE GÉNÉRATION DE FACTURE / REÇU PDF ---
         function generateInvoice(data) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if (!s) return;
@@ -2083,7 +2196,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             let html = `
                 <div style="border: 2px solid #000; padding: 20px; font-family: Arial, sans-serif; background: #fff; color: #000;">
-                    <!-- En-tête -->
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
                         <div>
                             <h3 style="margin: 0; font-weight: bold; text-transform: uppercase;">${s.name}</h3>
@@ -2095,13 +2207,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         </div>
                     </div>
 
-                    <!-- Titre et N° Facture -->
                     <div style="text-align: center; margin-bottom: 20px;">
                         <h4 style="margin: 0; text-decoration: underline; font-weight: bold;">REÇU DE PAIEMENT / FACTURE</h4>
                         <span style="font-size: 12px; font-weight: bold;">N° : ${invoiceNum}</span> | <small>Date : ${dateHeure}</small>
                     </div>
 
-                    <!-- Informations du Bénéficiaire / Payeur -->
                     <table style="width: 100%; margin-bottom: 20px; font-size: 14px; border-collapse: collapse;">
                         <tr>
                             <td style="padding: 4px 0;"><strong>Type d'opération :</strong> ${data.typeOp}</td>
@@ -2113,7 +2223,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         </tr>
                     </table>
 
-                    <!-- Tableau du Détail Financier -->
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;" border="1">
                         <thead>
                             <tr style="background-color: #f2f2f2;">
@@ -2133,7 +2242,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         </tbody>
                     </table>
 
-                    <!-- Signatures -->
                     <div style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px;">
                         <div style="text-align: center; width: 40%;">
                             <p style="margin-bottom: 50px;"><strong>Signature du Payeur / Bénéficiaire</strong></p>
@@ -2147,6 +2255,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </div>
             `;
 
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Facture / Reçu de Paiement`;
             document.getElementById('invoicePrintArea').innerHTML = html;
             
             const modalEl = document.getElementById('invoiceModal');
@@ -2154,7 +2263,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             modal.show();
         }
 
-        // --- 9. PRÉSENCES ---
+        // --- 9. PRÉSENCES ET IMPRESSION DE LISTE ---
         function refreshPresenceOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
@@ -2231,6 +2340,129 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!cl) { alert("Veuillez sélectionner une classe à modifier !"); return; }
             alert("Mode modification activé pour la classe " + cl + ". Vous pouvez changer les statuts directement dans le tableau.");
             document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
+        }
+
+        /* FONCTION IMPRESSION DES LISTES DE PRÉSENCE (ÉLÈVES, ENSEIGNANTS, ADMIN) */
+        function printPresenceList(type) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+
+            const dateStr = new Date().toLocaleDateString('fr-FR');
+            let title = "";
+            let tableContent = "";
+
+            if(type === 'eleves') {
+                const cl = document.getElementById('presClassSelect').value;
+                if(!cl) { alert("Veuillez d'abord sélectionner une classe d'élèves à imprimer !"); return; }
+                title = `LISTE DE PRÉSENCE ÉLÈVES — CLASSE : ${cl}`;
+                const students = s.students.filter(x => x.classe === cl);
+
+                tableContent = `
+                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
+                        <thead>
+                            <tr style="background:#f2f2f2;">
+                                <th style="padding:6px;">N°</th>
+                                <th style="padding:6px;">Matricule</th>
+                                <th style="padding:6px;">Nom & Prénom</th>
+                                <th style="padding:6px;">Sexe</th>
+                                <th style="padding:6px;">Statut Présence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${students.map((st, i) => {
+                                const status = (s.presenceStudents[cl] && s.presenceStudents[cl][st.id]) ? s.presenceStudents[cl][st.id] : 'Non renseigné';
+                                return `<tr>
+                                    <td style="padding:5px; text-align:center;">${i+1}</td>
+                                    <td style="padding:5px; text-align:center;">${st.mat}</td>
+                                    <td style="padding:5px;">${st.name}</td>
+                                    <td style="padding:5px; text-align:center;">${st.sexe}</td>
+                                    <td style="padding:5px; text-align:center;"><b>${status}</b></td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'profs') {
+                title = `RAPPORT DES PRÉSENCES ENSEIGNANTS / PROFESSEURS`;
+                const profsList = (s.presenceStaff || []).filter(x => x.type === 'Professeur');
+                tableContent = `
+                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
+                        <thead>
+                            <tr style="background:#f2f2f2;">
+                                <th style="padding:6px;">N°</th>
+                                <th style="padding:6px;">Nom complet</th>
+                                <th style="padding:6px;">Fonction / Classe</th>
+                                <th style="padding:6px;">Statut</th>
+                                <th style="padding:6px;">Heure Arrivée</th>
+                                <th style="padding:6px;">Heure Départ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${profsList.map((p, i) => `<tr>
+                                <td style="padding:5px; text-align:center;">${i+1}</td>
+                                <td style="padding:5px;">${p.name}</td>
+                                <td style="padding:5px;">${p.fonction}</td>
+                                <td style="padding:5px; text-align:center;"><b>${p.statut}</b></td>
+                                <td style="padding:5px; text-align:center;">${p.arrivee || '-'}</td>
+                                <td style="padding:5px; text-align:center;">${p.depart || '-'}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'admin') {
+                title = `RAPPORT DES PRÉSENCES PERSONNEL ADMINISTRATIF`;
+                const adminList = (s.presenceStaff || []).filter(x => x.type === 'Administration');
+                tableContent = `
+                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
+                        <thead>
+                            <tr style="background:#f2f2f2;">
+                                <th style="padding:6px;">N°</th>
+                                <th style="padding:6px;">Nom complet</th>
+                                <th style="padding:6px;">Fonction Admin</th>
+                                <th style="padding:6px;">Statut</th>
+                                <th style="padding:6px;">Heure Arrivée</th>
+                                <th style="padding:6px;">Heure Départ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${adminList.map((p, i) => `<tr>
+                                <td style="padding:5px; text-align:center;">${i+1}</td>
+                                <td style="padding:5px;">${p.name}</td>
+                                <td style="padding:5px;">${p.fonction}</td>
+                                <td style="padding:5px; text-align:center;"><b>${p.statut}</b></td>
+                                <td style="padding:5px; text-align:center;">${p.arrivee || '-'}</td>
+                                <td style="padding:5px; text-align:center;">${p.depart || '-'}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            let html = `
+                <div style="padding:15px; font-family:Arial, sans-serif; background:#fff; color:#000;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #000; padding-bottom:10px;">
+                        <div>
+                            <h4 style="margin:0; font-weight:bold;">${s.name}</h4>
+                            <small>${s.province} / ${s.commune}</small>
+                        </div>
+                        <div>
+                            <small>Date du jour : ${dateStr}</small>
+                        </div>
+                    </div>
+                    <h5 style="text-align:center; margin-top:15px; font-weight:bold; text-decoration:underline;">${title}</h5>
+                    ${tableContent}
+                    <div style="display:flex; justify-content:space-between; margin-top:30px; font-size:12px;">
+                        <div><b>Secrétariat / Discipline</b></div>
+                        <div><b>Direction de l'Établissement</b></div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Liste de Présence - Imprimable`;
+            document.getElementById('invoicePrintArea').innerHTML = html;
+            const modalEl = document.getElementById('invoiceModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
         }
 
         function closePresenceForm(tabName) {
@@ -2386,7 +2618,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             `).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence enregistrée.</td></tr>`;
         }
 
-        // --- 10. PROGRAMME & CALENDRIER ---
+        // --- 10. PROGRAMME ---
         function handleSaveProgram() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const text = document.getElementById('schoolProgramText').value.trim();
@@ -2418,7 +2650,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('schoolProgramText').value = s.program || '';
         }
 
-        // --- 11. COMMUNICATION & CONTACT ---
+        // --- 11. COMMUNICATION ---
         function handleSaveCommunication() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const editIdx = document.getElementById('editCommIndex').value;
@@ -2460,10 +2692,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('announcementText').value = "";
             document.getElementById('btnCommSubmit').innerHTML = '<i class="fa fa-save"></i> Publier / Enregistrer';
         }
-        function resetCommForm() {
-            clearCommForm();
-            closeRubricTab();
-        }
 
         function renderCommTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2480,95 +2708,53 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </tr>
             `).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune communication enregistrée.</td></tr>`;
         }
-     // Ouvre ou ferme le sous-menu du Tableau de bord
-function toggleDashboardSubmenu() {
-    const submenu = document.getElementById('dashSubmenu');
-    const arrow = document.getElementById('dashArrowIcon');
-    submenu.classList.toggle('show');
-    arrow.classList.toggle('fa-chevron-up');
-    arrow.classList.toggle('fa-chevron-down');
-}
 
-// Affiche exceptionnellement la rubrique sélectionnée depuis le Tableau de bord
-function switchDashboardTab(tabId, element) {
-    // Masque le message d'accueil par défaut
-    document.getElementById('defaultWelcomeMessage').style.display = 'none';
+        function verifyAndOpenDashboardTab(tabId) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if (!s) return;
 
-    // Désactive tous les panneaux et active uniquement celui demandé
-    document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
+            const inputCode = prompt(`[SÉCURITÉ TABLEAU DE BORD]\nVeuillez entrer votre code secret pour ouvrir cette rubrique :`);
+            if (inputCode === null) return;
 
-    // Met à jour l'élément actif dans le sous-menu
-    document.querySelectorAll('#dashSubmenu .list-group-item').forEach(el => el.classList.remove('active'));
-    element.classList.add('active');
+            const code = inputCode.trim();
+            let authorized = false;
 
-    // Exécute les fonctions de rafraîchissement spécifiques si nécessaire
-    if(tabId === 'tab-presences') {
-        refreshPresenceOptions();
-    } else if(tabId === 'tab-frais') {
-        refreshPaymentOptions();
-    } else if(tabId === 'tab-bulletins') {
-        refreshBulletinOptions();
-    } else if(tabId === 'tab-cours') {
-        renderCoursesTable();
-    } else if(tabId === 'tab-eleves-reg') {
-        renderStudentsTable();
-    }
-}
-     // Vérification du code secret et affichage de la rubrique depuis le Tableau de bord
-function verifyAndOpenDashboardTab(tabId) {
-    const s = appData.schools.find(x => x.id === activeSchoolId);
-    if (!s) return;
-
-    const inputCode = prompt(`[SÉCURITÉ TABLEAU DE BORD]\nVeuillez entrer votre code secret pour ouvrir cette rubrique :`);
-    if (inputCode === null) return;
-
-    const code = inputCode.trim();
-    let authorized = false;
-
-    // 1. Vérification si Code École / Propriétaire (Accès total)
-    if (code === s.secretCode) {
-        authorized = true;
-    } else {
-        // 2. Vérification si Code Agent / Enseignant (Accès limité aux cours, notes et bulletins)
-        const teacherMatch = s.teachers.find(t => t.secretCode === code);
-        if (teacherMatch) {
-            if (tabId === 'tab-cours' || tabId === 'tab-notes' || tabId === 'tab-bulletins') {
+            if (code === s.secretCode) {
                 authorized = true;
             } else {
-                alert("Accès restreint : Votre Code Agent vous permet uniquement d'accéder aux Cours, Notes et Bulletins.");
-                return;
+                const teacherMatch = s.teachers.find(t => t.secretCode === code);
+                if (teacherMatch) {
+                    if (tabId === 'tab-cours' || tabId === 'tab-notes' || tabId === 'tab-bulletins') {
+                        authorized = true;
+                    } else {
+                        alert("Accès restreint : Votre Code Agent vous permet uniquement d'accéder aux Cours, Notes et Bulletins.");
+                        return;
+                    }
+                }
+            }
+
+            if (authorized) {
+                document.getElementById('defaultWelcomeMessage').style.display = 'none';
+                document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
+
+                document.getElementById(tabId).classList.add('active');
+
+                if (tabId === 'tab-presences') {
+                    refreshPresenceOptions();
+                } else if (tabId === 'tab-frais') {
+                    refreshPaymentOptions();
+                } else if (tabId === 'tab-bulletins') {
+                    refreshBulletinOptions();
+                } else if (tabId === 'tab-cours') {
+                    renderCoursesTable();
+                } else if (tabId === 'tab-eleves-reg') {
+                    renderStudentsTable();
+                }
+            } else {
+                alert("Code secret incorrect ! Accès refusé.");
             }
         }
-    }
-
-    if (authorized) {
-        // Cache le message d'accueil et réinitialise les onglets de paramètres
-        document.getElementById('defaultWelcomeMessage').style.display = 'none';
-        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
-
-        // Affiche la rubrique demandée
-        document.getElementById(tabId).classList.add('active');
-
-        // Rafraîchissement des données selon le panneau ouvert
-        if (tabId === 'tab-presences') {
-            refreshPresenceOptions();
-        } else if (tabId === 'tab-frais') {
-            refreshPaymentOptions();
-        } else if (tabId === 'tab-bulletins') {
-            refreshBulletinOptions();
-        } else if (tabId === 'tab-cours') {
-            renderCoursesTable();
-        } else if (tabId === 'tab-eleves-reg') {
-            renderStudentsTable();
-        }
-    } else {
-        alert("Code secret incorrect ! Accès refusé.");
-    }
-}
-
-
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
