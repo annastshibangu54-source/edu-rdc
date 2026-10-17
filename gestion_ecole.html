@@ -205,7 +205,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         </div>
 
         <!-- ========================================================= -->
-        <!-- ESPACE ADMIN CENTRAL CONFIDENTIEL (OPTION 2) -->
+        <!-- ESPACE ADMIN CENTRAL CONFIDENTIEL -->
         <!-- ========================================================= -->
         <div id="view-admin-central" class="view-section">
             <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour au Portail</button>
@@ -217,17 +217,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 <div class="card-body p-4">
 
                     <!-- DEMANDES ENVOYÉES AU CENTRAL -->
-                    <h5 class="fw-bold text-primary mb-3"><i class="fa fa-envelope-open-text me-2"></i>1. Demandes de Récupération de Code Secret Reçues</h5>
+                    <h5 class="fw-bold text-primary mb-3"><i class="fa fa-envelope-open-text me-2"></i>1. Demandes de Récupération (Écoles & Enseignants)</h5>
                     <div class="table-responsive mb-4">
                         <table class="table table-bordered table-hover align-middle">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Date</th>
-                                    <th>École Concernée</th>
-                                    <th>Nom du Demandeur</th>
-                                    <th>Téléphone / Contact</th>
-                                    <th>Message / Justification</th>
-                                    <th>Code Secret de l'École</th>
+                                    <th>Type</th>
+                                    <th>Entité / École</th>
+                                    <th>Demandeur</th>
+                                    <th>Contact</th>
+                                    <th>Message</th>
+                                    <th>Code Secret Actuel</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -237,8 +238,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
                     <hr class="my-4">
 
-                    <!-- FORMULAIRE / TABLEAU DE TOUTES LES ÉCOLES ENREGISTRÉES ET LEURS CODES SECRETS -->
-                    <h5 class="fw-bold text-primary mb-3"><i class="fa fa-database me-2"></i>2. Registre des Écoles Enregistrées & Codes Secrets</h5>
+                    <!-- FORMULAIRE / TABLEAU DE TOUTES LES ÉCOLES -->
+                    <h5 class="fw-bold text-primary mb-3"><i class="fa fa-database me-2"></i>2. Registre des Écoles & Codes Secrets</h5>
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle">
                             <thead class="table-light">
@@ -246,7 +247,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <th>ID École</th>
                                     <th>Nom de l'École</th>
                                     <th>Province / Commune</th>
-                                    <th>Adresse</th>
                                     <th>Code Secret (Confidentiel)</th>
                                     <th>Action Admin</th>
                                 </tr>
@@ -380,8 +380,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <button type="submit" id="btnTeacherSubmit" class="btn btn-success w-100 fw-bold">Enregistrer</button>
                                 </div>
                             </form>
-                            <h6 class="fw-bold text-secondary">Liste des informations enregistrées :</h6>
-                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Actions</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
+                            <h6 class="fw-bold text-secondary">Liste des enseignants enregistrés (Protégés par Code Secret) :</h6>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Actions & Accès</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
                         </div>
 
                         <!-- 4. INSCRIPTION DES ÉLÈVES -->
@@ -766,8 +766,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); 
         }
 
-        function generateSecretCode() {
-            return 'SEC-' + Math.floor(1000 + Math.random() * 9000);
+        function generateSecretCode(prefix = 'SEC') {
+            return prefix + '-' + Math.floor(1000 + Math.random() * 9000);
         }
 
         function showSection(id) {
@@ -807,7 +807,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-        // --- GESTION ESPACE ADMIN CENTRAL CONFIDENTIEL (OPTION 2) ---
+        // --- GESTION ESPACE ADMIN CENTRAL CONFIDENTIEL ---
         function openAdminCentralPanel() {
             const pass = prompt("[ACCÈS ADMINISTRATEUR CENTRAL]\nVeuillez saisir le mot de passe Administrateur Confidentiel :");
             if(pass === null) return;
@@ -820,17 +820,25 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function renderAdminCentralData() {
-            // 1. Table des Demandes reçues
+            // 1. Table des Demandes reçues (Écoles et Enseignants)
             const reqTbody = document.getElementById('adminRequestsTableBody');
             if(!appData.adminRequests || !appData.adminRequests.length) {
-                reqTbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">Aucune demande de récupération reçue pour le moment.</td></tr>`;
+                reqTbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">Aucune demande de récupération reçue pour le moment.</td></tr>`;
             } else {
                 reqTbody.innerHTML = appData.adminRequests.map((r, i) => {
-                    const sch = appData.schools.find(s => s.id === r.schoolId);
-                    const currentCode = sch ? sch.secretCode : 'Inconnu';
+                    let currentCode = 'Inconnu';
+                    if(r.type === 'École') {
+                        const sch = appData.schools.find(s => s.id === r.schoolId);
+                        if(sch) currentCode = sch.secretCode;
+                    } else if(r.type === 'Enseignant') {
+                        const sch = appData.schools.find(s => s.id === r.schoolId);
+                        if(sch && sch.teachers[r.teacherIndex]) currentCode = sch.teachers[r.teacherIndex].secretCode;
+                    }
+
                     return `
                         <tr>
                             <td><small>${r.date}</small></td>
+                            <td><span class="badge bg-${r.type==='École'?'primary':'success'}">${r.type}</span></td>
                             <td><b class="text-primary">${r.schoolName}</b></td>
                             <td>${r.applicantName}</td>
                             <td><b>${r.contact}</b></td>
@@ -845,17 +853,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 }).join('');
             }
 
-            // 2. Table de toutes les écoles enregistrées et leurs codes secrets
+            // 2. Table de toutes les écoles enregistrées
             const schTbody = document.getElementById('adminSchoolsTableBody');
             if(!appData.schools || !appData.schools.length) {
-                schTbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">Aucune école enregistrée dans le système.</td></tr>`;
+                schTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Aucune école enregistrée dans le système.</td></tr>`;
             } else {
-                schTbody.innerHTML = appData.schools.map((s, i) => `
+                schTbody.innerHTML = appData.schools.map((s) => `
                     <tr>
                         <td><small class="text-muted">${s.id}</small></td>
                         <td><b class="text-primary">${s.name}</b> <br><small class="text-muted">${s.appartenance}</small></td>
                         <td>${s.province} / ${s.commune}</td>
-                        <td><small>${s.adresse || 'N/A'}</small></td>
                         <td><span class="badge bg-dark p-2 fs-6 text-warning"><i class="fa fa-key me-1"></i> ${s.secretCode}</span></td>
                         <td>
                             <button class="btn btn-sm btn-warning fw-bold" onclick="resetSchoolSecretCode('${s.id}')"><i class="fa fa-sync me-1"></i> Régénérer Code</button>
@@ -867,7 +874,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function copyCodeToClipboard(code) {
             navigator.clipboard.writeText(code);
-            alert(`Code secret "${code}" copié dans le presse-papier ! Vous pouvez maintenant l'envoyer au demandeur.`);
+            alert(`Code secret "${code}" copié dans le presse-papier !`);
         }
 
         function deleteAdminRequest(i) {
@@ -882,23 +889,26 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const sch = appData.schools.find(s => s.id === schoolId);
             if(!sch) return;
             if(confirm(`Voulez-vous générer un NOUVEAU code secret pour l'école "${sch.name}" ?`)) {
-                sch.secretCode = generateSecretCode();
+                sch.secretCode = generateSecretCode('SEC');
                 saveData();
                 renderAdminCentralData();
-                alert(`Nouveau code secret généré pour "${sch.name}" : ${sch.secretCode}`);
+                alert(`Nouveau code secret généré : ${sch.secretCode}`);
             }
         }
 
-        // --- PROCÉDURE DE RÉCUPÉRATION DU CODE SECRET POUR L'UTILISATEUR ---
-        function handleForgottenCode(schoolId) {
+        // --- RÉCUPÉRATION CODE SECRET (ÉCOLE OU ENSEIGNANT) ---
+        function handleForgottenCode(schoolId, teacherIndex = null) {
             const s = appData.schools.find(x => x.id === schoolId);
             if(!s) return;
 
+            const isTeacher = teacherIndex !== null;
+            const targetName = isTeacher ? s.teachers[teacherIndex].name : s.name;
+
             const option = prompt(
-                `[RÉCUPÉRATION DU CODE SECRET - ${s.name.toUpperCase()}]\n\n` +
+                `[RÉCUPÉRATION DU CODE SECRET - ${targetName.toUpperCase()}]\n\n` +
                 `Choisissez une option :\n` +
                 `1 : Envoyer une demande de récupération à l'Administrateur Central\n` +
-                `2 : Réinitialiser avec le mot de passe de secours Administrateur\n\n` +
+                `2 : Utiliser le mot de passe de secours Administrateur\n\n` +
                 `Entrez 1 ou 2 :`
             );
 
@@ -909,25 +919,28 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 if(!applicantName) return;
                 const contact = prompt("Entrez votre numéro de téléphone ou WhatsApp pour recevoir le code :");
                 if(!contact) return;
-                const message = prompt("Entrez un court motif/justification de votre demande :");
+                const message = prompt("Entrez un court motif de votre demande :");
 
                 if(!appData.adminRequests) appData.adminRequests = [];
                 appData.adminRequests.push({
                     date: new Date().toLocaleDateString('fr-FR') + ' ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
+                    type: isTeacher ? 'Enseignant' : 'École',
                     schoolId: s.id,
-                    schoolName: s.name,
+                    schoolName: s.name + (isTeacher ? ` (Prof: ${targetName})` : ''),
+                    teacherIndex: isTeacher ? teacherIndex : null,
                     applicantName,
                     contact,
                     message: message || 'Récupération de code secret'
                 });
 
                 saveData();
-                alert(`Votre demande a été envoyée avec succès à l'Administrateur Central !\n\nL'Administrateur traitera votre demande et vous transmettra le code secret au numéro : ${contact}.`);
+                alert(`Votre demande a été transmise à l'Administrateur Central avec succès ! Vous serez contacté au : ${contact}.`);
             } 
             else if(option.trim() === "2") {
                 const adminPass = prompt("Saisissez le mot de passe de secours Administrateur :");
                 if(adminPass === ADMIN_MASTER_PASSWORD) {
-                    alert(`[ACCÈS AUTORISÉ]\nLe code secret actuel de l'école "${s.name}" est : ${s.secretCode}`);
+                    const code = isTeacher ? s.teachers[teacherIndex].secretCode : s.secretCode;
+                    alert(`[ACCÈS AUTORISÉ]\nLe code secret est : ${code}`);
                 } else {
                     alert("Mot de passe de secours incorrect !");
                 }
@@ -972,7 +985,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     if(logoBase64) s.logo = logoBase64;
                     alert("École modifiée avec succès !");
                 } else {
-                    const secretCode = generateSecretCode();
+                    const secretCode = generateSecretCode('SEC');
                     appData.schools.push({
                         id: 'SCH-' + Date.now(),
                         name, appartenance, province, district, commune, adresse, secretCode,
@@ -980,7 +993,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: [], 
                         presenceStudents: {}, presenceStaff: [], studentPayments: [], agentPayments: []
                     });
-                    alert(`École créée avec succès !\n\nIMPORTANT : Le système a attribué le CODE SECRET suivant à votre école : ${secretCode}\n\nVeuillez le conserver précieusement. Il vous sera demandé pour ouvrir ou gérer votre école.`);
+                    alert(`École créée avec succès !\n\nCODE SECRET DE L'ÉCOLE : ${secretCode}\n\nConservez-le précieusement.`);
                 }
                 saveData();
                 showSection('view-portal');
@@ -998,10 +1011,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function deleteSchool(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez saisir le code secret attribué par le système pour l'école "${s.name}" afin de confirmer la suppression :`);
+            const inputCode = prompt(`Veuillez saisir le code secret de l'école "${s.name}" pour confirmer la suppression :`);
             if(inputCode === null) return;
             if(inputCode.trim() !== s.secretCode) {
-                alert("Code secret incorrect ! Suppression annulée.");
+                if(confirm("Code secret incorrect !\nVoulez-vous lancer la procédure de récupération de code ?")) {
+                    handleForgottenCode(id);
+                }
                 return;
             }
             if(confirm("Voulez-vous vraiment supprimer cette école ?")) {
@@ -1043,12 +1058,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function openSchoolFormWithCode(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez entrer le code secret généré par le système pour modifier l'école "${s.name}" :`);
+            const inputCode = prompt(`Veuillez entrer le code secret de l'école "${s.name}" pour modifier :`);
             if(inputCode === null) return;
             if(inputCode.trim() === s.secretCode) {
                 openSchoolForm(id);
             } else {
-                if(confirm("Code secret incorrect !\nAvez-vous oublié votre code secret ? Cliquez sur OK pour envoyer une demande de récupération à l'Administrateur Central.")) {
+                if(confirm("Code secret incorrect !\nAvez-vous oublié votre code secret ? Cliquez sur OK pour contacter l'Administrateur Central.")) {
                     handleForgottenCode(id);
                 }
             }
@@ -1057,7 +1072,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function verifySchoolCodeAndOpen(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`[ACCÈS SÉCURISÉ]\nEntrez le code secret généré par le système pour ouvrir l'école "${s.name}" :`);
+            const inputCode = prompt(`[ACCÈS SÉCURISÉ ÉCOLE]\nEntrez le code secret pour ouvrir "${s.name}" :`);
             if(inputCode === null) return;
             if(inputCode.trim() === s.secretCode) {
                 openSchoolDashboard(id);
@@ -1123,7 +1138,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('agentPayClassSelect').innerHTML = classOptions;
 
             const profTbody = document.getElementById('teachersTableBody');
-            profTbody.innerHTML = s.teachers.length ? s.teachers.map((t, i) => `<tr><td><b>${t.name}</b></td><td>${t.phone||'-'}</td><td>${t.titulaireClass||'Aucune'}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editTeacher(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTeacher(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucun enseignant enregistré.</td></tr>`;
+            profTbody.innerHTML = s.teachers.length ? s.teachers.map((t, i) => `
+                <tr>
+                    <td><b>${t.name}</b></td>
+                    <td>${t.phone||'-'}</td>
+                    <td>${t.titulaireClass||'Aucune'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTeacher(${i})" title="Modifier"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteTeacher(${i})" title="Supprimer"><i class="fa fa-trash"></i></button>
+                        <button class="btn btn-sm btn-success fw-bold" onclick="verifyTeacherCodeAndAccess(${i})" title="Accès classe / notes"><i class="fa fa-lock me-1"></i> Ouvrir Classe</button>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucun enseignant enregistré.</td></tr>`;
 
             renderStudentsTable();
             renderCoursesTable();
@@ -1185,7 +1211,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
         function deleteClass(i) { const s = appData.schools.find(x => x.id === activeSchoolId); s.classes.splice(i,1); saveData(); refreshDashboardViews(); }
 
-        // 3. Enseignants
+        // 3. Enseignants & Codes Secrets Individuels
         function handleSaveTeacher(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1195,23 +1221,76 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const titulaireClass = document.getElementById('teacherClass').value;
 
             if(editIdx !== "") {
-                s.teachers[editIdx] = { name, phone, titulaireClass };
+                s.teachers[editIdx].name = name;
+                s.teachers[editIdx].phone = phone;
+                s.teachers[editIdx].titulaireClass = titulaireClass;
                 document.getElementById('editTeacherIndex').value = "";
                 document.getElementById('btnTeacherSubmit').innerText = "Enregistrer";
+                alert("Enseignant modifié avec succès !");
             } else {
-                s.teachers.push({ name, phone, titulaireClass });
+                const secretCode = generateSecretCode('PROF');
+                s.teachers.push({ name, phone, titulaireClass, secretCode });
+                alert(`Enseignant enregistré avec succès !\n\nCODE SECRET ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre.`);
             }
             saveData(); refreshDashboardViews(); e.target.reset();
         }
+
         function editTeacher(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            document.getElementById('editTeacherIndex').value = i;
-            document.getElementById('teacherName').value = s.teachers[i].name;
-            document.getElementById('teacherPhone').value = s.teachers[i].phone || '';
-            document.getElementById('teacherClass').value = s.teachers[i].titulaireClass || '';
-            document.getElementById('btnTeacherSubmit').innerText = "Modifier";
+            const t = s.teachers[i];
+            const inputCode = prompt(`Entrez le code secret de l'enseignant "${t.name}" pour modifier :`);
+            if(inputCode === null) return;
+            if(inputCode.trim() === t.secretCode) {
+                document.getElementById('editTeacherIndex').value = i;
+                document.getElementById('teacherName').value = t.name;
+                document.getElementById('teacherPhone').value = t.phone || '';
+                document.getElementById('teacherClass').value = t.titulaireClass || '';
+                document.getElementById('btnTeacherSubmit').innerText = "Modifier";
+            } else {
+                if(confirm("Code secret enseignant incorrect !\nVoulez-vous lancer la procédure de récupération de code ?")) {
+                    handleForgottenCode(activeSchoolId, i);
+                }
+            }
         }
-        function deleteTeacher(i) { const s = appData.schools.find(x => x.id === activeSchoolId); s.teachers.splice(i,1); saveData(); refreshDashboardViews(); }
+
+        function deleteTeacher(i) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const t = s.teachers[i];
+            const inputCode = prompt(`Entrez le code secret de "${t.name}" pour confirmer la suppression :`);
+            if(inputCode === null) return;
+            if(inputCode.trim() !== t.secretCode) {
+                if(confirm("Code secret incorrect !\nVoulez-vous lancer la procédure de récupération de code ?")) {
+                    handleForgottenCode(activeSchoolId, i);
+                }
+                return;
+            }
+            if(confirm("Voulez-vous vraiment supprimer cet enseignant ?")) {
+                s.teachers.splice(i,1);
+                saveData();
+                refreshDashboardViews();
+            }
+        }
+
+        function verifyTeacherCodeAndAccess(i) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const t = s.teachers[i];
+            const inputCode = prompt(`[ACCÈS ENSEIGNANT]\nEntrez votre code secret personnel pour accéder à votre classe et vos attributions :`);
+            if(inputCode === null) return;
+            if(inputCode.trim() === t.secretCode) {
+                alert(`Accès autorisé !\nBienvenue Prof. ${t.name}. Vous pouvez maintenant gérer les notes et présences de votre classe (${t.titulaireClass || 'Générale'}).`);
+                if(t.titulaireClass) {
+                    document.getElementById('notesClassSelect').value = t.titulaireClass;
+                    loadStudentsForNotes();
+                    switchTab('tab-notes', document.querySelector('[onclick*="tab-notes"]'));
+                } else {
+                    switchTab('tab-notes', document.querySelector('[onclick*="tab-notes"]'));
+                }
+            } else {
+                if(confirm("Code secret enseignant incorrect !\nAvez-vous oublié votre code secret ? Cliquez sur OK pour envoyer une demande de récupération à l'Administrateur Central.")) {
+                    handleForgottenCode(activeSchoolId, i);
+                }
+            }
+        }
 
         // 4. Inscription Élèves
         function handleSaveStudent(e) {
@@ -1860,7 +1939,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         // =========================================================
-        // FONCTIONS DE LIAISON AUTOMATIQUE POUR LE BULLETIN
+        // BULLETIN DE COTES
         // =========================================================
         function refreshBulletinOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1916,7 +1995,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             </table>
             <div class="title">BULLETIN DE LA <span>${clName}</span> ANNEE SCOLAIRE 2025-2026</div>`;
 
-            const bl='<td class="blk"></td>', empty='<td></td>', gry='<td class="gry"></td>';
+            const bl='<td class="blk"></td>', empty='<td></td>';
             const pr=v=>`<td>${v||''}</td>`;
 
             h += '<table class="b"><colgroup><col style="width:14%">'+'<col style="width:5.6%">'.repeat(12)+'<col style="width:5%"><col style="width:6.9%"><col style="width:6.9%"></colgroup><thead>';
