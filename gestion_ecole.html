@@ -343,7 +343,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <div class="col-md-5"><label class="fw-bold">Nom Complet :</label><input type="text" id="staffName" class="form-control" placeholder="Nom et Prénom" required></div>
                                 <div class="col-md-3 d-flex align-items-end gap-2">
                                     <button type="submit" id="btnStaffSubmit" class="btn btn-success w-100 fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
-                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="resetStaffForm()">Fermer</button>
+                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </form>
                             <h6 class="fw-bold text-secondary">Liste des informations enregistrées :</h6>
@@ -366,7 +366,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <div class="col-md-5"><label class="fw-bold">Nom de la Classe :</label><input type="text" id="className" class="form-control" placeholder="Ex: 7ème EB A, 3ème Scientific A, 1ère Maternelle" required></div>
                                 <div class="col-md-3 d-flex align-items-end gap-2">
                                     <button type="submit" id="btnClassSubmit" class="btn btn-success w-100 fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
-                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="resetClassForm()">Fermer</button>
+                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </form>
                             <h6 class="fw-bold text-secondary">Liste des informations enregistrées :</h6>
@@ -383,7 +383,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <div class="col-md-3"><label class="fw-bold">Titulaire de la Classe :</label><select id="teacherClass" class="form-select"></select></div>
                                 <div class="col-md-2 d-flex align-items-end gap-1">
                                     <button type="submit" id="btnTeacherSubmit" class="btn btn-success w-100 fw-bold">Enregistrer</button>
-                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="resetTeacherForm()">Fermer</button>
+                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </form>
                             <h6 class="fw-bold text-secondary">Liste des enseignants enregistrés :</h6>
@@ -400,7 +400,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <div class="col-md-2"><label class="fw-bold">Sexe :</label><select id="studentSexe" class="form-select"><option value="M">M</option><option value="F">F</option></select></div>
                                 <div class="col-md-3 d-flex align-items-end gap-2">
                                     <button type="submit" id="btnStudentSubmit" class="btn btn-success w-100 fw-bold">Enregistrer</button>
-                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="resetStudentForm()">Fermer</button>
+                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </form>
                             <h6 class="fw-bold text-secondary">Liste des informations enregistrées :</h6>
@@ -419,7 +419,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <div class="col-md-3"><label class="fw-bold">Max / Pondération :</label><input type="number" id="courseMax" class="form-control" placeholder="Ex: 20" required></div>
                                 <div class="col-md-4 d-flex align-items-end gap-2">
                                     <button type="submit" id="btnCourseSubmit" class="btn btn-success w-100 fw-bold">Enregistrer</button>
-                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="resetCourseForm()">Fermer</button>
+                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </form>
                             <h6 class="fw-bold text-secondary">Liste des informations enregistrées :</h6>
@@ -745,7 +745,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <div class="mb-2"><label class="fw-bold">Message aux Parents / Extérieur :</label><textarea id="announcementText" class="form-control" rows="3" placeholder="Message..."></textarea></div>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-warning fw-bold" id="btnCommSubmit" onclick="handleSaveCommunication()"><i class="fa fa-save"></i> Publier / Enregistrer</button>
-                                    <button class="btn btn-secondary fw-bold" onclick="resetCommForm()">Fermer</button>
+                                    <button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </div>
                             <h6 class="fw-bold text-secondary">Historique des communications :</h6>
@@ -769,9 +769,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         window.onload = function() {
             let saved = localStorage.getItem(STORAGE_KEY);
-            if (!saved) {
-                saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
-            }
             if (saved) { 
                 try { 
                     appData = JSON.parse(saved); 
@@ -1232,7 +1229,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.staff.push({ role, name });
                 alert("Cadre enregistré avec succès !");
             }
-            saveData(); refreshDashboardViews(); resetStaffForm();
+            saveData(); 
+            refreshDashboardViews(); 
+            clearAdminStaffForm();
         }
         function editStaff(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1248,11 +1247,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 saveData(); refreshDashboardViews();
             }
         }
-        function resetStaffForm() {
+        function clearAdminStaffForm() {
             document.getElementById('editStaffIndex').value = "";
             document.getElementById('staffRole').value = "";
             document.getElementById('staffName').value = "";
             document.getElementById('btnStaffSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+        function resetStaffForm() {
+            clearAdminStaffForm();
             closeRubricTab();
         }
 
@@ -1271,7 +1273,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.classes.push({ niveau, name });
                 alert("Classe enregistrée avec succès !");
             }
-            saveData(); refreshDashboardViews(); resetClassForm();
+            saveData(); 
+            refreshDashboardViews(); 
+            clearClassForm();
         }
         function editClass(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1287,10 +1291,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 saveData(); refreshDashboardViews();
             }
         }
-        function resetClassForm() {
+        function clearClassForm() {
             document.getElementById('editClassIndex').value = "";
             document.getElementById('className').value = "";
             document.getElementById('btnClassSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+        function resetClassForm() {
+            clearClassForm();
             closeRubricTab();
         }
 
@@ -1313,7 +1320,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.teachers.push({ name, phone, titulaireClass, secretCode });
                 alert(`Enseignant enregistré avec succès !\n\nCODE SECRET ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre.`);
             }
-            saveData(); refreshDashboardViews(); resetTeacherForm();
+            saveData(); 
+            refreshDashboardViews(); 
+            clearTeacherForm();
         }
 
         function editTeacher(i) {
@@ -1333,11 +1342,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 saveData(); refreshDashboardViews();
             }
         }
-        function resetTeacherForm() {
+        function clearTeacherForm() {
             document.getElementById('editTeacherIndex').value = "";
             document.getElementById('teacherName').value = "";
             document.getElementById('teacherPhone').value = "";
             document.getElementById('btnTeacherSubmit').innerText = "Enregistrer";
+        }
+        function resetTeacherForm() {
+            clearTeacherForm();
             closeRubricTab();
         }
 
@@ -1361,7 +1373,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.students.push({ id: 'STU-'+Date.now(), mat: 'ELV-'+Math.floor(1000+Math.random()*9000), name, sexe, classe: targetClass });
                 alert("Élève inscrit avec succès !");
             }
-            saveData(); renderStudentsTable(); resetStudentForm();
+            saveData(); 
+            renderStudentsTable(); 
+            clearStudentForm();
         }
         function editStudent(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1379,10 +1393,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 saveData(); renderStudentsTable();
             }
         }
-        function resetStudentForm() {
+        function clearStudentForm() {
             document.getElementById('editStudentIndex').value = "";
             document.getElementById('studentName').value = "";
             document.getElementById('btnStudentSubmit').innerText = "Enregistrer";
+        }
+        function resetStudentForm() {
+            clearStudentForm();
             closeRubricTab();
         }
 
@@ -1415,7 +1432,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.courses[cl].push({ id: 'CRS-'+Date.now(), name, max });
                 alert("Cours enregistré avec succès !");
             }
-            saveData(); renderCoursesTable(); resetCourseForm();
+            saveData(); 
+            renderCoursesTable(); 
+            clearCourseForm();
         }
         function editCourse(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1434,11 +1453,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 saveData(); renderCoursesTable();
             }
         }
-        function resetCourseForm() {
+        function clearCourseForm() {
             document.getElementById('editCourseIndex').value = "";
             document.getElementById('courseName').value = "";
             document.getElementById('courseMax').value = "";
             document.getElementById('btnCourseSubmit').innerText = "Enregistrer";
+        }
+        function resetCourseForm() {
+            clearCourseForm();
             closeRubricTab();
         }
 
@@ -1683,7 +1705,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             saveData();
             renderStudentPayTable();
-            resetStudentPayForm();
+            clearStudentPayForm();
         }
 
         function editStudentPayment(i) {
@@ -1728,11 +1750,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             `).join('') : `<tr><td colspan="7" class="text-center text-muted">Aucun paiement d'élève enregistré.</td></tr>`;
         }
 
-        function resetStudentPayForm() {
+        function clearStudentPayForm() {
             document.getElementById('formStudentPay').reset();
             document.getElementById('editStudentPayIndex').value = "";
             document.getElementById('payReste').value = "";
             document.getElementById('btnStudentPaySubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+        function resetStudentPayForm() {
+            clearStudentPayForm();
             closeRubricTab();
         }
 
@@ -1776,7 +1801,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             saveData();
             renderAgentPayTable();
-            resetAgentPayForm();
+            clearAgentPayForm();
         }
 
         function editAgentPayment(i) {
@@ -1821,11 +1846,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             `).join('') : `<tr><td colspan="7" class="text-center text-muted">Aucun paiement d'agent enregistré.</td></tr>`;
         }
 
-        function resetAgentPayForm() {
+        function clearAgentPayForm() {
             document.getElementById('formAgentPay').reset();
             document.getElementById('editAgentPayIndex').value = "";
             document.getElementById('agentReste').value = "";
             document.getElementById('btnAgentPaySubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+        function resetAgentPayForm() {
+            clearAgentPayForm();
             closeRubricTab();
         }
 
@@ -1845,7 +1873,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.caisse.push({ date, type, motif, montant });
                 alert("Opération enregistrée avec succès !");
             }
-            saveData(); renderCaisseTable(); resetCaisseForm();
+            saveData(); renderCaisseTable(); clearCaisseForm();
         }
         function editTransaction(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1863,10 +1891,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 saveData(); renderCaisseTable();
             }
         }
-        function resetCaisseForm() {
+        function clearCaisseForm() {
             document.getElementById('formCaisse').reset();
             document.getElementById('editTransIndex').value = "";
             document.getElementById('btnTransSubmit').innerText = "Enregistrer";
+        }
+        function resetCaisseForm() {
+            clearCaisseForm();
             closeRubricTab();
         }
 
@@ -2013,7 +2044,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             saveData();
             renderStaffPresenceTables();
-            if(isProf) resetProfPresForm(); else resetAdminPresForm();
+            if(isProf) clearProfPresForm(); else clearAdminPresForm();
         }
 
         function editStaffPres(i) {
@@ -2049,23 +2080,29 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-        function resetProfPresForm() {
+        function clearProfPresForm() {
             const form = document.getElementById('formPresProf');
             if(form) form.reset();
             document.getElementById('editProfPresIndex').value = "";
             document.getElementById('presProfName').value = "";
             document.getElementById('presProfClass').value = "";
             document.getElementById('btnProfPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+        function resetProfPresForm() {
+            clearProfPresForm();
             closeRubricTab();
         }
 
-        function resetAdminPresForm() {
+        function clearAdminPresForm() {
             const form = document.getElementById('formPresAdmin');
             if(form) form.reset();
             document.getElementById('editAdminPresIndex').value = "";
             document.getElementById('presAdminName').value = "";
             document.getElementById('presAdminRole').value = "";
             document.getElementById('btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+        }
+        function resetAdminPresForm() {
+            clearAdminPresForm();
             closeRubricTab();
         }
 
@@ -2157,7 +2194,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
             saveData();
             renderCommTable();
-            resetCommForm();
+            clearCommForm();
         }
 
         function editCommunication(i) {
@@ -2177,10 +2214,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-        function resetCommForm() {
+        function clearCommForm() {
             document.getElementById('editCommIndex').value = "";
             document.getElementById('announcementText').value = "";
             document.getElementById('btnCommSubmit').innerHTML = '<i class="fa fa-save"></i> Publier / Enregistrer';
+        }
+        function resetCommForm() {
+            clearCommForm();
             closeRubricTab();
         }
 
