@@ -2379,6 +2379,59 @@ function switchDashboardTab(tabId, element) {
         renderStudentsTable();
     }
 }
+     // Vérification du code secret et affichage de la rubrique depuis le Tableau de bord
+function verifyAndOpenDashboardTab(tabId) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if (!s) return;
+
+    const inputCode = prompt(`[SÉCURITÉ TABLEAU DE BORD]\nVeuillez entrer votre code secret pour ouvrir cette rubrique :`);
+    if (inputCode === null) return;
+
+    const code = inputCode.trim();
+    let authorized = false;
+
+    // 1. Vérification si Code École / Propriétaire (Accès total)
+    if (code === s.secretCode) {
+        authorized = true;
+    } else {
+        // 2. Vérification si Code Agent / Enseignant (Accès limité aux cours, notes et bulletins)
+        const teacherMatch = s.teachers.find(t => t.secretCode === code);
+        if (teacherMatch) {
+            if (tabId === 'tab-cours' || tabId === 'tab-notes' || tabId === 'tab-bulletins') {
+                authorized = true;
+            } else {
+                alert("Accès restreint : Votre Code Agent vous permet uniquement d'accéder aux Cours, Notes et Bulletins.");
+                return;
+            }
+        }
+    }
+
+    if (authorized) {
+        // Cache le message d'accueil et réinitialise les onglets de paramètres
+        document.getElementById('defaultWelcomeMessage').style.display = 'none';
+        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
+
+        // Affiche la rubrique demandée
+        document.getElementById(tabId).classList.add('active');
+
+        // Rafraîchissement des données selon le panneau ouvert
+        if (tabId === 'tab-presences') {
+            refreshPresenceOptions();
+        } else if (tabId === 'tab-frais') {
+            refreshPaymentOptions();
+        } else if (tabId === 'tab-bulletins') {
+            refreshBulletinOptions();
+        } else if (tabId === 'tab-cours') {
+            renderCoursesTable();
+        } else if (tabId === 'tab-eleves-reg') {
+            renderStudentsTable();
+        }
+    } else {
+        alert("Code secret incorrect ! Accès refusé.");
+    }
+}
+
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
