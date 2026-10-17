@@ -457,7 +457,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 </div>
                                 <div class="col-md-4 d-flex align-items-end gap-2">
                                     <button class="btn btn-primary w-100 fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
-                                    <button class="btn btn-secondary w-100 fw-bold" onclick="closeRubricTab()">Fermer</button>
+                                    <button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </div>
 
@@ -581,7 +581,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                         <div class="col-md-3"><label class="fw-bold">Montant ($ / FC) :</label><input type="number" id="transMontant" class="form-control" required></div>
                                         <div class="col-md-2 d-flex align-items-end gap-1">
                                             <button type="submit" id="btnTransSubmit" class="btn btn-success w-100 fw-bold">Enregistrer</button>
-                                            <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="resetCaisseForm()">Fermer</button>
+                                            <button type="button" class="btn btn-secondary fw-bold" onclick="resetCaisseForm()">Fermer</button>
                                         </div>
                                     </form>
                                     <h6 class="fw-bold text-secondary">Liste des opérations et factures enregistrées :</h6>
@@ -807,13 +807,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function switchTab(tabId, element) {
-            // REGLE 3: RESTRICTION STRICTE DE LA RUBRIQUE FRAIS ET CAISSE (RUBRIQUE 8) POUR LES ENSEIGNANTS / PROFESSEURS
-            if(tabId === 'tab-frais' && currentUserSession.role === 'teacher') {
-                alert("ACCÈS REFUSÉ !\n\nLa rubrique '8. Frais scolaire & Caisse' est une zone strictement réservée au Chargé de Paiement et au Caissier.\nEn tant qu'enseignant, vous n'avez pas l'autorisation d'y accéder.");
-                return;
+            // RESTRICTION STRICTE : SI C'EST UN ENSEIGNANT, IL N'A DROIT QU'À LA SAISIE DE NOTE (tab-notes) ET AU BULLETIN DE COTES (tab-bulletins)
+            if(currentUserSession.role === 'teacher') {
+                if(tabId !== 'tab-notes' && tabId !== 'tab-bulletins') {
+                    alert("ACCÈS REFUSÉ !\n\nEn tant qu'enseignant, vous avez uniquement accès à :\n- 6. Saisie de note\n- 7. Bulletin de cotes\n\nLes autres rubriques sont réservées exclusivement au créateur de l'école.");
+                    return;
+                }
             }
 
-            // REGLE 2: VERIFICATION DU CODE SECRET DU PROFESSEUR AVANT TOUTE ACTIVITE SUR UNE RUBRIQUE
+            // VERIFICATION DU CODE SECRET DU PROFESSEUR AVANT TOUTE ACTIVITE SUR UNE RUBRIQUE AUTORISÉE
             if(currentUserSession.role === 'teacher') {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
                 const inputCode = prompt(`[SÉCURITÉ ENSEIGNANT - Prof. ${currentUserSession.name}]\nVeuillez saisir votre code secret pour accéder à cette rubrique :`);
@@ -1130,7 +1132,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     if(!teacherMatch.titulaireClass) {
                         alert(`Attention Prof. ${teacherMatch.name} : Vous n'avez pas de classe titulaire assignée. Accès restreint.`);
                     } else {
-                        alert(`Accès autorisé !\nBienvenue Prof. ${teacherMatch.name}. Vous avez accès uniquement à votre classe : ${teacherMatch.titulaireClass}.`);
+                        alert(`Accès autorisé !\nBienvenue Prof. ${teacherMatch.name}. Vous avez accès uniquement aux rubriques "Saisie de note" et "Bulletin de cotes" pour votre classe : ${teacherMatch.titulaireClass}.`);
                     }
                     openSchoolDashboard(id);
                 } else {
@@ -1321,7 +1323,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         // --- 3. ENSEIGNANTS ---
-        // REGLE 1: GENERATION DU CODE SECRET INDIVIDUEL POUR CHAQUE ENSEIGNANT / PROFESSEUR
         function handleSaveTeacher(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2197,7 +2198,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('schoolProgramText').value = s.program || '';
         }
 
-        // --- 11. COMMUNICATION / CONTACT ---
+        // --- 11. COMMUNICATION & CONTACT ---
         function handleSaveCommunication() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const editIdx = document.getElementById('editCommIndex').value;
