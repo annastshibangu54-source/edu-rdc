@@ -361,7 +361,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <a class="list-group-item list-group-item-action rubric-item" id="r-communication" href="javascript:void(0);" onclick="switchTab('tab-communication', this)"><i class="fa fa-bullhorn me-2 text-primary"></i> 11. Communication / Contact</a>
                         </div>
                     </div>
-                </div>
              <!-- NOUVEAU DESIGN TABLEAU DE BORD (Différent de Paramètres) -->
 <div class="dashboard-section mt-4 p-3 bg-white rounded shadow-sm border border-top-4 border-indigo">
     <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
@@ -437,6 +436,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         </div>
     </div>
 </div>
+                </div>
 
                 <!-- CONTENU DES PANNEAUX -->
                 <div class="col-lg-9">
@@ -871,6 +871,25 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             </div>
         </div>
 
+    </div>
+
+    <!-- MODAL FACTURE / REÇU DE PAIEMENT -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white no-print">
+            <h5 class="modal-title fw-bold"><i class="fa fa-file-invoice me-2"></i>Facture / Reçu de Paiement</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4" id="invoicePrintArea">
+            <!-- Contenu dynamique de la facture -->
+          </div>
+          <div class="modal-footer no-print">
+            <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Fermer</button>
+            <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer / Enregistrer en PDF</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- SCRIPT JS DE GESTION COMPLÈTE CORRIGÉ ET PERSISTANT -->
@@ -1816,6 +1835,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             saveData();
             renderStudentPayTable();
             clearStudentPayForm();
+
+            // Génération de la facture / reçu PDF
+            generateInvoice({
+                typeOp: "RECETTE (Frais Scolaires Élève)",
+                concerne: "Élève",
+                nom: studentName,
+                detail: classe,
+                motif: "Paiement Frais Scolaires",
+                total: total,
+                paye: paye,
+                reste: reste
+            });
         }
 
         function editStudentPayment(i) {
@@ -1912,6 +1943,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             saveData();
             renderAgentPayTable();
             clearAgentPayForm();
+
+            // Génération de la facture / reçu PDF
+            generateInvoice({
+                typeOp: "DÉPENSE (Paiement Salaire / Prime Agent)",
+                concerne: "Enseignant / Personnel",
+                nom: teacherName,
+                detail: classe,
+                motif: `Salaire (${salaire}$) + Prime (${prime}$)`,
+                total: (salaire + prime),
+                paye: paye,
+                reste: reste
+            });
         }
 
         function editAgentPayment(i) {
@@ -1984,6 +2027,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 alert("Opération enregistrée avec succès !");
             }
             saveData(); renderCaisseTable(); clearCaisseForm();
+
+            // Génération de la facture / reçu PDF
+            generateInvoice({
+                typeOp: type,
+                concerne: "Administration / Caisse",
+                nom: motif,
+                detail: "Caisse Générale",
+                motif: motif,
+                total: montant,
+                paye: montant,
+                reste: 0
+            });
         }
         function editTransaction(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2016,6 +2071,87 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!s || !s.caisse) return;
             const tbody = document.getElementById('caisseTableBody');
             tbody.innerHTML = s.caisse.length ? s.caisse.map((c, i) => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucune opération de caisse enregistrée.</td></tr>`;
+        }
+
+        // --- FONCTION DE GÉNÉRATION DE FACTURE / REÇU PDF ---
+        function generateInvoice(data) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if (!s) return;
+
+            const invoiceNum = 'FAC-' + Date.now().toString().slice(-6);
+            const dateHeure = new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+
+            let html = `
+                <div style="border: 2px solid #000; padding: 20px; font-family: Arial, sans-serif; background: #fff; color: #000;">
+                    <!-- En-tête -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
+                        <div>
+                            <h3 style="margin: 0; font-weight: bold; text-transform: uppercase;">${s.name}</h3>
+                            <small>${s.appartenance}</small><br>
+                            <small>${s.province} / ${s.commune} — ${s.adresse || ''}</small>
+                        </div>
+                        <div style="text-align: right;">
+                            ${s.logo ? `<img src="${s.logo}" style="max-height: 60px; max-width: 100px;">` : `<h4 style="margin:0;">EDU-RDC</h4>`}
+                        </div>
+                    </div>
+
+                    <!-- Titre et N° Facture -->
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h4 style="margin: 0; text-decoration: underline; font-weight: bold;">REÇU DE PAIEMENT / FACTURE</h4>
+                        <span style="font-size: 12px; font-weight: bold;">N° : ${invoiceNum}</span> | <small>Date : ${dateHeure}</small>
+                    </div>
+
+                    <!-- Informations du Bénéficiaire / Payeur -->
+                    <table style="width: 100%; margin-bottom: 20px; font-size: 14px; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 4px 0;"><strong>Type d'opération :</strong> ${data.typeOp}</td>
+                            <td style="padding: 4px 0; text-align: right;"><strong>Concerne :</strong> ${data.concerne}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0;"><strong>Nom & Prénom :</strong> ${data.nom}</td>
+                            <td style="padding: 4px 0; text-align: right;"><strong>Classe / Poste :</strong> ${data.detail || '—'}</td>
+                        </tr>
+                    </table>
+
+                    <!-- Tableau du Détail Financier -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;" border="1">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="padding: 8px; text-align: left;">Désignation / Motif</th>
+                                <th style="padding: 8px; text-align: right;">Total Dû ($)</th>
+                                <th style="padding: 8px; text-align: right;">Montant Payé ($)</th>
+                                <th style="padding: 8px; text-align: right;">Reste à Payer ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 8px;">${data.motif}</td>
+                                <td style="padding: 8px; text-align: right;">${data.total || data.paye} $</td>
+                                <td style="padding: 8px; text-align: right; font-weight: bold; color: green;">${data.paye} $</td>
+                                <td style="padding: 8px; text-align: right; font-weight: bold; color: red;">${data.reste || 0} $</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Signatures -->
+                    <div style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px;">
+                        <div style="text-align: center; width: 40%;">
+                            <p style="margin-bottom: 50px;"><strong>Signature du Payeur / Bénéficiaire</strong></p>
+                            <p>_______________________</p>
+                        </div>
+                        <div style="text-align: center; width: 40%;">
+                            <p style="margin-bottom: 50px;"><strong>Pour la Caisse / Sceau École</strong></p>
+                            <p>_______________________</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('invoicePrintArea').innerHTML = html;
+            
+            const modalEl = document.getElementById('invoiceModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
         }
 
         // --- 9. PRÉSENCES ---
