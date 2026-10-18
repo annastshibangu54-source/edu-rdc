@@ -809,7 +809,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                       <div class="l">
                                         <b>Délivré à</b> <input type="text" id="delivreA" style="width:1.6cm"><b>, le</b>
                                         <input type="text" id="dj" maxlength="2" style="width:.45cm;text-align:center"><b>/</b>
-                                        <input type="text" id="dm" maxlength="2" style="width:.45cm;text-align:center"><b>/</b><b>202</b><input type="text" id="da" maxlength="2" style="width:.45cm;text-align:center">
+                                        <input type="text" id="dm" maxlength="2" style="width:.45cm;text-align:center"><b>/202</b><input type="text" id="da" maxlength="2" style="width:.45cm;text-align:center">
                                       </div>
                                     </div>
                                   </div>
@@ -1314,7 +1314,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ RESTAURÉE -->
     <script>
         // Clé de stockage unique et persistante
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V12";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
         let appData = { schools: [], adminRequests: [], jobApplications: [] };
         let activeSchoolId = null;
@@ -1323,43 +1323,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         let chartFinancesInstance = null;
 
         window.onload = function() {
-            // CORRECTION : Récupération robuste des données avec fusion des différentes versions pour ne perdre aucune école
-            let savedV10 = localStorage.getItem(STORAGE_KEY);
-            let savedV11 = localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
-            
-            let combinedSchools = [];
-            let combinedRequests = [];
-            let combinedJobs = [];
-
-            try {
-                if (savedV10) {
-                    let parsedV10 = JSON.parse(savedV10);
-                    if (parsedV10.schools) combinedSchools = combinedSchools.concat(parsedV10.schools);
-                    if (parsedV10.adminRequests) combinedRequests = combinedRequests.concat(parsedV10.adminRequests);
-                    if (parsedV10.jobApplications) combinedJobs = combinedJobs.concat(parsedV10.jobApplications);
-                }
-            } catch(e) {}
-
-            try {
-                if (savedV11) {
-                    let parsedV11 = JSON.parse(savedV11);
-                    if (parsedV11.schools) {
-                        parsedV11.schools.forEach(s => {
-                            if (!combinedSchools.some(existing => existing.id === s.id)) {
-                                combinedSchools.push(s);
-                            }
-                        });
-                    }
-                }
-            } catch(e) {}
-
-            // S'il n'y a rien dans le localStorage, on initialise vide
-            appData = {
-                schools: combinedSchools,
-                adminRequests: combinedRequests,
-                jobApplications: combinedJobs
-            };
-
+            // Récupération sécurisée des données de toutes les versions précédentes et actuelles
+            let saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("EDURDC_FULL_PLATFORM_V10") || localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
+            if (saved) { 
+                try { 
+                    appData = JSON.parse(saved); 
+                    if(!appData.adminRequests) appData.adminRequests = [];
+                    if(!appData.jobApplications) appData.jobApplications = [];
+                    if(!appData.schools) appData.schools = [];
+                } catch(e){
+                    appData = { schools: [], adminRequests: [], jobApplications: [] };
+                } 
+            }
             saveData();
             renderSchoolsList();
             renderPublicEvents();
@@ -1415,7 +1390,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 </div>
                                 <div class="d-flex gap-1">
                                     <button class="btn btn-outline-primary btn-sm" onclick="openSchoolFormWithCode('${s.id}')" title="Modifier"><i class="fa fa-edit"></i></button>
-                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteSchool('${s.id}')" title="Supprimer"><i class="fa fa-trash"></i></button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteSchool('${s.id}')" title="Supprimer (Admin Central)"><i class="fa fa-trash"></i></button>
                                     <button class="btn btn-primary btn-sm fw-bold" onclick="promptLoginCode('${s.id}')"><i class="fa fa-lock me-1"></i> Ouvrir <i class="fa fa-arrow-right"></i></button>
                                 </div>
                             </div>
@@ -1824,7 +1799,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         <td>${s.province} / ${s.commune}</td>
                         <td><span class="badge bg-dark p-2 fs-6 text-warning"><i class="fa fa-key me-1"></i> ${s.secretCode}</span></td>
                         <td>
-                            <button class="btn btn-sm btn-warning fw-bold" onclick="resetSchoolSecretCode('${s.id}')"><i class="fa fa-sync me-1"></i> Régénérer Code</button>
+                            <button class="btn btn-sm btn-warning fw-bold mb-1" onclick="resetSchoolSecretCode('${s.id}')"><i class="fa fa-sync me-1"></i> Régénérer Code</button>
+                            <button class="btn btn-sm btn-danger fw-bold" onclick="deleteSchoolByAdmin('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer École</button>
                         </td>
                     </tr>
                 `).join('');
@@ -1853,6 +1829,31 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 renderAdminCentralData();
                 alert(`Nouveau code secret généré : ${sch.secretCode}`);
             }
+        }
+
+        // SUPPRESSION STRICTEMENT RÉSERVÉE À L'ADMIN CENTRAL COMME DEMANDÉ
+        function deleteSchool(id) {
+            const s = appData.schools.find(x => x.id === id);
+            if(!s) return;
+            
+            const adminPass = prompt(`[SÉCURITÉ ADMIN CENTRAL]\nSeul l'Administrateur Central peut supprimer définitivement une école.\nVeuillez saisir le Code Central de la plateforme :`);
+            if(adminPass === null) return;
+            
+            if(adminPass.trim() === ADMIN_MASTER_PASSWORD) {
+                if(confirm(`Êtes-vous sûr de vouloir supprimer définitivement l'école "${s.name}" ?`)) {
+                    appData.schools = appData.schools.filter(x => x.id !== id);
+                    saveData();
+                    renderSchoolsList();
+                    alert("École supprimée avec succès par l'Admin Central.");
+                }
+            } else {
+                alert("Code Central incorrect ! Suppression refusée.");
+            }
+        }
+
+        function deleteSchoolByAdmin(id) {
+            deleteSchool(id);
+            renderAdminCentralData();
         }
 
         function handleForgottenCode(schoolId, teacherIndex = null) {
@@ -1966,28 +1967,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-        function deleteSchool(id) {
-            const s = appData.schools.find(x => x.id === id);
-            if(!s) return;
-            const inputCode = prompt(`Veuillez saisir le code école de "${s.name}" pour confirmer la suppression :`);
-            if(inputCode === null) return;
-            if(inputCode.trim() !== s.secretCode) {
-                if(confirm("Code incorrect !\nVoulez-vous lancer la procédure de récupération de code ?")) {
-                    handleForgottenCode(id);
-                }
-                return;
-            }
-            if(confirm("Voulez-vous vraiment supprimer cette école ?")) {
-                appData.schools = appData.schools.filter(x => x.id !== id);
-                saveData();
-                renderSchoolsList();
-            }
-        }
-
         function openSchoolFormWithCode(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez entrer le code école de "${s.name}" pour modifier :`);
+            const inputCode = prompt(`[MODIFICATION ÉCOLE]\nVeuillez entrer le code école de "${s.name}" pour modifier :`);
             if(inputCode === null) return;
             if(inputCode.trim() === s.secretCode) {
                 openSchoolForm(id);
@@ -2359,7 +2342,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             const card = student.cardData || {};
             
-            // découpage simple du nom si postnom/prenom non remplis
             const parts = student.name.split(' ');
             document.getElementById('nom').value = card.nom || parts[0] || '';
             document.getElementById('postnom').value = card.postnom || parts[1] || '';
@@ -3424,7 +3406,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             var d = collecter();
             if (!d.nom && !d.prenom) { msg('Remplissez au moins le Nom et le Prénom.', false); return; }
             
-            // SAUVEGARDE EN CLASSE DANS L'ÉCOLE
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const stId = $('cardStudentSelect') ? $('cardStudentSelect').value : null;
 
@@ -3473,7 +3454,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         if (!ok) { $('codeErr').textContent = 'Code école incorrect.'; return; }
         $('fond').classList.remove('on');
         
-        // CORRECTION DE L'IMPRESSION DÉDIÉE DE LA CARTE ACTUELLE
         setTimeout(function () { 
             const rectoHtml = document.getElementById('recto').outerHTML;
             const versoHtml = document.getElementById('verso').outerHTML;
