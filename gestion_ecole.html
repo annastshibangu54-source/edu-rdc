@@ -739,6 +739,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         <div class="tab-pane" id="tab-carte-eleve">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-id-card me-2"></i>4.1. Carte d'Élève (Recto, Verso & Impression en Masse)</h5>
                             
+                            <!-- SÉLECTION CLASSE ET ÉLÈVE POUR EDITION DE CARTE ET ENREGISTREMENT EN CLASSE -->
+                            <div class="row g-2 mb-3 p-3 bg-light rounded border no-print">
+                                <div class="col-md-6">
+                                    <label class="fw-bold">1. Choisir la Classe de l'Élève :</label>
+                                    <select id="cardClassSelect" class="form-select" onchange="loadStudentsForCardSelect()"></select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold">2. Choisir l'Élève à charger :</label>
+                                    <select id="cardStudentSelect" class="form-select" onchange="populateCardFromSelectedStudent()"></select>
+                                </div>
+                            </div>
+
                             <div class="p-3 bg-light rounded border mb-4 no-print">
                                 <label class="fw-bold">Impression en masse des cartes par classe :</label>
                                 <div class="input-group mt-1">
@@ -873,7 +885,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     </select>
                                 </div>
                                 <div class="col-md-4 d-flex align-items-end gap-2">
-                                    <button class="btn btn-primary w-100 fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
+                                    <button class="btn btn-primary w-100 fw-bold" onclick="printBulletinModal()"><i class="fa fa-print me-1"></i> Imprimer</button>
                                     <button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </div>
@@ -1267,7 +1279,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     </div>
 
-    <!-- MODAL FACTURE / REÇU DE PAIEMENT & IMPRESSION DE LISTE -->
+    <!-- MODAL FACTURE / REÇU DE PAIEMENT & IMPRESSION DE LISTE ET BULLETIN -->
     <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -1712,6 +1724,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 renderCoursesTable();
             } else if(tabId === 'tab-eleves-reg') {
                 renderStudentsTable();
+            } else if(tabId === 'tab-carte-eleve') {
+                refreshCardOptions();
             } else if(tabId === 'tab-discipline') {
                 refreshDisciplineOptions();
             } else if(tabId === 'tab-analytics') {
@@ -2040,6 +2054,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('agentPayClassSelect').innerHTML = classOptions;
             document.getElementById('bulletinClassSelect').innerHTML = classOptions;
             document.getElementById('batchCardClassSelect').innerHTML = classOptions;
+            document.getElementById('cardClassSelect').innerHTML = classOptions;
             document.getElementById('discClassSelect').innerHTML = classOptions;
 
             const profTbody = document.getElementById('teachersTableBody');
@@ -2064,6 +2079,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderCommTable();
             renderProgramView();
             renderDisciplineTable();
+            refreshCardOptions();
         }
 
         // --- 0. ANALYTIQUE & GRAPHIQUES ---
@@ -2250,7 +2266,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.students[editIdx].classe = classe;
                 alert("Élève modifié avec succès !");
             } else {
-                s.students.push({ id: 'STU-'+Date.now(), mat: 'ELV-'+Math.floor(1000+Math.random()*9000), name, sexe, classe });
+                s.students.push({ id: 'STU-'+Date.now(), mat: 'ELV-'+Math.floor(1000+Math.random()*9000), name, sexe, classe, cardData: {} });
                 alert("Élève inscrit avec succès !");
             }
             saveData(); 
@@ -2289,7 +2305,62 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             tbody.innerHTML = filtered.length ? filtered.map((st) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editStudent(${st.originalIndex})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteStudent(${st.originalIndex})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucun élève inscrit dans cette classe.</td></tr>`;
         }
 
-        // --- 4.1. CARTE D'ÉLÈVE & IMPRESSION EN MASSE ---
+        // --- 4.1. CARTE D'ÉLÈVE & IMPRESSION EN MASSE & ENREGISTREMENT EN CLASSE ---
+        function refreshCardOptions() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+            let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            document.getElementById('cardClassSelect').innerHTML = classOptions;
+            loadStudentsForCardSelect();
+        }
+
+        function loadStudentsForCardSelect() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('cardClassSelect').value;
+            const selectEl = document.getElementById('cardStudentSelect');
+            if(!cl) { selectEl.innerHTML = `<option value="" disabled selected>Choisir d'abord une classe...</option>`; return; }
+            const students = s.students.filter(x => x.classe === cl);
+            selectEl.innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + students.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
+        }
+
+        function populateCardFromSelectedStudent() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const stId = document.getElementById('cardStudentSelect').value;
+            const student = s.students.find(x => x.id === stId);
+            if(!student) return;
+
+            const card = student.cardData || {};
+            
+            // découpage simple du nom si postnom/prenom non remplis
+            const parts = student.name.split(' ');
+            document.getElementById('nom').value = card.nom || parts[0] || '';
+            document.getElementById('postnom').value = card.postnom || parts[1] || '';
+            document.getElementById('prenom').value = card.prenom || parts.slice(2).join(' ') || '';
+            document.getElementById('sexe').value = card.sexe || student.sexe || 'M';
+            document.getElementById('classe').value = card.classe || student.classe || '';
+            
+            document.getElementById('sousDiv1').value = card.sousDiv1 || '';
+            document.getElementById('sousDiv2').value = card.sousDiv2 || '';
+            document.getElementById('an1').value = card.an1 || '2025';
+            document.getElementById('an2').value = card.an2 || '2026';
+            document.getElementById('lieuNaiss').value = card.lieuNaiss || 'Kinshasa';
+            document.getElementById('nj').value = card.nj || '01';
+            document.getElementById('nm').value = card.nm || '01';
+            document.getElementById('na').value = card.na || '2010';
+            document.getElementById('delivreA').value = card.delivreA || 'Kinshasa';
+            document.getElementById('dj').value = card.dj || '15';
+            document.getElementById('dm').value = card.dm || '09';
+            document.getElementById('da').value = card.da || '25';
+
+            if(student.photo) {
+                document.getElementById('photoImg').src = student.photo;
+                document.getElementById('photo').classList.add('has');
+            } else {
+                document.getElementById('photoImg').removeAttribute('src');
+                document.getElementById('photo').classList.remove('has');
+            }
+        }
+
         function printAllCardsForClass() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('batchCardClassSelect').value;
@@ -2299,14 +2370,25 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             let html = `<div style="padding:10px;">`;
             students.forEach(st => {
+                const c = st.cardData || {};
+                const photoSrc = st.photo || 'https://via.placeholder.com/100x120?text=PHOTO';
                 html += `
                     <div style="border:1px solid #000; width:9cm; height:7cm; background:#FFD400; padding:5px; margin:0 auto 20px; page-break-inside:avoid; break-inside:avoid; font-family:Arial; font-size:10px; position:relative;">
                         <div style="text-align:center; font-weight:bold;">République Démocratique du Congo</div>
                         <div style="text-align:center; font-size:12px; font-weight:bold; text-decoration:underline; margin:5px 0;">CARTE D'ÉLÈVE</div>
-                        <div><b>Nom :</b> ${st.name}</div>
-                        <div><b>Sexe :</b> ${st.sexe}</div>
-                        <div><b>Classe :</b> ${st.classe}</div>
-                        <div><b>Matricule :</b> ${st.mat}</div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <div>
+                                <div><b>Nom :</b> ${c.nom || st.name}</div>
+                                <div><b>Postnom :</b> ${c.postnom || ''}</div>
+                                <div><b>Prénom :</b> ${c.prenom || ''}</div>
+                                <div><b>Sexe :</b> ${st.sexe}</div>
+                                <div><b>Classe :</b> ${st.classe}</div>
+                                <div><b>Matricule :</b> ${st.mat}</div>
+                            </div>
+                            <div style="width:2.2cm; height:2.6cm; border:1px solid #000;">
+                                <img src="${photoSrc}" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                        </div>
                         <div style="position:absolute; bottom:10px; left:10px; right:10px; text-align:center; font-size:8px; font-weight:bold;">
                             ${s.name} — ${s.province}
                         </div>
@@ -2417,7 +2499,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             saveData();
         }
 
-        // --- 7. BULLETINS (AVEC CLASSEMENT AUTOMATIQUE) ---
+        // --- 7. BULLETINS (AVEC CLASSEMENT AUTOMATIQUE & IMPRESSION DÉDIÉE) ---
         function refreshBulletinOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
@@ -2429,6 +2511,19 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const cl = document.getElementById('bulletinClassSelect').value;
             const filtered = s.students.filter(x => x.classe === cl);
             document.getElementById('bulletinStudentSelect').innerHTML = `<option value="" disabled selected>— Sélectionner Élève —</option>` + filtered.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
+        }
+
+        function printBulletinModal() {
+            const bulletinHtml = document.getElementById('page').innerHTML;
+            if(!bulletinHtml || bulletinHtml.includes('Veuillez choisir')) {
+                alert("Veuillez sélectionner un élève et générer son bulletin avant d'imprimer !");
+                return;
+            }
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Bulletin de Cotes - Impression`;
+            document.getElementById('invoicePrintArea').innerHTML = `<div class="bulletin-container"><div class="wrap"><div class="page">${bulletinHtml}</div></div></div>`;
+            const modalEl = document.getElementById('invoiceModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
         }
 
         function calculateClassRank(school, className, studentId) {
@@ -3212,13 +3307,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 document.getElementById(tabId).classList.add('active');
                 if(tabId === 'tab-analytics') renderAnalyticsCharts();
                 if(tabId === 'tab-jobs-received') renderSchoolJobApplications();
+                if(tabId === 'tab-carte-eleve') refreshCardOptions();
             } else {
                 alert("Code secret incorrect !");
             }
         }
     </script>
 
-    <!-- SCRIPT CARTE D'ÉLÈVE -->
+    <!-- SCRIPT CARTE D'ÉLÈVE CORRIGÉ ET ENREGISTREMENT PAR CLASSE -->
     <script>
     (function () {
       var CLE = 'carte_eleve_v1';
@@ -3298,11 +3394,25 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       if(btnEnreg) {
           btnEnreg.addEventListener('click', function () {
             var d = collecter();
-            if (!d.nom || !d.prenom) { msg('Remplissez au moins le Nom et le Prénom.', false); return; }
+            if (!d.nom && !d.prenom) { msg('Remplissez au moins le Nom et le Prénom.', false); return; }
+            
+            // SAUVEGARDE EN CLASSE DANS L'ÉCOLE
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const stId = $('cardStudentSelect') ? $('cardStudentSelect').value : null;
+
+            if(s && stId) {
+                const student = s.students.find(x => x.id === stId);
+                if(student) {
+                    student.cardData = d;
+                    if(photoData) student.photo = photoData;
+                    saveData();
+                }
+            }
+
             try { localStorage.setItem(CLE, JSON.stringify(d)); } catch (e) {}
             enregistre = true;
             verrouiller(true);
-            msg('Carte enregistrée.', true);
+            msg('Carte enregistrée dans la classe de l\'élève avec succès.', true);
           });
       }
 
@@ -3334,7 +3444,17 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         try { ok = await verifierCodeEcole(code); } catch (e) { $('codeErr').textContent = 'Vérification impossible.'; return; }
         if (!ok) { $('codeErr').textContent = 'Code école incorrect.'; return; }
         $('fond').classList.remove('on');
-        setTimeout(function () { window.print(); }, 150);
+        
+        // CORRECTION DE L'IMPRESSION DÉDIÉE DE LA CARTE ACTUELLE
+        setTimeout(function () { 
+            const rectoHtml = document.getElementById('recto').outerHTML;
+            const versoHtml = document.getElementById('verso').outerHTML;
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Impression Carte d'Élève`;
+            document.getElementById('invoicePrintArea').innerHTML = `<div style="padding:20px; display:flex; flex-direction:column; align-items:center; gap:20px;">${rectoHtml}${versoHtml}</div>`;
+            const modalEl = document.getElementById('invoiceModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }, 150);
       }
 
       const codeOk = $('codeOk');
