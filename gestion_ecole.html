@@ -33,7 +33,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 /* STYLES BULLETIN INTEGRE */
 .bulletin-container *{box-sizing:border-box}
-.bulletin-container .page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:7mm 8mm;font-size:8px;box-shadow:0 2px 10px rgba(0,0,0,.25);color:#000;font-family:Arial,Helvetica,sans-serif}
+.bulletin-container .page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:7mm 8mm;font-size:8px;box-shadow:0 2px 10px rgba(0,0,0,.25);color:#000;font-family:Arial,Helvetica,sans-serif; page-break-inside: avoid; break-inside: avoid;}
 .bulletin-container .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
 .bulletin-container .logo{width:64px;height:50px;display:flex;align-items:center;justify-content:center}
 .bulletin-container .logo img,.bulletin-container .logo svg{max-width:100%;max-height:100%}
@@ -76,14 +76,19 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .bulletin-container .note .code{float:right}
 .bulletin-container .dots{display:inline-block;min-width:60px;border-bottom:1px dotted #000}
 
+/* IMPRESSION CORRIGÉE - RESPECT DES NORMES ET SANS MORCELLEMENT */
 @media print{
- @page{size:A4 portrait;margin:6mm}
- body{background:#fff}
- .no-print,.navbar,.sidebar-menu,.dashboard-section,.nav-tabs{display:none !important}
+ @page{size:A4 portrait;margin:5mm}
+ body{background:#fff; padding:0; margin:0;}
+ .no-print,.navbar,.sidebar-menu,.dashboard-section,.nav-tabs,.modal-header,.modal-footer,.boutons,.p-3,.btn{display:none !important}
  .wrap{overflow:visible;padding:0}
- .bulletin-container .page{box-shadow:none;margin:0;width:auto;padding:0}
+ .bulletin-container .page{box-shadow:none;margin:0 auto;width:100%;padding:0; page-break-inside: avoid; break-inside: avoid;}
  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
  .printable-area { display: block !important; }
+ .modal { position: static !important; display: block !important; overflow: visible !important; }
+ .modal-dialog { max-width: 100% !important; margin: 0 !important; }
+ .modal-content { border: 0 !important; box-shadow: none !important; }
+ .carte { page-break-inside: avoid; break-inside: avoid; margin: 0 auto 10px !important; }
 }
 
 .border-top-4 { border-top-width: 4px !important; }
@@ -124,7 +129,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     background: #FFD400; color: #000;
     border: 1px solid #000; border-radius: 4px;
     padding: 0.18cm 0.25cm; position: relative; overflow: hidden;
-    font-size: 6.4pt; line-height: 1.25;
+    font-size: 6.4pt; line-height: 1.25; page-break-inside: avoid; break-inside: avoid;
 }
 .centre { text-align: center; }
 .rdc { font-weight: bold; font-size: 7.4pt; }
@@ -183,17 +188,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .boite .rang { display: flex; gap: 8px; margin-top: 12px; }
 .boite .rang button { flex: 1; padding: 10px; font-size: 15px; border: 0; border-radius: 6px; color: #fff; cursor: pointer; }
 #codeErr { color: #b00020; font-size: 13px; min-height: 16px; margin-top: 6px; }
-
-@media print {
-  @page { size: 9cm 7cm; margin: 0; }
-  body { background: #fff; padding: 0; }
-  .no-print, h3, .navbar, .sidebar-menu, .dashboard-section { display: none !important; }
-  .card-zone { overflow: visible; padding: 0; }
-  .carte { margin: 0; border-radius: 0; page-break-after: always; break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .carte:last-of-type { page-break-after: auto; break-after: auto; }
-  .carte input[type=text] { border-bottom-color: transparent; }
-  .photo { background: transparent; }
-}
 </style>
 </head>
 <body>
@@ -203,7 +197,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5" onclick="showSection('view-portal')">
             <h2 class="m-0 text-primary"><i class="fa fa-school me-3"></i>EDU-RDC</h2>
         </a>
-        <div class="ms-auto p-3 d-flex align-items-center gap-3">
+        <div class="ms-auto p-3 d-flex align-items-center gap-2 flex-wrap">
+            <button class="btn btn-outline-warning btn-sm fw-bold" onclick="showSection('view-check-candidate-reply')"><i class="fa fa-envelope-open me-1"></i> Suivi Réponse Emploi</button>
             <button class="btn btn-outline-danger btn-sm fw-bold" onclick="openAdminCentralPanel()"><i class="fa fa-user-shield me-1"></i> Admin Central (Confidentiel)</button>
             <button class="btn btn-outline-primary btn-sm fw-bold" onclick="showSection('view-portal')"><i class="fa fa-home me-1"></i> Accueil Portail</button>
         </div>
@@ -218,7 +213,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 <p class="text-muted">Sélectionnez un service ci-dessous :</p>
             </div>
 
-            <div class="row g-4 mb-5">
+            <div class="row g-4 mb-4">
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openSchoolForm()">
                         <i class="fa fa-university fa-3x text-primary mb-3"></i>
@@ -236,7 +231,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="showSection('view-job-application')">
+                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openJobApplicationSection()">
                         <i class="fa fa-briefcase fa-3x text-warning mb-3"></i>
                         <h4 class="fw-bold">3. Demande d'Emploi</h4>
                         <p class="text-muted small">Postuler à un poste d'enseignant ou d'administratif.</p>
@@ -245,10 +240,33 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="m-0 text-primary fw-bold"><i class="fa fa-list me-2"></i>Liste des Écoles Enregistrées</h4>
-                <button class="btn btn-primary btn-sm" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter une École</button>
+            <!-- ÉVÉNEMENTS SCOLAIRES EN LIGNE (PUBLICATION DE 7 JOURS SEULEMENT) -->
+            <div class="card shadow-sm border-0 mb-4 bg-light">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 fw-bold"><i class="fa fa-calendar-star me-2"></i>Événements & Annonces des Écoles (Valide 7 Jours)</h5>
+                    <span class="badge bg-warning text-dark">Mis à jour en direct</span>
+                </div>
+                <div class="card-body p-3" id="publicEventsListContainer">
+                    <!-- Généré dynamiquement -->
+                </div>
             </div>
+
+            <!-- BARRE DE RECHERCHE DYNAMIQUE DE L'ÉCOLE -->
+            <div class="card shadow-sm border-0 p-3 mb-4 bg-white">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <h4 class="m-0 text-primary fw-bold"><i class="fa fa-list me-2"></i>Liste des Écoles Enregistrées</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-primary text-white"><i class="fa fa-search"></i></span>
+                            <input type="text" id="searchSchoolInput" class="form-control" placeholder="Rechercher une école par son Nom..." oninput="filterSchoolsList()">
+                            <button class="btn btn-primary fw-bold" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="schoolsListContainer" class="row g-3"></div>
         </div>
 
@@ -355,24 +373,52 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             </div>
         </div>
 
-        <!-- DEMANDE EMPLOI -->
+        <!-- DEMANDE EMPLOI ET SÉLECTION ÉCOLE -->
         <div id="view-job-application" class="view-section">
             <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-warning text-dark"><h4 class="m-0 fw-bold"><i class="fa fa-briefcase me-2"></i>3. Demande d'Emploi</h4></div>
                 <div class="card-body p-4">
-                    <form onsubmit="event.preventDefault(); alert('Candidature transmise avec succès !'); showSection('view-portal');">
+                    <form onsubmit="handleSendJobApplication(event)">
                         <div class="row g-3">
-                            <div class="col-md-6"><label class="fw-bold">Nom Complet :</label><input type="text" class="form-control" required></div>
-                            <div class="col-md-6"><label class="fw-bold">Poste Souhaité :</label><input type="text" class="form-control" placeholder="Ex: Enseignant de Mathématiques, Secrétaire..." required></div>
-                            <div class="col-md-6"><label class="fw-bold">Téléphone / WhatsApp :</label><input type="tel" class="form-control" required></div>
-                            <div class="col-md-6"><label class="fw-bold">Niveau d'Études / Diplôme :</label><input type="text" class="form-control" placeholder="Ex: Gradué / Licencié en Pédagogie" required></div>
+                            <div class="col-md-6">
+                                <label class="fw-bold">Choisir l'École Destinataire :</label>
+                                <select id="jobSchoolSelect" class="form-select" required></select>
+                            </div>
+                            <div class="col-md-6"><label class="fw-bold">Nom Complet :</label><input type="text" id="jobApplicantName" class="form-control" required></div>
+                            <div class="col-md-6"><label class="fw-bold">Poste Souhaité :</label><input type="text" id="jobRole" class="form-control" placeholder="Ex: Enseignant de Mathématiques, Secrétaire..." required></div>
+                            <div class="col-md-6"><label class="fw-bold">Téléphone / WhatsApp :</label><input type="tel" id="jobPhone" class="form-control" required></div>
+                            <div class="col-md-6"><label class="fw-bold">Niveau d'Études / Diplôme :</label><input type="text" id="jobDiploma" class="form-control" placeholder="Ex: Gradué / Licencié en Pédagogie" required></div>
+                            <div class="col-12"><label class="fw-bold">Lettre de Motivation / Message :</label><textarea id="jobMessage" class="form-control" rows="3" placeholder="Saisir votre demande d'emploi ici..." required></textarea></div>
                             <div class="col-12 d-flex gap-2">
                                 <button type="submit" class="btn btn-warning fw-bold px-4">Soumettre Candidature</button>
                                 <button type="button" class="btn btn-secondary fw-bold" onclick="showSection('view-portal')">Fermer</button>
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESPACE CANDIDAT : SUIVI DE RÉPONSE À LA CANDIDATURE -->
+        <div id="view-check-candidate-reply" class="view-section">
+            <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour au Portail</button>
+            <div class="card shadow-sm border-0 border-start border-4 border-warning">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="m-0 text-white"><i class="fa fa-key me-2 text-warning"></i>Consulter la Réponse à Votre Demande d'Emploi</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="fw-bold">Saisissez votre Code Secret Candidat (Généré lors de la soumission) :</label>
+                            <input type="text" id="candidateSecretCodeInput" class="form-control form-control-lg text-uppercase" placeholder="Ex: CAND-1234">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button class="btn btn-warning btn-lg fw-bold w-100" onclick="verifyCandidateCodeAndDisplayReply()"><i class="fa fa-lock-open me-1"></i> Déverrouiller Ma Réponse</button>
+                        </div>
+                    </div>
+
+                    <div id="candidateReplyResultArea" class="mt-4" style="display:none;"></div>
                 </div>
             </div>
         </div>
@@ -410,6 +456,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <a class="list-group-item list-group-item-action rubric-item" id="r-discipline" href="javascript:void(0);" onclick="switchTab('tab-discipline', this)"><i class="fa fa-gavel me-2 text-primary"></i> 9.1. Discipline & Sanctions</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-programme" href="javascript:void(0);" onclick="switchTab('tab-programme', this)"><i class="fa fa-calendar-alt me-2 text-primary"></i> 10. Programme & Calendrier</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-communication" href="javascript:void(0);" onclick="switchTab('tab-communication', this)"><i class="fa fa-bullhorn me-2 text-primary"></i> 11. Communication / Contact</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-jobs-received" href="javascript:void(0);" onclick="switchTab('tab-jobs-received', this)"><i class="fa fa-envelope-open-text me-2 text-warning"></i> 12. Demandes d'Emploi</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-search-students" href="javascript:void(0);" onclick="switchTab('tab-search-students', this)"><i class="fa fa-search text-info me-2"></i> Recherche Élèves (Palmarès)</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-search-staff" href="javascript:void(0);" onclick="switchTab('tab-search-staff', this)"><i class="fa fa-search text-info me-2"></i> Recherche Enseignants & Admin</a>
                         </div>
                     </div>
 
@@ -430,6 +479,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-carte-eleve')">
                                     <i class="fa fa-id-card text-indigo"></i>
                                     <span>Carte d'Élève & Impression Mass</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-search-students')">
+                                    <i class="fa fa-search text-info"></i>
+                                    <span>Recherche Élèves</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-search-staff')">
+                                    <i class="fa fa-search text-info"></i>
+                                    <span>Recherche Prof/Admin</span>
                                 </button>
                             </div>
                             <div class="col-6">
@@ -493,9 +554,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 </button>
                             </div>
                             <div class="col-12">
-                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-communication')">
-                                    <i class="fa fa-bullhorn text-indigo"></i>
-                                    <span>Communication / Contact</span>
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-jobs-received')">
+                                    <i class="fa fa-envelope-open-text text-warning"></i>
+                                    <span>Demandes d'Emploi Reçues</span>
                                 </button>
                             </div>
                         </div>
@@ -509,6 +570,53 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         <div id="defaultWelcomeMessage" class="text-center py-5 text-muted">
                             <i class="fa fa-hand-pointer fa-3x mb-3 text-primary"></i>
                             <h5>Veuillez cliquer sur <b>Paramètres</b> dans le menu de gauche ou sur un bouton du <b>Tableau de Bord</b> pour afficher une rubrique.</h5>
+                        </div>
+
+                        <!-- RECHERCHE ÉLÈVES / PALMARÈS -->
+                        <div class="tab-pane" id="tab-search-students">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-search me-2"></i>Rechercher un Élève dans le Palmarès</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text bg-primary text-white"><i class="fa fa-user-graduate"></i></span>
+                                <input type="text" id="searchStudentInput" class="form-control" placeholder="Entrez le Nom, Postnom ou Prénom de l'Élève..." oninput="renderSearchStudentsResults()">
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Matricule</th>
+                                            <th>Nom Complet</th>
+                                            <th>Sexe</th>
+                                            <th>Classe</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="searchStudentsTableBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3"><button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button></div>
+                        </div>
+
+                        <!-- RECHERCHE ENSEIGNANTS / PROFESSEURS ET ADMINISTRATEURS -->
+                        <div class="tab-pane" id="tab-search-staff">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-search me-2"></i>Rechercher un Enseignant, Professeur ou Administrateur</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text bg-primary text-white"><i class="fa fa-chalkboard-teacher"></i></span>
+                                <input type="text" id="searchStaffInput" class="form-control" placeholder="Entrez le Nom ou le Rôle..." oninput="renderSearchStaffResults()">
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Type / Categorie</th>
+                                            <th>Nom & Prénom</th>
+                                            <th>Fonction / Classe</th>
+                                            <th>Contact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="searchStaffTableBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3"><button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button></div>
                         </div>
 
                         <!-- 0. ANALYTIQUE & GRAPHIQUES -->
@@ -1107,19 +1215,46 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </div>
                         </div>
 
-                        <!-- 11. COMMUNICATION -->
+                        <!-- 11. COMMUNICATION ET PUBLICATION ÉVÉNEMENTS (DURÉE 7 JOURS) -->
                         <div class="tab-pane" id="tab-communication">
-                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-bullhorn me-2"></i>11. Communication / Contact (Formulaire & Liste)</h5>
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-bullhorn me-2"></i>11. Communication & Publication Événements (Visibilité 7 jours)</h5>
                             <div class="p-3 bg-light rounded border mb-3">
                                 <input type="hidden" id="editCommIndex">
-                                <div class="mb-2"><label class="fw-bold">Message aux Parents / Extérieur :</label><textarea id="announcementText" class="form-control" rows="3" placeholder="Message..."></textarea></div>
+                                <div class="mb-2">
+                                    <label class="fw-bold">Annonce / Événement à Publier :</label>
+                                    <textarea id="announcementText" class="form-control" rows="3" placeholder="Saisissez l'annonce ou le futur événement de l'école..."></textarea>
+                                    <small class="text-muted"><i class="fa fa-info-circle me-1"></i>Seul le propriétaire a le droit de publier. La publication restera 7 jours en ligne sur le portail.</small>
+                                </div>
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-warning fw-bold" id="btnCommSubmit" onclick="handleSaveCommunication()"><i class="fa fa-save"></i> Publier / Enregistrer</button>
+                                    <button class="btn btn-warning fw-bold" id="btnCommSubmit" onclick="handleSaveCommunication()"><i class="fa fa-save"></i> Publier (7 Jours en ligne)</button>
                                     <button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button>
                                 </div>
                             </div>
-                            <h6 class="fw-bold text-secondary">Historique des communications :</h6>
-                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Message</th><th>Actions</th></tr></thead><tbody id="commTableBody"></tbody></table>
+                            <h6 class="fw-bold text-secondary">Historique de vos publications en cours :</h6>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Message / Événement</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="commTableBody"></tbody></table>
+                        </div>
+
+                        <!-- 12. DEMANDES D'EMPLOI REÇUES PAR L'ÉCOLE -->
+                        <div class="tab-pane" id="tab-jobs-received">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-briefcase me-2"></i>12. Gestion des Demandes d'Emploi Reçues</h5>
+                            <p class="text-muted small">Consultez les candidatures confidentielles soumises à votre école et répondez aux candidats.</p>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Candidat</th>
+                                            <th>Poste Souhaité</th>
+                                            <th>Téléphone</th>
+                                            <th>Diplôme / Message</th>
+                                            <th>Réponse de l'École</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="schoolJobsTableBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3"><button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button></div>
                         </div>
 
                     </div>
@@ -1166,7 +1301,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         // Clé de stockage identique à votre code d'origine pour ne pas perdre l'école enregistrée
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
-        let appData = { schools: [], adminRequests: [] };
+        let appData = { schools: [], adminRequests: [], jobApplications: [] };
         let activeSchoolId = null;
         let currentUserSession = { role: null, name: null, assignedClass: null, secretCode: null };
         let chartSexeInstance = null;
@@ -1179,10 +1314,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 try { 
                     appData = JSON.parse(saved); 
                     if(!appData.adminRequests) appData.adminRequests = [];
+                    if(!appData.jobApplications) appData.jobApplications = [];
                 } catch(e){} 
             }
             saveData();
             renderSchoolsList();
+            renderPublicEvents();
         };
 
         function saveData() { 
@@ -1196,7 +1333,345 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function showSection(id) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id === 'view-portal') renderSchoolsList();
+            if(id === 'view-portal') {
+                renderSchoolsList();
+                renderPublicEvents();
+            }
+        }
+
+        /* --- 2. BARRE DE RECHERCHE DYNAMIQUE DE L'ÉCOLE --- */
+        function filterSchoolsList() {
+            const query = document.getElementById('searchSchoolInput').value.toLowerCase().trim();
+            renderSchoolsList(query);
+        }
+
+        function renderSchoolsList(filterQuery = '') {
+            const container = document.getElementById('schoolsListContainer');
+            container.innerHTML = "";
+            if(!appData.schools || !appData.schools.length) {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-secondary text-center">Aucune école enregistrée pour le moment. Cliquez sur « 1. Créer une École » ci-dessus.</div></div>`;
+                return;
+            }
+
+            const list = appData.schools.filter(s => s.name.toLowerCase().includes(filterQuery));
+
+            if(!list.length) {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Aucune école ne correspond au nom : <b>"${filterQuery}"</b></div></div>`;
+                return;
+            }
+
+            list.forEach(s => {
+                container.innerHTML += `
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-start border-4 border-primary p-3">
+                            <div class="d-flex align-items-center gap-3">
+                                ${s.logo ? `<img src="${s.logo}" class="logo-preview">` : `<i class="fa fa-school fa-2x text-primary"></i>`}
+                                <div class="flex-grow-1">
+                                    <h5 class="m-0 fw-bold text-primary">${s.name}</h5>
+                                    <small class="text-muted d-block">${s.appartenance} — ${s.province} / ${s.commune}</small>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="openSchoolFormWithCode('${s.id}')" title="Modifier"><i class="fa fa-edit"></i></button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteSchool('${s.id}')" title="Supprimer"><i class="fa fa-trash"></i></button>
+                                    <button class="btn btn-primary btn-sm fw-bold" onclick="promptLoginCode('${s.id}')"><i class="fa fa-lock me-1"></i> Ouvrir <i class="fa fa-arrow-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        /* --- 3. RECHERCHE ÉLÈVES (PALMARÈS) ET STAFF --- */
+        function renderSearchStudentsResults() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+            const query = document.getElementById('searchStudentInput').value.toLowerCase().trim();
+            const tbody = document.getElementById('searchStudentsTableBody');
+
+            if(!query) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Saisissez un nom dans la barre de recherche ci-dessus.</td></tr>`;
+                return;
+            }
+
+            const results = s.students.filter(st => st.name.toLowerCase().includes(query) || st.mat.toLowerCase().includes(query));
+
+            if(!results.length) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-warning py-3">Aucun élève trouvé pour "${query}".</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = results.map(st => `
+                <tr>
+                    <td><b>${st.mat}</b></td>
+                    <td>${st.name}</td>
+                    <td>${st.sexe}</td>
+                    <td><span class="badge bg-primary">${st.classe}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary fw-bold" onclick="quickOpenStudentBulletin('${st.classe}', '${st.id}')"><i class="fa fa-file-invoice me-1"></i> Ouvrir Bulletin</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function quickOpenStudentBulletin(classe, studentId) {
+            switchTab('tab-bulletins');
+            document.getElementById('bulletinClassSelect').value = classe;
+            loadStudentsForBulletin();
+            document.getElementById('bulletinStudentSelect').value = studentId;
+            renderBulletinFromSystem();
+        }
+
+        function renderSearchStaffResults() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+            const query = document.getElementById('searchStaffInput').value.toLowerCase().trim();
+            const tbody = document.getElementById('searchStaffTableBody');
+
+            if(!query) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">Saisissez un nom ou rôle dans la barre ci-dessus.</td></tr>`;
+                return;
+            }
+
+            let combinedStaff = [];
+            (s.staff || []).forEach(st => combinedStaff.push({ type: 'Administratif / Direction', name: st.name, fonction: st.role, phone: '—' }));
+            (s.teachers || []).forEach(t => combinedStaff.push({ type: 'Enseignant / Professeur', name: t.name, fonction: t.titulaireClass ? `Titulaire ${t.titulaireClass}` : 'Professeur', phone: t.phone || '—' }));
+
+            const results = combinedStaff.filter(x => x.name.toLowerCase().includes(query) || x.fonction.toLowerCase().includes(query) || x.type.toLowerCase().includes(query));
+
+            if(!results.length) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-warning py-3">Aucun enseignant ou membre administratif trouvé.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = results.map(x => `
+                <tr>
+                    <td><span class="badge bg-${x.type.includes('Enseignant')?'success':'dark'}">${x.type}</span></td>
+                    <td><b>${x.name}</b></td>
+                    <td>${x.fonction}</td>
+                    <td>${x.phone}</td>
+                </tr>
+            `).join('');
+        }
+
+        /* --- 4. GESTION DES DEMANDES D'EMPLOI ET CODES SECRETS --- */
+        function openJobApplicationSection() {
+            const select = document.getElementById('jobSchoolSelect');
+            if(!appData.schools || !appData.schools.length) {
+                alert("Aucune école n'est enregistrée sur le système.");
+                return;
+            }
+            select.innerHTML = appData.schools.map(s => `<option value="${s.id}">${s.name} (${s.province})</option>`).join('');
+            showSection('view-job-application');
+        }
+
+        function handleSendJobApplication(e) {
+            e.preventDefault();
+            const schoolId = document.getElementById('jobSchoolSelect').value;
+            const applicantName = document.getElementById('jobApplicantName').value.trim();
+            const role = document.getElementById('jobRole').value.trim();
+            const phone = document.getElementById('jobPhone').value.trim();
+            const diploma = document.getElementById('jobDiploma').value.trim();
+            const message = document.getElementById('jobMessage').value.trim();
+
+            const secretCode = generateSecretCode('CAND');
+            const date = new Date().toLocaleDateString('fr-FR') + ' ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+
+            if(!appData.jobApplications) appData.jobApplications = [];
+
+            appData.jobApplications.push({
+                id: 'JOB-' + Date.now(),
+                schoolId,
+                applicantName,
+                role,
+                phone,
+                diploma,
+                message,
+                candidateCode: secretCode,
+                date,
+                reply: ''
+            });
+
+            saveData();
+
+            alert(
+                ` VOTRE DEMANDE D'EMPLOI A ÉTÉ TRANSMISE AVEC SUCCÈS !\n\n` +
+                ` CONSERVEZ CE CODE SECRET CONFIDENTIEL CANDIDAT :\n` +
+                ` [ ${secretCode} ]\n\n` +
+                `Le propriétaire de l'école traitera votre demande. Utilisez ce code sur le portail (Suivi Réponse Emploi) pour ouvrir sa réponse personnelle.`
+            );
+
+            showSection('view-portal');
+        }
+
+        function renderSchoolJobApplications() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+
+            const tbody = document.getElementById('schoolJobsTableBody');
+            const apps = (appData.jobApplications || []).filter(x => x.schoolId === activeSchoolId);
+
+            if(!apps.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">Aucune demande d'emploi reçue pour votre école.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = apps.map((a, i) => `
+                <tr>
+                    <td><small>${a.date}</small></td>
+                    <td><b>${a.applicantName}</b></td>
+                    <td><span class="badge bg-warning text-dark">${a.role}</span></td>
+                    <td>${a.phone}</td>
+                    <td><small><b>Diplôme :</b> ${a.diploma}<br>${a.message}</small></td>
+                    <td>
+                        ${a.reply ? `<div class="p-2 bg-light border border-success rounded text-success fw-bold"><i class="fa fa-check-circle me-1"></i>${a.reply}</div>` : `<span class="badge bg-secondary">En attente de réponse</span>`}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary fw-bold" onclick="replyToJobCandidate('${a.id}')"><i class="fa fa-reply me-1"></i> Répondre</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function replyToJobCandidate(jobId) {
+            if (currentUserSession.role !== 'owner') {
+                alert("Seul le propriétaire de l'école peut répondre aux candidatures !");
+                return;
+            }
+
+            const app = appData.jobApplications.find(x => x.id === jobId);
+            if(!app) return;
+
+            const replyText = prompt(`[RÉPONDRE À ${app.applicantName.toUpperCase()}]\n\nSaisissez votre réponse confidentielle qui sera lisible uniquement par le candidat :`, app.reply || '');
+            if(replyText === null) return;
+
+            app.reply = replyText.trim();
+            saveData();
+            renderSchoolJobApplications();
+            alert("Votre réponse confidentielle a été enregistrée avec succès !");
+        }
+
+        function verifyCandidateCodeAndDisplayReply() {
+            const code = document.getElementById('candidateSecretCodeInput').value.trim().toUpperCase();
+            const area = document.getElementById('candidateReplyResultArea');
+
+            if(!code) {
+                alert("Veuillez saisir votre Code Secret Candidat !");
+                return;
+            }
+
+            const app = (appData.jobApplications || []).find(x => x.candidateCode.toUpperCase() === code);
+
+            if(!app) {
+                area.style.display = 'block';
+                area.innerHTML = `<div class="alert alert-danger fw-bold"><i class="fa fa-times-circle me-2"></i>Code Candidat invalide ou introuvable. Veuillez vérifier votre code.</div>`;
+                return;
+            }
+
+            const sch = appData.schools.find(x => x.id === app.schoolId);
+            const schoolName = sch ? sch.name : "l'École";
+
+            area.style.display = 'block';
+            area.innerHTML = `
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white fw-bold"><i class="fa fa-lock-open me-2"></i>Espace Confidentiel Candidat - ${app.applicantName}</div>
+                    <div class="card-body">
+                        <p><b>École destinataire :</b> ${schoolName}</p>
+                        <p><b>Poste demandé :</b> ${app.role}</p>
+                        <p><b>Date de soumission :</b> ${app.date}</p>
+                        <hr>
+                        <h5 class="fw-bold text-primary"><i class="fa fa-comment-dots me-2"></i>Réponse Confidentielle du Propriétaire de l'École :</h5>
+                        <div class="p-3 bg-light rounded border border-2 border-primary mt-2 fs-6">
+                            ${app.reply ? `<b>${app.reply}</b>` : `<i class="text-muted">Le propriétaire de l'école n'a pas encore répondu à votre demande. Revenez ultérieurement.</i>`}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* --- 5. ÉVÉNEMENTS SCOLAIRES (VALIDE 7 JOURS SEULEMENT) --- */
+        function handleSaveCommunication() {
+            if (currentUserSession.role !== 'owner') {
+                alert("Seul le propriétaire de l'école a le droit de publier les futurs événements !");
+                return;
+            }
+
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const message = document.getElementById('announcementText').value.trim();
+            if(!message) { alert("Saisir un message ou événement !"); return; }
+
+            const now = new Date();
+            s.communications.push({ 
+                date: now.toLocaleDateString('fr-FR'),
+                timestamp: now.getTime(),
+                message 
+            });
+
+            saveData(); 
+            renderCommTable(); 
+            renderPublicEvents();
+            document.getElementById('announcementText').value = '';
+            alert("Événement/Annonce publié(e) avec succès ! La publication restera en ligne pendant 7 jours.");
+        }
+
+        function renderCommTable() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s || !s.communications) return;
+            const now = new Date().getTime();
+            const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+            document.getElementById('commTableBody').innerHTML = s.communications.length ? s.communications.map((c, i) => {
+                const age = now - (c.timestamp || 0);
+                const isExpired = age > SEVEN_DAYS_MS;
+                return `
+                    <tr>
+                        <td>${c.date}</td>
+                        <td>${c.message}</td>
+                        <td>
+                            ${isExpired ? `<span class="badge bg-secondary">Expiré (+7 jours)</span>` : `<span class="badge bg-success">En Ligne (Actif)</span>`}
+                        </td>
+                        <td><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${i},1);saveData();renderCommTable();renderPublicEvents();"><i class="fa fa-trash"></i></button></td>
+                    </tr>
+                `;
+            }).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucune communication ou événement publié.</td></tr>`;
+        }
+
+        function renderPublicEvents() {
+            const container = document.getElementById('publicEventsListContainer');
+            if(!container) return;
+
+            const now = new Date().getTime();
+            const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+            let activeEvents = [];
+
+            (appData.schools || []).forEach(s => {
+                (s.communications || []).forEach(c => {
+                    const age = now - (c.timestamp || 0);
+                    if(age <= SEVEN_DAYS_MS) {
+                        activeEvents.push({
+                            schoolName: s.name,
+                            logo: s.logo,
+                            date: c.date,
+                            message: c.message
+                        });
+                    }
+                });
+            });
+
+            if(!activeEvents.length) {
+                container.innerHTML = `<div class="text-center text-muted p-2"><i class="fa fa-info-circle me-1"></i>Aucun événement récent publié par les écoles au cours des 7 derniers jours.</div>`;
+                return;
+            }
+
+            container.innerHTML = activeEvents.map(e => `
+                <div class="p-2 mb-2 bg-white rounded border d-flex align-items-center gap-3 shadow-sm">
+                    ${e.logo ? `<img src="${e.logo}" style="width:40px; height:40px; object-fit:cover;" class="rounded-circle">` : `<i class="fa fa-bullhorn text-primary fa-2x"></i>`}
+                    <div>
+                        <strong class="text-primary">${e.schoolName}</strong> <small class="text-muted">(${e.date})</small>
+                        <div class="text-dark fs-6">${e.message}</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function toggleParamsSubmenu() {
@@ -1217,7 +1692,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function switchTab(tabId, element) {
-            document.getElementById('defaultWelcomeMessage').style.display = 'block';
+            document.getElementById('defaultWelcomeMessage').style.display = 'none';
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
 
@@ -1238,6 +1713,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 refreshDisciplineOptions();
             } else if(tabId === 'tab-analytics') {
                 renderAnalyticsCharts();
+            } else if(tabId === 'tab-jobs-received') {
+                renderSchoolJobApplications();
             }
         }
 
@@ -1460,35 +1937,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 saveData();
                 renderSchoolsList();
             }
-        }
-
-        function renderSchoolsList() {
-            const container = document.getElementById('schoolsListContainer');
-            container.innerHTML = "";
-            if(!appData.schools || !appData.schools.length) {
-                container.innerHTML = `<div class="col-12"><div class="alert alert-secondary text-center">Aucune école enregistrée pour le moment. Cliquez sur « 1. Créer une École » ci-dessus.</div></div>`;
-                return;
-            }
-            appData.schools.forEach(s => {
-                container.innerHTML += `
-                    <div class="col-md-6">
-                        <div class="card shadow-sm border-start border-4 border-primary p-3">
-                            <div class="d-flex align-items-center gap-3">
-                                ${s.logo ? `<img src="${s.logo}" class="logo-preview">` : `<i class="fa fa-school fa-2x text-primary"></i>`}
-                                <div class="flex-grow-1">
-                                    <h5 class="m-0 fw-bold text-primary">${s.name}</h5>
-                                    <small class="text-muted d-block">${s.appartenance} — ${s.province} / ${s.commune}</small>
-                                </div>
-                                <div class="d-flex gap-1">
-                                    <button class="btn btn-outline-primary btn-sm" onclick="openSchoolFormWithCode('${s.id}')" title="Modifier"><i class="fa fa-edit"></i></button>
-                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteSchool('${s.id}')" title="Supprimer"><i class="fa fa-trash"></i></button>
-                                    <button class="btn btn-primary btn-sm fw-bold" onclick="promptLoginCode('${s.id}')"><i class="fa fa-lock me-1"></i> Ouvrir <i class="fa fa-arrow-right"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
         }
 
         function openSchoolFormWithCode(id) {
@@ -1849,7 +2297,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             let html = `<div style="padding:10px;">`;
             students.forEach(st => {
                 html += `
-                    <div style="border:1px solid #000; width:9cm; height:7cm; background:#FFD400; padding:5px; margin:0 auto 20px; page-break-after:always; font-family:Arial; font-size:10px; position:relative;">
+                    <div style="border:1px solid #000; width:9cm; height:7cm; background:#FFD400; padding:5px; margin:0 auto 20px; page-break-inside:avoid; break-inside:avoid; font-family:Arial; font-size:10px; position:relative;">
                         <div style="text-align:center; font-weight:bold;">République Démocratique du Congo</div>
                         <div style="text-align:center; font-size:12px; font-weight:bold; text-decoration:underline; margin:5px 0;">CARTE D'ÉLÈVE</div>
                         <div><b>Nom :</b> ${st.name}</div>
@@ -2539,7 +2987,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const invoiceNum = 'FAC-' + Date.now().toString().slice(-6);
             const dateHeure = new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
 
-            let html = `<div style="border: 2px solid #000; padding: 20px; font-family: Arial, sans-serif; background: #fff; color: #000;"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;"><div><h3 style="margin: 0; font-weight: bold; text-transform: uppercase;">${s.name}</h3><small>${s.appartenance}</small><br><small>${s.province} / ${s.commune}</small></div><div style="text-align: right;">${s.logo ? `<img src="${s.logo}" style="max-height: 60px; max-width: 100px;">` : `<h4 style="margin:0;">EDU-RDC</h4>`}</div></div><div style="text-align: center; margin-bottom: 20px;"><h4 style="margin: 0; text-decoration: underline; font-weight: bold;">REÇU DE PAIEMENT / FACTURE</h4><span style="font-size: 12px; font-weight: bold;">N° : ${invoiceNum}</span> | <small>Date : ${dateHeure}</small></div><table style="width: 100%; margin-bottom: 20px; font-size: 14px; border-collapse: collapse;"><tr><td style="padding: 4px 0;"><strong>Type :</strong> ${data.typeOp}</td><td style="padding: 4px 0; text-align: right;"><strong>Concerne :</strong> ${data.concerne}</td></tr><tr><td style="padding: 4px 0;"><strong>Nom :</strong> ${data.nom}</td><td style="padding: 4px 0; text-align: right;"><strong>Poste/Classe :</strong> ${data.detail || '—'}</td></tr></table><table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;" border="1"><thead><tr style="background-color: #f2f2f2;"><th style="padding: 8px; text-align: left;">Motif</th><th style="padding: 8px; text-align: right;">Total Dû ($)</th><th style="padding: 8px; text-align: right;">Payé ($)</th><th style="padding: 8px; text-align: right;">Reste ($)</th></tr></thead><tbody><tr><td style="padding: 8px;">${data.motif}</td><td style="padding: 8px; text-align: right;">${data.total || data.paye} $</td><td style="padding: 8px; text-align: right; font-weight: bold; color: green;">${data.paye} $</td><td style="padding: 8px; text-align: right; font-weight: bold; color: red;">${data.reste || 0} $</td></tr></tbody></table><div style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px;"><div style="text-align: center; width: 40%;"><p style="margin-bottom: 50px;"><strong>Signature Payeur</strong></p><p>_______________________</p></div><div style="text-align: center; width: 40%;"><p style="margin-bottom: 50px;"><strong>Pour la Caisse</strong></p><p>_______________________</p></div></div></div>`;
+            let html = `<div style="border: 2px solid #000; padding: 20px; font-family: Arial, sans-serif; background: #fff; color: #000; page-break-inside: avoid; break-inside: avoid;"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;"><div><h3 style="margin: 0; font-weight: bold; text-transform: uppercase;">${s.name}</h3><small>${s.appartenance}</small><br><small>${s.province} / ${s.commune}</small></div><div style="text-align: right;">${s.logo ? `<img src="${s.logo}" style="max-height: 60px; max-width: 100px;">` : `<h4 style="margin:0;">EDU-RDC</h4>`}</div></div><div style="text-align: center; margin-bottom: 20px;"><h4 style="margin: 0; text-decoration: underline; font-weight: bold;">REÇU DE PAIEMENT / FACTURE</h4><span style="font-size: 12px; font-weight: bold;">N° : ${invoiceNum}</span> | <small>Date : ${dateHeure}</small></div><table style="width: 100%; margin-bottom: 20px; font-size: 14px; border-collapse: collapse;"><tr><td style="padding: 4px 0;"><strong>Type :</strong> ${data.typeOp}</td><td style="padding: 4px 0; text-align: right;"><strong>Concerne :</strong> ${data.concerne}</td></tr><tr><td style="padding: 4px 0;"><strong>Nom :</strong> ${data.nom}</td><td style="padding: 4px 0; text-align: right;"><strong>Poste/Classe :</strong> ${data.detail || '—'}</td></tr></table><table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;" border="1"><thead><tr style="background-color: #f2f2f2;"><th style="padding: 8px; text-align: left;">Motif</th><th style="padding: 8px; text-align: right;">Total Dû ($)</th><th style="padding: 8px; text-align: right;">Payé ($)</th><th style="padding: 8px; text-align: right;">Reste ($)</th></tr></thead><tbody><tr><td style="padding: 8px;">${data.motif}</td><td style="padding: 8px; text-align: right;">${data.total || data.paye} $</td><td style="padding: 8px; text-align: right; font-weight: bold; color: green;">${data.paye} $</td><td style="padding: 8px; text-align: right; font-weight: bold; color: red;">${data.reste || 0} $</td></tr></tbody></table><div style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px;"><div style="text-align: center; width: 40%;"><p style="margin-bottom: 50px;"><strong>Signature Payeur</strong></p><p>_______________________</p></div><div style="text-align: center; width: 40%;"><p style="margin-bottom: 50px;"><strong>Pour la Caisse</strong></p><p>_______________________</p></div></div></div>`;
             document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Facture / Reçu de Paiement`;
             document.getElementById('invoicePrintArea').innerHTML = html;
             const modalEl = document.getElementById('invoiceModal');
@@ -2750,20 +3198,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('displaySchoolProgram').innerText = s.program || 'Aucun programme configuré.';
         }
 
-        // --- 11. COMMUNICATION ---
-        function handleSaveCommunication() {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            const message = document.getElementById('announcementText').value.trim();
-            if(!message) { alert("Saisir un message !"); return; }
-            s.communications.push({ date: new Date().toLocaleDateString('fr-FR'), message });
-            saveData(); renderCommTable(); alert("Communication publiée !");
-        }
-        function renderCommTable() {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            if(!s || !s.communications) return;
-            document.getElementById('commTableBody').innerHTML = s.communications.length ? s.communications.map((c, i) => `<tr><td>${c.date}</td><td>${c.message}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${i},1);saveData();renderCommTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune communication.</td></tr>`;
-        }
-
         function verifyAndOpenDashboardTab(tabId) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if (!s) return;
@@ -2774,6 +3208,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
                 document.getElementById(tabId).classList.add('active');
                 if(tabId === 'tab-analytics') renderAnalyticsCharts();
+                if(tabId === 'tab-jobs-received') renderSchoolJobApplications();
             } else {
                 alert("Code secret incorrect !");
             }
