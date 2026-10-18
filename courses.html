@@ -92,7 +92,7 @@
     .bulletin-container .note .code{float:right}
     .bulletin-container .dots{display:inline-block;min-width:60px;border-bottom:1px dotted #000}
 
-    /* IMPRESSION CORRIGÉE - RESPECT DES NORMES ET SANS MORCELLEMENT */
+    /* IMPRESSION NORMES EXACTES CODE 1 */
     @media print{
      @page{size:A4 portrait;margin:5mm}
      body{background:#fff; padding:0; margin:0;}
@@ -101,7 +101,6 @@
      .bulletin-container .page{box-shadow:none;margin:0 auto;width:100%;padding:0; page-break-inside: avoid; break-inside: avoid;}
      *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
      
-     /* CORRECTION IMPRESSION MODALE / RAPPORTS */
      body > *:not(.modal) { display: none !important; }
      .modal { position: absolute !important; left: 0 !important; top: 0 !important; margin: 0 !important; padding: 0 !important; display: block !important; overflow: visible !important; z-index: 9999 !important; background: #fff !important; width: 100% !important; }
      .modal-dialog { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
@@ -133,11 +132,11 @@
     }
     .dash-btn i { font-size: 18px; }
     .dash-btn:hover {
-        background-color: #6610f2;
+        background-color: #0d6efd;
         color: #ffffff !important;
-        border-color: #6610f2;
+        border-color: #0d6efd;
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(102, 16, 242, 0.2);
+        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
     }
     .dash-btn:hover i { color: #ffffff !important; }
 
@@ -219,7 +218,7 @@
     </div>
     <!-- Spinner End -->
 
-    <!-- NAVIGATION PRINCIPALE HARMONISÉE (NORMES CODE 1) -->
+    <!-- NAVIGATION PRINCIPALE NORMES STRICTES CODE 1 -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0 no-print">
         <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5" onclick="showSection('view-portal')">
             <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
@@ -252,7 +251,7 @@
 
     <div class="container-fluid py-4 px-lg-5">
 
-        <!-- PORTAIL PRINCIPAL -->
+        <!-- PORTAIL PRINCIPAL (NORME STRUCTURALE CODE 1) -->
         <div id="view-portal" class="view-section active">
             <div class="text-center mb-4">
                 <h6 class="section-title bg-white text-center text-primary px-3">Portail Officiel</h6>
@@ -286,6 +285,22 @@
                 </div>
             </div>
 
+            <!-- BARRE DE RECHERCHE DYNAMIQUE EXACTE DU CODE 1 (RÉACTICITÉ IMMEDIATE À LA SAISIE + BOUTON) -->
+            <div class="container py-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="card shadow border-0 p-3">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-primary text-white border-0"><i class="fa fa-search"></i></span>
+                                <input type="text" id="searchSchoolInput" class="form-control border-0 fs-5" placeholder="Rechercher une école par son nom, province, commune..." onkeyup="filterSchoolsList()" oninput="filterSchoolsList()">
+                                <button class="btn btn-primary px-4 fw-bold" type="button" onclick="filterSchoolsList()"><i class="fa fa-search me-1"></i> Rechercher</button>
+                                <button class="btn btn-success px-4 fw-bold" type="button" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- ÉVÉNEMENTS SCOLAIRES EN LIGNE (PUBLICATION DE 7 JOURS SEULEMENT) -->
             <div class="card shadow-sm border-0 mb-4 bg-light">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -297,25 +312,12 @@
                 </div>
             </div>
 
-            <!-- BARRE DE RECHERCHE DYNAMIQUE DE L'ÉCOLE (STYLE CODE 1) -->
-            <div class="container py-3">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="input-group mb-3 shadow-sm">
-                            <span class="input-group-text bg-primary text-white"><i class="fa fa-search"></i></span>
-                            <input type="text" id="searchSchoolInput" class="form-control py-3" placeholder="Rechercher une école par son nom, province..." oninput="filterSchoolsList()">
-                            <button class="btn btn-primary px-4 fw-bold" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="text-center wow fadeInUp mt-4" data-wow-delay="0.1s">
                 <h6 class="section-title bg-white text-center text-primary px-3">Répertoire</h6>
                 <h1 class="mb-4">Liste des Établissements Enregistrés</h1>
             </div>
             
-            <div id="schoolsListContainer" class="row g-3"></div>
+            <div id="schoolsListContainer" class="row g-4"></div>
         </div>
 
         <!-- FORMULAIRE ÉCOLE -->
@@ -511,21 +513,21 @@
                     </div>
 
                     <!-- TABLEAU DE BORD MODERNE -->
-                    <div class="dashboard-section mt-4 p-3 bg-white rounded shadow-sm border border-top-4 border-indigo">
+                    <div class="dashboard-section mt-4 p-3 bg-white rounded shadow-sm border border-top-4 border-primary">
                         <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
-                            <h6 class="m-0 fw-bold text-indigo"><i class="fa fa-tachometer-alt me-2"></i>TABLEAU DE BORD</h6>
-                            <span class="badge bg-indigo text-white">Pro 2026</span>
+                            <h6 class="m-0 fw-bold text-primary"><i class="fa fa-tachometer-alt me-2"></i>TABLEAU DE BORD</h6>
+                            <span class="badge bg-primary text-white">Pro 2026</span>
                         </div>
                         <div class="row g-2">
                             <div class="col-12">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-analytics')">
-                                    <i class="fa fa-chart-pie text-indigo"></i>
+                                    <i class="fa fa-chart-pie text-primary"></i>
                                     <span>Analytique & KPIs (Graphiques)</span>
                                 </button>
                             </div>
                             <div class="col-12">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-carte-eleve')">
-                                    <i class="fa fa-id-card text-indigo"></i>
+                                    <i class="fa fa-id-card text-primary"></i>
                                     <span>Carte d'Élève & Impression Mass</span>
                                 </button>
                             </div>
@@ -543,61 +545,61 @@
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-hierarchie')">
-                                    <i class="fa fa-sitemap text-indigo"></i>
+                                    <i class="fa fa-sitemap text-primary"></i>
                                     <span>Direction</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-classes')">
-                                    <i class="fa fa-door-open text-indigo"></i>
+                                    <i class="fa fa-door-open text-primary"></i>
                                     <span>Classes</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-profs')">
-                                    <i class="fa fa-chalkboard-teacher text-indigo"></i>
+                                    <i class="fa fa-chalkboard-teacher text-primary"></i>
                                     <span>Enseignants</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-eleves-reg')">
-                                    <i class="fa fa-user-graduate text-indigo"></i>
+                                    <i class="fa fa-user-graduate text-primary"></i>
                                     <span>Élèves</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-cours')">
-                                    <i class="fa fa-book-open text-indigo"></i>
+                                    <i class="fa fa-book-open text-primary"></i>
                                     <span>Cours</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-notes')">
-                                    <i class="fa fa-edit text-indigo"></i>
+                                    <i class="fa fa-edit text-primary"></i>
                                     <span>Notes</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-bulletins')">
-                                    <i class="fa fa-file-invoice text-indigo"></i>
+                                    <i class="fa fa-file-invoice text-primary"></i>
                                     <span>Bulletins</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-frais')">
-                                    <i class="fa fa-wallet text-indigo"></i>
+                                    <i class="fa fa-wallet text-primary"></i>
                                     <span>Caisse & Paiements</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-presences')">
-                                    <i class="fa fa-clipboard-check text-indigo"></i>
+                                    <i class="fa fa-clipboard-check text-primary"></i>
                                     <span>Présences</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-discipline')">
-                                    <i class="fa fa-gavel text-indigo"></i>
+                                    <i class="fa fa-gavel text-primary"></i>
                                     <span>Discipline</span>
                                 </button>
                             </div>
@@ -784,7 +786,6 @@
                         <div class="tab-pane" id="tab-carte-eleve">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-id-card me-2"></i>4.1. Carte d'Élève (Recto, Verso & Impression en Masse)</h5>
                             
-                            <!-- SÉLECTION CLASSE ET ÉLÈVE POUR EDITION DE CARTE ET ENREGISTREMENT EN CLASSE -->
                             <div class="row g-2 mb-3 p-3 bg-light rounded border no-print">
                                 <div class="col-md-6">
                                     <label class="fw-bold">1. Choisir la Classe de l'Élève :</label>
@@ -1434,7 +1435,7 @@
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ RESTAURÉE -->
+    <!-- SCRIPT JS AVEC RECHERCHE ET RENDU STRICTEMENT EXACTS AU CODE 1 -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
@@ -1504,6 +1505,7 @@
             }
         }
 
+        /* RECHERCHE ET RENDU DES ÉCOLES EXACETS AU COMPORTEMENT DU CODE 1 */
         function filterSchoolsList() {
             const query = document.getElementById('searchSchoolInput').value.toLowerCase().trim();
             renderSchoolsList(query);
@@ -1513,31 +1515,39 @@
             const container = document.getElementById('schoolsListContainer');
             container.innerHTML = "";
             if(!appData.schools || !appData.schools.length) {
-                container.innerHTML = `<div class="col-12"><div class="alert alert-secondary text-center">Aucune école enregistrée pour le moment. Cliquez sur « 1. Créer une École » ci-dessus.</div></div>`;
+                container.innerHTML = `<div class="col-12"><div class="alert alert-secondary text-center py-4 fs-5"><i class="fa fa-info-circle me-2"></i>Aucune école enregistrée pour le moment. Cliquez sur « 1. Créer une École » ci-dessus.</div></div>`;
                 return;
             }
 
-            const list = appData.schools.filter(s => s.name.toLowerCase().includes(filterQuery) || (s.province && s.province.toLowerCase().includes(filterQuery)));
+            const list = appData.schools.filter(s => {
+                const nameMatch = s.name ? s.name.toLowerCase().includes(filterQuery) : false;
+                const provMatch = s.province ? s.province.toLowerCase().includes(filterQuery) : false;
+                const comMatch = s.commune ? s.commune.toLowerCase().includes(filterQuery) : false;
+                const distMatch = s.district ? s.district.toLowerCase().includes(filterQuery) : false;
+                return nameMatch || provMatch || comMatch || distMatch;
+            });
 
             if(!list.length) {
-                container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Aucune école ne correspond à : <b>"${filterQuery}"</b></div></div>`;
+                container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center py-4 fs-5"><i class="fa fa-exclamation-triangle me-2"></i>Aucun établissement scolaire trouvé correspondant à : <b>"${filterQuery}"</b></div></div>`;
                 return;
             }
 
+            /* AFFICHAGE DES CARTES D'ÉCOLE AUX NORMES CODE 1 */
             list.forEach(s => {
                 container.innerHTML += `
-                    <div class="col-md-6">
-                        <div class="card shadow-sm border-start border-4 border-primary p-3 bg-light">
-                            <div class="d-flex align-items-center gap-3">
-                                ${s.logo ? `<img src="${s.logo}" class="logo-preview">` : `<i class="fa fa-school fa-2x text-primary"></i>`}
-                                <div class="flex-grow-1">
-                                    <h5 class="m-0 fw-bold text-primary">${s.name}</h5>
-                                    <small class="text-muted d-block">${s.appartenance} — ${s.province} / ${s.commune}</small>
-                                </div>
-                                <div class="d-flex gap-1">
-                                    <button class="btn btn-outline-primary btn-sm" onclick="openSchoolFormWithCode('${s.id}')" title="Modifier"><i class="fa fa-edit"></i></button>
-                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteSchool('${s.id}')" title="Supprimer"><i class="fa fa-trash"></i></button>
-                                    <button class="btn btn-primary btn-sm fw-bold" onclick="promptLoginCode('${s.id}')"><i class="fa fa-lock me-1"></i> Ouvrir <i class="fa fa-arrow-right"></i></button>
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="course-item bg-white shadow-sm rounded overflow-hidden h-100 border">
+                            <div class="position-relative overflow-hidden text-center p-3 bg-light border-bottom">
+                                ${s.logo ? `<img class="img-fluid logo-preview shadow-sm" src="${s.logo}" alt="Logo" style="height:90px; width:90px; object-fit:cover;">` : `<div class="bg-primary text-white d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm" style="width:80px; height:80px;"><i class="fa fa-university fa-2x"></i></div>`}
+                            </div>
+                            <div class="p-4 text-center">
+                                <h5 class="mb-2 fw-bold text-primary">${s.name}</h5>
+                                <p class="text-muted small mb-2"><i class="fa fa-building me-1"></i>${s.appartenance}</p>
+                                <p class="text-secondary small mb-3"><i class="fa fa-map-marker-alt me-1 text-danger"></i>${s.province} — ${s.commune} (${s.district || ''})</p>
+                                <div class="d-flex justify-content-center gap-2 pt-2 border-top">
+                                    <button class="btn btn-sm btn-outline-primary fw-bold" onclick="openSchoolFormWithCode('${s.id}')" title="Modifier"><i class="fa fa-edit me-1"></i>Éditer</button>
+                                    <button class="btn btn-sm btn-outline-danger fw-bold" onclick="deleteSchool('${s.id}')" title="Supprimer"><i class="fa fa-trash me-1"></i>Effacer</button>
+                                    <button class="btn btn-sm btn-primary fw-bold px-3" onclick="promptLoginCode('${s.id}')"><i class="fa fa-lock me-1"></i> Accéder</button>
                                 </div>
                             </div>
                         </div>
@@ -3149,7 +3159,7 @@
         setTimeout(function () { 
             const rectoHtml = document.getElementById('recto').outerHTML;
             const versoHtml = document.getElementById('verso').outerHTML;
-            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Impression Carte d'Élève`;
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Impression Carte d'Élève`;
             document.getElementById('invoicePrintArea').innerHTML = `<div style="padding:20px; display:flex; flex-direction:column; align-items:center; gap:20px;">${rectoHtml}${versoHtml}</div>`;
             new bootstrap.Modal(document.getElementById('invoiceModal')).show();
         }, 150);
