@@ -1313,8 +1313,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ RESTAURÉE -->
     <script>
-        // Clé de stockage identique à votre code d'origine pour ne pas perdre l'école enregistrée
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+                const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
         let appData = { schools: [], adminRequests: [], jobApplications: [] };
         let activeSchoolId = null;
@@ -1323,19 +1322,49 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         let chartFinancesInstance = null;
 
         window.onload = function() {
-            // Système de récupération automatique des données existantes (V10, V11, etc.)
-            let saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
-            if (saved) { 
-                try { 
-                    appData = JSON.parse(saved); 
-                    if(!appData.adminRequests) appData.adminRequests = [];
-                    if(!appData.jobApplications) appData.jobApplications = [];
-                } catch(e){} 
+            // Récupération sécurisée et fusion de toutes les écoles enregistrées dans toutes les versions
+            let keysToTry = [STORAGE_KEY, "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
+            let combinedSchools = [];
+            
+            keysToTry.forEach(key => {
+                let savedItem = localStorage.getItem(key);
+                if (savedItem) {
+                    try {
+                        let parsed = JSON.parse(savedItem);
+                        let list = Array.isArray(parsed) ? parsed : (parsed.schools || []);
+                        list.forEach(school => {
+                            if (school && school.id && !combinedSchools.some(s => s.id === school.id)) {
+                                combinedSchools.push(school);
+                            }
+                        });
+                        if (parsed.adminRequests && Array.isArray(parsed.adminRequests)) {
+                            appData.adminRequests = [...new Set([...appData.adminRequests, ...parsed.adminRequests])];
+                        }
+                        if (parsed.jobApplications && Array.isArray(parsed.jobApplications)) {
+                            appData.jobApplications = [...new Set([...appData.jobApplications, ...parsed.jobApplications])];
+                        }
+                    } catch(e) {}
+                }
+            });
+
+            if (combinedSchools.length > 0) {
+                appData.schools = combinedSchools;
+            } else {
+                let saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) { 
+                    try { appData = JSON.parse(saved); } catch(e){} 
+                }
             }
+
+            if(!appData.adminRequests) appData.adminRequests = [];
+            if(!appData.jobApplications) appData.jobApplications = [];
+            if(!appData.schools) appData.schools = [];
+
             saveData();
             renderSchoolsList();
             renderPublicEvents();
         };
+
 
         function saveData() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); 
