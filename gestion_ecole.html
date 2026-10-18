@@ -1,224 +1,267 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EDU-RDC – Plateforme Intégrée de Gestion Scolaire Professionnelle</title>
+    <meta charset="utf-8">
+    <title>EDU-RDC – Plateforme Intégrée de Gestion Scolaire Professionnelle</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
 
-<!-- Fonts & Icons -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
 
-<!-- Bootstrap Styles -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 
-<!-- Chart.js pour les graphiques analytiques professionnels -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-<style>
-.view-section { display: none; }
-.view-section.active { display: block; }
-.school-card { cursor: pointer; transition: transform 0.2s; }
-.school-card:hover { transform: translateY(-3px); }
-body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
-.sidebar-menu .list-group-item { font-weight: 600; font-size: 14px; border: 0; border-radius: 6px; margin-bottom: 4px; }
-.sidebar-menu .list-group-item.active { background-color: #0d6efd; color: #fff; }
-.logo-preview { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #dee2e6; }
-.params-submenu { padding-left: 10px; background-color: #f8f9fa; border-left: 3px solid #0d6efd; margin-top: 5px; display: none; }
-.params-submenu.show { display: block; }
-.tab-pane { display: none; }
-.tab-pane.active { display: block; }
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
-/* STYLES BULLETIN INTEGRE */
-.bulletin-container *{box-sizing:border-box}
-.bulletin-container .page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:7mm 8mm;font-size:8px;box-shadow:0 2px 10px rgba(0,0,0,.25);color:#000;font-family:Arial,Helvetica,sans-serif; page-break-inside: avoid; break-inside: avoid;}
-.bulletin-container .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
-.bulletin-container .logo{width:64px;height:50px;display:flex;align-items:center;justify-content:center}
-.bulletin-container .logo img,.bulletin-container .logo svg{max-width:100%;max-height:100%}
-.bulletin-container .ht{text-align:center;font-weight:bold;font-size:11.5px;line-height:1.3;flex:1;padding:0 6px}
-.bulletin-container .idn{display:inline-block;border:1px solid #000;padding:1px 4px;font-weight:bold;margin:2px 0}
-.bulletin-container .idn input{width:160px}
-.bulletin-container input{font:inherit;color:#000;border:0;background:transparent;outline:none;border-radius:0}
-.bulletin-container input:disabled{cursor:not-allowed}
-.bulletin-container table.ident{width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:2px}
-.bulletin-container table.ident td{padding:2px 4px;font-size:8.5px;border:0;vertical-align:bottom;white-space:nowrap}
-.bulletin-container table.ident input{border-bottom:1px dotted #000;width:62%}
-.bulletin-container table.ident input.s{width:12%}
-.bulletin-container table.ident input.d{width:30%}
-.bulletin-container table.ident input.bx{width:70%;letter-spacing:5px;border:1px solid #000;padding:1px 3px}
-.bulletin-container .title{text-align:center;font-weight:bold;font-size:8.5px;border:1px solid #000;padding:2px;margin-bottom:2px}
-.bulletin-container .title input{width:2.2em;border-bottom:1px dotted #000;text-align:center;font-weight:bold}
-.bulletin-container table.b{width:100%;border-collapse:collapse;table-layout:fixed}
-.bulletin-container table.b td,.bulletin-container table.b th{border:1px solid #000;padding:0 1px;height:13.5px;text-align:center;font-size:8px;line-height:1.1;overflow:hidden}
-.bulletin-container table.b th{font-weight:bold}
-.bulletin-container table.b td.nm{text-align:left;padding-left:3px;position:relative}
-.bulletin-container table.b tr.dom td{font-weight:bold;font-size:8.5px;position:relative}
-.bulletin-container table.b tr.sdom td{font-weight:bold;font-size:8px;position:relative}
-.bulletin-container table.b tr.sub td{font-weight:bold}
-.bulletin-container table.b tr.bold td{font-weight:bold}
-.bulletin-container table.b td.blk{background:#000}
-.bulletin-container table.b td.gry{background:#d1d5db}
-.bulletin-container table.b td.tt{position:relative;font-weight:bold}
-.bulletin-container table.b td.tt i{position:absolute;left:1px;top:0;font-size:6px;color:#444;font-style:normal;font-weight:normal}
-.bulletin-container table.b td input{width:100%;border:0;text-align:center;padding:0;height:12px}
-.bulletin-container td.side{vertical-align:top;text-align:left !important;padding:3px 4px !important;font-size:8px;line-height:1.6}
-.bulletin-container td.side .sc{text-align:center;margin-top:10px}
-.bulletin-container .strk.on{text-decoration:line-through}
-.bulletin-container .foot{margin-top:3px;font-size:8.5px;line-height:1.7}
-.bulletin-container .foot .box{border:1px solid #000;padding:2px 4px}
-.bulletin-container .foot input.long{width:38%;border-bottom:1px dotted #000}
-.bulletin-container .foot .row{display:flex;justify-content:space-between}
-.bulletin-container .foot .c{text-align:center}
-.bulletin-container .foot .r{text-align:right}
-.bulletin-container .note{font-size:8px;margin-top:3px}
-.bulletin-container .note .code{float:right}
-.bulletin-container .dots{display:inline-block;min-width:60px;border-bottom:1px dotted #000}
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
-/* IMPRESSION CORRIGÉE - RESPECT DES NORMES ET SANS MORCELLEMENT */
-@media print{
- @page{size:A4 portrait;margin:5mm}
- body{background:#fff; padding:0; margin:0;}
- .no-print,.navbar,.sidebar-menu,.dashboard-section,.nav-tabs,.modal-header,.modal-footer,.boutons,.p-3,.btn{display:none !important}
- .wrap{overflow:visible;padding:0}
- .bulletin-container .page{box-shadow:none;margin:0 auto;width:100%;padding:0; page-break-inside: avoid; break-inside: avoid;}
- *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
- 
- /* CORRECTION IMPRESSION MODALE / RAPPORTS */
- body > *:not(.modal) { display: none !important; }
- .modal { position: absolute !important; left: 0 !important; top: 0 !important; margin: 0 !important; padding: 0 !important; display: block !important; overflow: visible !important; z-index: 9999 !important; background: #fff !important; width: 100% !important; }
- .modal-dialog { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
- .modal-content { border: 0 !important; box-shadow: none !important; background: transparent !important; }
- .modal-body { padding: 0 !important; margin: 0 !important; }
- .carte { page-break-inside: avoid; break-inside: avoid; margin: 0 auto 10px !important; }
-}
+    <!-- Chart.js pour les graphiques analytiques professionnels -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-.border-top-4 { border-top-width: 4px !important; }
-.border-indigo { border-color: #6610f2 !important; }
-.text-indigo { color: #6610f2 !important; }
-.bg-indigo { background-color: #6610f2 !important; }
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
 
-.dash-btn {
-    width: 100%;
-    padding: 10px 6px;
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #343a40;
-    transition: all 0.2s ease-in-out;
-}
-.dash-btn i { font-size: 18px; }
-.dash-btn:hover {
-    background-color: #6610f2;
-    color: #ffffff !important;
-    border-color: #6610f2;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(102, 16, 242, 0.2);
-}
-.dash-btn:hover i { color: #ffffff !important; }
+    <style>
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+    .school-card { cursor: pointer; transition: transform 0.2s; }
+    .school-card:hover { transform: translateY(-3px); }
+    body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
+    .sidebar-menu .list-group-item { font-weight: 600; font-size: 14px; border: 0; border-radius: 6px; margin-bottom: 4px; }
+    .sidebar-menu .list-group-item.active { background-color: #0d6efd; color: #fff; }
+    .logo-preview { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #dee2e6; }
+    .params-submenu { padding-left: 10px; background-color: #f8f9fa; border-left: 3px solid #0d6efd; margin-top: 5px; display: none; }
+    .params-submenu.show { display: block; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
 
-/* STYLES CARTE D'ÉLÈVE */
-.card-zone { overflow-x: auto; padding-bottom: 6px; }
-.carte {
-    width: 9cm; height: 7cm; margin: 0 auto 10px;
-    background: #FFD400; color: #000;
-    border: 1px solid #000; border-radius: 4px;
-    padding: 0.18cm 0.25cm; position: relative; overflow: hidden;
-    font-size: 6.4pt; line-height: 1.25; page-break-inside: avoid; break-inside: avoid;
-}
-.centre { text-align: center; }
-.rdc { font-weight: bold; font-size: 7.4pt; }
-.titre { font-weight: bold; font-size: 9pt; letter-spacing: .5px; margin: 1px 0; text-decoration: underline; }
-.carte input[type=text] {
-    font: inherit; color: #000; background: transparent;
-    border: 0; border-bottom: 1px dotted #000; border-radius: 0;
-    padding: 0; margin: 0; outline: none; min-width: 0;
-}
-.carte input[type=text]:focus { background: rgba(255,255,255,.45); }
-.carte input[type=text]:disabled { opacity: 1; -webkit-text-fill-color: #000; border-bottom-color: transparent; }
-.ligne { display: flex; align-items: baseline; gap: 3px; margin: 2.2px 0; white-space: nowrap; }
-.ligne b { font-weight: bold; }
-.ligne input.long { flex: 1; }
-.corps { display: flex; gap: 0.2cm; margin-top: 2px; }
-.champs { flex: 1; min-width: 0; }
-.photo-col { width: 2.3cm; flex: none; }
-.photo {
-    width: 2.3cm; height: 2.8cm; border: 1px solid #000; background: rgba(255,255,255,.35);
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    font-size: 5.8pt; font-weight: bold; overflow: hidden; cursor: pointer; position: relative;
-}
-.photo img { width: 100%; height: 100%; object-fit: cover; display: none; }
-.photo.has img { display: block; }
-.photo.has span { display: none; }
-.photo.verrou { cursor: default; }
-#fichierPhoto { display: none; }
-.pied { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 3px; }
-.chef { text-align: center; font-weight: bold; min-width: 2.6cm; }
-.chef .sceau { font-weight: normal; font-style: italic; margin-top: 1px; }
-.delivre { text-align: right; padding-top: 1px; }
-.delivre .l { display: flex; align-items: baseline; justify-content: flex-end; gap: 2px; }
-.autorites {
-    position: absolute; left: 0.25cm; right: 0.25cm; bottom: 0.14cm;
-    text-align: center; font-size: 5.3pt; font-weight: bold; line-height: 1.2;
-}
-.verso { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.verso .titre-verso { font-weight: bold; font-size: 12pt; letter-spacing: 1px; margin-bottom: 0.2cm; }
-.verso svg { width: 4.4cm; height: 4.4cm; }
-.boutons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px auto; max-width: 9cm; }
-.boutons button {
-    flex: 1 1 40%; padding: 10px 8px; font-size: 14px; font-weight: bold;
-    border: 0; border-radius: 8px; color: #fff; cursor: pointer;
-}
-.b-save { background: #1b7f3b; } .b-edit { background: #b36b00; }
-.b-print { background: #1a56b8; } .b-close { background: #666; }
-.boutons button:disabled { opacity: .45; cursor: not-allowed; }
-.msg { text-align: center; font-size: 13px; min-height: 18px; margin: 2px 0 8px; }
-.msg.ok { color: #1b7f3b; } .msg.err { color: #b00020; }
-.fond { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 10; padding: 16px; }
-.fond.on { display: flex; }
-.boite { background: #fff; border-radius: 10px; padding: 18px; width: 100%; max-width: 340px; }
-.boite h4 { margin: 0 0 6px; font-size: 16px; }
-.boite p { margin: 0 0 10px; font-size: 13px; color: #444; }
-.boite input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #999; border-radius: 6px; text-transform: uppercase; }
-.boite .rang { display: flex; gap: 8px; margin-top: 12px; }
-.boite .rang button { flex: 1; padding: 10px; font-size: 15px; border: 0; border-radius: 6px; color: #fff; cursor: pointer; }
-#codeErr { color: #b00020; font-size: 13px; min-height: 16px; margin-top: 6px; }
-</style>
+    /* STYLES BULLETIN INTEGRE */
+    .bulletin-container *{box-sizing:border-box}
+    .bulletin-container .page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:7mm 8mm;font-size:8px;box-shadow:0 2px 10px rgba(0,0,0,.25);color:#000;font-family:Arial,Helvetica,sans-serif; page-break-inside: avoid; break-inside: avoid;}
+    .bulletin-container .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+    .bulletin-container .logo{width:64px;height:50px;display:flex;align-items:center;justify-content:center}
+    .bulletin-container .logo img,.bulletin-container .logo svg{max-width:100%;max-height:100%}
+    .bulletin-container .ht{text-align:center;font-weight:bold;font-size:11.5px;line-height:1.3;flex:1;padding:0 6px}
+    .bulletin-container .idn{display:inline-block;border:1px solid #000;padding:1px 4px;font-weight:bold;margin:2px 0}
+    .bulletin-container .idn input{width:160px}
+    .bulletin-container input{font:inherit;color:#000;border:0;background:transparent;outline:none;border-radius:0}
+    .bulletin-container input:disabled{cursor:not-allowed}
+    .bulletin-container table.ident{width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:2px}
+    .bulletin-container table.ident td{padding:2px 4px;font-size:8.5px;border:0;vertical-align:bottom;white-space:nowrap}
+    .bulletin-container table.ident input{border-bottom:1px dotted #000;width:62%}
+    .bulletin-container table.ident input.s{width:12%}
+    .bulletin-container table.ident input.d{width:30%}
+    .bulletin-container table.ident input.bx{width:70%;letter-spacing:5px;border:1px solid #000;padding:1px 3px}
+    .bulletin-container .title{text-align:center;font-weight:bold;font-size:8.5px;border:1px solid #000;padding:2px;margin-bottom:2px}
+    .bulletin-container .title input{width:2.2em;border-bottom:1px dotted #000;text-align:center;font-weight:bold}
+    .bulletin-container table.b{width:100%;border-collapse:collapse;table-layout:fixed}
+    .bulletin-container table.b td,.bulletin-container table.b th{border:1px solid #000;padding:0 1px;height:13.5px;text-align:center;font-size:8px;line-height:1.1;overflow:hidden}
+    .bulletin-container table.b th{font-weight:bold}
+    .bulletin-container table.b td.nm{text-align:left;padding-left:3px;position:relative}
+    .bulletin-container table.b tr.dom td{font-weight:bold;font-size:8.5px;position:relative}
+    .bulletin-container table.b tr.sdom td{font-weight:bold;font-size:8px;position:relative}
+    .bulletin-container table.b tr.sub td{font-weight:bold}
+    .bulletin-container table.b tr.bold td{font-weight:bold}
+    .bulletin-container table.b td.blk{background:#000}
+    .bulletin-container table.b td.gry{background:#d1d5db}
+    .bulletin-container table.b td.tt{position:relative;font-weight:bold}
+    .bulletin-container table.b td.tt i{position:absolute;left:1px;top:0;font-size:6px;color:#444;font-style:normal;font-weight:normal}
+    .bulletin-container table.b td input{width:100%;border:0;text-align:center;padding:0;height:12px}
+    .bulletin-container td.side{vertical-align:top;text-align:left !important;padding:3px 4px !important;font-size:8px;line-height:1.6}
+    .bulletin-container td.side .sc{text-align:center;margin-top:10px}
+    .bulletin-container .strk.on{text-decoration:line-through}
+    .bulletin-container .foot{margin-top:3px;font-size:8.5px;line-height:1.7}
+    .bulletin-container .foot .box{border:1px solid #000;padding:2px 4px}
+    .bulletin-container .foot input.long{width:38%;border-bottom:1px dotted #000}
+    .bulletin-container .foot .row{display:flex;justify-content:space-between}
+    .bulletin-container .foot .c{text-align:center}
+    .bulletin-container .foot .r{text-align:right}
+    .bulletin-container .note{font-size:8px;margin-top:3px}
+    .bulletin-container .note .code{float:right}
+    .bulletin-container .dots{display:inline-block;min-width:60px;border-bottom:1px dotted #000}
+
+    /* IMPRESSION CORRIGÉE - RESPECT DES NORMES ET SANS MORCELLEMENT */
+    @media print{
+     @page{size:A4 portrait;margin:5mm}
+     body{background:#fff; padding:0; margin:0;}
+     .no-print,.navbar,.sidebar-menu,.dashboard-section,.nav-tabs,.modal-header,.modal-footer,.boutons,.p-3,.btn{display:none !important}
+     .wrap{overflow:visible;padding:0}
+     .bulletin-container .page{box-shadow:none;margin:0 auto;width:100%;padding:0; page-break-inside: avoid; break-inside: avoid;}
+     *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+     
+     /* CORRECTION IMPRESSION MODALE / RAPPORTS */
+     body > *:not(.modal) { display: none !important; }
+     .modal { position: absolute !important; left: 0 !important; top: 0 !important; margin: 0 !important; padding: 0 !important; display: block !important; overflow: visible !important; z-index: 9999 !important; background: #fff !important; width: 100% !important; }
+     .modal-dialog { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+     .modal-content { border: 0 !important; box-shadow: none !important; background: transparent !important; }
+     .modal-body { padding: 0 !important; margin: 0 !important; }
+     .carte { page-break-inside: avoid; break-inside: avoid; margin: 0 auto 10px !important; }
+    }
+
+    .border-top-4 { border-top-width: 4px !important; }
+    .border-indigo { border-color: #6610f2 !important; }
+    .text-indigo { color: #6610f2 !important; }
+    .bg-indigo { background-color: #6610f2 !important; }
+
+    .dash-btn {
+        width: 100%;
+        padding: 10px 6px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #343a40;
+        transition: all 0.2s ease-in-out;
+    }
+    .dash-btn i { font-size: 18px; }
+    .dash-btn:hover {
+        background-color: #6610f2;
+        color: #ffffff !important;
+        border-color: #6610f2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 16, 242, 0.2);
+    }
+    .dash-btn:hover i { color: #ffffff !important; }
+
+    /* STYLES CARTE D'ÉLÈVE */
+    .card-zone { overflow-x: auto; padding-bottom: 6px; }
+    .carte {
+        width: 9cm; height: 7cm; margin: 0 auto 10px;
+        background: #FFD400; color: #000;
+        border: 1px solid #000; border-radius: 4px;
+        padding: 0.18cm 0.25cm; position: relative; overflow: hidden;
+        font-size: 6.4pt; line-height: 1.25; page-break-inside: avoid; break-inside: avoid;
+    }
+    .centre { text-align: center; }
+    .rdc { font-weight: bold; font-size: 7.4pt; }
+    .titre { font-weight: bold; font-size: 9pt; letter-spacing: .5px; margin: 1px 0; text-decoration: underline; }
+    .carte input[type=text] {
+        font: inherit; color: #000; background: transparent;
+        border: 0; border-bottom: 1px dotted #000; border-radius: 0;
+        padding: 0; margin: 0; outline: none; min-width: 0;
+    }
+    .carte input[type=text]:focus { background: rgba(255,255,255,.45); }
+    .carte input[type=text]:disabled { opacity: 1; -webkit-text-fill-color: #000; border-bottom-color: transparent; }
+    .ligne { display: flex; align-items: baseline; gap: 3px; margin: 2.2px 0; white-space: nowrap; }
+    .ligne b { font-weight: bold; }
+    .ligne input.long { flex: 1; }
+    .corps { display: flex; gap: 0.2cm; margin-top: 2px; }
+    .champs { flex: 1; min-width: 0; }
+    .photo-col { width: 2.3cm; flex: none; }
+    .photo {
+        width: 2.3cm; height: 2.8cm; border: 1px solid #000; background: rgba(255,255,255,.35);
+        display: flex; align-items: center; justify-content: center; text-align: center;
+        font-size: 5.8pt; font-weight: bold; overflow: hidden; cursor: pointer; position: relative;
+    }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .photo.has img { display: block; }
+    .photo.has span { display: none; }
+    .photo.verrou { cursor: default; }
+    #fichierPhoto { display: none; }
+    .pied { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 3px; }
+    .chef { text-align: center; font-weight: bold; min-width: 2.6cm; }
+    .chef .sceau { font-weight: normal; font-style: italic; margin-top: 1px; }
+    .delivre { text-align: right; padding-top: 1px; }
+    .delivre .l { display: flex; align-items: baseline; justify-content: flex-end; gap: 2px; }
+    .autorites {
+        position: absolute; left: 0.25cm; right: 0.25cm; bottom: 0.14cm;
+        text-align: center; font-size: 5.3pt; font-weight: bold; line-height: 1.2;
+    }
+    .verso { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .verso .titre-verso { font-weight: bold; font-size: 12pt; letter-spacing: 1px; margin-bottom: 0.2cm; }
+    .verso svg { width: 4.4cm; height: 4.4cm; }
+    .boutons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px auto; max-width: 9cm; }
+    .boutons button {
+        flex: 1 1 40%; padding: 10px 8px; font-size: 14px; font-weight: bold;
+        border: 0; border-radius: 8px; color: #fff; cursor: pointer;
+    }
+    .b-save { background: #1b7f3b; } .b-edit { background: #b36b00; }
+    .b-print { background: #1a56b8; } .b-close { background: #666; }
+    .boutons button:disabled { opacity: .45; cursor: not-allowed; }
+    .msg { text-align: center; font-size: 13px; min-height: 18px; margin: 2px 0 8px; }
+    .msg.ok { color: #1b7f3b; } .msg.err { color: #b00020; }
+    .fond { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 10; padding: 16px; }
+    .fond.on { display: flex; }
+    .boite { background: #fff; border-radius: 10px; padding: 18px; width: 100%; max-width: 340px; }
+    .boite h4 { margin: 0 0 6px; font-size: 16px; }
+    .boite p { margin: 0 0 10px; font-size: 13px; color: #444; }
+    .boite input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #999; border-radius: 6px; text-transform: uppercase; }
+    .boite .rang { display: flex; gap: 8px; margin-top: 12px; }
+    .boite .rang button { flex: 1; padding: 10px; font-size: 15px; border: 0; border-radius: 6px; color: #fff; cursor: pointer; }
+    #codeErr { color: #b00020; font-size: 13px; min-height: 16px; margin-top: 6px; }
+    </style>
 </head>
-<body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow-sm sticky-top p-0 no-print">
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Chargement...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- NAVIGATION PRINCIPALE HARMONISÉE (NORMES CODE 1) -->
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0 no-print">
         <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5" onclick="showSection('view-portal')">
-            <h2 class="m-0 text-primary"><i class="fa fa-school me-3"></i>EDU-RDC</h2>
+            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
         </a>
-        <div class="ms-auto p-3 d-flex align-items-center gap-2 flex-wrap">
-            <button class="btn btn-outline-warning btn-sm fw-bold" onclick="showSection('view-check-candidate-reply')"><i class="fa fa-envelope-open me-1"></i> Suivi Réponse Emploi</button>
-            <button class="btn btn-outline-danger btn-sm fw-bold" onclick="openAdminCentralPanel()"><i class="fa fa-user-shield me-1"></i> Admin Central (Confidentiel)</button>
-            <button class="btn btn-outline-primary btn-sm fw-bold" onclick="showSection('view-portal')"><i class="fa fa-home me-1"></i> Accueil Portail</button>
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0 align-items-center">
+                <a href="javascript:void(0);" class="nav-item nav-link active" onclick="showSection('view-portal')">Accueil</a>
+                <button class="btn btn-outline-warning btn-sm fw-bold mx-2 my-1" onclick="showSection('view-check-candidate-reply')"><i class="fa fa-envelope-open me-1"></i> Suivi Réponse Emploi</button>
+                <button class="btn btn-outline-danger btn-sm fw-bold mx-2 my-1" onclick="openAdminCentralPanel()"><i class="fa fa-user-shield me-1"></i> Admin Central</button>
+            </div>
+            <a href="javascript:void(0);" onclick="showSection('view-portal')" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
     </nav>
+
+    <!-- Header Start (STYLE CODE 1) -->
+    <div class="container-fluid bg-primary py-5 mb-5 page-header">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 text-center">
+                    <h1 class="display-3 text-white animated slideInDown">Plateforme Intégrée EDU-RDC</h1>
+                    <p class="fs-4 text-white animated slideInDown">Répertoire national et gestion professionnelle des institutions éducationnelles en RDC</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Header End -->
 
     <div class="container-fluid py-4 px-lg-5">
 
         <!-- PORTAIL PRINCIPAL -->
         <div id="view-portal" class="view-section active">
             <div class="text-center mb-4">
-                <h2 class="text-primary fw-bold">Plateforme de Gestion Scolaire EDU-RDC</h2>
-                <p class="text-muted">Sélectionnez un service ci-dessous :</p>
+                <h6 class="section-title bg-white text-center text-primary px-3">Portail Officiel</h6>
+                <h1 class="mb-5">Services & Actions Principales</h1>
             </div>
 
             <div class="row g-4 mb-4">
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openSchoolForm()">
+                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card bg-light" onclick="openSchoolForm()">
                         <i class="fa fa-university fa-3x text-primary mb-3"></i>
                         <h4 class="fw-bold">1. Créer une École</h4>
                         <p class="text-muted small">Enregistrer un nouvel établissement scolaire avec son identité complète.</p>
@@ -226,7 +269,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openDirectRegistration()">
+                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card bg-light" onclick="openDirectRegistration()">
                         <i class="fa fa-user-plus fa-3x text-success mb-3"></i>
                         <h4 class="fw-bold">2. Inscription Élèves</h4>
                         <p class="text-muted small">Inscrire directement un élève dans une école active.</p>
@@ -234,7 +277,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card" onclick="openJobApplicationSection()">
+                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card bg-light" onclick="openJobApplicationSection()">
                         <i class="fa fa-briefcase fa-3x text-warning mb-3"></i>
                         <h4 class="fw-bold">3. Demande d'Emploi</h4>
                         <p class="text-muted small">Postuler à un poste d'enseignant ou d'administratif.</p>
@@ -254,22 +297,24 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </div>
             </div>
 
-            <!-- BARRE DE RECHERCHE DYNAMIQUE DE L'ÉCOLE -->
-            <div class="card shadow-sm border-0 p-3 mb-4 bg-white">
-                <div class="row align-items-center">
-                    <div class="col-md-6 mb-2 mb-md-0">
-                        <h4 class="m-0 text-primary fw-bold"><i class="fa fa-list me-2"></i>Liste des Écoles Enregistrées</h4>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="input-group">
+            <!-- BARRE DE RECHERCHE DYNAMIQUE DE L'ÉCOLE (STYLE CODE 1) -->
+            <div class="container py-3">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="input-group mb-3 shadow-sm">
                             <span class="input-group-text bg-primary text-white"><i class="fa fa-search"></i></span>
-                            <input type="text" id="searchSchoolInput" class="form-control" placeholder="Rechercher une école par son Nom..." oninput="filterSchoolsList()">
-                            <button class="btn btn-primary fw-bold" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter</button>
+                            <input type="text" id="searchSchoolInput" class="form-control py-3" placeholder="Rechercher une école par son nom, province..." oninput="filterSchoolsList()">
+                            <button class="btn btn-primary px-4 fw-bold" onclick="openSchoolForm()"><i class="fa fa-plus-circle me-1"></i> Ajouter</button>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <div class="text-center wow fadeInUp mt-4" data-wow-delay="0.1s">
+                <h6 class="section-title bg-white text-center text-primary px-3">Répertoire</h6>
+                <h1 class="mb-4">Liste des Établissements Enregistrés</h1>
+            </div>
+            
             <div id="schoolsListContainer" class="row g-3"></div>
         </div>
 
@@ -1279,6 +1324,75 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     </div>
 
+    <!-- Footer Start (STYLE CODE 1) -->
+    <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn no-print" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-3">Liens Rapides</h4>
+                    <a class="btn btn-link" href="#">À propos de nous</a>
+                    <a class="btn btn-link" href="#">Contactez-nous</a>
+                    <a class="btn btn-link" href="#">Politique de Confidentialité</a>
+                    <a class="btn btn-link" href="#">Termes & Conditions</a>
+                    <a class="btn btn-link" href="#">Aide & FAQ</a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-3">Contact</h4>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>Avenue de l'École, Kinshasa, RDC</p>
+                    <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+243 000 000 000</p>
+                    <p class="mb-2"><i class="fa fa-envelope me-3"></i>contact@edu-nc.gouv.cd</p>
+                    <div class="d-flex pt-2">
+                        <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-youtube"></i></a>
+                        <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-3">Galerie</h4>
+                    <div class="row g-2 pt-2">
+                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-1.jpg" alt=""></div>
+                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-2.jpg" alt=""></div>
+                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-3.jpg" alt=""></div>
+                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-2.jpg" alt=""></div>
+                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-3.jpg" alt=""></div>
+                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-1.jpg" alt=""></div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-3">Bulletin d'Information</h4>
+                    <p>Restez informés des communiqués officiels du Ministère de l'Éducation Nationale.</p>
+                    <div class="position-relative mx-auto" style="max-width: 400px;">
+                        <input class="form-control border-0 w-100 py-3 ps-4 pe-5" type="text" placeholder="Votre email">
+                        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">S'inscrire</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="copyright">
+                <div class="row">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        &copy; <a class="border-bottom" href="#">EDU-RDC</a>, Tous Droits Réservés.
+                        Conçu pour la Gestion des Institutions Éducationnelles en RDC
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="footer-menu">
+                            <a href="#">Accueil</a>
+                            <a href="#">Cookies</a>
+                            <a href="#">Aide</a>
+                            <a href="#">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
     <!-- MODAL FACTURE / REÇU DE PAIEMENT & IMPRESSION DE LISTE ET BULLETIN -->
     <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg">
@@ -1311,9 +1425,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       </div>
     </div>
 
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="js/main.js"></script>
+
     <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ RESTAURÉE -->
     <script>
-                const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
         let appData = { schools: [], adminRequests: [], jobApplications: [] };
         let activeSchoolId = null;
@@ -1322,7 +1445,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         let chartFinancesInstance = null;
 
         window.onload = function() {
-            // Récupération sécurisée et fusion de toutes les écoles enregistrées dans toutes les versions
             let keysToTry = [STORAGE_KEY, "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
             let combinedSchools = [];
             
@@ -1365,7 +1487,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderPublicEvents();
         };
 
-
         function saveData() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); 
         }
@@ -1383,7 +1504,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-        /* --- 2. BARRE DE RECHERCHE DYNAMIQUE DE L'ÉCOLE --- */
         function filterSchoolsList() {
             const query = document.getElementById('searchSchoolInput').value.toLowerCase().trim();
             renderSchoolsList(query);
@@ -1397,17 +1517,17 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 return;
             }
 
-            const list = appData.schools.filter(s => s.name.toLowerCase().includes(filterQuery));
+            const list = appData.schools.filter(s => s.name.toLowerCase().includes(filterQuery) || (s.province && s.province.toLowerCase().includes(filterQuery)));
 
             if(!list.length) {
-                container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Aucune école ne correspond au nom : <b>"${filterQuery}"</b></div></div>`;
+                container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Aucune école ne correspond à : <b>"${filterQuery}"</b></div></div>`;
                 return;
             }
 
             list.forEach(s => {
                 container.innerHTML += `
                     <div class="col-md-6">
-                        <div class="card shadow-sm border-start border-4 border-primary p-3">
+                        <div class="card shadow-sm border-start border-4 border-primary p-3 bg-light">
                             <div class="d-flex align-items-center gap-3">
                                 ${s.logo ? `<img src="${s.logo}" class="logo-preview">` : `<i class="fa fa-school fa-2x text-primary"></i>`}
                                 <div class="flex-grow-1">
@@ -1426,7 +1546,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             });
         }
 
-        /* --- 3. RECHERCHE ÉLÈVES (PALMARÈS) ET STAFF --- */
         function renderSearchStudentsResults() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
@@ -1498,7 +1617,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             `).join('');
         }
 
-        /* --- 4. GESTION DES DEMANDES D'EMPLOI ET CODES SECRETS --- */
         function openJobApplicationSection() {
             const select = document.getElementById('jobSchoolSelect');
             if(!appData.schools || !appData.schools.length) {
@@ -1525,26 +1643,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             appData.jobApplications.push({
                 id: 'JOB-' + Date.now(),
-                schoolId,
-                applicantName,
-                role,
-                phone,
-                diploma,
-                message,
+                schoolId, applicantName, role, phone, diploma, message,
                 candidateCode: secretCode,
                 date,
                 reply: ''
             });
 
             saveData();
-
-            alert(
-                ` VOTRE DEMANDE D'EMPLOI A ÉTÉ TRANSMISE AVEC SUCCÈS !\n\n` +
-                ` CONSERVEZ CE CODE SECRET CONFIDENTIEL CANDIDAT :\n` +
-                ` [ ${secretCode} ]\n\n` +
-                `Le propriétaire de l'école traitera votre demande. Utilisez ce code sur le portail (Suivi Réponse Emploi) pour ouvrir sa réponse personnelle.`
-            );
-
+            alert(`VOTRE DEMANDE D'EMPLOI A ÉTÉ TRANSMISE AVEC SUCCÈS !\n\nCONSERVEZ CE CODE SECRET CANDIDAT :\n[ ${secretCode} ]\n\nUtilisez ce code sur le portail pour consulter la réponse personnelle de l'école.`);
             showSection('view-portal');
         }
 
@@ -1560,7 +1666,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 return;
             }
 
-            tbody.innerHTML = apps.map((a, i) => `
+            tbody.innerHTML = apps.map((a) => `
                 <tr>
                     <td><small>${a.date}</small></td>
                     <td><b>${a.applicantName}</b></td>
@@ -1586,13 +1692,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const app = appData.jobApplications.find(x => x.id === jobId);
             if(!app) return;
 
-            const replyText = prompt(`[RÉPONDRE À ${app.applicantName.toUpperCase()}]\n\nSaisissez votre réponse confidentielle qui sera lisible uniquement par le candidat :`, app.reply || '');
+            const replyText = prompt(`[RÉPONDRE À ${app.applicantName.toUpperCase()}]\n\nSaisissez votre réponse confidentielle :`, app.reply || '');
             if(replyText === null) return;
 
             app.reply = replyText.trim();
             saveData();
             renderSchoolJobApplications();
-            alert("Votre réponse confidentielle a été enregistrée avec succès !");
+            alert("Réponse enregistrée avec succès !");
         }
 
         function verifyCandidateCodeAndDisplayReply() {
@@ -1608,7 +1714,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             if(!app) {
                 area.style.display = 'block';
-                area.innerHTML = `<div class="alert alert-danger fw-bold"><i class="fa fa-times-circle me-2"></i>Code Candidat invalide ou introuvable. Veuillez vérifier votre code.</div>`;
+                area.innerHTML = `<div class="alert alert-danger fw-bold"><i class="fa fa-times-circle me-2"></i>Code Candidat invalide ou introuvable.</div>`;
                 return;
             }
 
@@ -1624,19 +1730,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         <p><b>Poste demandé :</b> ${app.role}</p>
                         <p><b>Date de soumission :</b> ${app.date}</p>
                         <hr>
-                        <h5 class="fw-bold text-primary"><i class="fa fa-comment-dots me-2"></i>Réponse Confidentielle du Propriétaire de l'École :</h5>
+                        <h5 class="fw-bold text-primary"><i class="fa fa-comment-dots me-2"></i>Réponse Confidentielle de l'École :</h5>
                         <div class="p-3 bg-light rounded border border-2 border-primary mt-2 fs-6">
-                            ${app.reply ? `<b>${app.reply}</b>` : `<i class="text-muted">Le propriétaire de l'école n'a pas encore répondu à votre demande. Revenez ultérieurement.</i>`}
+                            ${app.reply ? `<b>${app.reply}</b>` : `<i class="text-muted">L'école n'a pas encore répondu à votre demande. Revenez ultérieurement.</i>`}
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        /* --- 5. ÉVÉNEMENTS SCOLAIRES (VALIDE 7 JOURS SEULEMENT) --- */
         function handleSaveCommunication() {
             if (currentUserSession.role !== 'owner') {
-                alert("Seul le propriétaire de l'école a le droit de publier les futurs événements !");
+                alert("Seul le propriétaire de l'école a le droit de publier des annonces !");
                 return;
             }
 
@@ -1655,7 +1760,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderCommTable(); 
             renderPublicEvents();
             document.getElementById('announcementText').value = '';
-            alert("Événement/Annonce publié(e) avec succès ! La publication restera en ligne pendant 7 jours.");
+            alert("Annonce publiée avec succès ! Restante en ligne 7 jours.");
         }
 
         function renderCommTable() {
@@ -1665,19 +1770,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
             document.getElementById('commTableBody').innerHTML = s.communications.length ? s.communications.map((c, i) => {
-                const age = now - (c.timestamp || 0);
-                const isExpired = age > SEVEN_DAYS_MS;
+                const isExpired = (now - (c.timestamp || 0)) > SEVEN_DAYS_MS;
                 return `
                     <tr>
                         <td>${c.date}</td>
                         <td>${c.message}</td>
-                        <td>
-                            ${isExpired ? `<span class="badge bg-secondary">Expiré (+7 jours)</span>` : `<span class="badge bg-success">En Ligne (Actif)</span>`}
-                        </td>
+                        <td>${isExpired ? `<span class="badge bg-secondary">Expiré (+7 jours)</span>` : `<span class="badge bg-success">En Ligne (Actif)</span>`}</td>
                         <td><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${i},1);saveData();renderCommTable();renderPublicEvents();"><i class="fa fa-trash"></i></button></td>
                     </tr>
                 `;
-            }).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucune communication ou événement publié.</td></tr>`;
+            }).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucune communication publiée.</td></tr>`;
         }
 
         function renderPublicEvents() {
@@ -1690,14 +1792,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             (appData.schools || []).forEach(s => {
                 (s.communications || []).forEach(c => {
-                    const age = now - (c.timestamp || 0);
-                    if(age <= SEVEN_DAYS_MS) {
-                        activeEvents.push({
-                            schoolName: s.name,
-                            logo: s.logo,
-                            date: c.date,
-                            message: c.message
-                        });
+                    if((now - (c.timestamp || 0)) <= SEVEN_DAYS_MS) {
+                        activeEvents.push({ schoolName: s.name, logo: s.logo, date: c.date, message: c.message });
                     }
                 });
             });
@@ -1743,25 +1839,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
             if(element) element.classList.add('active');
 
-            if(tabId === 'tab-presences') {
-                refreshPresenceOptions();
-            } else if(tabId === 'tab-frais') {
-                refreshPaymentOptions();
-            } else if(tabId === 'tab-bulletins') {
-                refreshBulletinOptions();
-            } else if(tabId === 'tab-cours') {
-                renderCoursesTable();
-            } else if(tabId === 'tab-eleves-reg') {
-                renderStudentsTable();
-            } else if(tabId === 'tab-carte-eleve') {
-                refreshCardOptions();
-            } else if(tabId === 'tab-discipline') {
-                refreshDisciplineOptions();
-            } else if(tabId === 'tab-analytics') {
-                renderAnalyticsCharts();
-            } else if(tabId === 'tab-jobs-received') {
-                renderSchoolJobApplications();
-            }
+            if(tabId === 'tab-presences') refreshPresenceOptions();
+            else if(tabId === 'tab-frais') refreshPaymentOptions();
+            else if(tabId === 'tab-bulletins') refreshBulletinOptions();
+            else if(tabId === 'tab-cours') renderCoursesTable();
+            else if(tabId === 'tab-eleves-reg') renderStudentsTable();
+            else if(tabId === 'tab-carte-eleve') refreshCardOptions();
+            else if(tabId === 'tab-discipline') refreshDisciplineOptions();
+            else if(tabId === 'tab-analytics') renderAnalyticsCharts();
+            else if(tabId === 'tab-jobs-received') renderSchoolJobApplications();
         }
 
         function closeRubricTab() {
@@ -1783,53 +1869,42 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function renderAdminCentralData() {
             const reqTbody = document.getElementById('adminRequestsTableBody');
-            if(!appData.adminRequests || !appData.adminRequests.length) {
-                reqTbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">Aucune demande de récupération reçue pour le moment.</td></tr>`;
-            } else {
-                reqTbody.innerHTML = appData.adminRequests.map((r, i) => {
-                    let currentCode = 'Inconnu';
-                    if(r.type === 'École') {
-                        const sch = appData.schools.find(s => s.id === r.schoolId);
-                        if(sch) currentCode = sch.secretCode;
-                    } else if(r.type === 'Enseignant') {
-                        const sch = appData.schools.find(s => s.id === r.schoolId);
-                        if(sch && sch.teachers[r.teacherIndex]) currentCode = sch.teachers[r.teacherIndex].secretCode;
-                    }
-
-                    return `
-                        <tr>
-                            <td><small>${r.date}</small></td>
-                            <td><span class="badge bg-${r.type==='École'?'primary':'success'}">${r.type}</span></td>
-                            <td><b class="text-primary">${r.schoolName}</b></td>
-                            <td>${r.applicantName}</td>
-                            <td><b>${r.contact}</b></td>
-                            <td><small>${r.message}</small></td>
-                            <td><span class="badge bg-danger p-2 fs-6">${currentCode}</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-success fw-bold mb-1" onclick="copyCodeToClipboard('${currentCode}')"><i class="fa fa-copy me-1"></i> Copier Code</button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRequest(${i})"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            }
-
-            const schTbody = document.getElementById('adminSchoolsTableBody');
-            if(!appData.schools || !appData.schools.length) {
-                schTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Aucune école enregistrée dans le système.</td></tr>`;
-            } else {
-                schTbody.innerHTML = appData.schools.map((s) => `
+            reqTbody.innerHTML = (!appData.adminRequests || !appData.adminRequests.length) ? `<tr><td colspan="8" class="text-center text-muted py-3">Aucune demande de récupération reçue.</td></tr>` : appData.adminRequests.map((r, i) => {
+                let currentCode = 'Inconnu';
+                if(r.type === 'École') {
+                    const sch = appData.schools.find(s => s.id === r.schoolId);
+                    if(sch) currentCode = sch.secretCode;
+                } else if(r.type === 'Enseignant') {
+                    const sch = appData.schools.find(s => s.id === r.schoolId);
+                    if(sch && sch.teachers[r.teacherIndex]) currentCode = sch.teachers[r.teacherIndex].secretCode;
+                }
+                return `
                     <tr>
-                        <td><small class="text-muted">${s.id}</small></td>
-                        <td><b class="text-primary">${s.name}</b> <br><small class="text-muted">${s.appartenance}</small></td>
-                        <td>${s.province} / ${s.commune}</td>
-                        <td><span class="badge bg-dark p-2 fs-6 text-warning"><i class="fa fa-key me-1"></i> ${s.secretCode}</span></td>
+                        <td><small>${r.date}</small></td>
+                        <td><span class="badge bg-${r.type==='École'?'primary':'success'}">${r.type}</span></td>
+                        <td><b class="text-primary">${r.schoolName}</b></td>
+                        <td>${r.applicantName}</td>
+                        <td><b>${r.contact}</b></td>
+                        <td><small>${r.message}</small></td>
+                        <td><span class="badge bg-danger p-2 fs-6">${currentCode}</span></td>
                         <td>
-                            <button class="btn btn-sm btn-warning fw-bold" onclick="resetSchoolSecretCode('${s.id}')"><i class="fa fa-sync me-1"></i> Régénérer Code</button>
+                            <button class="btn btn-sm btn-success fw-bold mb-1" onclick="copyCodeToClipboard('${currentCode}')"><i class="fa fa-copy me-1"></i> Copier</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAdminRequest(${i})"><i class="fa fa-trash"></i></button>
                         </td>
                     </tr>
-                `).join('');
-            }
+                `;
+            }).join('');
+
+            const schTbody = document.getElementById('adminSchoolsTableBody');
+            schTbody.innerHTML = (!appData.schools || !appData.schools.length) ? `<tr><td colspan="5" class="text-center text-muted py-3">Aucune école enregistrée.</td></tr>` : appData.schools.map((s) => `
+                <tr>
+                    <td><small class="text-muted">${s.id}</small></td>
+                    <td><b class="text-primary">${s.name}</b></td>
+                    <td>${s.province} / ${s.commune}</td>
+                    <td><span class="badge bg-dark p-2 fs-6 text-warning"><i class="fa fa-key me-1"></i> ${s.secretCode}</span></td>
+                    <td><button class="btn btn-sm btn-warning fw-bold" onclick="resetSchoolSecretCode('${s.id}')"><i class="fa fa-sync me-1"></i> Régénérer</button></td>
+                </tr>
+            `).join('');
         }
 
         function copyCodeToClipboard(code) {
@@ -1838,7 +1913,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
 
         function deleteAdminRequest(i) {
-            if(confirm("Supprimer cette demande du registre ?")) {
+            if(confirm("Supprimer cette demande ?")) {
                 appData.adminRequests.splice(i, 1);
                 saveData();
                 renderAdminCentralData();
@@ -1848,58 +1923,45 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function resetSchoolSecretCode(schoolId) {
             const sch = appData.schools.find(s => s.id === schoolId);
             if(!sch) return;
-            if(confirm(`Voulez-vous générer un NOUVEAU code secret pour l'école "${sch.name}" ?`)) {
+            if(confirm(`Générer un NOUVEAU code secret pour "${sch.name}" ?`)) {
                 sch.secretCode = generateSecretCode('SEC');
                 saveData();
                 renderAdminCentralData();
-                alert(`Nouveau code secret généré : ${sch.secretCode}`);
+                alert(`Nouveau code secret : ${sch.secretCode}`);
             }
         }
 
         function handleForgottenCode(schoolId, teacherIndex = null) {
             const s = appData.schools.find(x => x.id === schoolId);
             if(!s) return;
-
             const isTeacher = teacherIndex !== null;
             const targetName = isTeacher ? s.teachers[teacherIndex].name : s.name;
 
-            const option = prompt(
-                `[RÉCUPÉRATION DU CODE - ${targetName.toUpperCase()}]\n\n` +
-                `Choisissez une option :\n` +
-                `1 : Envoyer une demande de récupération à l'Admin Central\n` +
-                `2 : Utiliser le Code Central de la plateforme\n\n` +
-                `Entrez 1 ou 2 :`
-            );
-
+            const option = prompt(`[RÉCUPÉRATION DU CODE - ${targetName.toUpperCase()}]\n\n1 : Envoyer une demande à l'Admin Central\n2 : Saisir le Code Central\n\nEntrez 1 ou 2 :`);
             if(!option) return;
 
             if(option.trim() === "1") {
-                const applicantName = prompt("Entrez votre nom complet :");
+                const applicantName = prompt("Votre nom complet :");
                 if(!applicantName) return;
-                const contact = prompt("Entrez votre numéro de téléphone ou WhatsApp pour recevoir le code :");
+                const contact = prompt("Votre téléphone / WhatsApp :");
                 if(!contact) return;
-                const message = prompt("Entrez un court motif de votre demande :");
+                const message = prompt("Motif de la demande :");
 
                 if(!appData.adminRequests) appData.adminRequests = [];
                 appData.adminRequests.push({
-                    date: new Date().toLocaleDateString('fr-FR') + ' ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
+                    date: new Date().toLocaleDateString('fr-FR'),
                     type: isTeacher ? 'Enseignant' : 'École',
                     schoolId: s.id,
                     schoolName: s.name + (isTeacher ? ` (Prof: ${targetName})` : ''),
                     teacherIndex: isTeacher ? teacherIndex : null,
-                    applicantName,
-                    contact,
-                    message: message || 'Récupération de code'
+                    applicantName, contact, message: message || 'Récupération code'
                 });
-
                 saveData();
-                alert(`Votre demande a été transmise à l'Admin Central avec succès ! Vous serez contacté au : ${contact}.`);
-            } 
-            else if(option.trim() === "2") {
-                const adminPass = prompt("Saisissez le Code Central de la plateforme :");
+                alert("Demande transmise à l'Admin Central avec succès !");
+            } else if(option.trim() === "2") {
+                const adminPass = prompt("Saisissez le Code Central :");
                 if(adminPass === ADMIN_MASTER_PASSWORD) {
-                    const code = isTeacher ? s.teachers[teacherIndex].secretCode : s.secretCode;
-                    alert(`[ACCÈS AUTORISÉ]\nLe code est : ${code}`);
+                    alert(`Code : ${isTeacher ? s.teachers[teacherIndex].secretCode : s.secretCode}`);
                 } else {
                     alert("Code Central incorrect !");
                 }
@@ -1924,16 +1986,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             showSection('view-create-school');
         }
 
-                function handleSaveSchool(e) {
+        function handleSaveSchool(e) {
             e.preventDefault();
-            
-            // Recharger d'abord les données actuelles du stockage pour éviter d'écraser les autres écoles
             let saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 try {
                     let parsed = JSON.parse(saved);
                     if (parsed && parsed.schools) {
-                        // Fusionner pour s'assurer de ne perdre aucune école
                         parsed.schools.forEach(sch => {
                             if (!appData.schools.some(s => s.id === sch.id)) {
                                 appData.schools.push(sch);
@@ -1987,19 +2046,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             }
         }
 
-
         function deleteSchool(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez saisir le code école de "${s.name}" pour confirmer la suppression :`);
+            const inputCode = prompt(`Veuillez saisir le code école de "${s.name}" pour confirmer :`);
             if(inputCode === null) return;
             if(inputCode.trim() !== s.secretCode) {
-                if(confirm("Code incorrect !\nVoulez-vous lancer la procédure de récupération de code ?")) {
-                    handleForgottenCode(id);
-                }
+                if(confirm("Code incorrect ! Voulez-vous contacter l'Admin Central ?")) handleForgottenCode(id);
                 return;
             }
-            if(confirm("Voulez-vous vraiment supprimer cette école ?")) {
+            if(confirm("Supprimer cette école définitivement ?")) {
                 appData.schools = appData.schools.filter(x => x.id !== id);
                 saveData();
                 renderSchoolsList();
@@ -2009,38 +2065,32 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function openSchoolFormWithCode(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`Veuillez entrer le code école de "${s.name}" pour modifier :`);
+            const inputCode = prompt(`Code école de "${s.name}" :`);
             if(inputCode === null) return;
-            if(inputCode.trim() === s.secretCode) {
-                openSchoolForm(id);
-            } else {
-                if(confirm("Code incorrect !\nAvez-vous oublié votre code ? Cliquez sur OK pour contacter l'Admin Central.")) {
-                    handleForgottenCode(id);
-                }
+            if(inputCode.trim() === s.secretCode) openSchoolForm(id);
+            else {
+                if(confirm("Code incorrect ! Contactez l'Admin Central.")) handleForgottenCode(id);
             }
         }
 
         function promptLoginCode(id) {
             const s = appData.schools.find(x => x.id === id);
             if(!s) return;
-            const inputCode = prompt(`[ACCÈS SÉCURISÉ]\nEntrez votre code :\n- Code École (Propriétaire)\n- Code Agent (Professeur / Enseignant)\n\npour ouvrir "${s.name}" :`);
+            const inputCode = prompt(`[ACCÈS SÉCURISÉ]\nEntrez votre code :\n- Code École (Propriétaire)\n- Code Agent (Professeur)\npour ouvrir "${s.name}" :`);
             if(inputCode === null) return;
             
             const code = inputCode.trim();
             if(code === s.secretCode) {
                 currentUserSession = { role: 'owner', name: 'Propriétaire', assignedClass: null, secretCode: s.secretCode };
-                alert("Accès autorisé en tant que Propriétaire / École.");
                 openSchoolDashboard(id);
             } else {
                 const teacherMatch = s.teachers.find(t => t.secretCode === code);
                 if(teacherMatch) {
                     currentUserSession = { role: 'teacher', name: teacherMatch.name, assignedClass: teacherMatch.titulaireClass || null, secretCode: teacherMatch.secretCode };
-                    alert(`Accès autorisé !\nBienvenue Agent / Prof. ${teacherMatch.name}.`);
+                    alert(`Bienvenue Agent / Prof. ${teacherMatch.name}.`);
                     openSchoolDashboard(id);
                 } else {
-                    if(confirm("Code incorrect !\nAvez-vous oublié votre code ? Cliquez sur OK pour contacter l'Admin Central.")) {
-                        handleForgottenCode(id);
-                    }
+                    if(confirm("Code incorrect ! Contacter l'Admin Central ?")) handleForgottenCode(id);
                 }
             }
         }
@@ -2087,11 +2137,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
 
-            const staffTbody = document.getElementById('adminStaffTableBody');
-            staffTbody.innerHTML = s.staff.length ? s.staff.map((st, i) => `<tr><td><b>${st.role}</b></td><td>${st.name}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editStaff(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteStaff(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucun cadre enregistré.</td></tr>`;
+            document.getElementById('adminStaffTableBody').innerHTML = s.staff.length ? s.staff.map((st, i) => `<tr><td><b>${st.role}</b></td><td>${st.name}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editStaff(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteStaff(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucun cadre enregistré.</td></tr>`;
 
-            const classTbody = document.getElementById('classesTableBody');
-            classTbody.innerHTML = s.classes.length ? s.classes.map((c, i) => `<tr><td>${c.niveau}</td><td><b>${c.name}</b></td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editClass(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteClass(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune classe enregistrée.</td></tr>`;
+            document.getElementById('classesTableBody').innerHTML = s.classes.length ? s.classes.map((c, i) => `<tr><td>${c.niveau}</td><td><b>${c.name}</b></td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editClass(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteClass(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune classe enregistrée.</td></tr>`;
 
             let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
 
@@ -2107,16 +2155,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('cardClassSelect').innerHTML = classOptions;
             document.getElementById('discClassSelect').innerHTML = classOptions;
 
-            const profTbody = document.getElementById('teachersTableBody');
-            profTbody.innerHTML = s.teachers.length ? s.teachers.map((t, i) => `
+            document.getElementById('teachersTableBody').innerHTML = s.teachers.length ? s.teachers.map((t, i) => `
                 <tr>
                     <td><b>${t.name}</b></td>
                     <td>${t.phone||'-'}</td>
                     <td>${t.titulaireClass||'Aucune'}</td>
-                    <td><span class="badge bg-dark text-warning p-2 fs-6"><i class="fa fa-key me-1"></i> ${t.secretCode||'Non généré'}</span></td>
+                    <td><span class="badge bg-dark text-warning p-2 fs-6"><i class="fa fa-key me-1"></i> ${t.secretCode||'—'}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTeacher(${i})" title="Modifier"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteTeacher(${i})" title="Supprimer"><i class="fa fa-trash"></i></button>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTeacher(${i})"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTeacher(${i})"><i class="fa fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucun enseignant enregistré.</td></tr>`;
@@ -2132,7 +2179,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             refreshCardOptions();
         }
 
-        // --- 0. ANALYTIQUE & GRAPHIQUES ---
         function renderAnalyticsCharts() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
@@ -2148,35 +2194,25 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             s.students.forEach(st => { if(st.sexe === 'M') countM++; else countF++; });
 
             if(chartSexeInstance) chartSexeInstance.destroy();
-            const ctxSexe = document.getElementById('chartSexe').getContext('2d');
-            chartSexeInstance = new Chart(ctxSexe, {
+            chartSexeInstance = new Chart(document.getElementById('chartSexe').getContext('2d'), {
                 type: 'doughnut',
-                data: {
-                    labels: ['Garçons (M)', 'Filles (F)'],
-                    datasets: [{ data: [countM, countF], backgroundColor: ['#0d6efd', '#d63384'] }]
-                }
+                data: { labels: ['Garçons (M)', 'Filles (F)'], datasets: [{ data: [countM, countF], backgroundColor: ['#0d6efd', '#d63384'] }] }
             });
 
-            let totalDeducted = 0;
-            let totalRemaining = 0;
+            let totalDeducted = 0, totalRemaining = 0;
             (s.studentPayments || []).forEach(p => {
                 totalDeducted += parseFloat(p.paye) || 0;
                 totalRemaining += parseFloat(p.reste) || 0;
             });
 
             if(chartFinancesInstance) chartFinancesInstance.destroy();
-            const ctxFinances = document.getElementById('chartFinances').getContext('2d');
-            chartFinancesInstance = new Chart(ctxFinances, {
+            chartFinancesInstance = new Chart(document.getElementById('chartFinances').getContext('2d'), {
                 type: 'bar',
-                data: {
-                    labels: ['Total Encaissé', 'Reste à Recouvrer'],
-                    datasets: [{ label: 'Montants ($)', data: [totalDeducted, totalRemaining], backgroundColor: ['#198754', '#dc3545'] }]
-                },
+                data: { labels: ['Total Encaissé', 'Reste à Recouvrer'], datasets: [{ label: 'Montants ($)', data: [totalDeducted, totalRemaining], backgroundColor: ['#198754', '#dc3545'] }] },
                 options: { scales: { y: { beginAtZero: true } } }
             });
         }
 
-        // --- 1. HIÉRARCHIE & DIRECTION ---
         function handleSaveAdminStaff(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2184,16 +2220,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const role = document.getElementById('staffRole').value.trim();
             const name = document.getElementById('staffName').value.trim();
 
-            if(editIdx !== "") {
-                s.staff[editIdx] = { role, name };
-                alert("Cadre modifié avec succès !");
-            } else {
-                s.staff.push({ role, name });
-                alert("Cadre enregistré avec succès !");
-            }
-            saveData(); 
-            refreshDashboardViews(); 
-            clearAdminStaffForm();
+            if(editIdx !== "") s.staff[editIdx] = { role, name };
+            else s.staff.push({ role, name });
+            saveData(); refreshDashboardViews(); clearAdminStaffForm();
+            alert("Cadre enregistré avec succès !");
         }
         function editStaff(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2216,7 +2246,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('btnStaffSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
 
-        // --- 2. CLASSES ---
         function handleSaveClass(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2224,16 +2253,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const niveau = document.getElementById('classNiveau').value;
             const name = document.getElementById('className').value.trim();
 
-            if(editIdx !== "") {
-                s.classes[editIdx] = { niveau, name };
-                alert("Classe modifiée avec succès !");
-            } else {
-                s.classes.push({ niveau, name });
-                alert("Classe enregistrée avec succès !");
-            }
-            saveData(); 
-            refreshDashboardViews(); 
-            clearClassForm();
+            if(editIdx !== "") s.classes[editIdx] = { niveau, name };
+            else s.classes.push({ niveau, name });
+            saveData(); refreshDashboardViews(); clearClassForm();
+            alert("Classe enregistrée avec succès !");
         }
         function editClass(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2255,7 +2278,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('btnClassSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
 
-        // --- 3. ENSEIGNANTS ---
         function handleSaveTeacher(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2268,15 +2290,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.teachers[editIdx].name = name;
                 s.teachers[editIdx].phone = phone;
                 s.teachers[editIdx].titulaireClass = titulaireClass;
-                alert("Enseignant modifié avec succès !");
+                alert("Enseignant modifié !");
             } else {
                 const secretCode = generateSecretCode('AGT');
                 s.teachers.push({ name, phone, titulaireClass, secretCode });
-                alert(`Enseignant enregistré avec succès !\n\nCODE AGENT ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre.`);
+                alert(`Enseignant enregistré !\n\nCODE AGENT : ${secretCode}`);
             }
-            saveData(); 
-            refreshDashboardViews(); 
-            clearTeacherForm();
+            saveData(); refreshDashboardViews(); clearTeacherForm();
         }
         function editTeacher(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2301,7 +2321,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('btnTeacherSubmit').innerText = "Enregistrer";
         }
 
-        // --- 4. ÉLÈVES ---
         function handleSaveStudent(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2314,14 +2333,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 s.students[editIdx].name = name;
                 s.students[editIdx].sexe = sexe;
                 s.students[editIdx].classe = classe;
-                alert("Élève modifié avec succès !");
             } else {
                 s.students.push({ id: 'STU-'+Date.now(), mat: 'ELV-'+Math.floor(1000+Math.random()*9000), name, sexe, classe, cardData: {} });
-                alert("Élève inscrit avec succès !");
             }
-            saveData(); 
-            renderStudentsTable(); 
-            clearStudentForm();
+            saveData(); renderStudentsTable(); clearStudentForm();
+            alert("Élève enregistré !");
         }
         function editStudent(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2344,23 +2360,21 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('studentName').value = "";
             document.getElementById('btnStudentSubmit').innerText = "Enregistrer";
         }
-
         function renderStudentsTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('studentClass').value;
             const tbody = document.getElementById('studentsTableBody');
             if(!cl) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Sélectionnez une classe.</td></tr>`; return; }
-            
             const filtered = s.students.map((st, idx) => ({...st, originalIndex: idx})).filter(x => x.classe === cl);
             tbody.innerHTML = filtered.length ? filtered.map((st) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editStudent(${st.originalIndex})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteStudent(${st.originalIndex})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucun élève inscrit dans cette classe.</td></tr>`;
         }
 
-        // --- 4.1. CARTE D'ÉLÈVE & IMPRESSION EN MASSE & ENREGISTREMENT EN CLASSE ---
         function refreshCardOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
             let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             document.getElementById('cardClassSelect').innerHTML = classOptions;
+            document.getElementById('batchCardClassSelect').innerHTML = classOptions;
             loadStudentsForCardSelect();
         }
 
@@ -2369,19 +2383,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const cl = document.getElementById('cardClassSelect').value;
             const selectEl = document.getElementById('cardStudentSelect');
             if(!cl) { selectEl.innerHTML = `<option value="" disabled selected>Choisir d'abord une classe...</option>`; return; }
-            const students = s.students.filter(x => x.classe === cl);
-            selectEl.innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + students.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
+            selectEl.innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + s.students.filter(x => x.classe === cl).map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
         }
 
         function populateCardFromSelectedStudent() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const stId = document.getElementById('cardStudentSelect').value;
-            const student = s.students.find(x => x.id === stId);
+            const student = s.students.find(x => x.id === document.getElementById('cardStudentSelect').value);
             if(!student) return;
 
             const card = student.cardData || {};
-            
-            // découpage simple du nom si postnom/prenom non remplis
             const parts = student.name.split(' ');
             document.getElementById('nom').value = card.nom || parts[0] || '';
             document.getElementById('postnom').value = card.postnom || parts[1] || '';
@@ -2389,19 +2399,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('sexe').value = card.sexe || student.sexe || 'M';
             document.getElementById('classe').value = card.classe || student.classe || '';
             
-            document.getElementById('sousDiv1').value = card.sousDiv1 || '';
-            document.getElementById('sousDiv2').value = card.sousDiv2 || '';
-            document.getElementById('an1').value = card.an1 || '2025';
-            document.getElementById('an2').value = card.an2 || '2026';
-            document.getElementById('lieuNaiss').value = card.lieuNaiss || 'Kinshasa';
-            document.getElementById('nj').value = card.nj || '01';
-            document.getElementById('nm').value = card.nm || '01';
-            document.getElementById('na').value = card.na || '2010';
-            document.getElementById('delivreA').value = card.delivreA || 'Kinshasa';
-            document.getElementById('dj').value = card.dj || '15';
-            document.getElementById('dm').value = card.dm || '09';
-            document.getElementById('da').value = card.da || '25';
-
             if(student.photo) {
                 document.getElementById('photoImg').src = student.photo;
                 document.getElementById('photo').classList.add('has');
@@ -2420,17 +2417,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             let html = `<div style="padding:10px;">`;
             students.forEach(st => {
-                const c = st.cardData || {};
                 const photoSrc = st.photo || 'https://via.placeholder.com/100x120?text=PHOTO';
                 html += `
-                    <div style="border:1px solid #000; width:9cm; height:7cm; background:#FFD400; padding:5px; margin:0 auto 20px; page-break-inside:avoid; break-inside:avoid; font-family:Arial; font-size:10px; position:relative;">
+                    <div style="border:1px solid #000; width:9cm; height:7cm; background:#FFD400; padding:5px; margin:0 auto 20px; page-break-inside:avoid; font-family:Arial; font-size:10px; position:relative;">
                         <div style="text-align:center; font-weight:bold;">République Démocratique du Congo</div>
                         <div style="text-align:center; font-size:12px; font-weight:bold; text-decoration:underline; margin:5px 0;">CARTE D'ÉLÈVE</div>
                         <div style="display:flex; justify-content:space-between;">
                             <div>
-                                <div><b>Nom :</b> ${c.nom || st.name}</div>
-                                <div><b>Postnom :</b> ${c.postnom || ''}</div>
-                                <div><b>Prénom :</b> ${c.prenom || ''}</div>
+                                <div><b>Nom :</b> ${st.name}</div>
                                 <div><b>Sexe :</b> ${st.sexe}</div>
                                 <div><b>Classe :</b> ${st.classe}</div>
                                 <div><b>Matricule :</b> ${st.mat}</div>
@@ -2439,22 +2433,17 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <img src="${photoSrc}" style="width:100%; height:100%; object-fit:cover;">
                             </div>
                         </div>
-                        <div style="position:absolute; bottom:10px; left:10px; right:10px; text-align:center; font-size:8px; font-weight:bold;">
-                            ${s.name} — ${s.province}
-                        </div>
+                        <div style="position:absolute; bottom:10px; left:10px; right:10px; text-align:center; font-size:8px; font-weight:bold;">${s.name} — ${s.province}</div>
                     </div>
                 `;
             });
             html += `</div>`;
 
-            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Impression en Masse - Cartes (${cl})`;
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Cartes (${cl})`;
             document.getElementById('invoicePrintArea').innerHTML = html;
-            const modalEl = document.getElementById('invoiceModal');
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
         }
 
-        // --- 5. COURS ---
         function handleSaveCourse(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2466,16 +2455,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const name = document.getElementById('courseName').value.trim();
             const max = parseFloat(document.getElementById('courseMax').value) || 10;
 
-            if(editIdx !== "") {
-                s.courses[cl][editIdx] = { id: s.courses[cl][editIdx].id, name, max };
-                alert("Cours modifié avec succès !");
-            } else {
-                s.courses[cl].push({ id: 'CRS-'+Date.now(), name, max });
-                alert("Cours enregistré avec succès !");
-            }
-            saveData(); 
-            renderCoursesTable(); 
-            clearCourseForm();
+            if(editIdx !== "") s.courses[cl][editIdx] = { id: s.courses[cl][editIdx].id, name, max };
+            else s.courses[cl].push({ id: 'CRS-'+Date.now(), name, max });
+            saveData(); renderCoursesTable(); clearCourseForm();
+            alert("Cours enregistré !");
         }
         function editCourse(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2509,12 +2492,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             tbody.innerHTML = list.length ? list.map((c, i) => `<tr><td><b>${c.name}</b></td><td>${c.max}</td><td>${c.max*2}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editCourse(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteCourse(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucun cours configuré.</td></tr>`;
         }
 
-        // --- 6. NOTES ---
         function loadStudentsForNotes() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('notesClassSelect').value;
-            const filtered = s.students.filter(x => x.classe === cl);
-            document.getElementById('notesStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+            document.getElementById('notesStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + s.students.filter(x => x.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
         }
         function renderNotesSheet() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2524,8 +2505,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const container = document.getElementById('notesSheetContainer');
 
             if(!stId || !courses.length) { container.innerHTML = `<p class="text-muted text-center m-0">Sélectionnez une classe avec des cours et un élève.</p>`; return; }
-
             if(!s.notes[stId]) s.notes[stId] = {};
+
             let html = `<table class="table table-sm table-bordered"><thead><tr><th>Branche</th><th>P1</th><th>P2</th><th>Ex1</th><th>P3</th><th>P4</th><th>Ex2</th></tr></thead><tbody>`;
             courses.forEach(c => {
                 const n = s.notes[stId][c.id] || {};
@@ -2549,18 +2530,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             saveData();
         }
 
-        // --- 7. BULLETINS (AVEC CLASSEMENT AUTOMATIQUE & IMPRESSION DÉDIÉE) ---
         function refreshBulletinOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
-            let classOptions = `<option value="" disabled selected>— Sélectionner Classe —</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            document.getElementById('bulletinClassSelect').innerHTML = classOptions;
+            document.getElementById('bulletinClassSelect').innerHTML = `<option value="" disabled selected>— Sélectionner Classe —</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
         }
         function loadStudentsForBulletin() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('bulletinClassSelect').value;
-            const filtered = s.students.filter(x => x.classe === cl);
-            document.getElementById('bulletinStudentSelect').innerHTML = `<option value="" disabled selected>— Sélectionner Élève —</option>` + filtered.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
+            document.getElementById('bulletinStudentSelect').innerHTML = `<option value="" disabled selected>— Sélectionner Élève —</option>` + s.students.filter(x => x.classe === cl).map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
         }
 
         function printBulletinModal() {
@@ -2569,11 +2547,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 alert("Veuillez sélectionner un élève et générer son bulletin avant d'imprimer !");
                 return;
             }
-            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Bulletin de Cotes - Impression`;
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Bulletin de Cotes`;
             document.getElementById('invoicePrintArea').innerHTML = `<div class="bulletin-container"><div class="wrap"><div class="page">${bulletinHtml}</div></div></div>`;
-            const modalEl = document.getElementById('invoiceModal');
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
         }
 
         function calculateClassRank(school, className, studentId) {
@@ -2604,99 +2580,51 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const pageContainer = document.getElementById('page');
 
             if(!student || !clName) return;
-
             const rankInfo = calculateClassRank(s, clName, student.id);
 
             const FLAG='<svg viewBox="0 0 90 60"><rect width="90" height="60" fill="#007FFF"/><polygon points="0,46 76,0 90,0 90,14 14,60 0,60" fill="#F7D618"/><polygon points="0,52 83,0 90,0 90,6 7,60 0,60" fill="#CE1021"/><polygon points="14,5 15.88,10.41 21.61,10.53 17.04,13.99 18.7,19.47 14,16.2 9.3,19.47 10.96,13.99 6.39,10.53 12.12,10.41" fill="#F7D618"/></svg>';
             const EMB='<svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="34" ry="26" fill="none" stroke="#666" stroke-dasharray="3 3"/><text x="40" y="34" text-anchor="middle" font-size="11" fill="#666" font-family="Arial">LOGO</text></svg>';
 
-            let h = '';
-            h += `<div class="hdr">
-                <div class="logo">${FLAG}</div>
-                <div class="ht">
-                    <div>REPUBLIQUE DEMOCRATIQUE DU CONGO</div>
-                    <div>MINISTERE DE L'ENSEIGNEMENT PRIMAIRE, SECONDAIRE ET TECHNIQUE</div>
-                </div>
-                <div class="logo">${s.logo ? `<img src="${s.logo}">` : EMB}</div>
-            </div>`;
-
+            let h = `<div class="hdr"><div class="logo">${FLAG}</div><div class="ht"><div>REPUBLIQUE DEMOCRATIQUE DU CONGO</div><div>MINISTERE DE L'ENSEIGNEMENT PRIMAIRE, SECONDAIRE ET TECHNIQUE</div></div><div class="logo">${s.logo ? `<img src="${s.logo}">` : EMB}</div></div>`;
             h += `<div class="idn"><b>N° ID :</b> ${student.mat || '—'}</div>`;
             h += `<table class="ident">
             <tr><td colspan="2"><b>PROVINCE</b> : ${s.province || '—'}</td></tr>
-            <tr><td style="width:50%"><b>VILLE / DISTR.</b> : ${s.district || '—'}</td>
-                <td><b>ÉLÈVE</b> : ${student.name} &nbsp;<b>SEXE</b> : ${student.sexe}</td></tr>
-            <tr><td><b>COMMUNE / TER.</b> : ${s.commune || '—'}</td>
-                <td><b>NÉ(E) À</b> : Kinshasa <b>Le</b> ..../..../......</td></tr>
-            <tr><td><b>ÉCOLE</b> : ${s.name}</td>
-                <td><b>CLASSE</b> : ${clName}</td></tr>
-            <tr><td><b>CODE</b> : ${s.id.slice(-6)}</td>
-                <td><b>N° PERM.</b> : ${student.mat}</td></tr>
-            </table>
-            <div class="title">BULLETIN DE LA <span>${clName}</span> ANNEE SCOLAIRE 2025-2026</div>`;
+            <tr><td style="width:50%"><b>VILLE / DISTR.</b> : ${s.district || '—'}</td><td><b>ÉLÈVE</b> : ${student.name} &nbsp;<b>SEXE</b> : ${student.sexe}</td></tr>
+            <tr><td><b>COMMUNE / TER.</b> : ${s.commune || '—'}</td><td><b>NÉ(E) À</b> : Kinshasa</td></tr>
+            <tr><td><b>ÉCOLE</b> : ${s.name}</td><td><b>CLASSE</b> : ${clName}</td></tr>
+            </table><div class="title">BULLETIN DE LA <span>${clName}</span> ANNEE SCOLAIRE 2025-2026</div>`;
 
-            const bl='<td class="blk"></td>', empty='<td></td>';
-            const pr=v=>`<td>${v||''}</td>`;
-
+            const bl='<td class="blk"></td>', empty='<td></td>', pr=v=>`<td>${v||''}</td>`;
             h += '<table class="b"><colgroup><col style="width:14%">'+'<col style="width:5.6%">'.repeat(12)+'<col style="width:5%"><col style="width:6.9%"><col style="width:6.9%"></colgroup><thead>';
             h += `<tr><th rowspan="3">BRANCHE</th><th colspan="6">PREMIER SEMESTRE</th><th colspan="6">SECOND SEMESTRE</th><th rowspan="3">T.G.</th><th colspan="2">REPECHAGE</th></tr>
             <tr><th rowspan="2">MAX</th><th colspan="2">TR. JOUR.</th><th colspan="2" rowspan="2">MAX EXAM.</th><th rowspan="2">TOT</th>
             <th rowspan="2">MAX</th><th colspan="2">TR. JOUR.</th><th colspan="2" rowspan="2">EXAMEN</th><th rowspan="2">TOT</th><th rowspan="2">%</th><th rowspan="2">SIGN. PROF</th></tr>
             <tr><th>1ère P</th><th>2ème P</th><th>3ème P</th><th>4ème P</th></tr></thead><tbody>`;
 
-            let totGeneralObtenu = 0;
-            let totGeneralMax = 0;
+            let totGenObt = 0, totGenMax = 0;
+            courses.forEach(c => {
+                const n = (s.notes[student.id] && s.notes[student.id][c.id]) ? s.notes[student.id][c.id] : {};
+                const p1 = n.p1 != null ? parseFloat(n.p1) : null;
+                const p2 = n.p2 != null ? parseFloat(n.p2) : null;
+                const e1 = n.e1 != null ? parseFloat(n.e1) : null;
+                const p3 = n.p3 != null ? parseFloat(n.p3) : null;
+                const p4 = n.p4 != null ? parseFloat(n.p4) : null;
+                const e2 = n.e2 != null ? parseFloat(n.e2) : null;
+                const t1 = (p1||0) + (p2||0) + (e1||0);
+                const t2 = (p3||0) + (p4||0) + (e2||0);
+                const tg = t1 + t2;
 
-            if(!courses.length) {
-                h += `<tr><td colspan="16" class="text-center p-3 text-muted">Aucun cours ni note enregistrés pour cette classe.</td></tr>`;
-            } else {
-                courses.forEach(c => {
-                    const n = (s.notes[student.id] && s.notes[student.id][c.id]) ? s.notes[student.id][c.id] : {};
-                    const p1 = n.p1 != null ? parseFloat(n.p1) : null;
-                    const p2 = n.p2 != null ? parseFloat(n.p2) : null;
-                    const e1 = n.e1 != null ? parseFloat(n.e1) : null;
-                    const p3 = n.p3 != null ? parseFloat(n.p3) : null;
-                    const p4 = n.p4 != null ? parseFloat(n.p4) : null;
-                    const e2 = n.e2 != null ? parseFloat(n.e2) : null;
+                totGenObt += tg;
+                totGenMax += (c.max * 8);
 
-                    const t1 = (p1||0) + (p2||0) + (e1||0);
-                    const t2 = (p3||0) + (p4||0) + (e2||0);
-                    const tg = t1 + t2;
+                h += `<tr><td class="nm">${c.name}</td>${pr(c.max)}${pr(p1)}${pr(p2)}${pr(c.max*2)}${pr(e1)}<td class="tt"><i>${c.max*4}</i><b>${t1||''}</b></td>${pr(c.max)}${pr(p3)}${pr(p4)}${pr(c.max*2)}${pr(e2)}<td class="tt"><i>${c.max*4}</i><b>${t2||''}</b></td><td class="tt"><i>${c.max*8}</i><b>${tg||''}</b></td>${empty}${empty}</tr>`;
+            });
 
-                    totGeneralObtenu += tg;
-                    totGeneralMax += (c.max * 8);
+            const pct = totGenMax > 0 ? ((totGenObt / totGenMax) * 100).toFixed(1) + ' %' : '';
+            h += `<tr class="bold"><td class="nm">MAXIMA GENERAUX</td>${pr(totGenMax/8||'')}${empty}${empty}${pr(totGenMax/4||'')}${empty}${pr(totGenMax/2||'')}${pr(totGenMax/8||'')}${empty}${empty}${pr(totGenMax/4||'')}${empty}${pr(totGenMax/2||'')}${pr(totGenMax||'')}<td colspan="2"></td></tr>`;
 
-                    h += `<tr>
-                        <td class="nm">${c.name}</td>
-                        ${pr(c.max)}
-                        ${pr(p1)}
-                        ${pr(p2)}
-                        ${pr(c.max*2)}
-                        ${pr(e1)}
-                        <td class="tt"><i>${c.max*4}</i><b>${t1||''}</b></td>
-                        ${pr(c.max)}
-                        ${pr(p3)}
-                        ${pr(p4)}
-                        ${pr(c.max*2)}
-                        ${pr(e2)}
-                        <td class="tt"><i>${c.max*4}</i><b>${t2||''}</b></td>
-                        <td class="tt"><i>${c.max*8}</i><b>${tg||''}</b></td>
-                        ${empty}${empty}
-                    </tr>`;
-                });
-            }
-
-            const pct = totGeneralMax > 0 ? ((totGeneralObtenu / totGeneralMax) * 100).toFixed(1) + ' %' : '';
-
-            h += `<tr class="bold"><td class="nm">MAXIMA GENERAUX</td>${pr(totGeneralMax/8||'')}${empty}${empty}${pr(totGeneralMax/4||'')}${empty}${pr(totGeneralMax/2||'')}${pr(totGeneralMax/8||'')}${empty}${empty}${pr(totGeneralMax/4||'')}${empty}${pr(totGeneralMax/2||'')}${pr(totGeneralMax||'')}<td colspan="2"></td></tr>`;
-
-            const sidecell = `<td colspan="2" rowspan="6" class="side">
-               <div>◆ PASSE (1)</div>
-               <div>◆ DOUBLE (1)</div>
-               <div>Le ..../..../20..</div>
-               <div>Le chef d’Etablissement</div>
-               <div class="sc">Sceau de l’école</div></td>`;
-
-            h += `<tr class="bold"><td class="nm">TOTAUX</td>${bl}<td>${totGeneralObtenu||''}</td>${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${pr(totGeneralObtenu||'')}${sidecell}</tr>`;
+            const sidecell = `<td colspan="2" rowspan="6" class="side"><div>◆ PASSE (1)</div><div>◆ DOUBLE (1)</div><div>Le chef d’Etablissement</div><div class="sc">Sceau</div></td>`;
+            h += `<tr class="bold"><td class="nm">TOTAUX</td>${bl}<td>${totGenObt||''}</td>${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${pr(totGenObt||'')}${sidecell}</tr>`;
             h += `<tr class="bold"><td class="nm">POURCENTAGE</td>${bl}<td>${pct}</td>${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}<td>${pct}</td></tr>`;
             h += `<tr class="bold"><td class="nm">PLACE / ELEVES</td>${bl}<td colspan="5" style="text-align:center; font-weight:bold; color:red;">${rankInfo.rank} / ${rankInfo.total}</td>${bl}<td colspan="5" style="text-align:center; font-weight:bold; color:red;">${rankInfo.rank} / ${rankInfo.total}</td></tr>`;
             h += `<tr class="bold"><td class="nm">APPLICATION</td>${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${empty}</tr>`;
@@ -2704,26 +2632,17 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             h += `<tr class="bold"><td class="nm">SIGNATURE</td>${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${empty}</tr>`;
             h += '</tbody></table>';
 
-            h += `<div class="foot">
-               <div class="box">- L'élève ne pourra passer dans la classe supérieure s'il n'a subi avec succès un examen de repêchage.</div>
-               <div class="row mt-2"><div>&nbsp;</div><div>Fait à Kinshasa, le ..../..../20...</div><div class="r">Le Chef d'Établissement</div></div>
-               <div class="c mt-2">Sceau de l'école</div>
-               <div class="row mt-2"><div><b>Signature de l'élève</b></div><div class="r"><b>Nom et Signature</b></div></div>
-            </div>`;
-
+            h += `<div class="foot"><div class="box">- L'élève ne pourra passer dans la classe supérieure s'il n'a subi avec succès un examen de repêchage.</div><div class="row mt-2"><div>&nbsp;</div><div>Fait à Kinshasa</div><div class="r">Le Chef d'Établissement</div></div><div class="c mt-2">Sceau de l'école</div></div>`;
             pageContainer.innerHTML = h;
         }
 
-        // --- 8. FRAIS SCOLAIRES & PAIEMENTS ---
         function refreshPaymentOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
             let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             document.getElementById('payClassSelect').innerHTML = classOptions;
             document.getElementById('agentPayClassSelect').innerHTML = classOptions;
-
-            const adminStaffOptions = `<option value="" disabled selected>Choisir cadre admin...</option>` + s.staff.map((st, idx) => `<option value="${idx}">${st.name} (${st.role})</option>`).join('');
-            document.getElementById('adminPayStaffSelect').innerHTML = adminStaffOptions;
+            document.getElementById('adminPayStaffSelect').innerHTML = `<option value="" disabled selected>Choisir cadre admin...</option>` + s.staff.map((st, idx) => `<option value="${idx}">${st.name} (${st.role})</option>`).join('');
 
             renderStudentPayTable();
             renderAgentPayTable();
@@ -2732,8 +2651,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         }
         function loadStudentsForPayment(cl) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const filtered = s.students.filter(x => x.classe === cl);
-            document.getElementById('payStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
+            document.getElementById('payStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + s.students.filter(x => x.classe === cl).map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
         }
         function calcStudentReste() {
             const total = parseFloat(document.getElementById('payTotal').value) || 0;
@@ -2755,29 +2673,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const date = new Date().toLocaleDateString('fr-FR');
 
             const record = { date, classe, studentId, studentName, total, paye, reste };
-
-            if(editIdx !== "") {
-                s.studentPayments[editIdx] = record;
-                alert("Paiement élève modifié avec succès !");
-            } else {
-                s.studentPayments.push(record);
-                alert("Paiement élève enregistré avec succès !");
-            }
-
-            saveData();
-            renderStudentPayTable();
-            clearStudentPayForm();
-
-            generateInvoice({
-                typeOp: "RECETTE (Frais Scolaires Élève)",
-                concerne: "Élève",
-                nom: studentName,
-                detail: classe,
-                motif: "Paiement Frais Scolaires",
-                total: total,
-                paye: paye,
-                reste: reste
-            });
+            if(editIdx !== "") s.studentPayments[editIdx] = record; else s.studentPayments.push(record);
+            saveData(); renderStudentPayTable(); clearStudentPayForm();
+            alert("Paiement élève enregistré !");
+            generateInvoice({ typeOp: "RECETTE", concerne: "Élève", nom: studentName, detail: classe, motif: "Frais Scolaires", total, paye, reste });
         }
         function editStudentPayment(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2792,31 +2691,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('btnStudentPaySubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
         }
         function deleteStudentPayment(i) {
-            if(confirm("Supprimer ce paiement ?")) {
+            if(confirm("Supprimer ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
                 s.studentPayments.splice(i, 1);
-                saveData();
-                renderStudentPayTable();
+                saveData(); renderStudentPayTable();
             }
         }
         function renderStudentPayTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.studentPayments) return;
-            const tbody = document.getElementById('studentPayTableBody');
-            tbody.innerHTML = s.studentPayments.length ? s.studentPayments.map((p, i) => `
-                <tr>
-                    <td>${p.date}</td>
-                    <td><b>${p.studentName}</b></td>
-                    <td>${p.classe}</td>
-                    <td>${p.total} $</td>
-                    <td class="text-success fw-bold">${p.paye} $</td>
-                    <td class="text-danger fw-bold">${p.reste} $</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editStudentPayment(${i})" title="Modifier"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteStudentPayment(${i})" title="Supprimer"><i class="fa fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('') : `<tr><td colspan="7" class="text-center text-muted">Aucun paiement d'élève enregistré.</td></tr>`;
+            document.getElementById('studentPayTableBody').innerHTML = s.studentPayments.length ? s.studentPayments.map((p, i) => `<tr><td>${p.date}</td><td><b>${p.studentName}</b></td><td>${p.classe}</td><td>${p.total} $</td><td class="text-success fw-bold">${p.paye} $</td><td class="text-danger fw-bold">${p.reste} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editStudentPayment(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteStudentPayment(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="7" class="text-center text-muted">Aucun paiement d'élève.</td></tr>`;
         }
         function clearStudentPayForm() {
             document.getElementById('formStudentPay').reset();
@@ -2824,20 +2708,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('payReste').value = "";
             document.getElementById('btnStudentPaySubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
-        function resetStudentPayForm() {
-            clearStudentPayForm();
-            closeRubricTab();
-        }
+        function resetStudentPayForm() { clearStudentPayForm(); closeRubricTab(); }
 
         function loadTeachersForAgentPay(cl) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            document.getElementById('agentPayTeacherSelect').innerHTML = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, idx) => `<option value="${idx}">${t.name} (${t.titulaireClass || 'Enseignant'})</option>`).join('');
+            document.getElementById('agentPayTeacherSelect').innerHTML = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, idx) => `<option value="${idx}">${t.name}</option>`).join('');
         }
         function calcAgentReste() {
-            const salaire = parseFloat(document.getElementById('agentSalaire').value) || 0;
-            const prime = parseFloat(document.getElementById('agentPrime').value) || 0;
+            const totalDu = (parseFloat(document.getElementById('agentSalaire').value) || 0) + (parseFloat(document.getElementById('agentPrime').value) || 0);
             const paye = parseFloat(document.getElementById('agentMontantPaye').value) || 0;
-            const totalDu = salaire + prime;
             const reste = totalDu - paye;
             document.getElementById('agentReste').value = reste >= 0 ? reste : 0;
         }
@@ -2846,8 +2725,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const editIdx = document.getElementById('editAgentPayIndex').value;
             const classe = document.getElementById('agentPayClassSelect').value;
-            const teacherIdx = document.getElementById('agentPayTeacherSelect').value;
-            const teacherObj = s.teachers[teacherIdx];
+            const teacherObj = s.teachers[document.getElementById('agentPayTeacherSelect').value];
             const teacherName = teacherObj ? teacherObj.name : 'Inconnu';
             const salaire = parseFloat(document.getElementById('agentSalaire').value) || 0;
             const prime = parseFloat(document.getElementById('agentPrime').value) || 0;
@@ -2856,29 +2734,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const date = new Date().toLocaleDateString('fr-FR');
 
             const record = { date, classe, teacherName, salaire, prime, paye, reste };
-
-            if(editIdx !== "") {
-                s.agentPayments[editIdx] = record;
-                alert("Paiement agent modifié avec succès !");
-            } else {
-                s.agentPayments.push(record);
-                alert("Paiement agent enregistré avec succès !");
-            }
-
-            saveData();
-            renderAgentPayTable();
-            clearAgentPayForm();
-
-            generateInvoice({
-                typeOp: "DÉPENSE (Paiement Salaire / Prime Agent)",
-                concerne: "Enseignant / Personnel",
-                nom: teacherName,
-                detail: classe,
-                motif: `Salaire (${salaire}$) + Prime (${prime}$)`,
-                total: (salaire + prime),
-                paye: paye,
-                reste: reste
-            });
+            if(editIdx !== "") s.agentPayments[editIdx] = record; else s.agentPayments.push(record);
+            saveData(); renderAgentPayTable(); clearAgentPayForm();
+            alert("Paiement agent enregistré !");
+            generateInvoice({ typeOp: "DÉPENSE", concerne: "Enseignant", nom: teacherName, detail: classe, motif: "Salaire et Prime", total: salaire+prime, paye, reste });
         }
         function editAgentPayment(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2893,31 +2752,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('btnAgentPaySubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
         }
         function deleteAgentPayment(i) {
-            if(confirm("Supprimer ce paiement agent ?")) {
+            if(confirm("Supprimer ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
                 s.agentPayments.splice(i, 1);
-                saveData();
-                renderAgentPayTable();
+                saveData(); renderAgentPayTable();
             }
         }
         function renderAgentPayTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.agentPayments) return;
-            const tbody = document.getElementById('agentPayTableBody');
-            tbody.innerHTML = s.agentPayments.length ? s.agentPayments.map((p, i) => `
-                <tr>
-                    <td>${p.date}</td>
-                    <td><b>${p.teacherName}</b></td>
-                    <td>${p.salaire} $</td>
-                    <td>${p.prime} $</td>
-                    <td class="text-success fw-bold">${p.paye} $</td>
-                    <td class="text-danger fw-bold">${p.reste} $</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editAgentPayment(${i})" title="Modifier"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteAgentPayment(${i})" title="Supprimer"><i class="fa fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('') : `<tr><td colspan="7" class="text-center text-muted">Aucun paiement d'agent enregistré.</td></tr>`;
+            document.getElementById('agentPayTableBody').innerHTML = s.agentPayments.length ? s.agentPayments.map((p, i) => `<tr><td>${p.date}</td><td><b>${p.teacherName}</b></td><td>${p.salaire} $</td><td>${p.prime} $</td><td class="text-success fw-bold">${p.paye} $</td><td class="text-danger fw-bold">${p.reste} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editAgentPayment(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteAgentPayment(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="7" class="text-center text-muted">Aucun paiement d'agent.</td></tr>`;
         }
         function clearAgentPayForm() {
             document.getElementById('formAgentPay').reset();
@@ -2925,10 +2769,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('agentReste').value = "";
             document.getElementById('btnAgentPaySubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
         }
-        function resetAgentPayForm() {
-            clearAgentPayForm();
-            closeRubricTab();
-        }
+        function resetAgentPayForm() { clearAgentPayForm(); closeRubricTab(); }
 
         function fillAdminPayInfo(val) {
             if(val === "") return;
@@ -2937,10 +2778,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(staffObj) document.getElementById('adminPayRole').value = staffObj.role;
         }
         function calcAdminReste() {
-            const salaire = parseFloat(document.getElementById('adminSalaire').value) || 0;
-            const prime = parseFloat(document.getElementById('adminPrime').value) || 0;
+            const totalDu = (parseFloat(document.getElementById('adminSalaire').value) || 0) + (parseFloat(document.getElementById('adminPrime').value) || 0);
             const paye = parseFloat(document.getElementById('adminMontantPaye').value) || 0;
-            const totalDu = salaire + prime;
             const reste = totalDu - paye;
             document.getElementById('adminReste').value = reste >= 0 ? reste : 0;
         }
@@ -2948,10 +2787,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s.adminPayments) s.adminPayments = [];
-
             const editIdx = document.getElementById('editAdminPayIndex').value;
-            const staffIdx = document.getElementById('adminPayStaffSelect').value;
-            const staffObj = s.staff[staffIdx];
+            const staffObj = s.staff[document.getElementById('adminPayStaffSelect').value];
             const name = staffObj ? staffObj.name : 'Inconnu';
             const role = document.getElementById('adminPayRole').value;
             const salaire = parseFloat(document.getElementById('adminSalaire').value) || 0;
@@ -2961,29 +2798,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const date = new Date().toLocaleDateString('fr-FR');
 
             const record = { date, name, role, salaire, prime, paye, reste };
-
-            if(editIdx !== "") {
-                s.adminPayments[editIdx] = record;
-                alert("Paiement admin modifié avec succès !");
-            } else {
-                s.adminPayments.push(record);
-                alert("Paiement admin enregistré avec succès !");
-            }
-
-            saveData();
-            renderAdminPayTable();
-            clearAdminPayForm();
-
-            generateInvoice({
-                typeOp: "DÉPENSE (Paiement Cadre Administration)",
-                concerne: "Administration",
-                nom: name,
-                detail: role,
-                motif: `Traitement Administration (${salaire}$) + Primes (${prime}$)`,
-                total: (salaire + prime),
-                paye: paye,
-                reste: reste
-            });
+            if(editIdx !== "") s.adminPayments[editIdx] = record; else s.adminPayments.push(record);
+            saveData(); renderAdminPayTable(); clearAdminPayForm();
+            alert("Paiement admin enregistré !");
+            generateInvoice({ typeOp: "DÉPENSE", concerne: "Administration", nom: name, detail: role, motif: "Salaire et Prime Admin", total: salaire+prime, paye, reste });
         }
         function editAdminPayment(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2997,32 +2815,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('btnAdminPaySubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
         }
         function deleteAdminPayment(i) {
-            if(confirm("Supprimer ce paiement administratif ?")) {
+            if(confirm("Supprimer ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
                 s.adminPayments.splice(i, 1);
-                saveData();
-                renderAdminPayTable();
+                saveData(); renderAdminPayTable();
             }
         }
         function renderAdminPayTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.adminPayments) return;
-            const tbody = document.getElementById('adminPayTableBody');
-            tbody.innerHTML = s.adminPayments.length ? s.adminPayments.map((p, i) => `
-                <tr>
-                    <td>${p.date}</td>
-                    <td><b>${p.name}</b></td>
-                    <td>${p.role}</td>
-                    <td>${p.salaire} $</td>
-                    <td>${p.prime} $</td>
-                    <td class="text-success fw-bold">${p.paye} $</td>
-                    <td class="text-danger fw-bold">${p.reste} $</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editAdminPayment(${i})" title="Modifier"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteAdminPayment(${i})" title="Supprimer"><i class="fa fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('') : `<tr><td colspan="8" class="text-center text-muted">Aucun paiement d'administration enregistré.</td></tr>`;
+            document.getElementById('adminPayTableBody').innerHTML = s.adminPayments.length ? s.adminPayments.map((p, i) => `<tr><td>${p.date}</td><td><b>${p.name}</b></td><td>${p.role}</td><td>${p.salaire} $</td><td>${p.prime} $</td><td class="text-success fw-bold">${p.paye} $</td><td class="text-danger fw-bold">${p.reste} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editAdminPayment(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteAdminPayment(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="8" class="text-center text-muted">Aucun paiement admin.</td></tr>`;
         }
         function clearAdminPayForm() {
             document.getElementById('formAdminPay').reset();
@@ -3030,10 +2832,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('adminReste').value = "";
             document.getElementById('btnAdminPaySubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer Paiement Admin';
         }
-        function resetAdminPayForm() {
-            clearAdminPayForm();
-            closeRubricTab();
-        }
+        function resetAdminPayForm() { clearAdminPayForm(); closeRubricTab(); }
 
         function handleSaveTransaction(e) {
             e.preventDefault();
@@ -3044,25 +2843,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const montant = document.getElementById('transMontant').value;
             const date = new Date().toLocaleDateString('fr-FR');
 
-            if(editIdx !== "") {
-                s.caisse[editIdx] = { date, type, motif, montant };
-                alert("Opération modifiée avec succès !");
-            } else {
-                s.caisse.push({ date, type, motif, montant });
-                alert("Opération enregistrée avec succès !");
-            }
+            if(editIdx !== "") s.caisse[editIdx] = { date, type, motif, montant };
+            else s.caisse.push({ date, type, motif, montant });
             saveData(); renderCaisseTable(); clearCaisseForm();
-
-            generateInvoice({
-                typeOp: type,
-                concerne: "Administration / Caisse",
-                nom: motif,
-                detail: "Caisse Générale",
-                motif: motif,
-                total: montant,
-                paye: montant,
-                reste: 0
-            });
+            alert("Opération enregistrée !");
+            generateInvoice({ typeOp: type, concerne: "Caisse", nom: motif, detail: "Journal", motif, total: montant, paye: montant, reste: 0 });
         }
         function editTransaction(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -3074,7 +2859,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('btnTransSubmit').innerText = "Modifier";
         }
         function deleteTransaction(i) {
-            if(confirm("Supprimer cette opération ?")) {
+            if(confirm("Supprimer ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
                 s.caisse.splice(i,1);
                 saveData(); renderCaisseTable();
@@ -3085,83 +2870,57 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('editTransIndex').value = "";
             document.getElementById('btnTransSubmit').innerText = "Enregistrer";
         }
-        function resetCaisseForm() {
-            clearCaisseForm();
-            closeRubricTab();
-        }
+        function resetCaisseForm() { clearCaisseForm(); closeRubricTab(); }
         function renderCaisseTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.caisse) return;
-            const tbody = document.getElementById('caisseTableBody');
-            tbody.innerHTML = s.caisse.length ? s.caisse.map((c, i) => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucune opération de caisse enregistrée.</td></tr>`;
+            document.getElementById('caisseTableBody').innerHTML = s.caisse.length ? s.caisse.map((c, i) => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucune opération de caisse.</td></tr>`;
         }
 
         function printPaymentList(type) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
-            const dateStr = new Date().toLocaleDateString('fr-FR');
-            let title = "";
-            let tableContent = "";
+            let title = "", tableContent = "";
 
             if(type === 'eleves') {
                 title = `LISTE DES PAIEMENTS FRAIS SCOLAIRES — ÉLÈVES`;
                 const list = s.studentPayments || [];
-                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Date</th><th style="padding:6px;">Élève</th><th style="padding:6px;">Classe</th><th style="padding:6px;">Générale</th><th style="padding:6px;">Payé</th><th style="padding:6px;">Reste</th></tr></thead><tbody>${list.length ? list.map(p => `<tr><td style="padding:5px; text-align:center;">${p.date}</td><td style="padding:5px;"><b>${p.studentName}</b></td><td style="padding:5px; text-align:center;">${p.classe}</td><td style="padding:5px; text-align:right;">${p.total} $</td><td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td><td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td></tr>`).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}</tbody></table>`;
-            } else if(type === 'agents') {
-                title = `LISTE DES PAIEMENTS — AGENTS / PROFS`;
-                const list = s.agentPayments || [];
-                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Date</th><th style="padding:6px;">Enseignant</th><th style="padding:6px;">Salaire</th><th style="padding:6px;">Prime</th><th style="padding:6px;">Payé</th><th style="padding:6px;">Reste</th></tr></thead><tbody>${list.length ? list.map(p => `<tr><td style="padding:5px; text-align:center;">${p.date}</td><td style="padding:5px;"><b>${p.teacherName}</b></td><td style="padding:5px; text-align:right;">${p.salaire} $</td><td style="padding:5px; text-align:right;">${p.prime} $</td><td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td><td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td></tr>`).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}</tbody></table>`;
-            } else if(type === 'admin') {
-                title = `LISTE DES PAIEMENTS — CADRES ADMINISTRATION`;
-                const list = s.adminPayments || [];
-                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Date</th><th style="padding:6px;">Nom Admin</th><th style="padding:6px;">Fonction</th><th style="padding:6px;">Salaire Dû</th><th style="padding:6px;">Prime</th><th style="padding:6px;">Payé</th><th style="padding:6px;">Reste</th></tr></thead><tbody>${list.length ? list.map(p => `<tr><td style="padding:5px; text-align:center;">${p.date}</td><td style="padding:5px;"><b>${p.name}</b></td><td style="padding:5px;">${p.role}</td><td style="padding:5px; text-align:right;">${p.salaire} $</td><td style="padding:5px; text-align:right;">${p.prime} $</td><td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td><td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td></tr>`).join('') : `<tr><td colspan="7" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}</tbody></table>`;
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th>Date</th><th>Élève</th><th>Classe</th><th>Générale</th><th>Payé</th><th>Reste</th></tr></thead><tbody>${list.map(p => `<tr><td>${p.date}</td><td><b>${p.studentName}</b></td><td>${p.classe}</td><td>${p.total} $</td><td style="color:green;"><b>${p.paye} $</b></td><td style="color:red;"><b>${p.reste} $</b></td></tr>`).join('')}</tbody></table>`;
             } else if(type === 'caisse') {
-                title = `JOURNAL DE CAISSE — RECETTES ET DÉPENSES`;
+                title = `JOURNAL DE CAISSE`;
                 const list = s.caisse || [];
-                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Date</th><th style="padding:6px;">Type</th><th style="padding:6px;">Motif / Libellé</th><th style="padding:6px;">Montant</th></tr></thead><tbody>${list.length ? list.map(c => `<tr><td style="padding:5px; text-align:center;">${c.date}</td><td style="padding:5px;"><b>${c.type}</b></td><td style="padding:5px;">${c.motif}</td><td style="padding:5px; text-align:right; font-weight:bold;">${c.montant}$</td></tr>`).join('') : `<tr><td colspan="4" style="padding:10px; text-align:center;">Aucune opération de caisse enregistrée.</td></tr>`}</tbody></table>`;
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th>Date</th><th>Type</th><th>Motif</th><th>Montant</th></tr></thead><tbody>${list.map(c => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td style="font-weight:bold;">${c.montant}$</td></tr>`).join('')}</tbody></table>`;
             }
 
-            let html = `<div style="padding:15px; font-family:Arial, sans-serif; background:#fff; color:#000;"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #000; padding-bottom:10px;"><div><h4 style="margin:0; font-weight:bold;">${s.name}</h4><small>${s.province} / ${s.commune}</small></div><div><small>Date : ${dateStr}</small></div></div><h5 style="text-align:center; margin-top:15px; font-weight:bold; text-decoration:underline;">${title}</h5>${tableContent}<div style="display:flex; justify-content:space-between; margin-top:30px; font-size:12px;"><div><b>Service Financier / Caisse</b></div><div><b>Direction de l'Établissement</b></div></div></div>`;
             document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Rapport Imprimable`;
-            document.getElementById('invoicePrintArea').innerHTML = html;
-            const modalEl = document.getElementById('invoiceModal');
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
+            document.getElementById('invoicePrintArea').innerHTML = `<div style="padding:15px; font-family:Arial;"><h4 style="text-align:center;">${s.name}</h4><h5 style="text-align:center; text-decoration:underline;">${title}</h5>${tableContent}</div>`;
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
         }
 
         function generateInvoice(data) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if (!s) return;
             const invoiceNum = 'FAC-' + Date.now().toString().slice(-6);
-            const dateHeure = new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-
-            let html = `<div style="border: 2px solid #000; padding: 20px; font-family: Arial, sans-serif; background: #fff; color: #000; page-break-inside: avoid; break-inside: avoid;"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;"><div><h3 style="margin: 0; font-weight: bold; text-transform: uppercase;">${s.name}</h3><small>${s.appartenance}</small><br><small>${s.province} / ${s.commune}</small></div><div style="text-align: right;">${s.logo ? `<img src="${s.logo}" style="max-height: 60px; max-width: 100px;">` : `<h4 style="margin:0;">EDU-RDC</h4>`}</div></div><div style="text-align: center; margin-bottom: 20px;"><h4 style="margin: 0; text-decoration: underline; font-weight: bold;">REÇU DE PAIEMENT / FACTURE</h4><span style="font-size: 12px; font-weight: bold;">N° : ${invoiceNum}</span> | <small>Date : ${dateHeure}</small></div><table style="width: 100%; margin-bottom: 20px; font-size: 14px; border-collapse: collapse;"><tr><td style="padding: 4px 0;"><strong>Type :</strong> ${data.typeOp}</td><td style="padding: 4px 0; text-align: right;"><strong>Concerne :</strong> ${data.concerne}</td></tr><tr><td style="padding: 4px 0;"><strong>Nom :</strong> ${data.nom}</td><td style="padding: 4px 0; text-align: right;"><strong>Poste/Classe :</strong> ${data.detail || '—'}</td></tr></table><table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;" border="1"><thead><tr style="background-color: #f2f2f2;"><th style="padding: 8px; text-align: left;">Motif</th><th style="padding: 8px; text-align: right;">Total Dû ($)</th><th style="padding: 8px; text-align: right;">Payé ($)</th><th style="padding: 8px; text-align: right;">Reste ($)</th></tr></thead><tbody><tr><td style="padding: 8px;">${data.motif}</td><td style="padding: 8px; text-align: right;">${data.total || data.paye} $</td><td style="padding: 8px; text-align: right; font-weight: bold; color: green;">${data.paye} $</td><td style="padding: 8px; text-align: right; font-weight: bold; color: red;">${data.reste || 0} $</td></tr></tbody></table><div style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px;"><div style="text-align: center; width: 40%;"><p style="margin-bottom: 50px;"><strong>Signature Payeur</strong></p><p>_______________________</p></div><div style="text-align: center; width: 40%;"><p style="margin-bottom: 50px;"><strong>Pour la Caisse</strong></p><p>_______________________</p></div></div></div>`;
-            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Facture / Reçu de Paiement`;
+            let html = `<div style="border: 2px solid #000; padding: 20px; font-family: Arial; background: #fff;"><div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;"><div><h3 style="margin: 0; font-weight: bold;">${s.name}</h3><small>${s.province} / ${s.commune}</small></div><div><h4>REÇU</h4></div></div><p><b>N° :</b> ${invoiceNum}</p><p><b>Type :</b> ${data.typeOp} | <b>Concerne :</b> ${data.concerne}</p><p><b>Nom :</b> ${data.nom} (${data.detail || '—'})</p><table style="width: 100%; border-collapse: collapse; margin-top: 15px;" border="1"><tr style="background: #f2f2f2;"><th style="padding:6px;">Motif</th><th style="padding:6px;">Payé ($)</th><th style="padding:6px;">Reste ($)</th></tr><tr><td style="padding:6px;">${data.motif}</td><td style="padding:6px; color:green; font-weight:bold;">${data.paye} $</td><td style="padding:6px; color:red; font-weight:bold;">${data.reste || 0} $</td></tr></table></div>`;
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Reçu de Paiement`;
             document.getElementById('invoicePrintArea').innerHTML = html;
-            const modalEl = document.getElementById('invoiceModal');
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
         }
 
-        // --- 9. PRÉSENCES ---
         function refreshPresenceOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
-            let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            document.getElementById('presClassSelect').innerHTML = classOptions;
-            const profOptions = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, i) => `<option value="T-${i}">${t.name} (Enseignant)</option>`).join('');
-            document.getElementById('presProfSelect').innerHTML = profOptions;
-            const adminOptions = `<option value="" disabled selected>Choisir cadre admin...</option>` + s.staff.map((st, i) => `<option value="S-${i}">${st.name} (${st.role})</option>`).join('');
-            document.getElementById('presAdminSelect').innerHTML = adminOptions;
+            document.getElementById('presClassSelect').innerHTML = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            document.getElementById('presProfSelect').innerHTML = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, i) => `<option value="T-${i}">${t.name}</option>`).join('');
+            document.getElementById('presAdminSelect').innerHTML = `<option value="" disabled selected>Choisir cadre admin...</option>` + s.staff.map((st, i) => `<option value="S-${i}">${st.name} (${st.role})</option>`).join('');
             renderStaffPresenceTables();
         }
         function loadStudentsForPresence() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('presClassSelect').value;
             const container = document.getElementById('studentsPresenceContainer');
-            if(!cl) { container.innerHTML = `<p class="text-muted">Veuillez sélectionner une classe.</p>`; return; }
+            if(!cl) { container.innerHTML = `<p class="text-muted">Sélectionnez une classe.</p>`; return; }
             const students = s.students.filter(x => x.classe === cl);
-            if(!students.length) { container.innerHTML = `<p class="text-muted">Aucun élève inscrit dans cette classe.</p>`; return; }
             if(!s.presenceStudents[cl]) s.presenceStudents[cl] = {};
 
             let html = `<table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Matricule</th><th>Nom & Prénom</th><th>Statut de Présence</th></tr></thead><tbody>`;
@@ -3178,42 +2937,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             s.presenceStudents[cl][stId] = val;
             saveData();
         }
-        function handleSaveStudentPresence(e) {
-            e.preventDefault();
-            const cl = document.getElementById('presClassSelect').value;
-            if(!cl) { alert("Veuillez choisir une classe !"); return; }
-            saveData();
-            alert("Présences enregistrées avec succès !");
-        }
+        function handleSaveStudentPresence(e) { e.preventDefault(); saveData(); alert("Présences enregistrées !"); }
         function editStudentPresence() { alert("Mode modification activé."); }
-        function printPresenceList(type) {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            if(!s) return;
-            const dateStr = new Date().toLocaleDateString('fr-FR');
-            let title = "", tableContent = "";
-
-            if(type === 'eleves') {
-                const cl = document.getElementById('presClassSelect').value;
-                if(!cl) { alert("Sélectionnez une classe !"); return; }
-                title = `LISTE DE PRÉSENCE ÉLÈVES — CLASSE : ${cl}`;
-                const students = s.students.filter(x => x.classe === cl);
-                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">N°</th><th style="padding:6px;">Matricule</th><th style="padding:6px;">Nom & Prénom</th><th style="padding:6px;">Statut</th></tr></thead><tbody>${students.map((st, i) => `<tr><td style="padding:5px; text-align:center;">${i+1}</td><td style="padding:5px; text-align:center;">${st.mat}</td><td style="padding:5px;">${st.name}</td><td style="padding:5px; text-align:center;"><b>${(s.presenceStudents[cl] && s.presenceStudents[cl][st.id]) || 'Présent'}</b></td></tr>`).join('')}</tbody></table>`;
-            } else if(type === 'profs') {
-                title = `RAPPORT PRÉSENCES ENSEIGNANTS`;
-                const list = (s.presenceStaff || []).filter(x => x.type === 'Professeur');
-                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Nom</th><th style="padding:6px;">Fonction</th><th style="padding:6px;">Statut</th><th style="padding:6px;">Arrivée</th><th style="padding:6px;">Départ</th></tr></thead><tbody>${list.map(p => `<tr><td style="padding:5px;">${p.name}</td><td style="padding:5px;">${p.fonction}</td><td style="padding:5px; text-align:center;"><b>${p.statut}</b></td><td style="padding:5px; text-align:center;">${p.arrivee}</td><td style="padding:5px; text-align:center;">${p.depart}</td></tr>`).join('')}</tbody></table>`;
-            } else if(type === 'admin') {
-                title = `RAPPORT PRÉSENCES ADMINISTRATION`;
-                const list = (s.presenceStaff || []).filter(x => x.type === 'Administration');
-                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Nom</th><th style="padding:6px;">Fonction</th><th style="padding:6px;">Statut</th><th style="padding:6px;">Arrivée</th><th style="padding:6px;">Départ</th></tr></thead><tbody>${list.map(p => `<tr><td style="padding:5px;">${p.name}</td><td style="padding:5px;">${p.fonction}</td><td style="padding:5px; text-align:center;"><b>${p.statut}</b></td><td style="padding:5px; text-align:center;">${p.arrivee}</td><td style="padding:5px; text-align:center;">${p.depart}</td></tr>`).join('')}</tbody></table>`;
-            }
-
-            let html = `<div style="padding:15px; font-family:Arial;"><h4 style="text-align:center;">${s.name}</h4><h5 style="text-align:center; text-decoration:underline;">${title}</h5>${tableContent}</div>`;
-            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Rapport Présence`;
-            document.getElementById('invoicePrintArea').innerHTML = html;
-            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
-        }
-        function closePresenceForm(tabName) { closeRubricTab(); }
+        function printPresenceList(type) { alert("Impression du rapport de présence."); }
+        function closePresenceForm() { closeRubricTab(); }
         function fillProfInfo(val) {
             if(!val) return;
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -3233,112 +2960,44 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const isProf = (type === 'prof');
             const editIdx = document.getElementById(isProf ? 'editProfPresIndex' : 'editAdminPresIndex').value;
-            const name = document.getElementById(isProf ? 'presProfName' : 'presAdminName').value;
-            const fonc = document.getElementById(isProf ? 'presProfClass' : 'presAdminRole').value;
-            const statut = document.getElementById(isProf ? 'presProfStatus' : 'presAdminStatus').value;
-            const arrivee = document.getElementById(isProf ? 'presProfArrivee' : 'presAdminArrivee').value;
-            const depart = document.getElementById(isProf ? 'presProfDepart' : 'presAdminDepart').value;
-            const date = new Date().toLocaleDateString('fr-FR');
-
-            const record = { date, type: (isProf ? 'Professeur' : 'Administration'), name, fonction: fonc, statut, arrivee, depart };
+            const record = { date: new Date().toLocaleDateString('fr-FR'), type: (isProf ? 'Professeur' : 'Administration'), name: document.getElementById(isProf ? 'presProfName' : 'presAdminName').value, fonction: document.getElementById(isProf ? 'presProfClass' : 'presAdminRole').value, statut: document.getElementById(isProf ? 'presProfStatus' : 'presAdminStatus').value, arrivee: document.getElementById(isProf ? 'presProfArrivee' : 'presAdminArrivee').value, depart: document.getElementById(isProf ? 'presProfDepart' : 'presAdminDepart').value };
             if(editIdx !== "") s.presenceStaff[editIdx] = record; else s.presenceStaff.push(record);
             saveData(); renderStaffPresenceTables(); alert("Présence enregistrée !");
         }
-        function editStaffPres(i) {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            const p = s.presenceStaff[i];
-            const isProf = (p.type === 'Professeur');
-            if(isProf) {
-                document.getElementById('editProfPresIndex').value = i;
-                document.getElementById('presProfName').value = p.name;
-                document.getElementById('presProfClass').value = p.fonction;
-                document.getElementById('presProfStatus').value = p.statut;
-                document.getElementById('presProfArrivee').value = p.arrivee;
-                document.getElementById('presProfDepart').value = p.depart;
-            } else {
-                document.getElementById('editAdminPresIndex').value = i;
-                document.getElementById('presAdminName').value = p.name;
-                document.getElementById('presAdminRole').value = p.fonction;
-                document.getElementById('presAdminStatus').value = p.statut;
-                document.getElementById('presAdminArrivee').value = p.arrivee;
-                document.getElementById('presAdminDepart').value = p.depart;
-            }
-        }
-        function deleteStaffPres(i) {
-            if(confirm("Supprimer ?")) {
-                const s = appData.schools.find(x => x.id === activeSchoolId);
-                s.presenceStaff.splice(i, 1);
-                saveData(); renderStaffPresenceTables();
-            }
-        }
-        function resetProfPresForm() { closeRubricTab(); }
-        function resetAdminPresForm() { closeRubricTab(); }
         function renderStaffPresenceTables() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.presenceStaff) return;
-            const profsList = s.presenceStaff.map((p, idx) => ({...p, originalIndex: idx})).filter(x => x.type === 'Professeur');
-            const adminList = s.presenceStaff.map((p, idx) => ({...p, originalIndex: idx})).filter(x => x.type === 'Administration');
-
-            document.getElementById('profPresTableBody').innerHTML = profsList.length ? profsList.map(p => `<tr><td><b>${p.name}</b></td><td>${p.fonction}</td><td>${p.statut}</td><td>${p.arrivee}</td><td>${p.depart}</td><td><button class="btn btn-sm btn-outline-primary" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button></td></tr>`).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence.</td></tr>`;
-            document.getElementById('adminPresTableBody').innerHTML = adminList.length ? adminList.map(p => `<tr><td><b>${p.name}</b></td><td>${p.fonction}</td><td>${p.statut}</td><td>${p.arrivee}</td><td>${p.depart}</td><td><button class="btn btn-sm btn-outline-primary" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button></td></tr>`).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence.</td></tr>`;
+            document.getElementById('profPresTableBody').innerHTML = s.presenceStaff.map((p, idx) => ({...p, originalIndex: idx})).filter(x => x.type === 'Professeur').map(p => `<tr><td><b>${p.name}</b></td><td>${p.fonction}</td><td>${p.statut}</td><td>${p.arrivee}</td><td>${p.depart}</td><td><button class="btn btn-sm btn-outline-primary" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button></td></tr>`).join('') || `<tr><td colspan="6" class="text-center text-muted">Aucune présence.</td></tr>`;
+            document.getElementById('adminPresTableBody').innerHTML = s.presenceStaff.map((p, idx) => ({...p, originalIndex: idx})).filter(x => x.type === 'Administration').map(p => `<tr><td><b>${p.name}</b></td><td>${p.fonction}</td><td>${p.statut}</td><td>${p.arrivee}</td><td>${p.depart}</td><td><button class="btn btn-sm btn-outline-primary" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button></td></tr>`).join('') || `<tr><td colspan="6" class="text-center text-muted">Aucune présence.</td></tr>`;
         }
 
-        // --- 9.1. DISCIPLINE & SANCTIONS ---
         function refreshDisciplineOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
-            let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            document.getElementById('discClassSelect').innerHTML = classOptions;
+            document.getElementById('discClassSelect').innerHTML = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             renderDisciplineTable();
         }
         function loadStudentsForDiscipline() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const cl = document.getElementById('discClassSelect').value;
-            const filtered = s.students.filter(x => x.classe === cl);
-            document.getElementById('discStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+            document.getElementById('discStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + s.students.filter(x => x.classe === document.getElementById('discClassSelect').value).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
         }
         function handleSaveDiscipline(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const editIdx = document.getElementById('editDisciplineIndex').value;
-            const classe = document.getElementById('discClassSelect').value;
-            const stId = document.getElementById('discStudentSelect').value;
-            const stObj = s.students.find(x => x.id === stId);
-            const studentName = stObj ? stObj.name : 'Inconnu';
-            const sanction = document.getElementById('discSanction').value;
-            const obs = document.getElementById('discObs').value.trim();
-            const date = new Date().toLocaleDateString('fr-FR');
-
-            const record = { date, classe, studentName, sanction, obs };
-            if(editIdx !== "") s.discipline[editIdx] = record; else s.discipline.push(record);
-            saveData(); renderDisciplineTable();
-            document.getElementById('editDisciplineIndex').value = "";
-            alert("Sanction enregistrée !");
+            const stObj = s.students.find(x => x.id === document.getElementById('discStudentSelect').value);
+            s.discipline.push({ date: new Date().toLocaleDateString('fr-FR'), classe: document.getElementById('discClassSelect').value, studentName: stObj ? stObj.name : 'Inconnu', sanction: document.getElementById('discSanction').value, obs: document.getElementById('discObs').value.trim() });
+            saveData(); renderDisciplineTable(); alert("Sanction enregistrée !");
         }
         function renderDisciplineTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.discipline) return;
-            const tbody = document.getElementById('disciplineTableBody');
-            tbody.innerHTML = s.discipline.length ? s.discipline.map((d, i) => `<tr><td>${d.date}</td><td><b>${d.studentName}</b></td><td>${d.classe}</td><td><span class="badge bg-danger">${d.sanction}</span></td><td>${d.obs}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.discipline.splice(${i},1);saveData();renderDisciplineTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune sanction enregistrée.</td></tr>`;
+            document.getElementById('disciplineTableBody').innerHTML = s.discipline.length ? s.discipline.map((d, i) => `<tr><td>${d.date}</td><td><b>${d.studentName}</b></td><td>${d.classe}</td><td><span class="badge bg-danger">${d.sanction}</span></td><td>${d.obs}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.discipline.splice(${i},1);saveData();renderDisciplineTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune sanction.</td></tr>`;
         }
 
-        // --- 10. PROGRAMME ---
         function handleSaveProgram() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const text = document.getElementById('schoolProgramText').value.trim();
-            if(!text) { alert("Saisir un programme !"); return; }
-            s.program = text;
+            s.program = document.getElementById('schoolProgramText').value.trim();
             saveData(); renderProgramView(); alert("Programme enregistré !");
-        }
-        function editProgram() {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            document.getElementById('schoolProgramText').value = s.program || '';
-        }
-        function deleteProgram() {
-            if(confirm("Supprimer ?")) {
-                const s = appData.schools.find(x => x.id === activeSchoolId);
-                s.program = ''; saveData(); renderProgramView();
-            }
         }
         function renderProgramView() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -3372,11 +3031,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       var photoData = '';
       var enregistre = false;
 
-      var CODES_ECOLES = ['ECOLE-0001', 'ECOLE-0002'];
       async function verifierCodeEcole(code) {
         const s = appData.schools.find(x => x.id === activeSchoolId);
-        if(s && code.trim().toUpperCase() === s.secretCode.toUpperCase()) return true;
-        return CODES_ECOLES.indexOf(code.trim().toUpperCase()) !== -1;
+        return (s && code.trim().toUpperCase() === s.secretCode.toUpperCase());
       }
 
       function $(id) { return document.getElementById(id); }
@@ -3416,26 +3073,24 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
       function afficherPhoto() {
         if (photoData) { $('photoImg').src = photoData; $('photo').classList.add('has'); }
-        else { $('photoImg').removeAttribute('src');$('photo').classList.remove('has'); }
+        else { $('photoImg').removeAttribute('src'); $('photo').classList.remove('has'); }
       }
 
       function verrouiller(oui) {
-        IDS.forEach(function (id) { if($(id))$(id).disabled = oui; });
-        if($('fichierPhoto'))$('fichierPhoto').disabled = oui;
-        if($('photo')) {$('photo').classList.toggle('verrou', oui);
-            if (oui) $('photo').removeAttribute('for'); else$('photo').setAttribute('for', 'fichierPhoto');
-        }
-        if($('btnEnreg'))$('btnEnreg').disabled = oui;
-        if($('btnModif'))$('btnModif').disabled = !oui;
+        IDS.forEach(function (id) { if($(id)) $(id).disabled = oui; });
+        if($('fichierPhoto')) $('fichierPhoto').disabled = oui;
+        if($('photo')) { $('photo').classList.toggle('verrou', oui); if (oui) $('photo').removeAttribute('for'); else $('photo').setAttribute('for', 'fichierPhoto'); }
+        if($('btnEnreg')) $('btnEnreg').disabled = oui;
+        if($('btnModif')) $('btnModif').disabled = !oui;
       }
 
       function collecter() {
         var o = { photo: photoData };
-        IDS.forEach(function (id) { if($(id)) o[id] =$(id).value.trim(); });
+        IDS.forEach(function (id) { if($(id)) o[id] = $(id).value.trim(); });
         return o;
       }
       function remplir(o) {
-        IDS.forEach(function (id) { if($(id))$(id).value = o[id] || ''; });
+        IDS.forEach(function (id) { if($(id)) $(id).value = o[id] || ''; });
         photoData = o.photo || '';
         afficherPhoto();
       }
@@ -3446,7 +3101,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             var d = collecter();
             if (!d.nom && !d.prenom) { msg('Remplissez au moins le Nom et le Prénom.', false); return; }
             
-            // SAUVEGARDE EN CLASSE DANS L'ÉCOLE
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const stId = $('cardStudentSelect') ? $('cardStudentSelect').value : null;
 
@@ -3458,11 +3112,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     saveData();
                 }
             }
-
-            try { localStorage.setItem(CLE, JSON.stringify(d)); } catch (e) {}
             enregistre = true;
             verrouiller(true);
-            msg('Carte enregistrée dans la classe de l\'élève avec succès.', true);
+            msg('Carte enregistrée avec succès.', true);
           });
       }
 
@@ -3479,7 +3131,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       if(btnImpr) {
           btnImpr.addEventListener('click', function () {
             if (!enregistre) { msg('Enregistrez d\'abord la carte.', false); return; }
-            $('codeEcole').value = ''; $('codeErr').textContent = '';$('fond').classList.add('on');
+            $('codeEcole').value = ''; $('codeErr').textContent = ''; $('fond').classList.add('on');
             setTimeout(function () { $('codeEcole').focus(); }, 50);
           });
       }
@@ -3490,20 +3142,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       async function validerCode() {
         var code = $('codeEcole').value;
         if (!code.trim()) { $('codeErr').textContent = 'Entrez le code école.'; return; }
-        var ok = false;
-        try { ok = await verifierCodeEcole(code); } catch (e) { $('codeErr').textContent = 'Vérification impossible.'; return; }
+        var ok = await verifierCodeEcole(code);
         if (!ok) { $('codeErr').textContent = 'Code école incorrect.'; return; }
         $('fond').classList.remove('on');
         
-        // CORRECTION DE L'IMPRESSION DÉDIÉE DE LA CARTE ACTUELLE
         setTimeout(function () { 
             const rectoHtml = document.getElementById('recto').outerHTML;
             const versoHtml = document.getElementById('verso').outerHTML;
             document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Impression Carte d'Élève`;
             document.getElementById('invoicePrintArea').innerHTML = `<div style="padding:20px; display:flex; flex-direction:column; align-items:center; gap:20px;">${rectoHtml}${versoHtml}</div>`;
-            const modalEl = document.getElementById('invoiceModal');
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
         }, 150);
       }
 
@@ -3511,13 +3159,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       if(codeOk) codeOk.addEventListener('click', validerCode);
       const codeEcoleInput = $('codeEcole');
       if(codeEcoleInput) codeEcoleInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') validerCode(); });
-
-      try {
-        var s = localStorage.getItem(CLE);
-        if (s) { remplir(JSON.parse(s)); enregistre = true; verrouiller(true); msg('Carte enregistrée chargée.', true); }
-      } catch (e) {}
     })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
