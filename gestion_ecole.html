@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EDU-RDC – Plateforme Intégrée de Gestion Scolaire</title>
+<title>EDU-RDC – Plateforme Intégrée de Gestion Scolaire Professionnelle</title>
 
 <!-- Fonts & Icons -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,9 @@
 
 <!-- Bootstrap Styles -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js pour les graphiques analytiques professionnels -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 .view-section { display: none; }
@@ -82,7 +85,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
  .printable-area { display: block !important; }
 }
- /* Style personnalisé pour le Tableau de bord (Grille moderne) */
+
 .border-top-4 { border-top-width: 4px !important; }
 .border-indigo { border-color: #6610f2 !important; }
 .text-indigo { color: #6610f2 !important; }
@@ -104,11 +107,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     color: #343a40;
     transition: all 0.2s ease-in-out;
 }
-
-.dash-btn i {
-    font-size: 18px;
-}
-
+.dash-btn i { font-size: 18px; }
 .dash-btn:hover {
     background-color: #6610f2;
     color: #ffffff !important;
@@ -116,12 +115,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(102, 16, 242, 0.2);
 }
+.dash-btn:hover i { color: #ffffff !important; }
 
-.dash-btn:hover i {
-    color: #ffffff !important;
-}
-
-/* STYLES CARTE D'ÉLÈVE (Intégration de votre CSS) */
+/* STYLES CARTE D'ÉLÈVE */
 .card-zone { overflow-x: auto; padding-bottom: 6px; }
 .carte {
     width: 9cm; height: 7cm; margin: 0 auto 10px;
@@ -133,7 +129,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .centre { text-align: center; }
 .rdc { font-weight: bold; font-size: 7.4pt; }
 .titre { font-weight: bold; font-size: 9pt; letter-spacing: .5px; margin: 1px 0; text-decoration: underline; }
-
 .carte input[type=text] {
     font: inherit; color: #000; background: transparent;
     border: 0; border-bottom: 1px dotted #000; border-radius: 0;
@@ -141,11 +136,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 }
 .carte input[type=text]:focus { background: rgba(255,255,255,.45); }
 .carte input[type=text]:disabled { opacity: 1; -webkit-text-fill-color: #000; border-bottom-color: transparent; }
-
 .ligne { display: flex; align-items: baseline; gap: 3px; margin: 2.2px 0; white-space: nowrap; }
 .ligne b { font-weight: bold; }
 .ligne input.long { flex: 1; }
-
 .corps { display: flex; gap: 0.2cm; margin-top: 2px; }
 .champs { flex: 1; min-width: 0; }
 .photo-col { width: 2.3cm; flex: none; }
@@ -159,7 +152,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .photo.has span { display: none; }
 .photo.verrou { cursor: default; }
 #fichierPhoto { display: none; }
-
 .pied { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 3px; }
 .chef { text-align: center; font-weight: bold; min-width: 2.6cm; }
 .chef .sceau { font-weight: normal; font-style: italic; margin-top: 1px; }
@@ -415,6 +407,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <a class="list-group-item list-group-item-action rubric-item" id="r-bulletins" href="javascript:void(0);" onclick="switchTab('tab-bulletins', this)"><i class="fa fa-file-invoice me-2 text-primary"></i> 7. Bulletin de cotes</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-frais" href="javascript:void(0);" onclick="switchTab('tab-frais', this)"><i class="fa fa-wallet me-2 text-primary"></i> 8. Frais scolaire & Caisse</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-presences" href="javascript:void(0);" onclick="switchTab('tab-presences', this)"><i class="fa fa-clipboard-check me-2 text-primary"></i> 9. Gestion de présence</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-discipline" href="javascript:void(0);" onclick="switchTab('tab-discipline', this)"><i class="fa fa-gavel me-2 text-primary"></i> 9.1. Discipline & Sanctions</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-programme" href="javascript:void(0);" onclick="switchTab('tab-programme', this)"><i class="fa fa-calendar-alt me-2 text-primary"></i> 10. Programme & Calendrier</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-communication" href="javascript:void(0);" onclick="switchTab('tab-communication', this)"><i class="fa fa-bullhorn me-2 text-primary"></i> 11. Communication / Contact</a>
                         </div>
@@ -424,14 +417,19 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <div class="dashboard-section mt-4 p-3 bg-white rounded shadow-sm border border-top-4 border-indigo">
                         <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
                             <h6 class="m-0 fw-bold text-indigo"><i class="fa fa-tachometer-alt me-2"></i>TABLEAU DE BORD</h6>
-                            <span class="badge bg-indigo text-white">Accès Sécurisé</span>
+                            <span class="badge bg-indigo text-white">Pro 2026</span>
                         </div>
                         <div class="row g-2">
-                            <!-- Bouton Carte d'Élève inséré juste en dessous de Tableau de bord -->
+                            <div class="col-12">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-analytics')">
+                                    <i class="fa fa-chart-pie text-indigo"></i>
+                                    <span>Analytique & KPIs (Graphiques)</span>
+                                </button>
+                            </div>
                             <div class="col-12">
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-carte-eleve')">
                                     <i class="fa fa-id-card text-indigo"></i>
-                                    <span>Carte d'Élève (Recto & Verso)</span>
+                                    <span>Carte d'Élève & Impression Mass</span>
                                 </button>
                             </div>
                             <div class="col-6">
@@ -489,9 +487,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 </button>
                             </div>
                             <div class="col-6">
-                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-programme')">
-                                    <i class="fa fa-calendar-alt text-indigo"></i>
-                                    <span>Programme</span>
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-discipline')">
+                                    <i class="fa fa-gavel text-indigo"></i>
+                                    <span>Discipline</span>
                                 </button>
                             </div>
                             <div class="col-12">
@@ -511,6 +509,46 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         <div id="defaultWelcomeMessage" class="text-center py-5 text-muted">
                             <i class="fa fa-hand-pointer fa-3x mb-3 text-primary"></i>
                             <h5>Veuillez cliquer sur <b>Paramètres</b> dans le menu de gauche ou sur un bouton du <b>Tableau de Bord</b> pour afficher une rubrique.</h5>
+                        </div>
+
+                        <!-- 0. ANALYTIQUE & GRAPHIQUES -->
+                        <div class="tab-pane" id="tab-analytics">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-chart-pie me-2"></i>Tableau de Bord Analytique & KPIs</h5>
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-4">
+                                    <div class="card bg-primary text-white p-3 shadow-sm">
+                                        <h6>Total Élèves Inscrits</h6>
+                                        <h3 id="kpiTotalStudents" class="fw-bold m-0">0</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-success text-white p-3 shadow-sm">
+                                        <h6>Total Encaissé (Frais)</h6>
+                                        <h3 id="kpiTotalCollected" class="fw-bold m-0">0 $</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-warning text-dark p-3 shadow-sm">
+                                        <h6>Total Enseignants</h6>
+                                        <h3 id="kpiTotalTeachers" class="fw-bold m-0">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="card p-3 shadow-sm">
+                                        <h6 class="fw-bold text-primary mb-3">Répartition Filles / Garçons</h6>
+                                        <canvas id="chartSexe" height="180"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card p-3 shadow-sm">
+                                        <h6 class="fw-bold text-primary mb-3">Finances (Encaissé vs Reste)</h6>
+                                        <canvas id="chartFinances" height="180"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3"><button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button></div>
                         </div>
 
                         <!-- 1. HIÉRARCHIE -->
@@ -586,10 +624,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th>Classe</th><th>Actions</th></tr></thead><tbody id="studentsTableBody"></tbody></table>
                         </div>
 
-                        <!-- 4.1. CARTE D'ÉLÈVE (Votre code carte intégré) -->
+                        <!-- 4.1. CARTE D'ÉLÈVE -->
                         <div class="tab-pane" id="tab-carte-eleve">
-                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-id-card me-2"></i>4.1. Carte d'Élève (Recto & Verso)</h5>
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-id-card me-2"></i>4.1. Carte d'Élève (Recto, Verso & Impression en Masse)</h5>
                             
+                            <div class="p-3 bg-light rounded border mb-4 no-print">
+                                <label class="fw-bold">Impression en masse des cartes par classe :</label>
+                                <div class="input-group mt-1">
+                                    <select id="batchCardClassSelect" class="form-select"></select>
+                                    <button class="btn btn-primary fw-bold" onclick="printAllCardsForClass()"><i class="fa fa-print me-1"></i> Imprimer Toutes les Cartes de la Classe</button>
+                                </div>
+                            </div>
+
                             <div id="appli">
                               <h3>Recto</h3>
                               <div class="card-zone">
@@ -698,9 +744,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <div class="mt-3"><button class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button></div>
                         </div>
 
-                        <!-- 7. BULLETINS -->
+                        <!-- 7. BULLETINS (Avec Classement Automatique) -->
                         <div class="tab-pane" id="tab-bulletins">
-                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-file-invoice me-2"></i>7. Bulletin de cotes (Génération & Affichage)</h5>
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-file-invoice me-2"></i>7. Bulletin de cotes (Génération & Classement Auto)</h5>
                             
                             <div class="row g-2 mb-3 p-3 bg-light rounded border no-print">
                                 <div class="col-md-4">
@@ -725,14 +771,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <div class="wrap">
                                     <div class="page" id="page">
                                         <div class="text-center text-muted p-5">
-                                            <h5><i class="fa fa-info-circle me-2"></i>Veuillez choisir une classe et un élève ci-dessus pour générer automatiquement le bulletin.</h5>
+                                            <h5><i class="fa fa-info-circle me-2"></i>Veuillez choisir une classe et un élève ci-dessus pour générer automatiquement le bulletin avec son classement.</h5>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 8. FRAIS SCOLAIRES & PAIEMENTS (ÉLÈVE, AGENT & ADMIN) -->
+                        <!-- 8. FRAIS SCOLAIRES & PAIEMENTS -->
                         <div class="tab-pane" id="tab-frais">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-wallet me-2"></i>8. Gestion des Paiements & Caisse</h5>
                             
@@ -752,7 +798,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </ul>
 
                             <div class="tab-content" id="paymentTabsContent">
-                                <!-- 1. PAIEMENT ÉLÈVES -->
                                 <div class="tab-pane fade show active" id="p-eleves-frais" role="tabpanel">
                                     <form id="formStudentPay" onsubmit="handleSaveStudentPayment(event)" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editStudentPayIndex">
@@ -792,7 +837,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Élève</th><th>Classe</th><th>Générale</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="studentPayTableBody"></tbody></table>
                                 </div>
 
-                                <!-- 2. PAIEMENT AGENTS / PROFS -->
                                 <div class="tab-pane fade" id="p-agents-frais" role="tabpanel">
                                     <form id="formAgentPay" onsubmit="handleSaveAgentPayment(event)" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editAgentPayIndex">
@@ -836,7 +880,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Enseignant</th><th>Salaire</th><th>Prime</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="agentPayTableBody"></tbody></table>
                                 </div>
 
-                                <!-- 3. PAIEMENT ADMINISTRATION -->
                                 <div class="tab-pane fade" id="p-admin-frais" role="tabpanel">
                                     <form id="formAdminPay" onsubmit="handleSaveAdminPayment(event)" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editAdminPayIndex">
@@ -878,7 +921,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Nom Admin</th><th>Fonction</th><th>Salaire Dû</th><th>Prime</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="adminPayTableBody"></tbody></table>
                                 </div>
 
-                                <!-- 4. JOURNAL CAISSE -->
                                 <div class="tab-pane fade" id="p-caisse-tab" role="tabpanel">
                                     <form id="formCaisse" onsubmit="handleSaveTransaction(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
                                         <input type="hidden" id="editTransIndex">
@@ -897,7 +939,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </div>
                         </div>
 
-                        <!-- 9. PRÉSENCES (ÉLÈVE, AGENT & ADMIN + LISTES IMPRIMABLES) -->
+                        <!-- 9. PRÉSENCES -->
                         <div class="tab-pane" id="tab-presences">
                             <h5 class="text-primary fw-bold mb-3"><i class="fa fa-clipboard-check me-2"></i>9. Gestion de présence</h5>
                             
@@ -914,7 +956,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </ul>
 
                             <div class="tab-content" id="presenceTabsContent">
-                                <!-- 1. PRÉSENCE ÉLÈVES -->
                                 <div class="tab-pane fade show active" id="p-eleves" role="tabpanel">
                                     <div class="row g-2 mb-3">
                                         <div class="col-md-6">
@@ -935,7 +976,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     </form>
                                 </div>
 
-                                <!-- 2. PRÉSENCE PROFESSEURS -->
                                 <div class="tab-pane fade" id="p-profs" role="tabpanel">
                                     <form id="formPresProf" onsubmit="handleSaveStaffPresence(event, 'prof')" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editProfPresIndex">
@@ -983,7 +1023,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom</th><th>Fonction/Classe</th><th>Statut</th><th>Arrivée</th><th>Départ</th><th>Actions</th></tr></thead><tbody id="profPresTableBody"></tbody></table>
                                 </div>
 
-                                <!-- 3. PRÉSENCE ADMINISTRATION -->
                                 <div class="tab-pane fade" id="p-admin" role="tabpanel">
                                     <form id="formPresAdmin" onsubmit="handleSaveStaffPresence(event, 'admin')" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editAdminPresIndex">
@@ -1031,6 +1070,24 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom</th><th>Fonction</th><th>Statut</th><th>Arrivée</th><th>Départ</th><th>Actions</th></tr></thead><tbody id="adminPresTableBody"></tbody></table>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- 9.1. DISCIPLINE & SANCTIONS -->
+                        <div class="tab-pane" id="tab-discipline">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-gavel me-2"></i>9.1. Registre de Discipline & Sanctions</h5>
+                            <form onsubmit="handleSaveDiscipline(event)" class="row g-2 mb-4 p-3 bg-light rounded border">
+                                <input type="hidden" id="editDisciplineIndex">
+                                <div class="col-md-4"><label class="fw-bold">Classe :</label><select id="discClassSelect" class="form-select" required onchange="loadStudentsForDiscipline()"></select></div>
+                                <div class="col-md-4"><label class="fw-bold">Élève :</label><select id="discStudentSelect" class="form-select" required></select></div>
+                                <div class="col-md-4"><label class="fw-bold">Sanction / Motif :</label><select id="discSanction" class="form-select"><option value="Retard">Retard</option><option value="Absence injustifiée">Absence injustifiée</option><option value="Indiscipline / Bruit">Indiscipline / Bruit</option><option value="Blâme">Blâme</option><option value="Renvoi temporaire">Renvoi temporaire</option></select></div>
+                                <div class="col-md-9"><label class="fw-bold">Observation / Détails :</label><input type="text" id="discObs" class="form-control" placeholder="Ex: Perturbation du cours de mathématiques" required></div>
+                                <div class="col-md-3 d-flex align-items-end gap-2">
+                                    <button type="submit" id="btnDisciplineSubmit" class="btn btn-success w-100 fw-bold"><i class="fa fa-save"></i> Enregistrer</button>
+                                    <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="closeRubricTab()">Fermer</button>
+                                </div>
+                            </form>
+                            <h6 class="fw-bold text-secondary">Registre des infractions et sanctions :</h6>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Élève</th><th>Classe</th><th>Sanction</th><th>Observation</th><th>Actions</th></tr></thead><tbody id="disciplineTableBody"></tbody></table>
                         </div>
 
                         <!-- 10. PROGRAMME -->
@@ -1090,7 +1147,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       </div>
     </div>
 
-    <!-- Fenêtre : code école (réservé au propriétaire d'école pour la carte) -->
+    <!-- Fenêtre : code école pour la carte -->
     <div class="fond no-print" id="fond">
       <div class="boite">
         <h4>Impression réservée</h4>
@@ -1104,13 +1161,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       </div>
     </div>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE -->
+    <!-- SCRIPT JS DE GESTION COMPLÈTE & PROFESSIONNELLE -->
     <script>
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V11";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
         let appData = { schools: [], adminRequests: [] };
         let activeSchoolId = null;
         let currentUserSession = { role: null, name: null, assignedClass: null, secretCode: null };
+        let chartSexeInstance = null;
+        let chartFinancesInstance = null;
 
         window.onload = function() {
             let saved = localStorage.getItem(STORAGE_KEY);
@@ -1139,21 +1198,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
         function toggleParamsSubmenu() {
             const items = document.querySelectorAll('.rubric-item');
-
-            if (currentUserSession.role === 'owner') {
-                items.forEach(el => el.style.display = 'block');
-            } 
-            else if (currentUserSession.role === 'teacher') {
-                items.forEach(el => {
-                    if (el.id === 'r-cours' || el.id === 'r-notes' || el.id === 'r-bulletins' || el.id === 'r-carte-eleve') {
-                        el.style.display = 'block';
-                    } else {
-                        el.style.display = 'none';
-                    }
-                });
-            } else {
-                items.forEach(el => el.style.display = 'block');
-            }
+            items.forEach(el => el.style.display = 'block');
 
             const submenu = document.getElementById('paramsSubmenu');
             const arrow = document.getElementById('arrowIcon');
@@ -1186,6 +1231,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 renderCoursesTable();
             } else if(tabId === 'tab-eleves-reg') {
                 renderStudentsTable();
+            } else if(tabId === 'tab-discipline') {
+                refreshDisciplineOptions();
+            } else if(tabId === 'tab-analytics') {
+                renderAnalyticsCharts();
             }
         }
 
@@ -1375,7 +1424,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         logo: logoBase64 || '',
                         staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: [], 
                         presenceStudents: {}, presenceStaff: [], studentPayments: [], agentPayments: [], adminPayments: [],
-                        program: '', communications: []
+                        discipline: [], program: '', communications: []
                     });
                     alert(`École créée avec succès !\n\nCODE ÉCOLE (Propriétaire) : ${secretCode}\n\nConservez-le précieusement.`);
                 }
@@ -1496,6 +1545,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!s.studentPayments) s.studentPayments = [];
             if(!s.agentPayments) s.agentPayments = [];
             if(!s.adminPayments) s.adminPayments = [];
+            if(!s.discipline) s.discipline = [];
             if(!s.communications) s.communications = [];
 
             document.getElementById('dashSchoolTitle').innerText = s.name;
@@ -1535,6 +1585,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('payClassSelect').innerHTML = classOptions;
             document.getElementById('agentPayClassSelect').innerHTML = classOptions;
             document.getElementById('bulletinClassSelect').innerHTML = classOptions;
+            document.getElementById('batchCardClassSelect').innerHTML = classOptions;
+            document.getElementById('discClassSelect').innerHTML = classOptions;
 
             const profTbody = document.getElementById('teachersTableBody');
             profTbody.innerHTML = s.teachers.length ? s.teachers.map((t, i) => `
@@ -1557,6 +1609,51 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             refreshPaymentOptions();
             renderCommTable();
             renderProgramView();
+            renderDisciplineTable();
+        }
+
+        // --- 0. ANALYTIQUE & GRAPHIQUES ---
+        function renderAnalyticsCharts() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+
+            document.getElementById('kpiTotalStudents').innerText = s.students.length;
+            document.getElementById('kpiTotalTeachers').innerText = s.teachers.length;
+
+            let totalCollected = 0;
+            (s.studentPayments || []).forEach(p => { totalCollected += parseFloat(p.paye) || 0; });
+            document.getElementById('kpiTotalCollected').innerText = totalCollected + ' $';
+
+            let countM = 0, countF = 0;
+            s.students.forEach(st => { if(st.sexe === 'M') countM++; else countF++; });
+
+            if(chartSexeInstance) chartSexeInstance.destroy();
+            const ctxSexe = document.getElementById('chartSexe').getContext('2d');
+            chartSexeInstance = new Chart(ctxSexe, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Garçons (M)', 'Filles (F)'],
+                    datasets: [{ data: [countM, countF], backgroundColor: ['#0d6efd', '#d63384'] }]
+                }
+            });
+
+            let totalDeducted = 0;
+            let totalRemaining = 0;
+            (s.studentPayments || []).forEach(p => {
+                totalDeducted += parseFloat(p.paye) || 0;
+                totalRemaining += parseFloat(p.reste) || 0;
+            });
+
+            if(chartFinancesInstance) chartFinancesInstance.destroy();
+            const ctxFinances = document.getElementById('chartFinances').getContext('2d');
+            chartFinancesInstance = new Chart(ctxFinances, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Encaissé', 'Reste à Recouvrer'],
+                    datasets: [{ label: 'Montants ($)', data: [totalDeducted, totalRemaining], backgroundColor: ['#198754', '#dc3545'] }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
         }
 
         // --- 1. HIÉRARCHIE & DIRECTION ---
@@ -1655,13 +1752,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             } else {
                 const secretCode = generateSecretCode('AGT');
                 s.teachers.push({ name, phone, titulaireClass, secretCode });
-                alert(`Enseignant enregistré avec succès !\n\nCODE AGENT ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre pour qu'il puisse se connecter.`);
+                alert(`Enseignant enregistré avec succès !\n\nCODE AGENT ATTRIBUÉ À ${name.toUpperCase()} : ${secretCode}\n\nVeuillez le lui transmettre.`);
             }
             saveData(); 
             refreshDashboardViews(); 
             clearTeacherForm();
         }
-
         function editTeacher(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const t = s.teachers[i];
@@ -1671,7 +1767,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('teacherClass').value = t.titulaireClass || '';
             document.getElementById('btnTeacherSubmit').innerText = "Modifier";
         }
-
         function deleteTeacher(i) {
             if(confirm("Supprimer cet enseignant ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1740,6 +1835,39 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             tbody.innerHTML = filtered.length ? filtered.map((st) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editStudent(${st.originalIndex})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteStudent(${st.originalIndex})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucun élève inscrit dans cette classe.</td></tr>`;
         }
 
+        // --- 4.1. CARTE D'ÉLÈVE & IMPRESSION EN MASSE ---
+        function printAllCardsForClass() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('batchCardClassSelect').value;
+            if(!cl) { alert("Veuillez sélectionner une classe !"); return; }
+            const students = s.students.filter(x => x.classe === cl);
+            if(!students.length) { alert("Aucun élève dans cette classe."); return; }
+
+            let html = `<div style="padding:10px;">`;
+            students.forEach(st => {
+                html += `
+                    <div style="border:1px solid #000; width:9cm; height:7cm; background:#FFD400; padding:5px; margin:0 auto 20px; page-break-after:always; font-family:Arial; font-size:10px; position:relative;">
+                        <div style="text-align:center; font-weight:bold;">République Démocratique du Congo</div>
+                        <div style="text-align:center; font-size:12px; font-weight:bold; text-decoration:underline; margin:5px 0;">CARTE D'ÉLÈVE</div>
+                        <div><b>Nom :</b> ${st.name}</div>
+                        <div><b>Sexe :</b> ${st.sexe}</div>
+                        <div><b>Classe :</b> ${st.classe}</div>
+                        <div><b>Matricule :</b> ${st.mat}</div>
+                        <div style="position:absolute; bottom:10px; left:10px; right:10px; text-align:center; font-size:8px; font-weight:bold;">
+                            ${s.name} — ${s.province}
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Impression en Masse - Cartes (${cl})`;
+            document.getElementById('invoicePrintArea').innerHTML = html;
+            const modalEl = document.getElementById('invoiceModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+
         // --- 5. COURS ---
         function handleSaveCourse(e) {
             e.preventDefault();
@@ -1786,7 +1914,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('courseMax').value = "";
             document.getElementById('btnCourseSubmit').innerText = "Enregistrer";
         }
-
         function renderCoursesTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('courseClassSelect').value;
@@ -1803,7 +1930,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const filtered = s.students.filter(x => x.classe === cl);
             document.getElementById('notesStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name}</option>`).join('');
         }
-
         function renderNotesSheet() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('notesClassSelect').value;
@@ -1829,7 +1955,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             html += `</tbody></table>`;
             container.innerHTML = html;
         }
-
         function saveNote(stId, crsId, period, val) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s.notes[stId]) s.notes[stId] = {};
@@ -1838,19 +1963,37 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             saveData();
         }
 
-        // --- 7. BULLETINS ---
+        // --- 7. BULLETINS (AVEC CLASSEMENT AUTOMATIQUE) ---
         function refreshBulletinOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
             let classOptions = `<option value="" disabled selected>— Sélectionner Classe —</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             document.getElementById('bulletinClassSelect').innerHTML = classOptions;
         }
-
         function loadStudentsForBulletin() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('bulletinClassSelect').value;
             const filtered = s.students.filter(x => x.classe === cl);
             document.getElementById('bulletinStudentSelect').innerHTML = `<option value="" disabled selected>— Sélectionner Élève —</option>` + filtered.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
+        }
+
+        function calculateClassRank(school, className, studentId) {
+            const studentsInClass = school.students.filter(x => x.classe === className);
+            const courses = school.courses[className] || [];
+            if(!studentsInClass.length || !courses.length) return { rank: 1, total: studentsInClass.length };
+
+            let scores = studentsInClass.map(st => {
+                let totalObt = 0;
+                courses.forEach(c => {
+                    const n = (school.notes[st.id] && school.notes[st.id][c.id]) ? school.notes[st.id][c.id] : {};
+                    totalObt += (parseFloat(n.p1)||0) + (parseFloat(n.p2)||0) + (parseFloat(n.e1)||0) + (parseFloat(n.p3)||0) + (parseFloat(n.p4)||0) + (parseFloat(n.e2)||0);
+                });
+                return { id: st.id, total: totalObt };
+            });
+
+            scores.sort((a, b) => b.total - a.total);
+            const index = scores.findIndex(x => x.id === studentId);
+            return { rank: index !== -1 ? index + 1 : 1, total: studentsInClass.length };
         }
 
         function renderBulletinFromSystem() {
@@ -1862,6 +2005,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const pageContainer = document.getElementById('page');
 
             if(!student || !clName) return;
+
+            const rankInfo = calculateClassRank(s, clName, student.id);
 
             const FLAG='<svg viewBox="0 0 90 60"><rect width="90" height="60" fill="#007FFF"/><polygon points="0,46 76,0 90,0 90,14 14,60 0,60" fill="#F7D618"/><polygon points="0,52 83,0 90,0 90,6 7,60 0,60" fill="#CE1021"/><polygon points="14,5 15.88,10.41 21.61,10.53 17.04,13.99 18.7,19.47 14,16.2 9.3,19.47 10.96,13.99 6.39,10.53 12.12,10.41" fill="#F7D618"/></svg>';
             const EMB='<svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="34" ry="26" fill="none" stroke="#666" stroke-dasharray="3 3"/><text x="40" y="34" text-anchor="middle" font-size="11" fill="#666" font-family="Arial">LOGO</text></svg>';
@@ -1903,7 +2048,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             let totGeneralMax = 0;
 
             if(!courses.length) {
-                h += `<tr><td colspan="16" class="text-center p-3 text-muted">Aucun cours ni note enregistrés pour cette classe. Veuillez ajouter les cours dans "5. Cours & Pondération".</td></tr>`;
+                h += `<tr><td colspan="16" class="text-center p-3 text-muted">Aucun cours ni note enregistrés pour cette classe.</td></tr>`;
             } else {
                 courses.forEach(c => {
                     const n = (s.notes[student.id] && s.notes[student.id][c.id]) ? s.notes[student.id][c.id] : {};
@@ -1954,7 +2099,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
             h += `<tr class="bold"><td class="nm">TOTAUX</td>${bl}<td>${totGeneralObtenu||''}</td>${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${pr(totGeneralObtenu||'')}${sidecell}</tr>`;
             h += `<tr class="bold"><td class="nm">POURCENTAGE</td>${bl}<td>${pct}</td>${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}<td>${pct}</td></tr>`;
-            h += `<tr class="bold"><td class="nm">PLACE / ELEVES</td>${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${empty}</tr>`;
+            h += `<tr class="bold"><td class="nm">PLACE / ELEVES</td>${bl}<td colspan="5" style="text-align:center; font-weight:bold; color:red;">${rankInfo.rank} / ${rankInfo.total}</td>${bl}<td colspan="5" style="text-align:center; font-weight:bold; color:red;">${rankInfo.rank} / ${rankInfo.total}</td></tr>`;
             h += `<tr class="bold"><td class="nm">APPLICATION</td>${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${empty}</tr>`;
             h += `<tr class="bold"><td class="nm">CONDUITE</td>${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${empty}</tr>`;
             h += `<tr class="bold"><td class="nm">SIGNATURE</td>${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${bl}${empty}${empty}${empty}</tr>`;
@@ -1970,7 +2115,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             pageContainer.innerHTML = h;
         }
 
-        // --- 8. FRAIS SCOLAIRES & PAIEMENTS (ÉLÈVE, AGENT & ADMIN) ---
+        // --- 8. FRAIS SCOLAIRES & PAIEMENTS ---
         function refreshPaymentOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
@@ -1986,20 +2131,17 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             renderAdminPayTable();
             renderCaisseTable();
         }
-
         function loadStudentsForPayment(cl) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const filtered = s.students.filter(x => x.classe === cl);
             document.getElementById('payStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
         }
-
         function calcStudentReste() {
             const total = parseFloat(document.getElementById('payTotal').value) || 0;
             const paye = parseFloat(document.getElementById('payMontant').value) || 0;
             const reste = total - paye;
             document.getElementById('payReste').value = reste >= 0 ? reste : 0;
         }
-
         function handleSaveStudentPayment(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2038,7 +2180,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 reste: reste
             });
         }
-
         function editStudentPayment(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const p = s.studentPayments[i];
@@ -2051,7 +2192,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('payReste').value = p.reste;
             document.getElementById('btnStudentPaySubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
         }
-
         function deleteStudentPayment(i) {
             if(confirm("Supprimer ce paiement ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2060,7 +2200,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 renderStudentPayTable();
             }
         }
-
         function renderStudentPayTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.studentPayments) return;
@@ -2080,7 +2219,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </tr>
             `).join('') : `<tr><td colspan="7" class="text-center text-muted">Aucun paiement d'élève enregistré.</td></tr>`;
         }
-
         function clearStudentPayForm() {
             document.getElementById('formStudentPay').reset();
             document.getElementById('editStudentPayIndex').value = "";
@@ -2096,7 +2234,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const s = appData.schools.find(x => x.id === activeSchoolId);
             document.getElementById('agentPayTeacherSelect').innerHTML = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, idx) => `<option value="${idx}">${t.name} (${t.titulaireClass || 'Enseignant'})</option>`).join('');
         }
-
         function calcAgentReste() {
             const salaire = parseFloat(document.getElementById('agentSalaire').value) || 0;
             const prime = parseFloat(document.getElementById('agentPrime').value) || 0;
@@ -2105,7 +2242,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const reste = totalDu - paye;
             document.getElementById('agentReste').value = reste >= 0 ? reste : 0;
         }
-
         function handleSaveAgentPayment(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2145,7 +2281,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 reste: reste
             });
         }
-
         function editAgentPayment(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const p = s.agentPayments[i];
@@ -2158,7 +2293,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('agentReste').value = p.reste;
             document.getElementById('btnAgentPaySubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
         }
-
         function deleteAgentPayment(i) {
             if(confirm("Supprimer ce paiement agent ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2167,7 +2301,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 renderAgentPayTable();
             }
         }
-
         function renderAgentPayTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.agentPayments) return;
@@ -2187,7 +2320,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </tr>
             `).join('') : `<tr><td colspan="7" class="text-center text-muted">Aucun paiement d'agent enregistré.</td></tr>`;
         }
-
         function clearAgentPayForm() {
             document.getElementById('formAgentPay').reset();
             document.getElementById('editAgentPayIndex').value = "";
@@ -2199,16 +2331,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             closeRubricTab();
         }
 
-        /* --- PAIEMENT ADMINISTRATION --- */
         function fillAdminPayInfo(val) {
             if(val === "") return;
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const staffObj = s.staff[val];
-            if(staffObj) {
-                document.getElementById('adminPayRole').value = staffObj.role;
-            }
+            if(staffObj) document.getElementById('adminPayRole').value = staffObj.role;
         }
-
         function calcAdminReste() {
             const salaire = parseFloat(document.getElementById('adminSalaire').value) || 0;
             const prime = parseFloat(document.getElementById('adminPrime').value) || 0;
@@ -2217,7 +2345,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const reste = totalDu - paye;
             document.getElementById('adminReste').value = reste >= 0 ? reste : 0;
         }
-
         function handleSaveAdminPayment(e) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2259,7 +2386,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 reste: reste
             });
         }
-
         function editAdminPayment(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const p = s.adminPayments[i];
@@ -2271,7 +2397,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             document.getElementById('adminReste').value = p.reste;
             document.getElementById('btnAdminPaySubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
         }
-
         function deleteAdminPayment(i) {
             if(confirm("Supprimer ce paiement administratif ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2280,7 +2405,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 renderAdminPayTable();
             }
         }
-
         function renderAdminPayTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.adminPayments) return;
@@ -2301,7 +2425,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 </tr>
             `).join('') : `<tr><td colspan="8" class="text-center text-muted">Aucun paiement d'administration enregistré.</td></tr>`;
         }
-
         function clearAdminPayForm() {
             document.getElementById('formAdminPay').reset();
             document.getElementById('editAdminPayIndex').value = "";
@@ -2367,7 +2490,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             clearCaisseForm();
             closeRubricTab();
         }
-
         function renderCaisseTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.caisse) return;
@@ -2375,11 +2497,9 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             tbody.innerHTML = s.caisse.length ? s.caisse.map((c, i) => `<tr><td>${c.date}</td><td><b>${c.type}</b></td><td>${c.motif}</td><td class="fw-bold">${c.montant} $</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editTransaction(${i})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${i})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucune opération de caisse enregistrée.</td></tr>`;
         }
 
-        /* FONCTION D'IMPRESSION DES LISTES DE PAIEMENTS ET CAISSE */
         function printPaymentList(type) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
-
             const dateStr = new Date().toLocaleDateString('fr-FR');
             let title = "";
             let tableContent = "";
@@ -2387,139 +2507,22 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(type === 'eleves') {
                 title = `LISTE DES PAIEMENTS FRAIS SCOLAIRES — ÉLÈVES`;
                 const list = s.studentPayments || [];
-                tableContent = `
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
-                        <thead>
-                            <tr style="background:#f2f2f2;">
-                                <th style="padding:6px;">Date</th>
-                                <th style="padding:6px;">Élève</th>
-                                <th style="padding:6px;">Classe</th>
-                                <th style="padding:6px;">Générale</th>
-                                <th style="padding:6px;">Payé</th>
-                                <th style="padding:6px;">Reste</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${list.length ? list.map(p => `
-                                <tr>
-                                    <td style="padding:5px; text-align:center;">${p.date}</td>
-                                    <td style="padding:5px;"><b>${p.studentName}</b></td>
-                                    <td style="padding:5px; text-align:center;">${p.classe}</td>
-                                    <td style="padding:5px; text-align:right;">${p.total} $</td>
-                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td>
-                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td>
-                                </tr>
-                            `).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}
-                        </tbody>
-                    </table>
-                `;
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Date</th><th style="padding:6px;">Élève</th><th style="padding:6px;">Classe</th><th style="padding:6px;">Générale</th><th style="padding:6px;">Payé</th><th style="padding:6px;">Reste</th></tr></thead><tbody>${list.length ? list.map(p => `<tr><td style="padding:5px; text-align:center;">${p.date}</td><td style="padding:5px;"><b>${p.studentName}</b></td><td style="padding:5px; text-align:center;">${p.classe}</td><td style="padding:5px; text-align:right;">${p.total} $</td><td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td><td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td></tr>`).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}</tbody></table>`;
             } else if(type === 'agents') {
                 title = `LISTE DES PAIEMENTS — AGENTS / PROFS`;
                 const list = s.agentPayments || [];
-                tableContent = `
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
-                        <thead>
-                            <tr style="background:#f2f2f2;">
-                                <th style="padding:6px;">Date</th>
-                                <th style="padding:6px;">Enseignant</th>
-                                <th style="padding:6px;">Salaire</th>
-                                <th style="padding:6px;">Prime</th>
-                                <th style="padding:6px;">Payé</th>
-                                <th style="padding:6px;">Reste</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${list.length ? list.map(p => `
-                                <tr>
-                                    <td style="padding:5px; text-align:center;">${p.date}</td>
-                                    <td style="padding:5px;"><b>${p.teacherName}</b></td>
-                                    <td style="padding:5px; text-align:right;">${p.salaire} $</td>
-                                    <td style="padding:5px; text-align:right;">${p.prime} $</td>
-                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td>
-                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td>
-                                </tr>
-                            `).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}
-                        </tbody>
-                    </table>
-                `;
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Date</th><th style="padding:6px;">Enseignant</th><th style="padding:6px;">Salaire</th><th style="padding:6px;">Prime</th><th style="padding:6px;">Payé</th><th style="padding:6px;">Reste</th></tr></thead><tbody>${list.length ? list.map(p => `<tr><td style="padding:5px; text-align:center;">${p.date}</td><td style="padding:5px;"><b>${p.teacherName}</b></td><td style="padding:5px; text-align:right;">${p.salaire} $</td><td style="padding:5px; text-align:right;">${p.prime} $</td><td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td><td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td></tr>`).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}</tbody></table>`;
             } else if(type === 'admin') {
                 title = `LISTE DES PAIEMENTS — CADRES ADMINISTRATION`;
                 const list = s.adminPayments || [];
-                tableContent = `
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
-                        <thead>
-                            <tr style="background:#f2f2f2;">
-                                <th style="padding:6px;">Date</th>
-                                <th style="padding:6px;">Nom Admin</th>
-                                <th style="padding:6px;">Fonction</th>
-                                <th style="padding:6px;">Salaire Dû</th>
-                                <th style="padding:6px;">Prime</th>
-                                <th style="padding:6px;">Payé</th>
-                                <th style="padding:6px;">Reste</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${list.length ? list.map(p => `
-                                <tr>
-                                    <td style="padding:5px; text-align:center;">${p.date}</td>
-                                    <td style="padding:5px;"><b>${p.name}</b></td>
-                                    <td style="padding:5px;">${p.role}</td>
-                                    <td style="padding:5px; text-align:right;">${p.salaire} $</td>
-                                    <td style="padding:5px; text-align:right;">${p.prime} $</td>
-                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td>
-                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td>
-                                </tr>
-                            `).join('') : `<tr><td colspan="7" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}
-                        </tbody>
-                    </table>
-                `;
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Date</th><th style="padding:6px;">Nom Admin</th><th style="padding:6px;">Fonction</th><th style="padding:6px;">Salaire Dû</th><th style="padding:6px;">Prime</th><th style="padding:6px;">Payé</th><th style="padding:6px;">Reste</th></tr></thead><tbody>${list.length ? list.map(p => `<tr><td style="padding:5px; text-align:center;">${p.date}</td><td style="padding:5px;"><b>${p.name}</b></td><td style="padding:5px;">${p.role}</td><td style="padding:5px; text-align:right;">${p.salaire} $</td><td style="padding:5px; text-align:right;">${p.prime} $</td><td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td><td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td></tr>`).join('') : `<tr><td colspan="7" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}</tbody></table>`;
             } else if(type === 'caisse') {
                 title = `JOURNAL DE CAISSE — RECETTES ET DÉPENSES`;
                 const list = s.caisse || [];
-                tableContent = `
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
-                        <thead>
-                            <tr style="background:#f2f2f2;">
-                                <th style="padding:6px;">Date</th>
-                                <th style="padding:6px;">Type</th>
-                                <th style="padding:6px;">Motif / Libellé</th>
-                                <th style="padding:6px;">Montant</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${list.length ? list.map(c => `
-                                <tr>
-                                    <td style="padding:5px; text-align:center;">${c.date}</td>
-                                    <td style="padding:5px;"><b>${c.type}</b></td>
-                                    <td style="padding:5px;">${c.motif}</td>
-                                    <td style="padding:5px; text-align:right; font-weight:bold;">${c.montant}$</td>
-                                </tr>
-                            `).join('') : `<tr><td colspan="4" style="padding:10px; text-align:center;">Aucune opération de caisse enregistrée.</td></tr>`}
-                        </tbody>
-                    </table>
-                `;
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Date</th><th style="padding:6px;">Type</th><th style="padding:6px;">Motif / Libellé</th><th style="padding:6px;">Montant</th></tr></thead><tbody>${list.length ? list.map(c => `<tr><td style="padding:5px; text-align:center;">${c.date}</td><td style="padding:5px;"><b>${c.type}</b></td><td style="padding:5px;">${c.motif}</td><td style="padding:5px; text-align:right; font-weight:bold;">${c.montant}$</td></tr>`).join('') : `<tr><td colspan="4" style="padding:10px; text-align:center;">Aucune opération de caisse enregistrée.</td></tr>`}</tbody></table>`;
             }
 
-            let html = `
-                <div style="padding:15px; font-family:Arial, sans-serif; background:#fff; color:#000;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #000; padding-bottom:10px;">
-                        <div>
-                            <h4 style="margin:0; font-weight:bold;">${s.name}</h4>
-                            <small>${s.province} / ${s.commune}</small>
-                        </div>
-                        <div>
-                            <small>Date du jour : ${dateStr}</small>
-                        </div>
-                    </div>
-                    <h5 style="text-align:center; margin-top:15px; font-weight:bold; text-decoration:underline;">${title}</h5>
-                    ${tableContent}
-                    <div style="display:flex; justify-content:space-between; margin-top:30px; font-size:12px;">
-                        <div><b>Service Financier / Caisse</b></div>
-                        <div><b>Direction de l'Établissement</b></div>
-                    </div>
-                </div>
-            `;
-
+            let html = `<div style="padding:15px; font-family:Arial, sans-serif; background:#fff; color:#000;"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #000; padding-bottom:10px;"><div><h4 style="margin:0; font-weight:bold;">${s.name}</h4><small>${s.province} / ${s.commune}</small></div><div><small>Date : ${dateStr}</small></div></div><h5 style="text-align:center; margin-top:15px; font-weight:bold; text-decoration:underline;">${title}</h5>${tableContent}<div style="display:flex; justify-content:space-between; margin-top:30px; font-size:12px;"><div><b>Service Financier / Caisse</b></div><div><b>Direction de l'Établissement</b></div></div></div>`;
             document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Rapport Imprimable`;
             document.getElementById('invoicePrintArea').innerHTML = html;
             const modalEl = document.getElementById('invoiceModal');
@@ -2530,314 +2533,107 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         function generateInvoice(data) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if (!s) return;
-
             const invoiceNum = 'FAC-' + Date.now().toString().slice(-6);
             const dateHeure = new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
 
-            let html = `
-                <div style="border: 2px solid #000; padding: 20px; font-family: Arial, sans-serif; background: #fff; color: #000;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
-                        <div>
-                            <h3 style="margin: 0; font-weight: bold; text-transform: uppercase;">${s.name}</h3>
-                            <small>${s.appartenance}</small><br>
-                            <small>${s.province} / ${s.commune} — ${s.adresse || ''}</small>
-                        </div>
-                        <div style="text-align: right;">
-                            ${s.logo ? `<img src="${s.logo}" style="max-height: 60px; max-width: 100px;">` : `<h4 style="margin:0;">EDU-RDC</h4>`}
-                        </div>
-                    </div>
-
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h4 style="margin: 0; text-decoration: underline; font-weight: bold;">REÇU DE PAIEMENT / FACTURE</h4>
-                        <span style="font-size: 12px; font-weight: bold;">N° : ${invoiceNum}</span> | <small>Date : ${dateHeure}</small>
-                    </div>
-
-                    <table style="width: 100%; margin-bottom: 20px; font-size: 14px; border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 4px 0;"><strong>Type d'opération :</strong> ${data.typeOp}</td>
-                            <td style="padding: 4px 0; text-align: right;"><strong>Concerne :</strong> ${data.concerne}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 4px 0;"><strong>Nom & Prénom :</strong> ${data.nom}</td>
-                            <td style="padding: 4px 0; text-align: right;"><strong>Classe / Poste :</strong> ${data.detail || '—'}</td>
-                        </tr>
-                    </table>
-
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;" border="1">
-                        <thead>
-                            <tr style="background-color: #f2f2f2;">
-                                <th style="padding: 8px; text-align: left;">Désignation / Motif</th>
-                                <th style="padding: 8px; text-align: right;">Total Dû ($)</th>
-                                <th style="padding: 8px; text-align: right;">Montant Payé ($)</th>
-                                <th style="padding: 8px; text-align: right;">Reste à Payer ($)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="padding: 8px;">${data.motif}</td>
-                                <td style="padding: 8px; text-align: right;">${data.total || data.paye} $</td>
-                                <td style="padding: 8px; text-align: right; font-weight: bold; color: green;">${data.paye} $</td>
-                                <td style="padding: 8px; text-align: right; font-weight: bold; color: red;">${data.reste || 0} $</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px;">
-                        <div style="text-align: center; width: 40%;">
-                            <p style="margin-bottom: 50px;"><strong>Signature du Payeur / Bénéficiaire</strong></p>
-                            <p>_______________________</p>
-                        </div>
-                        <div style="text-align: center; width: 40%;">
-                            <p style="margin-bottom: 50px;"><strong>Pour la Caisse / Sceau École</strong></p>
-                            <p>_______________________</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-
+            let html = `<div style="border: 2px solid #000; padding: 20px; font-family: Arial, sans-serif; background: #fff; color: #000;"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;"><div><h3 style="margin: 0; font-weight: bold; text-transform: uppercase;">${s.name}</h3><small>${s.appartenance}</small><br><small>${s.province} / ${s.commune}</small></div><div style="text-align: right;">${s.logo ? `<img src="${s.logo}" style="max-height: 60px; max-width: 100px;">` : `<h4 style="margin:0;">EDU-RDC</h4>`}</div></div><div style="text-align: center; margin-bottom: 20px;"><h4 style="margin: 0; text-decoration: underline; font-weight: bold;">REÇU DE PAIEMENT / FACTURE</h4><span style="font-size: 12px; font-weight: bold;">N° : ${invoiceNum}</span> | <small>Date : ${dateHeure}</small></div><table style="width: 100%; margin-bottom: 20px; font-size: 14px; border-collapse: collapse;"><tr><td style="padding: 4px 0;"><strong>Type :</strong> ${data.typeOp}</td><td style="padding: 4px 0; text-align: right;"><strong>Concerne :</strong> ${data.concerne}</td></tr><tr><td style="padding: 4px 0;"><strong>Nom :</strong> ${data.nom}</td><td style="padding: 4px 0; text-align: right;"><strong>Poste/Classe :</strong> ${data.detail || '—'}</td></tr></table><table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;" border="1"><thead><tr style="background-color: #f2f2f2;"><th style="padding: 8px; text-align: left;">Motif</th><th style="padding: 8px; text-align: right;">Total Dû ($)</th><th style="padding: 8px; text-align: right;">Payé ($)</th><th style="padding: 8px; text-align: right;">Reste ($)</th></tr></thead><tbody><tr><td style="padding: 8px;">${data.motif}</td><td style="padding: 8px; text-align: right;">${data.total || data.paye} $</td><td style="padding: 8px; text-align: right; font-weight: bold; color: green;">${data.paye} $</td><td style="padding: 8px; text-align: right; font-weight: bold; color: red;">${data.reste || 0} $</td></tr></tbody></table><div style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px;"><div style="text-align: center; width: 40%;"><p style="margin-bottom: 50px;"><strong>Signature Payeur</strong></p><p>_______________________</p></div><div style="text-align: center; width: 40%;"><p style="margin-bottom: 50px;"><strong>Pour la Caisse</strong></p><p>_______________________</p></div></div></div>`;
             document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-file-invoice me-2"></i>Facture / Reçu de Paiement`;
             document.getElementById('invoicePrintArea').innerHTML = html;
-            
             const modalEl = document.getElementById('invoiceModal');
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
         }
 
-        // --- 9. PRÉSENCES ET IMPRESSION DE LISTE ---
+        // --- 9. PRÉSENCES ---
         function refreshPresenceOptions() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
-
             let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             document.getElementById('presClassSelect').innerHTML = classOptions;
-
             const profOptions = `<option value="" disabled selected>Choisir enseignant...</option>` + s.teachers.map((t, i) => `<option value="T-${i}">${t.name} (Enseignant)</option>`).join('');
             document.getElementById('presProfSelect').innerHTML = profOptions;
-
             const adminOptions = `<option value="" disabled selected>Choisir cadre admin...</option>` + s.staff.map((st, i) => `<option value="S-${i}">${st.name} (${st.role})</option>`).join('');
             document.getElementById('presAdminSelect').innerHTML = adminOptions;
-
             renderStaffPresenceTables();
         }
-
         function loadStudentsForPresence() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const cl = document.getElementById('presClassSelect').value;
             const container = document.getElementById('studentsPresenceContainer');
             if(!cl) { container.innerHTML = `<p class="text-muted">Veuillez sélectionner une classe.</p>`; return; }
-
             const students = s.students.filter(x => x.classe === cl);
             if(!students.length) { container.innerHTML = `<p class="text-muted">Aucun élève inscrit dans cette classe.</p>`; return; }
-
             if(!s.presenceStudents[cl]) s.presenceStudents[cl] = {};
 
             let html = `<table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Matricule</th><th>Nom & Prénom</th><th>Statut de Présence</th></tr></thead><tbody>`;
             students.forEach(st => {
                 const status = s.presenceStudents[cl][st.id] || 'Présent';
-                html += `<tr>
-                    <td><b>${st.mat}</b></td>
-                    <td>${st.name}</td>
-                    <td>
-                        <div class="d-flex gap-3">
-                            <div class="form-check">
-                                <input class="form-check-input student-pres-input" type="radio" name="pres_${st.id}" value="Présent" ${status==='Présent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Présent')">
-                                <label class="form-check-label text-success fw-bold">Présent</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input student-pres-input" type="radio" name="pres_${st.id}" value="Absent" ${status==='Absent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Absent')">
-                                <label class="form-check-label text-danger fw-bold">Absent</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input student-pres-input" type="radio" name="pres_${st.id}" value="Malade" ${status==='Malade'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Malade')">
-                                <label class="form-check-label text-warning fw-bold">Malade</label>
-                            </div>
-                        </div>
-                    </td>
-                </tr>`;
+                html += `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td><div class="d-flex gap-3"><div class="form-check"><input class="form-check-input" type="radio" name="pres_${st.id}" value="Présent" ${status==='Présent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Présent')"><label class="form-check-label text-success fw-bold">Présent</label></div><div class="form-check"><input class="form-check-input" type="radio" name="pres_${st.id}" value="Absent" ${status==='Absent'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Absent')"><label class="form-check-label text-danger fw-bold">Absent</label></div><div class="form-check"><input class="form-check-input" type="radio" name="pres_${st.id}" value="Malade" ${status==='Malade'?'checked':''} onchange="setStudentPres('${cl}','${st.id}','Malade')"><label class="form-check-label text-warning fw-bold">Malade</label></div></div></td></tr>`;
             });
             html += `</tbody></table>`;
             container.innerHTML = html;
         }
-
         function setStudentPres(cl, stId, val) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s.presenceStudents[cl]) s.presenceStudents[cl] = {};
             s.presenceStudents[cl][stId] = val;
             saveData();
         }
-
         function handleSaveStudentPresence(e) {
             e.preventDefault();
             const cl = document.getElementById('presClassSelect').value;
             if(!cl) { alert("Veuillez choisir une classe !"); return; }
             saveData();
-            alert("Présences des élèves enregistrées avec succès !");
-            document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
+            alert("Présences enregistrées avec succès !");
         }
-
-        function editStudentPresence() {
-            const cl = document.getElementById('presClassSelect').value;
-            if(!cl) { alert("Veuillez sélectionner une classe à modifier !"); return; }
-            alert("Mode modification activé pour la classe " + cl + ". Vous pouvez changer les statuts directement dans le tableau.");
-            document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
-        }
-
-        /* FONCTION IMPRESSION DES LISTES DE PRÉSENCE (ÉLÈVES, ENSEIGNANTS, ADMIN) */
+        function editStudentPresence() { alert("Mode modification activé."); }
         function printPresenceList(type) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
-
             const dateStr = new Date().toLocaleDateString('fr-FR');
-            let title = "";
-            let tableContent = "";
+            let title = "", tableContent = "";
 
             if(type === 'eleves') {
                 const cl = document.getElementById('presClassSelect').value;
-                if(!cl) { alert("Veuillez d'abord sélectionner une classe d'élèves à imprimer !"); return; }
+                if(!cl) { alert("Sélectionnez une classe !"); return; }
                 title = `LISTE DE PRÉSENCE ÉLÈVES — CLASSE : ${cl}`;
                 const students = s.students.filter(x => x.classe === cl);
-
-                tableContent = `
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
-                        <thead>
-                            <tr style="background:#f2f2f2;">
-                                <th style="padding:6px;">N°</th>
-                                <th style="padding:6px;">Matricule</th>
-                                <th style="padding:6px;">Nom & Prénom</th>
-                                <th style="padding:6px;">Sexe</th>
-                                <th style="padding:6px;">Statut Présence</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${students.map((st, i) => {
-                                const status = (s.presenceStudents[cl] && s.presenceStudents[cl][st.id]) ? s.presenceStudents[cl][st.id] : 'Non renseigné';
-                                return `<tr>
-                                    <td style="padding:5px; text-align:center;">${i+1}</td>
-                                    <td style="padding:5px; text-align:center;">${st.mat}</td>
-                                    <td style="padding:5px;">${st.name}</td>
-                                    <td style="padding:5px; text-align:center;">${st.sexe}</td>
-                                    <td style="padding:5px; text-align:center;"><b>${status}</b></td>
-                                </tr>`;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                `;
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">N°</th><th style="padding:6px;">Matricule</th><th style="padding:6px;">Nom & Prénom</th><th style="padding:6px;">Statut</th></tr></thead><tbody>${students.map((st, i) => `<tr><td style="padding:5px; text-align:center;">${i+1}</td><td style="padding:5px; text-align:center;">${st.mat}</td><td style="padding:5px;">${st.name}</td><td style="padding:5px; text-align:center;"><b>${(s.presenceStudents[cl] && s.presenceStudents[cl][st.id]) || 'Présent'}</b></td></tr>`).join('')}</tbody></table>`;
             } else if(type === 'profs') {
-                title = `RAPPORT DES PRÉSENCES ENSEIGNANTS / PROFESSEURS`;
-                const profsList = (s.presenceStaff || []).filter(x => x.type === 'Professeur');
-                tableContent = `
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
-                        <thead>
-                            <tr style="background:#f2f2f2;">
-                                <th style="padding:6px;">N°</th>
-                                <th style="padding:6px;">Nom complet</th>
-                                <th style="padding:6px;">Fonction / Classe</th>
-                                <th style="padding:6px;">Statut</th>
-                                <th style="padding:6px;">Heure Arrivée</th>
-                                <th style="padding:6px;">Heure Départ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${profsList.map((p, i) => `<tr>
-                                <td style="padding:5px; text-align:center;">${i+1}</td>
-                                <td style="padding:5px;">${p.name}</td>
-                                <td style="padding:5px;">${p.fonction}</td>
-                                <td style="padding:5px; text-align:center;"><b>${p.statut}</b></td>
-                                <td style="padding:5px; text-align:center;">${p.arrivee || '-'}</td>
-                                <td style="padding:5px; text-align:center;">${p.depart || '-'}</td>
-                            </tr>`).join('')}
-                        </tbody>
-                    </table>
-                `;
+                title = `RAPPORT PRÉSENCES ENSEIGNANTS`;
+                const list = (s.presenceStaff || []).filter(x => x.type === 'Professeur');
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Nom</th><th style="padding:6px;">Fonction</th><th style="padding:6px;">Statut</th><th style="padding:6px;">Arrivée</th><th style="padding:6px;">Départ</th></tr></thead><tbody>${list.map(p => `<tr><td style="padding:5px;">${p.name}</td><td style="padding:5px;">${p.fonction}</td><td style="padding:5px; text-align:center;"><b>${p.statut}</b></td><td style="padding:5px; text-align:center;">${p.arrivee}</td><td style="padding:5px; text-align:center;">${p.depart}</td></tr>`).join('')}</tbody></table>`;
             } else if(type === 'admin') {
-                title = `RAPPORT DES PRÉSENCES PERSONNEL ADMINISTRATIF`;
-                const adminList = (s.presenceStaff || []).filter(x => x.type === 'Administration');
-                tableContent = `
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;">
-                        <thead>
-                            <tr style="background:#f2f2f2;">
-                                <th style="padding:6px;">N°</th>
-                                <th style="padding:6px;">Nom complet</th>
-                                <th style="padding:6px;">Fonction Admin</th>
-                                <th style="padding:6px;">Statut</th>
-                                <th style="padding:6px;">Heure Arrivée</th>
-                                <th style="padding:6px;">Heure Départ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${adminList.map((p, i) => `<tr>
-                                <td style="padding:5px; text-align:center;">${i+1}</td>
-                                <td style="padding:5px;">${p.name}</td>
-                                <td style="padding:5px;">${p.fonction}</td>
-                                <td style="padding:5px; text-align:center;"><b>${p.statut}</b></td>
-                                <td style="padding:5px; text-align:center;">${p.arrivee || '-'}</td>
-                                <td style="padding:5px; text-align:center;">${p.depart || '-'}</td>
-                            </tr>`).join('')}
-                        </tbody>
-                    </table>
-                `;
+                title = `RAPPORT PRÉSENCES ADMINISTRATION`;
+                const list = (s.presenceStaff || []).filter(x => x.type === 'Administration');
+                tableContent = `<table border="1" style="width:100%; border-collapse:collapse; margin-top:15px; font-size:12px;"><thead><tr style="background:#f2f2f2;"><th style="padding:6px;">Nom</th><th style="padding:6px;">Fonction</th><th style="padding:6px;">Statut</th><th style="padding:6px;">Arrivée</th><th style="padding:6px;">Départ</th></tr></thead><tbody>${list.map(p => `<tr><td style="padding:5px;">${p.name}</td><td style="padding:5px;">${p.fonction}</td><td style="padding:5px; text-align:center;"><b>${p.statut}</b></td><td style="padding:5px; text-align:center;">${p.arrivee}</td><td style="padding:5px; text-align:center;">${p.depart}</td></tr>`).join('')}</tbody></table>`;
             }
 
-            let html = `
-                <div style="padding:15px; font-family:Arial, sans-serif; background:#fff; color:#000;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #000; padding-bottom:10px;">
-                        <div>
-                            <h4 style="margin:0; font-weight:bold;">${s.name}</h4>
-                            <small>${s.province} / ${s.commune}</small>
-                        </div>
-                        <div>
-                            <small>Date du jour : ${dateStr}</small>
-                        </div>
-                    </div>
-                    <h5 style="text-align:center; margin-top:15px; font-weight:bold; text-decoration:underline;">${title}</h5>
-                    ${tableContent}
-                    <div style="display:flex; justify-content:space-between; margin-top:30px; font-size:12px;">
-                        <div><b>Secrétariat / Discipline</b></div>
-                        <div><b>Direction de l'Établissement</b></div>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Liste de Présence - Imprimable`;
+            let html = `<div style="padding:15px; font-family:Arial;"><h4 style="text-align:center;">${s.name}</h4><h5 style="text-align:center; text-decoration:underline;">${title}</h5>${tableContent}</div>`;
+            document.getElementById('modalPrintTitle').innerHTML = `<i class="fa fa-print me-2"></i>Rapport Présence`;
             document.getElementById('invoicePrintArea').innerHTML = html;
-            const modalEl = document.getElementById('invoiceModal');
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
         }
-
-        function closePresenceForm(tabName) {
-            if(tabName === 'p-eleves') {
-                document.getElementById('presClassSelect').value = "";
-                document.getElementById('studentsPresenceContainer').innerHTML = `<p class="text-muted">Veuillez sélectionner une classe pour afficher les élèves.</p>`;
-                document.getElementById('btnStudentPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
-            }
-            closeRubricTab();
-        }
-
+        function closePresenceForm(tabName) { closeRubricTab(); }
         function fillProfInfo(val) {
             if(!val) return;
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const idx = parseInt(val.split('-')[1]);
-            const t = s.teachers[idx];
+            const t = s.teachers[parseInt(val.split('-')[1])];
             document.getElementById('presProfName').value = t.name;
             document.getElementById('presProfClass').value = t.titulaireClass ? `Titulaire: ${t.titulaireClass}` : 'Enseignant';
         }
-
         function fillAdminInfo(val) {
             if(!val) return;
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const idx = parseInt(val.split('-')[1]);
-            const st = s.staff[idx];
+            const st = s.staff[parseInt(val.split('-')[1])];
             document.getElementById('presAdminName').value = st.name;
             document.getElementById('presAdminRole').value = st.role;
         }
-
         function handleSaveStaffPresence(e, type) {
             e.preventDefault();
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const isProf = (type === 'prof');
             const editIdx = document.getElementById(isProf ? 'editProfPresIndex' : 'editAdminPresIndex').value;
-
             const name = document.getElementById(isProf ? 'presProfName' : 'presAdminName').value;
             const fonc = document.getElementById(isProf ? 'presProfClass' : 'presAdminRole').value;
             const statut = document.getElementById(isProf ? 'presProfStatus' : 'presAdminStatus').value;
@@ -2846,25 +2642,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const date = new Date().toLocaleDateString('fr-FR');
 
             const record = { date, type: (isProf ? 'Professeur' : 'Administration'), name, fonction: fonc, statut, arrivee, depart };
-
-            if(editIdx !== "") {
-                s.presenceStaff[editIdx] = record;
-                alert("Présence modifiée avec succès !");
-            } else {
-                s.presenceStaff.push(record);
-                alert("Présence enregistrée avec succès !");
-            }
-
-            saveData();
-            renderStaffPresenceTables();
-            if(isProf) clearProfPresForm(); else clearAdminPresForm();
+            if(editIdx !== "") s.presenceStaff[editIdx] = record; else s.presenceStaff.push(record);
+            saveData(); renderStaffPresenceTables(); alert("Présence enregistrée !");
         }
-
         function editStaffPres(i) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const p = s.presenceStaff[i];
             const isProf = (p.type === 'Professeur');
-            
             if(isProf) {
                 document.getElementById('editProfPresIndex').value = i;
                 document.getElementById('presProfName').value = p.name;
@@ -2872,7 +2656,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 document.getElementById('presProfStatus').value = p.statut;
                 document.getElementById('presProfArrivee').value = p.arrivee;
                 document.getElementById('presProfDepart').value = p.depart;
-                document.getElementById('btnProfPresSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
             } else {
                 document.getElementById('editAdminPresIndex').value = i;
                 document.getElementById('presAdminName').value = p.name;
@@ -2880,224 +2663,121 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 document.getElementById('presAdminStatus').value = p.statut;
                 document.getElementById('presAdminArrivee').value = p.arrivee;
                 document.getElementById('presAdminDepart').value = p.depart;
-                document.getElementById('btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
             }
         }
-
         function deleteStaffPres(i) {
-            if(confirm("Supprimer cette présence ?")) {
+            if(confirm("Supprimer ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
                 s.presenceStaff.splice(i, 1);
-                saveData();
-                renderStaffPresenceTables();
+                saveData(); renderStaffPresenceTables();
             }
         }
-
-        function clearProfPresForm() {
-            const form = document.getElementById('formPresProf');
-            if(form) form.reset();
-            document.getElementById('editProfPresIndex').value = "";
-            document.getElementById('presProfName').value = "";
-            document.getElementById('presProfClass').value = "";
-            document.getElementById('btnProfPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
-        }
-        function resetProfPresForm() {
-            clearProfPresForm();
-            closeRubricTab();
-        }
-
-        function clearAdminPresForm() {
-            const form = document.getElementById('formPresAdmin');
-            if(form) form.reset();
-            document.getElementById('editAdminPresIndex').value = "";
-            document.getElementById('presAdminName').value = "";
-            document.getElementById('presAdminRole').value = "";
-            document.getElementById('btnAdminPresSubmit').innerHTML = '<i class="fa fa-save"></i> Enregistrer';
-        }
-        function resetAdminPresForm() {
-            clearAdminPresForm();
-            closeRubricTab();
-        }
-
+        function resetProfPresForm() { closeRubricTab(); }
+        function resetAdminPresForm() { closeRubricTab(); }
         function renderStaffPresenceTables() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.presenceStaff) return;
-
-            const profsTbody = document.getElementById('profPresTableBody');
-            const adminTbody = document.getElementById('adminPresTableBody');
-
             const profsList = s.presenceStaff.map((p, idx) => ({...p, originalIndex: idx})).filter(x => x.type === 'Professeur');
             const adminList = s.presenceStaff.map((p, idx) => ({...p, originalIndex: idx})).filter(x => x.type === 'Administration');
 
-            profsTbody.innerHTML = profsList.length ? profsList.map(p => `
-                <tr>
-                    <td><b>${p.name}</b></td>
-                    <td>${p.fonction}</td>
-                    <td><span class="badge bg-${p.statut==='Présent'?'success':(p.statut==='Absent'?'danger':'warning')}">${p.statut}</span></td>
-                    <td>${p.arrivee}</td>
-                    <td>${p.depart}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteStaffPres(${p.originalIndex})"><i class="fa fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence enregistrée.</td></tr>`;
+            document.getElementById('profPresTableBody').innerHTML = profsList.length ? profsList.map(p => `<tr><td><b>${p.name}</b></td><td>${p.fonction}</td><td>${p.statut}</td><td>${p.arrivee}</td><td>${p.depart}</td><td><button class="btn btn-sm btn-outline-primary" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button></td></tr>`).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence.</td></tr>`;
+            document.getElementById('adminPresTableBody').innerHTML = adminList.length ? adminList.map(p => `<tr><td><b>${p.name}</b></td><td>${p.fonction}</td><td>${p.statut}</td><td>${p.arrivee}</td><td>${p.depart}</td><td><button class="btn btn-sm btn-outline-primary" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button></td></tr>`).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence.</td></tr>`;
+        }
 
-            adminTbody.innerHTML = adminList.length ? adminList.map(p => `
-                <tr>
-                    <td><b>${p.name}</b></td>
-                    <td>${p.fonction}</td>
-                    <td><span class="badge bg-${p.statut==='Présent'?'success':(p.statut==='Absent'?'danger':'warning')}">${p.statut}</span></td>
-                    <td>${p.arrivee}</td>
-                    <td>${p.depart}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editStaffPres(${p.originalIndex})"><i class="fa fa-edit"></i></button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteStaffPres(${p.originalIndex})"><i class="fa fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune présence enregistrée.</td></tr>`;
+        // --- 9.1. DISCIPLINE & SANCTIONS ---
+        function refreshDisciplineOptions() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+            let classOptions = `<option value="" disabled selected>Choisir classe...</option>` + s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            document.getElementById('discClassSelect').innerHTML = classOptions;
+            renderDisciplineTable();
+        }
+        function loadStudentsForDiscipline() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const cl = document.getElementById('discClassSelect').value;
+            const filtered = s.students.filter(x => x.classe === cl);
+            document.getElementById('discStudentSelect').innerHTML = `<option value="" disabled selected>Choisir élève...</option>` + filtered.map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+        }
+        function handleSaveDiscipline(e) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const editIdx = document.getElementById('editDisciplineIndex').value;
+            const classe = document.getElementById('discClassSelect').value;
+            const stId = document.getElementById('discStudentSelect').value;
+            const stObj = s.students.find(x => x.id === stId);
+            const studentName = stObj ? stObj.name : 'Inconnu';
+            const sanction = document.getElementById('discSanction').value;
+            const obs = document.getElementById('discObs').value.trim();
+            const date = new Date().toLocaleDateString('fr-FR');
+
+            const record = { date, classe, studentName, sanction, obs };
+            if(editIdx !== "") s.discipline[editIdx] = record; else s.discipline.push(record);
+            saveData(); renderDisciplineTable();
+            document.getElementById('editDisciplineIndex').value = "";
+            alert("Sanction enregistrée !");
+        }
+        function renderDisciplineTable() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s || !s.discipline) return;
+            const tbody = document.getElementById('disciplineTableBody');
+            tbody.innerHTML = s.discipline.length ? s.discipline.map((d, i) => `<tr><td>${d.date}</td><td><b>${d.studentName}</b></td><td>${d.classe}</td><td><span class="badge bg-danger">${d.sanction}</span></td><td>${d.obs}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.discipline.splice(${i},1);saveData();renderDisciplineTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="6" class="text-center text-muted">Aucune sanction enregistrée.</td></tr>`;
         }
 
         // --- 10. PROGRAMME ---
         function handleSaveProgram() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const text = document.getElementById('schoolProgramText').value.trim();
-            if(!text) { alert("Veuillez saisir un programme !"); return; }
+            if(!text) { alert("Saisir un programme !"); return; }
             s.program = text;
-            saveData();
-            renderProgramView();
-            alert("Programme enregistré avec succès !");
+            saveData(); renderProgramView(); alert("Programme enregistré !");
         }
-
         function editProgram() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             document.getElementById('schoolProgramText').value = s.program || '';
         }
-
         function deleteProgram() {
-            if(confirm("Supprimer ce programme ?")) {
+            if(confirm("Supprimer ?")) {
                 const s = appData.schools.find(x => x.id === activeSchoolId);
-                s.program = '';
-                saveData();
-                renderProgramView();
+                s.program = ''; saveData(); renderProgramView();
             }
         }
-
         function renderProgramView() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s) return;
             document.getElementById('displaySchoolProgram').innerText = s.program || 'Aucun programme configuré.';
-            document.getElementById('schoolProgramText').value = s.program || '';
         }
 
         // --- 11. COMMUNICATION ---
         function handleSaveCommunication() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
-            const editIdx = document.getElementById('editCommIndex').value;
             const message = document.getElementById('announcementText').value.trim();
-            if(!message) { alert("Veuillez saisir un message !"); return; }
-            const date = new Date().toLocaleDateString('fr-FR');
-
-            if(editIdx !== "") {
-                s.communications[editIdx] = { date, message };
-                alert("Communication modifiée avec succès !");
-            } else {
-                s.communications.push({ date, message });
-                alert("Communication publiée avec succès !");
-            }
-            saveData();
-            renderCommTable();
-            clearCommForm();
+            if(!message) { alert("Saisir un message !"); return; }
+            s.communications.push({ date: new Date().toLocaleDateString('fr-FR'), message });
+            saveData(); renderCommTable(); alert("Communication publiée !");
         }
-
-        function editCommunication(i) {
-            const s = appData.schools.find(x => x.id === activeSchoolId);
-            const c = s.communications[i];
-            document.getElementById('editCommIndex').value = i;
-            document.getElementById('announcementText').value = c.message;
-            document.getElementById('btnCommSubmit').innerHTML = '<i class="fa fa-save"></i> Modifier';
-        }
-
-        function deleteCommunication(i) {
-            if(confirm("Supprimer cette communication ?")) {
-                const s = appData.schools.find(x => x.id === activeSchoolId);
-                s.communications.splice(i, 1);
-                saveData();
-                renderCommTable();
-            }
-        }
-
-        function clearCommForm() {
-            document.getElementById('editCommIndex').value = "";
-            document.getElementById('announcementText').value = "";
-            document.getElementById('btnCommSubmit').innerHTML = '<i class="fa fa-save"></i> Publier / Enregistrer';
-        }
-
         function renderCommTable() {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if(!s || !s.communications) return;
-            const tbody = document.getElementById('commTableBody');
-            tbody.innerHTML = s.communications.length ? s.communications.map((c, i) => `
-                <tr>
-                    <td>${c.date}</td>
-                    <td>${c.message}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editCommunication(${i})"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteCommunication(${i})"><i class="fa fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune communication enregistrée.</td></tr>`;
+            document.getElementById('commTableBody').innerHTML = s.communications.length ? s.communications.map((c, i) => `<tr><td>${c.date}</td><td>${c.message}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${i},1);saveData();renderCommTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted">Aucune communication.</td></tr>`;
         }
 
         function verifyAndOpenDashboardTab(tabId) {
             const s = appData.schools.find(x => x.id === activeSchoolId);
             if (!s) return;
-
-            const inputCode = prompt(`[SÉCURITÉ TABLEAU DE BORD]\nVeuillez entrer votre code secret pour ouvrir cette rubrique :`);
+            const inputCode = prompt(`[SÉCURITÉ TABLEAU DE BORD]\nVeuillez entrer votre code secret :`);
             if (inputCode === null) return;
-
-            const code = inputCode.trim();
-            let authorized = false;
-
-            if (code === s.secretCode) {
-                authorized = true;
-            } else {
-                const teacherMatch = s.teachers.find(t => t.secretCode === code);
-                if (teacherMatch) {
-                    if (tabId === 'tab-cours' || tabId === 'tab-notes' || tabId === 'tab-bulletins' || tabId === 'tab-carte-eleve') {
-                        authorized = true;
-                    } else {
-                        alert("Accès restreint : Votre Code Agent vous permet uniquement d'accéder aux Cours, Notes et Bulletins.");
-                        return;
-                    }
-                }
-            }
-
-            if (authorized) {
+            if (inputCode.trim() === s.secretCode || s.teachers.some(t => t.secretCode === inputCode.trim())) {
                 document.getElementById('defaultWelcomeMessage').style.display = 'none';
                 document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-                document.querySelectorAll('.params-submenu .list-group-item').forEach(el => el.classList.remove('active'));
-
                 document.getElementById(tabId).classList.add('active');
-
-                if (tabId === 'tab-presences') {
-                    refreshPresenceOptions();
-                } else if (tabId === 'tab-frais') {
-                    refreshPaymentOptions();
-                } else if (tabId === 'tab-bulletins') {
-                    refreshBulletinOptions();
-                } else if (tabId === 'tab-cours') {
-                    renderCoursesTable();
-                } else if (tabId === 'tab-eleves-reg') {
-                    renderStudentsTable();
-                }
+                if(tabId === 'tab-analytics') renderAnalyticsCharts();
             } else {
-                alert("Code secret incorrect ! Accès refusé.");
+                alert("Code secret incorrect !");
             }
         }
     </script>
 
-    <!-- VOTRE SCRIPT CARTE INTÉGRÉ -->
+    <!-- SCRIPT CARTE D'ÉLÈVE -->
     <script>
     (function () {
       var CLE = 'carte_eleve_v1';
@@ -3190,14 +2870,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
           btnModif.addEventListener('click', function () {
             enregistre = false;
             verrouiller(false);
-            msg('Modification en cours. Pensez à enregistrer.', true);
+            msg('Modification en cours.', true);
           });
       }
 
       const btnImpr = $('btnImpr');
       if(btnImpr) {
           btnImpr.addEventListener('click', function () {
-            if (!enregistre) { msg('Enregistrez d\'abord la carte avant d\'imprimer.', false); return; }
+            if (!enregistre) { msg('Enregistrez d\'abord la carte.', false); return; }
             $('codeEcole').value = ''; $('codeErr').textContent = '';$('fond').classList.add('on');
             setTimeout(function () { $('codeEcole').focus(); }, 50);
           });
@@ -3210,8 +2890,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         var code = $('codeEcole').value;
         if (!code.trim()) { $('codeErr').textContent = 'Entrez le code école.'; return; }
         var ok = false;
-        try { ok = await verifierCodeEcole(code); } catch (e) { $('codeErr').textContent = 'Vérification impossible. Réessayez.'; return; }
-        if (!ok) { $('codeErr').textContent = 'Code école incorrect. Impression refusée.'; return; }
+        try { ok = await verifierCodeEcole(code); } catch (e) { $('codeErr').textContent = 'Vérification impossible.'; return; }
+        if (!ok) { $('codeErr').textContent = 'Code école incorrect.'; return; }
         $('fond').classList.remove('on');
         setTimeout(function () { window.print(); }, 150);
       }
