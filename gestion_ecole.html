@@ -1313,7 +1313,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
     <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ RESTAURÉE -->
     <script>
-        // Clé de stockage identique à votre code d'origine pour ne pas perdre l'école enregistrée
+        // Clé de stockage unique et persistante
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
         let appData = { schools: [], adminRequests: [], jobApplications: [] };
@@ -1323,15 +1323,43 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         let chartFinancesInstance = null;
 
         window.onload = function() {
-            // Système de récupération automatique des données existantes (V10, V11, etc.)
-            let saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
-            if (saved) { 
-                try { 
-                    appData = JSON.parse(saved); 
-                    if(!appData.adminRequests) appData.adminRequests = [];
-                    if(!appData.jobApplications) appData.jobApplications = [];
-                } catch(e){} 
-            }
+            // CORRECTION : Récupération robuste des données avec fusion des différentes versions pour ne perdre aucune école
+            let savedV10 = localStorage.getItem(STORAGE_KEY);
+            let savedV11 = localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
+            
+            let combinedSchools = [];
+            let combinedRequests = [];
+            let combinedJobs = [];
+
+            try {
+                if (savedV10) {
+                    let parsedV10 = JSON.parse(savedV10);
+                    if (parsedV10.schools) combinedSchools = combinedSchools.concat(parsedV10.schools);
+                    if (parsedV10.adminRequests) combinedRequests = combinedRequests.concat(parsedV10.adminRequests);
+                    if (parsedV10.jobApplications) combinedJobs = combinedJobs.concat(parsedV10.jobApplications);
+                }
+            } catch(e) {}
+
+            try {
+                if (savedV11) {
+                    let parsedV11 = JSON.parse(savedV11);
+                    if (parsedV11.schools) {
+                        parsedV11.schools.forEach(s => {
+                            if (!combinedSchools.some(existing => existing.id === s.id)) {
+                                combinedSchools.push(s);
+                            }
+                        });
+                    }
+                }
+            } catch(e) {}
+
+            // S'il n'y a rien dans le localStorage, on initialise vide
+            appData = {
+                schools: combinedSchools,
+                adminRequests: combinedRequests,
+                jobApplications: combinedJobs
+            };
+
             saveData();
             renderSchoolsList();
             renderPublicEvents();
