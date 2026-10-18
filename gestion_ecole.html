@@ -1924,8 +1924,25 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             showSection('view-create-school');
         }
 
-        function handleSaveSchool(e) {
+                function handleSaveSchool(e) {
             e.preventDefault();
+            
+            // Recharger d'abord les données actuelles du stockage pour éviter d'écraser les autres écoles
+            let saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    let parsed = JSON.parse(saved);
+                    if (parsed && parsed.schools) {
+                        // Fusionner pour s'assurer de ne perdre aucune école
+                        parsed.schools.forEach(sch => {
+                            if (!appData.schools.some(s => s.id === sch.id)) {
+                                appData.schools.push(sch);
+                            }
+                        });
+                    }
+                } catch(err){}
+            }
+
             const id = document.getElementById('editSchoolId').value;
             const name = document.getElementById('schoolName').value.trim();
             const appartenance = document.getElementById('schoolAppartenance').value;
@@ -1938,9 +1955,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             const processSave = (logoBase64) => {
                 if(id) {
                     const s = appData.schools.find(x => x.id === id);
-                    s.name = name; s.appartenance = appartenance; s.province = province;
-                    s.district = district; s.commune = commune; s.adresse = adresse;
-                    if(logoFile) s.logo = logoBase64;
+                    if(s) {
+                        s.name = name; s.appartenance = appartenance; s.province = province;
+                        s.district = district; s.commune = commune; s.adresse = adresse;
+                        if(logoFile) s.logo = logoBase64;
+                    }
                     alert("École modifiée avec succès !");
                 } else {
                     const secretCode = generateSecretCode('SEC');
@@ -1955,6 +1974,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     alert(`École créée avec succès !\n\nCODE ÉCOLE (Propriétaire) : ${secretCode}\n\nConservez-le précieusement.`);
                 }
                 saveData();
+                renderSchoolsList();
                 showSection('view-portal');
             };
 
@@ -1966,6 +1986,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 processSave(null);
             }
         }
+
 
         function deleteSchool(id) {
             const s = appData.schools.find(x => x.id === id);
