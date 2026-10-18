@@ -1161,9 +1161,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       </div>
     </div>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE & PROFESSIONNELLE -->
+    <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ RESTAURÉE -->
     <script>
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V11";
+        // Clé de stockage identique à votre code d'origine pour ne pas perdre l'école enregistrée
+        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
         let appData = { schools: [], adminRequests: [] };
         let activeSchoolId = null;
@@ -1172,13 +1173,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
         let chartFinancesInstance = null;
 
         window.onload = function() {
-            let saved = localStorage.getItem(STORAGE_KEY);
+            // Système de récupération automatique des données existantes (V10, V11, etc.)
+            let saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("EDURDC_FULL_PLATFORM_V11");
             if (saved) { 
                 try { 
                     appData = JSON.parse(saved); 
                     if(!appData.adminRequests) appData.adminRequests = [];
                 } catch(e){} 
             }
+            saveData();
             renderSchoolsList();
         };
 
