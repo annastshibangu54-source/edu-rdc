@@ -121,6 +121,38 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     color: #ffffff !important;
 }
 
+/* STYLES CARTE D'ÉLÈVE (9cm x 7cm, Fond Jaune, Texte Noir) */
+.student-card-preview {
+    width: 9cm;
+    height: 7cm;
+    background-color: #ffeb3b !important;
+    color: #000 !important;
+    border: 2px solid #000;
+    padding: 6mm;
+    margin: 10px auto;
+    font-family: Arial, sans-serif;
+    font-size: 9.5px;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.student-card-preview img.card-logo {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border: 1px solid #000;
+}
+.student-card-preview img.card-photo {
+    width: 2.2cm;
+    height: 2.6cm;
+    object-fit: cover;
+    border: 1px solid #000;
+}
+@media print {
+    .card-print-container { display: block !important; }
+}
 </style>
 </head>
 <body>
@@ -328,6 +360,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             <a class="list-group-item list-group-item-action rubric-item" id="r-classes" href="javascript:void(0);" onclick="switchTab('tab-classes', this)"><i class="fa fa-door-open me-2 text-primary"></i> 2. Enregistrement Classe</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-profs" href="javascript:void(0);" onclick="switchTab('tab-profs', this)"><i class="fa fa-chalkboard-teacher me-2 text-primary"></i> 3. Enseignants & Titulaires</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-eleves-reg" href="javascript:void(0);" onclick="switchTab('tab-eleves-reg', this)"><i class="fa fa-user-graduate me-2 text-primary"></i> 4. Inscription des élèves</a>
+                            <a class="list-group-item list-group-item-action rubric-item" id="r-carte-eleve" href="javascript:void(0);" onclick="switchTab('tab-carte-eleve', this)"><i class="fa fa-id-card me-2 text-primary"></i> 4.1. Carte d'Élève</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-cours" href="javascript:void(0);" onclick="switchTab('tab-cours', this)"><i class="fa fa-book-open me-2 text-primary"></i> 5. Cours & Pondération</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-notes" href="javascript:void(0);" onclick="switchTab('tab-notes', this)"><i class="fa fa-edit me-2 text-primary"></i> 6. Saisie de note</a>
                             <a class="list-group-item list-group-item-action rubric-item" id="r-bulletins" href="javascript:void(0);" onclick="switchTab('tab-bulletins', this)"><i class="fa fa-file-invoice me-2 text-primary"></i> 7. Bulletin de cotes</a>
@@ -367,6 +400,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-eleves-reg')">
                                     <i class="fa fa-user-graduate text-indigo"></i>
                                     <span>Élèves</span>
+                                </button>
+                            </div>
+                            <!-- Bouton Carte d'Élève ajouté juste en dessous de Tableau de bord -->
+                            <div class="col-12">
+                                <button class="dash-btn" onclick="verifyAndOpenDashboardTab('tab-carte-eleve')">
+                                    <i class="fa fa-id-card text-indigo"></i>
+                                    <span>Carte d'Élève (Recto & Verso)</span>
                                 </button>
                             </div>
                             <div class="col-6">
@@ -495,6 +535,121 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                             </form>
                             <h6 class="fw-bold text-secondary">Liste des informations enregistrées :</h6>
                             <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th>Classe</th><th>Actions</th></tr></thead><tbody id="studentsTableBody"></tbody></table>
+                        </div>
+
+                        <!-- 4.1. CARTE D'ÉLÈVE (RECTO / VERSO) -->
+                        <div class="tab-pane" id="tab-carte-eleve">
+                            <h5 class="text-primary fw-bold mb-3"><i class="fa fa-id-card me-2"></i>4.1. Carte d'Élève (Remplissage, Aperçu & Impression)</h5>
+                            
+                            <form id="formStudentCard" onsubmit="handleSaveStudentCard(event)" class="p-3 bg-light rounded border mb-4">
+                                <input type="hidden" id="editCardIndex">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="fw-bold">Sous-Division / EDU-NC :</label>
+                                        <input type="text" id="cardSousDiv" class="form-control" placeholder="Ex: LUKUNGA / KINSHASA" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fw-bold">Année Scolaire :</label>
+                                        <input type="text" id="cardAnnee" class="form-control" placeholder="Ex: 2025 – 2026" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fw-bold">Classe :</label>
+                                        <input type="text" id="cardClasse" class="form-control" placeholder="Ex: 3ème Humanités" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fw-bold">Nom :</label>
+                                        <input type="text" id="cardNom" class="form-control" placeholder="Nom de famille" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fw-bold">Post-nom :</label>
+                                        <input type="text" id="cardPostNom" class="form-control" placeholder="Post-nom" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fw-bold">Prénom :</label>
+                                        <input type="text" id="cardPrenom" class="form-control" placeholder="Prénom" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="fw-bold">Sexe :</label>
+                                        <select id="cardSexe" class="form-select">
+                                            <option value="M">M</option>
+                                            <option value="F">F</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fw-bold">Lieu de Naissance :</label>
+                                        <input type="text" id="cardLieuNais" class="form-control" placeholder="Ex: Kinshasa" required>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="fw-bold">Date de Naissance :</label>
+                                        <input type="date" id="cardDateNais" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold">Délivré à (Lieu) :</label>
+                                        <input type="text" id="cardDelivreLieu" class="form-control" placeholder="Ex: Kinshasa" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold">Date de Délivrance :</label>
+                                        <input type="date" id="cardDelivreDate" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold">Photo de l'Élève :</label>
+                                        <input type="file" id="cardPhotoFile" class="form-control" accept="image/*" required>
+                                    </div>
+                                    <div class="col-12 d-flex gap-2 mt-3">
+                                        <button type="submit" id="btnCardSubmit" class="btn btn-success fw-bold"><i class="fa fa-save me-1"></i> Enregistrer</button>
+                                        <button type="button" class="btn btn-warning fw-bold text-dark" onclick="previewStudentCard()"><i class="fa fa-eye me-1"></i> Aperçu de la Carte</button>
+                                        <button type="button" class="btn btn-primary fw-bold" onclick="printStudentCardSecure()"><i class="fa fa-print me-1"></i> Imprimer (Propriétaire Seulement)</button>
+                                        <button type="button" class="btn btn-secondary fw-bold" onclick="closeRubricTab()">Fermer</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <h6 class="fw-bold text-secondary">Liste des Cartes d'Élèves Enregistrées :</h6>
+                            <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Nom & Prénom</th><th>Classe</th><th>Année</th><th>Actions</th></tr></thead><tbody id="studentCardsTableBody"></tbody></table>
+
+                            <!-- APERÇU VISUEL (RECTO & VERSO) -->
+                            <div id="cardPreviewArea" class="mt-4 p-3 bg-light rounded border text-center" style="display:none;">
+                                <h5 class="text-primary fw-bold mb-3">Aperçu de la Carte (9cm x 7cm)</h5>
+                                <div class="d-flex flex-wrap justify-content-center gap-4">
+                                    <!-- RECTO -->
+                                    <div id="cardRecto" class="student-card-preview shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div id="cardLogoContainer"></div>
+                                            <div class="text-center flex-grow-1" style="font-size: 8.5px; line-height: 1.1;">
+                                                <b>République Démocratique du Congo</b><br>
+                                                <span id="lblSousDiv">SOUS-DIVISION / EDU-NC / ................... / ..............</span><br>
+                                                <b style="font-size:11px; text-decoration:underline;">CARTE D'ÉLÈVE</b><br>
+                                                <span>Année Scolaire : <span id="lblAnnee">......... – ........</span></span>
+                                            </div>
+                                            <div id="cardPhotoContainer"></div>
+                                        </div>
+                                        <div style="font-size: 9px; line-height: 1.3; margin-top: 2px;">
+                                            <div><b>Nom :</b> <span id="lblNom">...........................................................</span></div>
+                                            <div><b>Post-nom :</b> <span id="lblPostNom">.................................................</span></div>
+                                            <div><b>Prénom :</b> <span id="lblPrenom">.....................................................</span></div>
+                                            <div><b>Sexe :</b> <span id="lblSexe">...........................................................</span></div>
+                                            <div><b>Lieu et Date naissance :</b> <span id="lblNais">...................., le ...../...../.........</span></div>
+                                            <div><b>Classe :</b> <span id="lblClasse">.......................................................</span></div>
+                                        </div>
+                                        <div style="font-size: 7.5px; text-align: center; font-style: italic; border-top: 1px dotted #000; padding-top: 2px;">
+                                            "Les autorités tant Civiles, Militaire que Policières sont Priées d'apporter leur Assistance aux porteurs du présent document."
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-end" style="font-size: 8.5px;">
+                                            <div>Délivré à <span id="lblDelivreLieu">........</span>, le <span id="lblDelivreDate">...../...../202.....</span></div>
+                                            <div class="text-center">Le Chef d'établissement<br><b>Sceau d'école</b></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- VERSO -->
+                                    <div id="cardVerso" class="student-card-preview shadow-sm d-flex flex-column justify-content-center align-items-center">
+                                        <h4 class="fw-bold mb-3" style="text-decoration: underline;">CARTE D'ÉLÈVE</h4>
+                                        <div class="border border-dark p-2 bg-white w-75 text-center fw-bold" style="height: 120px; display:flex; align-items:center; justify-content:center;">
+                                            <i class="fa fa-map-marked-alt fa-3x text-secondary"></i><br>
+                                            <span class="ms-2">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO<br>(Carte Géographique RDC)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- 5. COURS -->
@@ -666,7 +821,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Date</th><th>Enseignant</th><th>Salaire</th><th>Prime</th><th>Payé</th><th>Reste</th><th>Actions</th></tr></thead><tbody id="agentPayTableBody"></tbody></table>
                                 </div>
 
-                                <!-- 3. PAIEMENT ADMINISTRATION (NOUVEAU) -->
+                                <!-- 3. PAIEMENT ADMINISTRATION -->
                                 <div class="tab-pane fade" id="p-admin-frais" role="tabpanel">
                                     <form id="formAdminPay" onsubmit="handleSaveAdminPayment(event)" class="p-3 bg-light rounded border mb-3">
                                         <input type="hidden" id="editAdminPayIndex">
@@ -961,7 +1116,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             } 
             else if (currentUserSession.role === 'teacher') {
                 items.forEach(el => {
-                    if (el.id === 'r-cours' || el.id === 'r-notes' || el.id === 'r-bulletins') {
+                    if (el.id === 'r-cours' || el.id === 'r-notes' || el.id === 'r-bulletins' || el.id === 'r-carte-eleve') {
                         el.style.display = 'block';
                     } else {
                         el.style.display = 'none';
@@ -1002,6 +1157,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 renderCoursesTable();
             } else if(tabId === 'tab-eleves-reg') {
                 renderStudentsTable();
+            } else if(tabId === 'tab-carte-eleve') {
+                renderStudentCardsTable();
             }
         }
 
@@ -1191,6 +1348,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                         logo: logoBase64 || '',
                         staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: [], 
                         presenceStudents: {}, presenceStaff: [], studentPayments: [], agentPayments: [], adminPayments: [],
+                        studentCards: [],
                         program: '', communications: []
                     });
                     alert(`École créée avec succès !\n\nCODE ÉCOLE (Propriétaire) : ${secretCode}\n\nConservez-le précieusement.`);
@@ -1312,6 +1470,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             if(!s.studentPayments) s.studentPayments = [];
             if(!s.agentPayments) s.agentPayments = [];
             if(!s.adminPayments) s.adminPayments = [];
+            if(!s.studentCards) s.studentCards = [];
             if(!s.communications) s.communications = [];
 
             document.getElementById('dashSchoolTitle').innerText = s.name;
@@ -1373,6 +1532,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             refreshPaymentOptions();
             renderCommTable();
             renderProgramView();
+            renderStudentCardsTable();
         }
 
         // --- 1. HIÉRARCHIE & DIRECTION ---
@@ -1554,6 +1714,184 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             
             const filtered = s.students.map((st, idx) => ({...st, originalIndex: idx})).filter(x => x.classe === cl);
             tbody.innerHTML = filtered.length ? filtered.map((st) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editStudent(${st.originalIndex})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteStudent(${st.originalIndex})"><i class="fa fa-trash"></i></button></td></tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Aucun élève inscrit dans cette classe.</td></tr>`;
+        }
+
+        // --- 4.1. CARTE D'ÉLÈVE ---
+        function handleSaveStudentCard(e) {
+            e.preventDefault();
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const editIdx = document.getElementById('editCardIndex').value;
+            const sousDiv = document.getElementById('cardSousDiv').value.trim();
+            const annee = document.getElementById('cardAnnee').value.trim();
+            const classe = document.getElementById('cardClasse').value.trim();
+            const nom = document.getElementById('cardNom').value.trim();
+            const postNom = document.getElementById('cardPostNom').value.trim();
+            const prenom = document.getElementById('cardPrenom').value.trim();
+            const sexe = document.getElementById('cardSexe').value;
+            const lieuNais = document.getElementById('cardLieuNais').value.trim();
+            const dateNais = document.getElementById('cardDateNais').value;
+            const delivreLieu = document.getElementById('cardDelivreLieu').value.trim();
+            const delivreDate = document.getElementById('cardDelivreDate').value;
+            const photoFile = document.getElementById('cardPhotoFile').files[0];
+
+            const processCardSave = (photoBase64) => {
+                const cardData = {
+                    sousDiv, annee, classe, nom, postNom, prenom, sexe, lieuNais, dateNais, delivreLieu, delivreDate,
+                    photo: photoBase64 || (editIdx !== "" ? s.studentCards[editIdx].photo : '')
+                };
+
+                if(editIdx !== "") {
+                    s.studentCards[editIdx] = cardData;
+                    alert("Carte d'élève modifiée avec succès !");
+                } else {
+                    s.studentCards.push(cardData);
+                    alert("Carte d'élève enregistrée avec succès !");
+                }
+                saveData();
+                renderStudentCardsTable();
+                clearStudentCardForm();
+            };
+
+            if(photoFile) {
+                const reader = new FileReader();
+                reader.onload = function(evt) { processCardSave(evt.target.result); };
+                reader.readAsDataURL(photoFile);
+            } else {
+                processCardSave(null);
+            }
+        }
+
+        function renderStudentCardsTable() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s || !s.studentCards) return;
+            const tbody = document.getElementById('studentCardsTableBody');
+            tbody.innerHTML = s.studentCards.length ? s.studentCards.map((c, i) => `
+                <tr>
+                    <td><b>${c.nom} ${c.postNom} ${c.prenom}</b></td>
+                    <td>${c.classe}</td>
+                    <td>${c.annee}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-success me-1" onclick="loadCardToPreview(${i})" title="Afficher Aperçu"><i class="fa fa-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editStudentCard(${i})" title="Modifier"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteStudentCard(${i})" title="Supprimer"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td colspan="4" class="text-center text-muted">Aucune carte d'élève enregistrée.</td></tr>`;
+        }
+
+        function loadCardToPreview(i) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const c = s.studentCards[i];
+            if(!c) return;
+
+            document.getElementById('lblSousDiv').innerText = `SOUS-DIVISION / EDU-NC / ${c.sousDiv}`;
+            document.getElementById('lblAnnee').innerText = c.annee;
+            document.getElementById('lblNom').innerText = c.nom;
+            document.getElementById('lblPostNom').innerText = c.postNom;
+            document.getElementById('lblPrenom').innerText = c.prenom;
+            document.getElementById('lblSexe').innerText = c.sexe;
+            document.getElementById('lblNais').innerText = `${c.lieuNais}, le ${c.dateNais}`;
+            document.getElementById('lblClasse').innerText = c.classe;
+            document.getElementById('lblDelivreLieu').innerText = c.delivreLieu;
+            document.getElementById('lblDelivreDate').innerText = c.delivreDate;
+
+            document.getElementById('cardLogoContainer').innerHTML = s.logo ? `<img src="${s.logo}" class="card-logo">` : `<div style="width:35px;height:35px;border:1px solid #000;font-size:7px;display:flex;align-items:center;justify-content:center;text-align:center;">LOGO</div>`;
+            document.getElementById('cardPhotoContainer').innerHTML = c.photo ? `<img src="${c.photo}" class="card-photo">` : `<div style="width:2.2cm;height:2.6cm;border:1px solid #000;font-size:8px;display:flex;align-items:center;justify-content:center;text-align:center;">PHOTO</div>`;
+
+            document.getElementById('cardPreviewArea').style.display = 'block';
+            window.scrollTo({ top: document.getElementById('cardPreviewArea').offsetTop, behavior: 'smooth' });
+        }
+
+        function previewStudentCard() {
+            const sousDiv = document.getElementById('cardSousDiv').value || '...........................';
+            const annee = document.getElementById('cardAnnee').value || '......... – ........';
+            const classe = document.getElementById('cardClasse').value || '.......................................';
+            const nom = document.getElementById('cardNom').value || '...........................................................';
+            const postNom = document.getElementById('cardPostNom').value || '................................................';
+            const prenom = document.getElementById('cardPrenom').value || '.....................................................';
+            const sexe = document.getElementById('cardSexe').value;
+            const lieuNais = document.getElementById('cardLieuNais').value || '....................';
+            const dateNais = document.getElementById('cardDateNais').value || '...../...../.........';
+            const delivreLieu = document.getElementById('cardDelivreLieu').value || '........';
+            const delivreDate = document.getElementById('cardDelivreDate').value || '...../...../202.....';
+
+            document.getElementById('lblSousDiv').innerText = `SOUS-DIVISION / EDU-NC / ${sousDiv}`;
+            document.getElementById('lblAnnee').innerText = annee;
+            document.getElementById('lblNom').innerText = nom;
+            document.getElementById('lblPostNom').innerText = postNom;
+            document.getElementById('lblPrenom').innerText = prenom;
+            document.getElementById('lblSexe').innerText = sexe;
+            document.getElementById('lblNais').innerText = `${lieuNais}, le ${dateNais}`;
+            document.getElementById('lblClasse').innerText = classe;
+            document.getElementById('lblDelivreLieu').innerText = delivreLieu;
+            document.getElementById('lblDelivreDate').innerText = delivreDate;
+
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const logoHtml = (s && s.logo) ? `<img src="${s.logo}" class="card-logo">` : `<div style="width:35px;height:35px;border:1px solid #000;font-size:7px;display:flex;align-items:center;justify-content:center;text-align:center;">LOGO</div>`;
+            document.getElementById('cardLogoContainer').innerHTML = logoHtml;
+
+            const photoInput = document.getElementById('cardPhotoFile').files[0];
+            if(photoInput) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('cardPhotoContainer').innerHTML = `<img src="${e.target.result}" class="card-photo">`;
+                };
+                reader.readAsDataURL(photoInput);
+            } else {
+                document.getElementById('cardPhotoContainer').innerHTML = `<div style="width:2.2cm;height:2.6cm;border:1px solid #000;font-size:8px;display:flex;align-items:center;justify-content:center;text-align:center;">PHOTO</div>`;
+            }
+
+            document.getElementById('cardPreviewArea').style.display = 'block';
+        }
+
+        function printStudentCardSecure() {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            if(!s) return;
+
+            const codeInput = prompt("[SÉCURITÉ IMPRESSION]\nSeul le propriétaire de l'école disposant du Code École peut imprimer la carte d'élève.\nVeuillez saisir le Code École :");
+            if(codeInput === null) return;
+
+            if(codeInput.trim() === s.secretCode) {
+                previewStudentCard();
+                window.print();
+            } else {
+                alert("Code École incorrect ! Vous n'avez pas l'autorisation d'imprimer la carte.");
+            }
+        }
+
+        function editStudentCard(i) {
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const c = s.studentCards[i];
+            document.getElementById('editCardIndex').value = i;
+            document.getElementById('cardSousDiv').value = c.sousDiv;
+            document.getElementById('cardAnnee').value = c.annee;
+            document.getElementById('cardClasse').value = c.classe;
+            document.getElementById('cardNom').value = c.nom;
+            document.getElementById('cardPostNom').value = c.postNom;
+            document.getElementById('cardPrenom').value = c.prenom;
+            document.getElementById('cardSexe').value = c.sexe;
+            document.getElementById('cardLieuNais').value = c.lieuNais;
+            document.getElementById('cardDateNais').value = c.dateNais;
+            document.getElementById('cardDelivreLieu').value = c.delivreLieu;
+            document.getElementById('cardDelivreDate').value = c.delivreDate;
+            document.getElementById('btnCardSubmit').innerHTML = '<i class="fa fa-save me-1"></i> Modifier';
+            loadCardToPreview(i);
+        }
+
+        function deleteStudentCard(i) {
+            if(confirm("Supprimer cette carte d'élève ?")) {
+                const s = appData.schools.find(x => x.id === activeSchoolId);
+                s.studentCards.splice(i, 1);
+                saveData();
+                renderStudentCardsTable();
+                document.getElementById('cardPreviewArea').style.display = 'none';
+            }
+        }
+
+        function clearStudentCardForm() {
+            document.getElementById('formStudentCard').reset();
+            document.getElementById('editCardIndex').value = "";
+            document.getElementById('btnCardSubmit').innerHTML = '<i class="fa fa-save me-1"></i> Enregistrer';
         }
 
         // --- 5. COURS ---
@@ -2249,10 +2587,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                 <tr>
                                     <td style="padding:5px; text-align:center;">${p.date}</td>
                                     <td style="padding:5px;"><b>${p.teacherName}</b></td>
-                                    <td style="padding:5px; text-align:right;">${p.salaire}$</td>
-                                    <td style="padding:5px; text-align:right;">${p.prime}$</td>
-                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye}$</b></td>
-                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste}$</b></td>
+                                    <td style="padding:5px; text-align:right;">${p.salaire} $</td>
+                                    <td style="padding:5px; text-align:right;">${p.prime} $</td>
+                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td>
+                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td>
                                 </tr>
                             `).join('') : `<tr><td colspan="6" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}
                         </tbody>
@@ -2280,10 +2618,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <td style="padding:5px; text-align:center;">${p.date}</td>
                                     <td style="padding:5px;"><b>${p.name}</b></td>
                                     <td style="padding:5px;">${p.role}</td>
-                                    <td style="padding:5px; text-align:right;">${p.salaire}$</td>
-                                    <td style="padding:5px; text-align:right;">${p.prime}$</td>
-                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye}$</b></td>
-                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste}$</b></td>
+                                    <td style="padding:5px; text-align:right;">${p.salaire} $</td>
+                                    <td style="padding:5px; text-align:right;">${p.prime} $</td>
+                                    <td style="padding:5px; text-align:right; color:green;"><b>${p.paye} $</b></td>
+                                    <td style="padding:5px; text-align:right; color:red;"><b>${p.reste} $</b></td>
                                 </tr>
                             `).join('') : `<tr><td colspan="7" style="padding:10px; text-align:center;">Aucun paiement enregistré.</td></tr>`}
                         </tbody>
@@ -2308,7 +2646,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                                     <td style="padding:5px; text-align:center;">${c.date}</td>
                                     <td style="padding:5px;"><b>${c.type}</b></td>
                                     <td style="padding:5px;">${c.motif}</td>
-                                    <td style="padding:5px; text-align:right; font-weight:bold;">${c.montant}$</td>
+                                    <td style="padding:5px; text-align:right; font-weight:bold;">${c.montant} $</td>
                                 </tr>
                             `).join('') : `<tr><td colspan="4" style="padding:10px; text-align:center;">Aucune opération de caisse enregistrée.</td></tr>`}
                         </tbody>
@@ -2880,10 +3218,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             } else {
                 const teacherMatch = s.teachers.find(t => t.secretCode === code);
                 if (teacherMatch) {
-                    if (tabId === 'tab-cours' || tabId === 'tab-notes' || tabId === 'tab-bulletins') {
+                    if (tabId === 'tab-cours' || tabId === 'tab-notes' || tabId === 'tab-bulletins' || tabId === 'tab-carte-eleve') {
                         authorized = true;
                     } else {
-                        alert("Accès restreint : Votre Code Agent vous permet uniquement d'accéder aux Cours, Notes et Bulletins.");
+                        alert("Accès restreint : Votre Code Agent vous permet uniquement d'accéder aux Cours, Notes, Bulletins et Cartes d'élèves.");
                         return;
                     }
                 }
@@ -2906,6 +3244,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     renderCoursesTable();
                 } else if (tabId === 'tab-eleves-reg') {
                     renderStudentsTable();
+                } else if (tabId === 'tab-carte-eleve') {
+                    renderStudentCardsTable();
                 }
             } else {
                 alert("Code secret incorrect ! Accès refusé.");
