@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>EDU-RDC - Compte Professionnel & Authentification</title>
+    <title>EDU-RDC - Connexion & Compte Professionnel</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -47,7 +47,7 @@
 
     <!-- Navigation Principale Harmonisée -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-        <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+        <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
             <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -55,12 +55,8 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="index.html" class="nav-item nav-link">Accueil</a>
-                <a href="about.html" class="nav-item nav-link">À propos</a>
-                <a href="courses.html" class="nav-item nav-link">Établissements</a>
-                <a href="contact.html" class="nav-item nav-link">Contact</a>
+                <a href="#" class="nav-item nav-link active">Étape 1 & 2 : Accès Sécurisé</a>
             </div>
-            <a href="login.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
     </nav>
 
@@ -69,8 +65,8 @@
         <div class="container py-5">
             <div class="row justify-content-center">
                 <div class="col-lg-10 text-center">
-                    <h1 class="display-3 text-white animated slideInDown">Espace Professionnel</h1>
-                    <p class="fs-4 text-white animated slideInDown">Création de Compte & Authentification Sécurisée (Firebase)</p>
+                    <h1 class="display-3 text-white animated slideInDown">Portail d'Accès EDU-RDC</h1>
+                    <p class="fs-4 text-white animated slideInDown">1. Connexion | 2. Identification (Inscription) | 3. Accueil (index.html)</p>
                 </div>
             </div>
         </div>
@@ -87,19 +83,19 @@
                         <!-- Onglets de basculement Connexion / Inscription -->
                         <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active fw-bold" id="tab-login" onclick="switchMode('login')">Se Connecter</button>
+                                <button class="nav-link active fw-bold" id="tab-login" onclick="switchMode('login')">1. Se Connecter</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold" id="tab-register" onclick="switchMode('register')">Créer un Compte</button>
+                                <button class="nav-link fw-bold" id="tab-register" onclick="switchMode('register')">2. Identification (Créer un Compte)</button>
                             </li>
                         </ul>
 
-                        <!-- ================= FORMULAIRE DE CONNEXION ================= -->
+                        <!-- ================= ÉTAPE 1 : FORMULAIRE DE CONNEXION ================= -->
                         <div id="section-login">
                             <div class="text-center mb-4">
                                 <i class="fa fa-user-shield fa-3x text-primary mb-3"></i>
                                 <h3 class="mb-1">Connexion Professionnelle</h3>
-                                <p class="text-muted small">Ministère de l'Éducation Nationale et Nouvelle Citoyenneté</p>
+                                <p class="text-muted small">Première étape à l'ouverture de l'application</p>
                             </div>
                             <form onsubmit="handleLogin(event)">
                                 <div class="form-floating mb-3">
@@ -107,22 +103,22 @@
                                     <label for="loginEmail"><i class="fa fa-envelope me-2"></i>Adresse E-mail vérifiée</label>
                                 </div>
                                 <div class="form-floating mb-4">
-                                    <input type="password" class="form-control" id="loginPassword" placeholder="Mot de passe ou Code Secret" required>
-                                    <label for="loginPassword"><i class="fa fa-lock me-2"></i>Code Secret ou Mot de passe</label>
+                                    <input type="password" class="form-control" id="loginPassword" placeholder="Code Secret" required>
+                                    <label for="loginPassword"><i class="fa fa-lock me-2"></i>Code Secret Professionnel</label>
                                 </div>
-                                <button class="btn btn-primary w-100 py-3 fw-bold fs-5" type="submit"><i class="fa fa-sign-in-alt me-2"></i>Se Connecter</button>
+                                <button class="btn btn-primary w-100 py-3 fw-bold fs-5" type="submit"><i class="fa fa-sign-in-alt me-2"></i>Se Connecter (Vers index.html)</button>
                             </form>
                         </div>
 
-                        <!-- ================= FORMULAIRE DE CRÉATION DE COMPTE ================= -->
+                        <!-- ================= ÉTAPE 2 : FORMULAIRE D'IDENTIFICATION / CRÉATION DE COMPTE ================= -->
                         <div id="section-register" style="display: none;">
                             <div class="text-center mb-4">
                                 <i class="fa fa-user-plus fa-3x text-success mb-3"></i>
-                                <h3 class="mb-1">Créer un Compte Professionnel</h3>
-                                <p class="text-muted small">Enregistrement sécurisé sur Firebase</p>
+                                <h3 class="mb-1">Identification & Création de Compte</h3>
+                                <p class="text-muted small">Deuxième étape si vous n'avez pas encore de compte</p>
                             </div>
 
-                            <!-- Étape 1 : Saisie Nom et Contact -->
+                            <!-- Sous-étape A : Saisie Nom et Contact -->
                             <div id="reg-step-1" class="auth-step active">
                                 <form onsubmit="sendVerificationCode(event)">
                                     <div class="form-floating mb-3">
@@ -131,13 +127,13 @@
                                     </div>
                                     <div class="form-floating mb-3">
                                         <input type="text" class="form-control" id="regContact" placeholder="Email ou Numéro de téléphone" required>
-                                        <label for="regContact"><i class="fa id-card me-2"></i>Adresse E-mail ou Téléphone</label>
+                                        <label for="regContact"><i class="fa fa-id-card me-2"></i>Adresse E-mail ou Téléphone</label>
                                     </div>
                                     <button class="btn btn-success w-100 py-3 fw-bold fs-5" type="submit"><i class="fa fa-paper-plane me-2"></i>Envoyer le code de vérification</button>
                                 </form>
                             </div>
 
-                            <!-- Étape 2 : Saisie des 6 chiffres -->
+                            <!-- Sous-étape B : Saisie des 6 chiffres -->
                             <div id="reg-step-2" class="auth-step">
                                 <div class="alert alert-info text-center small">
                                     Un code de vérification à 6 chiffres a été envoyé à <b id="displayContactSent"></b>.
@@ -151,7 +147,7 @@
                                 </form>
                             </div>
 
-                            <!-- Étape 3 : Succès et Affichage du Code Secret -->
+                            <!-- Sous-étape C : Succès et Affichage du Code Secret -->
                             <div id="reg-step-3" class="auth-step text-center">
                                 <div class="alert alert-success">
                                     <i class="fa fa-check-circle fa-3x mb-2 text-success"></i>
@@ -161,7 +157,7 @@
                                 <div class="p-3 bg-white border rounded mb-3">
                                     <span class="text-muted small d-block">Votre Code Secret Professionnel attribué :</span>
                                     <h2 class="text-danger fw-bold my-2" id="generatedSecretCode">PRO-0000</h2>
-                                    <small class="text-muted">Conservez ce code précieusement. Il vous sera demandé avec votre e-mail pour vous connecter.</small>
+                                    <small class="text-muted">Conservez ce code précieusement. Il vous servira pour vous connecter.</small>
                                 </div>
                                 <button class="btn btn-primary w-100 py-2 fw-bold" onclick="switchMode('login')">Aller à la page de Connexion</button>
                             </div>
@@ -179,11 +175,6 @@
     <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="container py-5">
             <div class="row g-5">
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-white mb-3">Liens Rapides</h4>
-                    <a class="btn btn-link" href="about.html">À propos de nous</a>
-                    <a class="btn btn-link" href="contact.html">Contactez-nous</a>
-                </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-white mb-3">Contact</h4>
                     <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>Avenue de l'Enseignement, Kinshasa, RDC</p>
@@ -237,7 +228,7 @@
         let simulatedVerificationCode = "";
         let pendingUserData = {};
 
-        // Basculer entre Connexion et Inscription
+        // Basculer entre l'Étape 1 (Connexion) et l'Étape 2 (Identification/Inscription)
         window.switchMode = function(mode) {
             if(mode === 'login') {
                 document.getElementById('section-login').style.display = 'block';
@@ -252,7 +243,7 @@
             }
         };
 
-        // Étape 1 : Envoi du code de vérification à 6 chiffres
+        // Étape 2A : Envoi du code de vérification à 6 chiffres
         window.sendVerificationCode = function(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
@@ -263,20 +254,17 @@
                 return;
             }
 
-            // Générer un code aléatoire à 6 chiffres
             simulatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             pendingUserData = { name, contact };
 
-            // Affichage de l'alerte simulant l'envoi du message sur l'e-mail ou le numéro
             document.getElementById('displayContactSent').innerText = contact;
             alert(`[SIMULATION ENVOI SMS/EMAIL]\nUn message a été envoyé à : ${contact}\n\nCODE DE VÉRIFICATION : ${simulatedVerificationCode}`);
 
-            // Passer à l'étape 2 (Saisie du code)
             document.getElementById('reg-step-1').classList.remove('active');
             document.getElementById('reg-step-2').classList.add('active');
         };
 
-        // Étape 2 : Vérification du code et enregistrement Firebase
+        // Étape 2B : Vérification du code et enregistrement Firebase
         window.verifyCodeAndCreateAccount = async function(e) {
             e.preventDefault();
             const inputCode = document.getElementById('regCodeInput').value.trim();
@@ -286,11 +274,9 @@
                 return;
             }
 
-            // Génération d'un code secret professionnel unique pour le compte
             const secretCode = 'PRO-' + Math.floor(1000 + Math.random() * 9000);
 
             try {
-                // Enregistrement dans la base de données Firebase Firestore (Collection "professional_users")
                 await addDoc(collection(db, "professional_users"), {
                     name: pendingUserData.name,
                     contact: pendingUserData.contact,
@@ -300,7 +286,6 @@
 
                 document.getElementById('generatedSecretCode').innerText = secretCode;
 
-                // Passer à l'étape 3 (Succès)
                 document.getElementById('reg-step-2').classList.remove('active');
                 document.getElementById('reg-step-3').classList.add('active');
 
@@ -310,24 +295,26 @@
             }
         };
 
-        // Connexion avec l'email vérifié et le code secret ou mot de passe
+        // Étape 1 (Validation) : Connexion -> Redirection vers index.html (3ème étape)
         window.handleLogin = async function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
 
             try {
-                // Vérification dans Firestore si le contact et le code secret correspondent
                 const q = query(
                     collection(db, "professional_users"), 
                     where("contact", "==", email), 
                     where("secretCode", "==", password)
                 );
-                const querySnapshot = await getDocs(q);
+                const querySnapshot = getDocs(q);
+                // Note : Pour les requêtes asynchrones en JS module, on utilise await getDocs(q)
+                const snapshot = await getDocs(q);
 
-                if (!querySnapshot.empty) {
-                    alert("Connexion réussie ! Bienvenue dans l'espace professionnel EDU-RDC.");
-                    window.location.href = "dashboard.html"; // Redirection vers le tableau de bord
+                if (!snapshot.empty) {
+                    alert("Connexion réussie ! Redirection vers l'accueil principal.");
+                    // REDIRECTION VERS INDEX.HTML (La 3ème étape)
+                    window.location.href = "index.html"; 
                 } else {
                     alert("Identifiants incorrects. Vérifiez votre e-mail ou votre code secret.");
                 }
