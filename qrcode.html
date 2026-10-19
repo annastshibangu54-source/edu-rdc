@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>EDU-RDC - Générateur de Cartes Cloud</title>
+    <title>EDU-RDC - Générateur de Cartes Multi-Écoles</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -23,11 +23,42 @@
             box-sizing: border-box;
             -webkit-print-color-adjust: exact !important;
         }
+        .id-card::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3.5cm;
+            height: 3.5cm;
+            background-image: var(--school-bg-logo);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.12;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .id-card > * { position: relative; z-index: 1; }
         .id-card header {
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.4);
             padding-bottom: 2px;
             margin-bottom: 4px;
+        }
+        .school-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1px;
+        }
+        .school-logo-img {
+            width: 0.7cm;
+            height: 0.7cm;
+            object-fit: contain;
+            border-radius: 50%;
+            background: #ffffff;
+            padding: 1px;
         }
         .card-photo {
             width: 1.4cm;
@@ -71,10 +102,10 @@
 </head>
 <body style="background-color: #f8f9fa; padding: 10px;">
 
-    <!-- Écran d'Authentification -->
+    <!-- Écran d'Authentification / Choix de l'École -->
     <div class="container" id="authSection" style="max-width: 500px; margin-top: 40px;">
         <div class="card shadow p-4 bg-white rounded border-0">
-            <h3 class="text-center text-primary mb-4"><i class="fa fa-lock me-2"></i>Accès Propriétaire</h3>
+            <h3 class="text-center text-primary mb-4"><i class="fa fa-school me-2"></i>Accès Établissement</h3>
             <div class="mb-3">
                 <label class="form-label fw-bold">Nom Complet de l'École</label>
                 <input type="text" id="authSchoolName" class="form-control" placeholder="ex: JSD ou C.S. LA RÉVOLUTION">
@@ -83,82 +114,120 @@
                 <label class="form-label fw-bold">Code Secret</label>
                 <input type="password" id="authOwnerCode" class="form-control" placeholder="••••••••">
             </div>
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Logo de l'École (Optionnel)</label>
+                <input type="file" class="form-control form-control-sm" id="authSchoolLogoInput" accept="image/*">
+            </div>
             <button type="button" onclick="ouvrirEspace()" class="btn btn-primary w-100 py-2 fw-bold">
-                <i class="fa fa-key me-2"></i>Accéder à l'Espace
+                <i class="fa fa-key me-2"></i>Ouvrir l'Espace École
             </button>
         </div>
     </div>
 
-    <!-- Espace de Génération (Toutes les rubriques) -->
-    <div class="container" id="cardGeneratorSection" style="display: none; margin-top: 10px; max-width: 900px;">
+    <!-- Espace de Génération et Stockage -->
+    <div class="container" id="cardGeneratorSection" style="display: none; margin-top: 10px; max-width: 950px;">
         <div class="alert alert-success d-flex justify-content-between align-items-center mb-3">
-            <span><i class="fa fa-school me-2"></i>Établissement : <strong id="lockedSchoolTitle">---</strong></span>
-            <button class="btn btn-sm btn-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt"></i> Quitter</button>
+            <span><i class="fa fa-shield-alt me-2"></i>Établissement Actif : <strong id="lockedSchoolTitle">---</strong></span>
+            <button class="btn btn-sm btn-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt"></i> Changer d'école</button>
         </div>
 
-        <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="bg-white p-3 rounded shadow-sm border">
-                    <h5 class="text-primary mb-3"><i class="fa fa-id-card me-2"></i>Formulaire de la Carte</h5>
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold">Catégorie</label>
-                        <select class="form-select form-select-sm" id="cardCategory" onchange="mettreAJour()">
-                            <option value="Élève" selected>Élève</option>
-                            <option value="Enseignant">Enseignant</option>
-                            <option value="Professeur">Professeur</option>
-                            <option value="Administrateur">Administrateur</option>
-                        </select>
+        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active fw-bold" id="create-tab" data-bs-toggle="tab" data-bs-target="#createPane" type="button">Créer & Imprimer</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button" onclick="afficherArchives()">Cartes Enregistrées (<span id="vaultCount">0</span>)</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Onglet Création -->
+            <div class="tab-pane fade show active" id="createPane">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="bg-white p-3 rounded shadow-sm border">
+                            <h5 class="text-primary mb-3"><i class="fa id-card me-2"></i>Formulaire de la Carte</h5>
+                            <div class="mb-2">
+                                <label class="form-label small fw-bold">Catégorie</label>
+                                <select class="form-select form-select-sm" id="cardCategory" onchange="mettreAJour()">
+                                    <option value="Élève" selected>Élève</option>
+                                    <option value="Enseignant">Enseignant</option>
+                                    <option value="Professeur">Professeur</option>
+                                    <option value="Administrateur">Administrateur</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" value="KALOMBO" oninput="mettreAJour()"></div>
+                                <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" value="TSHIBANGU" oninput="mettreAJour()"></div>
+                                <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" value="Mike" oninput="mettreAJour()"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" value="MAT-001" oninput="mettreAJour()"></div>
+                                <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" value="KINSHASA" oninput="mettreAJour()"></div>
+                            </div>
+                            <div class="mb-2"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète" value="Avenue de la Paix" oninput="mettreAJour()"></div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
+                                <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*" onchange="chargerPhoto(event)">
+                            </div>
+                            <button type="button" onclick="enregistrerCarte()" class="btn btn-outline-primary w-100 py-2 fw-bold">
+                                <i class="fa fa-save me-2"></i>Enregistrer dans la base de l'école
+                            </button>
+                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" value="KALOMBO" oninput="mettreAJour()"></div>
-                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" value="TSHIBANGU" oninput="mettreAJour()"></div>
-                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" value="Mike" oninput="mettreAJour()"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" value="MAT-001" oninput="mettreAJour()"></div>
-                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" value="KINSHASA" oninput="mettreAJour()"></div>
-                    </div>
-                    <div class="mb-2"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète" value="Avenue de la Paix" oninput="mettreAJour()"></div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
-                        <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*" onchange="chargerPhoto(event)">
+
+                    <!-- Aperçu de la Carte Conforme avec Logo en haut à droite -->
+                    <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
+                        <h6 class="text-muted mb-2">Aperçu Conforme (8,5 cm x 5,5 cm)</h6>
+                        <div class="id-card" id="cardPreview" style="--school-bg-logo: url('img/course-1.jpg');">
+                            <header>
+                                <div style="font-size: 0.38rem; font-weight: bold;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
+                                <div style="font-size: 0.32rem;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
+                                <div class="school-header-row px-1">
+                                    <span id="cardSchoolName" style="font-size: 0.42rem; font-weight: bold; text-transform: uppercase;">NOM DE L'ÉCOLE</span>
+                                    <img id="cardSchoolLogoImg" src="img/course-1.jpg" class="school-logo-img" alt="Logo">
+                                </div>
+                            </header>
+                            <div class="d-flex align-items-start mt-1">
+                                <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
+                                <div class="card-details">
+                                    <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.3rem;">ÉLÈVE</strong></div>
+                                    <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
+                                    <div><strong>Postnom :</strong> <span id="viewPostnom">TSHIBANGU</span></div>
+                                    <div><strong>Prénom :</strong> <span id="viewPrenom">Mike</span></div>
+                                    <div><strong>Matricule :</strong> <span id="viewMatricule">MAT-001</span></div>
+                                    <div><strong>Adresse :</strong> <span id="viewAdresse">Avenue de la Paix</span></div>
+                                    <div><strong>Province :</strong> <span id="viewProvince">KINSHASA</span></div>
+                                </div>
+                            </div>
+                            <div class="qr-container" id="qrcodePreview"></div>
+                            <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
+                        </div>
+                        <button onclick="window.print()" class="btn btn-success mt-3 py-2 px-4 fw-bold shadow-sm">
+                            <i class="fa fa-print me-2"></i>Imprimer cette Carte
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Aperçu de la Carte Conforme -->
-            <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
-                <h6 class="text-muted mb-2">Aperçu Conforme (8,5 cm x 5,5 cm)</h6>
-                <div class="id-card" id="cardPreview">
-                    <header>
-                        <div style="font-size: 0.38rem; font-weight: bold;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
-                        <div style="font-size: 0.32rem;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
-                        <div id="cardSchoolName" style="font-size: 0.42rem; font-weight: bold; text-transform: uppercase; margin-top: 1px;">NOM DE L'ÉCOLE</div>
-                    </header>
-                    <div class="d-flex align-items-start mt-1">
-                        <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
-                        <div class="card-details">
-                            <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.3rem;">ÉLÈVE</strong></div>
-                            <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
-                            <div><strong>Postnom :</strong> <span id="viewPostnom">TSHIBANGU</span></div>
-                            <div><strong>Prénom :</strong> <span id="viewPrenom">Mike</span></div>
-                            <div><strong>Matricule :</strong> <span id="viewMatricule">MAT-001</span></div>
-                            <div><strong>Adresse :</strong> <span id="viewAdresse">Avenue de la Paix</span></div>
-                            <div><strong>Province :</strong> <span id="viewProvince">KINSHASA</span></div>
-                        </div>
+            <!-- Onglet Archives / Cartes Enregistrées -->
+            <div class="tab-pane fade" id="vaultPane">
+                <div class="card p-3 shadow-sm border-0">
+                    <h5 class="text-primary mb-3"><i class="fa fa-archive me-2"></i>Cartes enregistrées pour <span id="vaultSchoolName">---</span></h5>
+                    <div id="vaultListContainer" class="row g-3">
+                        <!-- Les cartes enregistrées s'afficheront ici -->
                     </div>
-                    <div class="qr-container" id="qrcodePreview"></div>
-                    <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
                 </div>
-                <button onclick="window.print()" class="btn btn-success mt-3 py-2 px-4 fw-bold shadow-sm">
-                    <i class="fa fa-print me-2"></i>Imprimer cette Carte
-                </button>
             </div>
         </div>
     </div>
 
+    <!-- Bootstrap JS pour les onglets -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         var currentSchool = "";
+        var schoolLogoBase64 = "img/course-1.jpg";
         var tempPhotoBase64 = "img/team-1.jpg";
 
         function ouvrirEspace() {
@@ -169,12 +238,34 @@
             }
 
             currentSchool = nomEcole.toUpperCase();
+            
+            // Gestion du logo personnalisé si l'utilisateur en a choisi un
+            var logoInput = document.getElementById('authSchoolLogoInput').files[0];
+            if (logoInput) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    schoolLogoBase64 = e.target.result;
+                    validerOuvertureEspace();
+                };
+                reader.readAsDataURL(logoInput);
+            } else {
+                validerOuvertureEspace();
+            }
+        }
+
+        function validerOuvertureEspace() {
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('cardGeneratorSection').style.display = 'block';
 
             document.getElementById('lockedSchoolTitle').innerText = currentSchool;
+            document.getElementById('vaultSchoolName').innerText = currentSchool;
             document.getElementById('cardSchoolName').innerText = currentSchool;
+            
+            document.getElementById('cardSchoolLogoImg').src = schoolLogoBase64;
+            document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${schoolLogoBase64}')`);
+
             mettreAJour();
+            compterArchives();
         }
 
         function mettreAJour() {
@@ -220,6 +311,59 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        }
+
+        // Enregistrement des cartes générées par école
+        function enregistrerCarte() {
+            var carteData = {
+                school: currentSchool,
+                category: document.getElementById('cardCategory').value,
+                nom: document.getElementById('inputNom').value,
+                postnom: document.getElementById('inputPostnom').value,
+                prenom: document.getElementById('inputPrenom').value,
+                matricule: document.getElementById('inputMatricule').value,
+                province: document.getElementById('inputProvince').value,
+                adresse: document.getElementById('inputAdresse').value,
+                photo: tempPhotoBase64,
+                logo: schoolLogoBase64,
+                date: new Date().toLocaleDateString()
+            };
+
+            var stock = JSON.parse(localStorage.getItem('edu_rdc_cartes') || '[]');
+            stock.push(carteData);
+            localStorage.setItem('edu_rdc_cartes', JSON.stringify(stock));
+
+            alert("Carte enregistrée avec succès pour l'établissement " + currentSchool + " !");
+            compterArchives();
+        }
+
+        function compterArchives() {
+            var stock = JSON.parse(localStorage.getItem('edu_rdc_cartes') || '[]');
+            var filtered = stock.filter(function(c) { return c.school === currentSchool; });
+            document.getElementById('vaultCount').innerText = filtered.length;
+        }
+
+        function afficherArchives() {
+            var container = document.getElementById('vaultListContainer');
+            var stock = JSON.parse(localStorage.getItem('edu_rdc_cartes') || '[]');
+            var filtered = stock.filter(function(c) { return c.school === currentSchool; });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted py-3">Aucune carte enregistrée pour cette école pour le moment.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            filtered.forEach(function(c, index) {
+                container.innerHTML += `
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <strong>${c.category.toUpperCase()} : ${c.nom} ${c.prenom}</strong><br>
+                            <small class="text-muted">Matricule : ${c.matricule} | Enregistré le : ${c.date}</small>
+                        </div>
+                    </div>
+                `;
+            });
         }
     </script>
 </body>
