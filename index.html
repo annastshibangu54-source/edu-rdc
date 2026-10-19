@@ -39,6 +39,8 @@
             transform: translateY(-5px);
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
         }
+        .modal-auth-step { display: none; }
+        .modal-auth-step.active { display: block; }
     </style>
 </head>
 
@@ -75,7 +77,8 @@
                 </div>
                 <a href="contact.html" class="nav-item nav-link">Contact</a>
             </div>
-            <a href="login.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
+            <!-- Bouton Espace Sécurisé lié à la modale -->
+            <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#authModal" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
     </nav>
 
@@ -291,11 +294,11 @@
                 <!-- Généré dynamiquement à partir de localStorage ou données témoins -->
             </div>
             
-            <!-- Bouton "Créer et Numérisésvotreécole" demandé en dessous de l'affichage des écoles -->
+            <!-- Bouton "Créer et Numérisésvotreécole" relié à la modale d'authentification/inscription -->
             <div class="text-center mt-5">
-                <a href="gestion_ecole.html" class="btn btn-primary btn-lg py-3 px-5 shadow fw-bold" style="border-radius: 30px;">
+                <button type="button" class="btn btn-primary btn-lg py-3 px-5 shadow fw-bold" style="border-radius: 30px;" data-bs-toggle="modal" data-bs-target="#authModal">
                     <i class="fa fa-plus-circle me-2"></i>Créer et Numérisés votre École 
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -533,6 +536,87 @@
     </div>
 
 
+    <!-- ================= MODALE DE CONNEXION / IDENTIFICATION (FIREBASE) ================= -->
+    <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title text-white fw-bold" id="authModalLabel"><i class="fa fa-user-shield me-2"></i>Espace Professionnel EDU-RDC</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <ul class="nav nav-pills nav-fill mb-4" id="modalAuthTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active fw-bold" id="modal-tab-login" onclick="switchModalMode('login')">Se Connecter</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link fw-bold" id="modal-tab-register" onclick="switchModalMode('register')">Créer un Compte</button>
+                        </li>
+                    </ul>
+
+                    <!-- SECTION CONNEXION -->
+                    <div id="modal-section-login">
+                        <form onsubmit="handleModalLogin(event)">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="modalLoginEmail" placeholder="nom@exemple.com" required>
+                                <label for="modalLoginEmail"><i class="fa fa-envelope me-2"></i>Adresse E-mail vérifiée</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="modalLoginPassword" placeholder="Code Secret" required>
+                                <label for="modalLoginPassword"><i class="fa fa-lock me-2"></i>Code Secret ou Mot de passe</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold"><i class="fa fa-sign-in-alt me-2"></i>Se Connecter</button>
+                        </form>
+                    </div>
+
+                    <!-- SECTION CRÉATION DE COMPTE / IDENTIFICATION -->
+                    <div id="modal-section-register" style="display: none;">
+                        <div id="modal-reg-step-1" class="modal-auth-step active">
+                            <form onsubmit="modalSendCode(event)">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="modalRegName" placeholder="Nom complet" required>
+                                    <label for="modalRegName"><i class="fa fa-user me-2"></i>Nom Complet</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="modalRegContact" placeholder="Email ou Téléphone" required>
+                                    <label for="modalRegContact"><i class="fa id-card me-2"></i>Email ou Numéro de téléphone</label>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 py-3 fw-bold"><i class="fa fa-paper-plane me-2"></i>Envoyer le code (6 chiffres)</button>
+                            </form>
+                        </div>
+
+                        <div id="modal-reg-step-2" class="modal-auth-step" style="display: none;">
+                            <div class="alert alert-info text-center small">
+                                Code de vérification envoyé à <b id="modalDisplayContact"></b>.
+                            </div>
+                            <form onsubmit="modalVerifyAndCreate(event)">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control text-center fs-3 letter-spacing-2" id="modalRegCode" placeholder="000000" maxlength="6" required>
+                                    <label for="modalRegCode" class="text-center w-100">Saisir les 6 chiffres</label>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 py-3 fw-bold"><i class="fa fa-check-circle me-2"></i>Confirmer & Créer le compte</button>
+                            </form>
+                        </div>
+
+                        <div id="modal-reg-step-3" class="modal-auth-step text-center" style="display: none;">
+                            <div class="alert alert-success">
+                                <h4 class="alert-heading fw-bold">Compte Créé !</h4>
+                                <p class="small mb-0">Enregistré avec succès sur <b>Firebase</b>.</p>
+                            </div>
+                            <div class="p-3 bg-light border rounded mb-3">
+                                <span class="text-muted small d-block">Votre Code Secret Professionnel :</span>
+                                <h2 class="text-danger fw-bold my-2" id="modalGeneratedSecret">PRO-0000</h2>
+                                <small class="text-danger">Conservez ce code. Il vous sera demandé avec votre email pour vos connexions.</small>
+                            </div>
+                            <button class="btn btn-primary w-100 fw-bold" onclick="switchModalMode('login')">Aller à la connexion</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 
@@ -576,7 +660,6 @@
                 }
             });
 
-            // Données par défaut de secours si la base locale est vide avec Régime, Province, Territoire et Commune
             if (allSchools.length === 0) {
                 allSchools = [
                     {
@@ -726,7 +809,6 @@
             let html = `<div class="alert alert-info fw-bold">Nombre total d'établissements répertoriés dans toute la RDC pour ce secteur : ${matches.length > 0 ? matches.length : '15,200+ (Base Nationale)'}</div>`;
             html += `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l'Établissement</th><th>Régime Éducatif</th><th>Province</th><th>Territoire</th><th>Commune</th><th>Action</th></tr></thead><tbody>`;
             
-            // Si la base filtrée locale est vide, afficher un exemple textuel national détaillé pour satisfaire l'affichage complet de toute la RDC
             if(matches.length === 0) {
                 html += `
                     <tr>
@@ -825,6 +907,117 @@
                 container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Aucun établissement ne correspond à votre recherche "${query}".</div></div>`;
             }
         }
+    </script>
+
+    <!-- SCRIPT FIREBASE POUR LA MODALE DE CONNEXION / IDENTIFICATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "votre-projet.firebaseapp.com",
+            projectId: "votre-projet-id",
+            storageBucket: "votre-projet.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let simulatedCode = "";
+        let tempUser = {};
+
+        window.switchModalMode = function(mode) {
+            if(mode === 'login') {
+                document.getElementById('modal-section-login').style.display = 'block';
+                document.getElementById('modal-section-register').style.display = 'none';
+                document.getElementById('modal-tab-login').classList.add('active');
+                document.getElementById('modal-tab-register').classList.remove('active');
+            } else {
+                document.getElementById('modal-section-login').style.display = 'none';
+                document.getElementById('modal-section-register').style.display = 'block';
+                document.getElementById('modal-tab-register').classList.add('active');
+                document.getElementById('modal-tab-login').classList.remove('active');
+                
+                document.getElementById('modal-reg-step-1').style.display = 'block';
+                document.getElementById('modal-reg-step-2').style.display = 'none';
+                document.getElementById('modal-reg-step-3').style.display = 'none';
+            }
+        };
+
+        window.modalSendCode = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('modalRegName').value.trim();
+            const contact = document.getElementById('modalRegContact').value.trim();
+
+            if(!name || !contact) return alert("Remplissez tous les champs.");
+
+            simulatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+            tempUser = { name, contact };
+
+            document.getElementById('modalDisplayContact').innerText = contact;
+            alert(`[SIMULATION SMS/EMAIL]\nCode envoyé à ${contact}\n\nCODE À 6 CHIFFRES : ${simulatedCode}`);
+
+            document.getElementById('modal-reg-step-1').style.display = 'none';
+            document.getElementById('modal-reg-step-2').style.display = 'block';
+        };
+
+        window.modalVerifyAndCreate = async function(e) {
+            e.preventDefault();
+            const entered = document.getElementById('modalRegCode').value.trim();
+
+            if(entered !== simulatedCode) {
+                alert("Code incorrect !");
+                return;
+            }
+
+            const secretCode = 'PRO-' + Math.floor(1000 + Math.random() * 9000);
+
+            try {
+                await addDoc(collection(db, "professional_users"), {
+                    name: tempUser.name,
+                    contact: tempUser.contact,
+                    secretCode: secretCode,
+                    createdAt: new Date().toISOString()
+                });
+
+                document.getElementById('modalGeneratedSecret').innerText = secretCode;
+                document.getElementById('modal-reg-step-2').style.display = 'none';
+                document.getElementById('modal-reg-step-3').style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                alert("Erreur d'enregistrement Firebase.");
+            }
+        };
+
+        window.handleModalLogin = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('modalLoginEmail').value.trim();
+            const password = document.getElementById('modalLoginPassword').value.trim();
+
+            try {
+                const q = query(
+                    collection(db, "professional_users"), 
+                    where("contact", "==", email), 
+                    where("secretCode", "==", password)
+                );
+                const snapshot = await getDocs(q);
+
+                if (!snapshot.empty) {
+                    alert("Connexion réussie ! Bienvenue dans votre espace sécurisé.");
+                    localStorage.setItem("edu_is_logged", "true");
+                    location.reload(); 
+                } else {
+                    alert("Email ou Code Secret incorrect.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Erreur de connexion Firebase.");
+            }
+        };
     </script>
 </body>
 
