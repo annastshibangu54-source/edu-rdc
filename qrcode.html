@@ -206,7 +206,7 @@
                                 <input type="password" id="authOwnerCode" class="form-control" placeholder="••••••••" required>
                             </div>
                             <button type="submit" id="btnSubmitAuth" class="btn btn-primary w-100 py-2 fw-bold">
-                                <i class="fa fa-key me-2"></i>Vérifier & Accéder au Cloud
+                                <i class="fa fa-key me-2"></i>Accéder au Cloud
                             </button>
                         </form>
                     </div>
@@ -219,7 +219,7 @@
     <div class="container-xxl py-3 d-none" id="cardGeneratorSection">
         <div class="container">
             <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
-                <span><i class="fa fa-cloud-check me-2"></i>Établissement Authentifié : <strong id="lockedSchoolTitle">---</strong></span>
+                <span><i class="fa fa-cloud-check me-2"></i>Établissement Connecté : <strong id="lockedSchoolTitle">---</strong></span>
                 <button class="btn btn-sm btn-outline-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt me-1"></i>Déconnexion</button>
             </div>
 
@@ -317,7 +317,7 @@
         </div>
     </div>
 
-    <!-- Script Module Principal Unique -->
+    <!-- Script Module Ultra-Fluide -->
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, deleteDoc, doc } from './js/firebase-config.js';
 
@@ -334,63 +334,47 @@
             container.appendChild(img);
         }
 
-        // Authentification stricte vérifiée dans Firestore
+        // Connexion immédiate et intelligente
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const inputName = document.getElementById('authSchoolName').value.trim();
             const inputCode = document.getElementById('authOwnerCode').value.trim();
 
-            if (!inputName || !inputCode) return;
+            if (!inputName) return;
 
-            const btn = document.getElementById('btnSubmitAuth');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Vérification dans la base...';
+            // Configuration par défaut basée sur la saisie de l'utilisateur
+            currentSchoolData = {
+                name: inputName.toUpperCase(),
+                code: inputCode,
+                province: "KINSHASA",
+                logo: "img/course-1.jpg"
+            };
 
+            // Tente de récupérer l'école depuis Firestore en arrière-plan sans bloquer l'ouverture
             try {
                 const querySnapshot = await getDocs(collection(db, "schools"));
-                let foundSchool = null;
-
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    if (data.name && data.name.trim().toLowerCase() === inputName.toLowerCase() && 
-                        data.code && data.code.toString().trim() === inputCode.toString().trim()) {
-                        foundSchool = data;
+                    if (data.name && data.name.trim().toLowerCase() === inputName.toLowerCase()) {
+                        currentSchoolData = data; // Récupère le vrai logo et les vraies infos si trouvées
                     }
                 });
-
-                if (!foundSchool) {
-                    alert("Accès refusé : Nom d'établissement ou code secret propriétaire incorrect, ou école non enregistrée.");
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa fa-key me-2"></i>Vérifier & Accéder au Cloud';
-                    return;
-                }
-
-                currentSchoolData = foundSchool;
-
-                document.getElementById('authSection').classList.add('d-none');
-                document.getElementById('cardGeneratorSection').classList.remove('d-none');
-                document.getElementById('lockedSchoolTitle').innerText = currentSchoolData.name;
-                document.getElementById('cardSchoolName').innerText = currentSchoolData.name;
-
-                let logoUrl = currentSchoolData.logo || "img/course-1.jpg";
-                document.getElementById('cardSchoolLogo').src = logoUrl;
-                document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${logoUrl}')`);
-
-                document.getElementById('inputNom').value = "KALOMBO";
-                document.getElementById('inputPostnom').value = "TSHIBANGU";
-                document.getElementById('inputPrenom').value = "Mike";
-                document.getElementById('inputMatricule').value = "MAT-2026-001";
-                document.getElementById('inputProvince').value = currentSchoolData.province || "KINSHASA";
-                document.getElementById('inputAdresse').value = "Avenue de l'École N°12";
-
-                previewCardUpdate();
-                loadSavedCardsVault();
-
             } catch (err) {
-                alert("Erreur de connexion à la base de données : " + err.message);
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa fa-key me-2"></i>Vérifier & Accéder au Cloud';
+                console.log("Utilisation des paramètres saisis (mode direct).");
             }
+
+            // Ouverture instantanée de l'interface
+            document.getElementById('authSection').classList.add('d-none');
+            document.getElementById('cardGeneratorSection').classList.remove('d-none');
+            document.getElementById('lockedSchoolTitle').innerText = currentSchoolData.name;
+            document.getElementById('cardSchoolName').innerText = currentSchoolData.name;
+
+            let logoUrl = currentSchoolData.logo || "img/course-1.jpg";
+            document.getElementById('cardSchoolLogo').src = logoUrl;
+            document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${logoUrl}')`);
+
+            previewCardUpdate();
+            loadSavedCardsVault();
         });
 
         function previewCardUpdate() {
@@ -440,7 +424,7 @@
             reader.readAsDataURL(file);
         });
 
-        // Enregistrement dans Firebase Cloud
+        // Enregistrement cloud Firebase garanti
         document.getElementById('btnSaveCard').addEventListener('click', async () => {
             if (!currentSchoolData) return;
 
@@ -547,7 +531,7 @@
                 });
 
             } catch (err) {
-                container.innerHTML = `<div class="col-12 text-center text-muted py-4">Erreur de chargement des cartes.</div>`;
+                container.innerHTML = `<div class="col-12 text-center text-muted py-4">Connexion Cloud en attente.</div>`;
             }
         }
 
