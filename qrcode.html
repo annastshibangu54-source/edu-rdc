@@ -24,7 +24,7 @@
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
 
-    <!-- qrcode.js Library pour la génération dynamique des QR Codes -->
+    <!-- qrcode.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -32,7 +32,7 @@
         .id-card {
             width: 8.5cm;
             height: 5.5cm;
-            background: #0088cc !important; /* Fond bleu ciel d'origine */
+            background: #0088cc !important;
             background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%) !important;
             border-radius: 8px;
             color: #ffffff !important;
@@ -154,7 +154,12 @@
             border-radius: 3px;
         }
 
-        /* Impression exacte aux dimensions réelles */
+        .qr-container img, .qr-container canvas {
+            display: block !important;
+            width: 44px !important;
+            height: 44px !important;
+        }
+
         @media print {
             body * {
                 visibility: hidden;
@@ -222,7 +227,7 @@
                         <h4 class="m-0 text-white"><i class="fa fa-lock me-2"></i>Accès Propriétaire d'Établissement</h4>
                     </div>
                     <div class="card-body p-4">
-                        <p class="text-muted small text-center mb-4">Saisissez le nom de l'école (telle qu'enregistrée dans la gestion) ainsi que votre code secret pour ouvrir votre session d'impression.</p>
+                        <p class="text-muted small text-center mb-4">Saisissez le nom de votre école ainsi que votre code secret propriétaire pour déverrouiller la gestion exclusive de votre établissement.</p>
                         <form id="authForm" onsubmit="unlockSchoolForm(event)">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Nom Complet de l'École</label>
@@ -242,7 +247,7 @@
         </div>
     </div>
 
-    <!-- ZONE DE SAISIE ET BOÎTE DE STOCKAGE (Masquée par défaut avant authentification) -->
+    <!-- ZONE DE SAISIE ET BOÎTE DE STOCKAGE -->
     <div class="container-xxl py-3 d-none" id="cardGeneratorSection">
         <div class="container">
             <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
@@ -250,7 +255,7 @@
                 <button class="btn btn-sm btn-outline-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt me-1"></i>Déconnexion</button>
             </div>
 
-            <!-- Onglets de Navigation : Création vs Boîte d'Archives & Impression -->
+            <!-- Onglets de Navigation -->
             <ul class="nav nav-tabs mb-4" id="cardTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold" id="create-tab" data-bs-toggle="tab" data-bs-target="#createPane" type="button" role="tab">Créer & Enregistrer une Carte</button>
@@ -322,12 +327,11 @@
                             </div>
                         </div>
 
-                        <!-- Aperçu Visuel de la Carte au Format Réel (8.5 Cm x 5.5 Cm) -->
+                        <!-- Aperçu Visuel de la Carte (8.5 cm x 5.5 cm) -->
                         <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
                             <h5 class="mb-3 text-muted">Aperçu Conforme (8,5 cm x 5,5 cm)</h5>
                             
                             <div id="cardPreviewContainer">
-                                <!-- Carte Plastifiée Virtuelle -->
                                 <div class="id-card" id="cardPreview" style="--school-bg-logo: url('img/course-1.jpg');">
                                     <header>
                                         <div class="header-title">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
@@ -353,12 +357,10 @@
                                         </div>
                                     </div>
 
-                                    <!-- QR Code généré en bas à droite -->
                                     <div class="qr-container">
                                         <div id="qrcodePreview"></div>
                                     </div>
 
-                                    <!-- Mot d'assistance aux autorités militaires et civiles -->
                                     <div class="footer-assistance">
                                         Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.
                                     </div>
@@ -372,11 +374,11 @@
                     </div>
                 </div>
 
-                <!-- PANNEAU 2 : BOÎTE DE STOCKAGE ET ARCHIVES DES CARTES -->
+                <!-- PANNEAU 2 : BOÎTE DE STOCKAGE -->
                 <div class="tab-pane fade" id="vaultPane" role="tabpanel">
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                            <h5 class="m-0 text-white"><i class="fa fa-archive me-2"></i>Boîte de Stockage de toutes les Cartes de l'Établissement</h5>
+                            <h5 class="m-0 text-white"><i class="fa fa-archive me-2"></i>Boîte de Stockage des Cartes de l'Établissement</h5>
                             <div>
                                 <select id="filterCategory" class="form-select form-select-sm d-inline-block w-auto" onchange="loadSavedCardsVault()">
                                     <option value="ALL">Toutes les Catégories</option>
@@ -389,7 +391,7 @@
                         </div>
                         <div class="card-body p-4">
                             <div id="vaultCardsContainer" class="row g-4">
-                                <!-- Cartes stockées affichées dynamiquement ici -->
+                                <!-- Cartes générées et archivées ici -->
                             </div>
                         </div>
                     </div>
@@ -405,14 +407,40 @@
             <p class="mb-0">&copy; <a class="border-bottom" href="#">EDU-RDC</a> - République Démocratique du Congo. Tous Droits Réservés.</p>
         </div>
     </div>
-    <!-- Footer End -->
 
-    <!-- LOGIQUE JAVASCRIPT CORRIGÉE ET INTERCONNECTÉE AVEC LA GESTION D'ÉCOLE -->
+    <!-- JAVASCRIPT DE GÉNÉRATION ET SAUVEGARDE GARANTIE SUR RENDER -->
     <script>
         let currentSchoolData = null;
         let tempPhotoBase64 = "img/team-1.jpg";
 
-        // Récupération globale des écoles sauvegardées depuis la gestion
+        // Détection globale et secours QR Code API universelle
+        function renderQRCodeInContainer(container, textData) {
+            if (!container) return;
+            container.innerHTML = "";
+            
+            if (typeof QRCode !== 'undefined') {
+                try {
+                    new QRCode(container, {
+                        text: textData,
+                        width: 44,
+                        height: 44,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                    return;
+                } catch(e) {}
+            }
+            
+            // Moteur de secours fiable (API QR Image direct si le JS externe CDN bloque sur Render)
+            let safeUrl = encodeURIComponent(textData);
+            let img = document.createElement("img");
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${safeUrl}`;
+            img.style.width = "44px";
+            img.style.height = "44px";
+            container.appendChild(img);
+        }
+
         function getStoredPlatformSchools() {
             let keysToTry = ["EDURDC_FULL_PLATFORM_V10", "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
             let found = [];
@@ -439,25 +467,20 @@
             const inputCode = document.getElementById('authOwnerCode').value.trim();
 
             if (!inputName) {
-                alert("Veuillez saisir le nom de votre établissement.");
+                alert("Veuillez entrer le nom de l'école.");
                 return;
             }
 
             let savedSchools = getStoredPlatformSchools();
             let match = savedSchools.find(s => s.name.toLowerCase() === inputName.toLowerCase());
 
-            // Utilise l'école issue de la gestion ou en crée une nouvelle dynamiquement
-            if (match) {
-                currentSchoolData = match;
-            } else {
-                currentSchoolData = {
-                    name: inputName.toUpperCase(),
-                    code: inputCode,
-                    province: "KINSHASA",
-                    commune: "CENTRE",
-                    logo: "img/course-1.jpg"
-                };
-            }
+            currentSchoolData = match || {
+                name: inputName.toUpperCase(),
+                code: inputCode,
+                province: "KINSHASA",
+                commune: "CENTRE",
+                logo: "img/course-1.jpg"
+            };
 
             document.getElementById('authSection').classList.add('d-none');
             document.getElementById('cardGeneratorSection').classList.remove('d-none');
@@ -481,15 +504,26 @@
         }
 
         function loadUserPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
             const reader = new FileReader();
-            reader.onload = function() {
-                tempPhotoBase64 = reader.result;
-                document.getElementById('cardUserPhoto').src = tempPhotoBase64;
-                previewCardUpdate();
+            reader.onload = function(e) {
+                // Compression de l'image pour éviter de dépasser les quotas de LocalStorage
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 150;
+                    canvas.height = 180;
+                    ctx.drawImage(img, 0, 0, 150, 180);
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    document.getElementById('cardUserPhoto').src = tempPhotoBase64;
+                    previewCardUpdate();
+                };
+                img.src = e.target.result;
             };
-            if (event.target.files[0]) {
-                reader.readAsDataURL(event.target.files[0]);
-            }
+            reader.readAsDataURL(file);
         }
 
         function previewCardUpdate() {
@@ -512,23 +546,10 @@
             document.getElementById('cardAdresse').innerText = adresse;
             document.getElementById('cardUserPhoto').src = tempPhotoBase64;
 
-            // Génération dynamique garantie du QR Code
             const qrContainer = document.getElementById('qrcodePreview');
-            if (qrContainer) {
-                qrContainer.innerHTML = "";
-                const qrData = `EDU-RDC VERIFIED\nÉcole: ${currentSchoolData.name}\nCat: ${category}\nNom: ${nom} ${postnom} ${prenom}\nMatricule: ${matricule}\nProv: ${province}`;
+            const qrData = `EDU-RDC VERIFIED\nÉcole: ${currentSchoolData.name}\nCat: ${category}\nNom: ${nom} ${postnom} ${prenom}\nMatricule: ${matricule}\nProv: ${province}`;
 
-                if (typeof QRCode !== 'undefined') {
-                    new QRCode(qrContainer, {
-                        text: qrData,
-                        width: 44,
-                        height: 44,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.M
-                    });
-                }
-            }
+            renderQRCodeInContainer(qrContainer, qrData);
         }
 
         function getVaultStorageKey() {
@@ -566,12 +587,15 @@
             }
 
             vault.push(cardData);
-            localStorage.setItem(storageKey, JSON.stringify(vault));
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(vault));
+                alert("Carte enregistrée avec succès dans la boîte de stockage !");
+            } catch(e) {
+                alert("Erreur de stockage : L'image est trop volumineuse.");
+            }
 
-            alert("Carte enregistrée avec succès dans la boîte de stockage de l'établissement !");
             updateVaultCount();
             
-            // Basculement automatique vers la boîte de stockage
             const vaultTab = document.getElementById('vault-tab');
             if (vaultTab) vaultTab.click();
             loadSavedCardsVault();
@@ -651,26 +675,14 @@
                 </div>
             `).join('');
 
-            // Régénération dynamique des QR codes dans la grille d'affichage
+            // Rendu systématique des QR codes pour chaque carte archivée
             setTimeout(() => {
                 filtered.forEach(card => {
                     const qrEl = document.getElementById(`vault-qr-${card.id}`);
-                    if (qrEl) {
-                        qrEl.innerHTML = "";
-                        const qrData = `EDU-RDC VERIFIED\nÉcole: ${card.schoolName}\nCat: ${card.category}\nNom: ${card.nom} ${card.postnom} ${card.prenom}\nMatricule: ${card.matricule}\nProv: ${card.province}`;
-                        if (typeof QRCode !== 'undefined') {
-                            new QRCode(qrEl, {
-                                text: qrData,
-                                width: 44,
-                                height: 44,
-                                colorDark: "#000000",
-                                colorLight: "#ffffff",
-                                correctLevel: QRCode.CorrectLevel.M
-                            });
-                        }
-                    }
+                    const qrData = `EDU-RDC VERIFIED\nÉcole: ${card.schoolName}\nCat: ${card.category}\nNom: ${card.nom} ${card.postnom} ${card.prenom}\nMatricule: ${card.matricule}\nProv: ${card.province}`;
+                    renderQRCodeInContainer(qrEl, qrData);
                 });
-            }, 100);
+            }, 50);
         }
 
         function printSpecificCard(cardId) {
@@ -726,6 +738,7 @@
                         .card-details { font-size: 0.36rem; line-height: 1.2; margin-left: 4px; }
                         .footer-assistance { position: absolute; bottom: 2px; left: 0; width: 100%; text-align: center; font-size: 0.28rem; font-style: italic; border-top: 0.5px solid rgba(255,255,255,0.3); padding-top: 1px; }
                         .qr-container { position: absolute; bottom: 15px; right: 8px; background: #ffffff; padding: 2px; border-radius: 3px; }
+                        .qr-container img { width: 44px !important; height: 44px !important; }
                     </style>
                 </head>
                 <body onload="window.print(); window.close();">
@@ -739,7 +752,7 @@
         }
 
         function deleteCard(cardId) {
-            if (confirm("Voulez-vous supprimer définitivement cette carte de la boîte de stockage ?")) {
+            if (confirm("Voulez-vous supprimer définitivement cette carte ?")) {
                 let storageKey = getVaultStorageKey();
                 let vault = [];
                 try {
