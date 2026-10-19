@@ -29,6 +29,17 @@
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+    
+    <style>
+        .interactive-card {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -42,33 +53,31 @@
 
 
     <!-- Navigation Principale Harmonisée -->
-<nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-    <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-        <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
-    </a>
-    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-        <div class="navbar-nav ms-auto p-4 p-lg-0">
-            <a href="index.html" class="nav-item nav-link active">Accueil</a>
-            <a href="about.html" class="nav-item nav-link">À propos</a>
-            <a href="courses.html" class="nav-item nav-link">Établissements</a>
-            <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
-                <div class="dropdown-menu fade-down m-0">
-                    <a href="team.html" class="dropdown-item">Notre Équipe</a>
-                    <a href="testimonial.html" class="dropdown-item">Témoignages</a>
-                    <a href="404.html" class="dropdown-item">Page 404</a>
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
+        </a>
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                <a href="index.html" class="nav-item nav-link active">Accueil</a>
+                <a href="about.html" class="nav-item nav-link">À propos</a>
+                <a href="courses.html" class="nav-item nav-link">Établissements</a>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                    <div class="dropdown-menu fade-down m-0">
+                        <a href="team.html" class="dropdown-item">Notre Équipe</a>
+                        <a href="testimonial.html" class="dropdown-item">Témoignages</a>
+                        <a href="404.html" class="dropdown-item">Page 404</a>
+                    </div>
                 </div>
+                <a href="contact.html" class="nav-item nav-link">Contact</a>
             </div>
-            <a href="contact.html" class="nav-item nav-link">Contact</a>
+            <a href="login.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
-        <a href="login.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
-    </div>
-</nav>
-
-
+    </nav>
 
 
     <!-- Carousel Start -->
@@ -83,8 +92,8 @@
                                 <h5 class="text-primary text-uppercase mb-3 animated slideInDown">Ministère de l'Éducation Nationale</h5>
                                 <h1 class="display-3 text-white animated slideInDown">Plateforme de Gestion des Écoles en RDC</h1>
                                 <p class="fs-5 text-white mb-4 pb-2">Système centralisé de suivi des établissements scolaires, des élèves et du corps enseignant sur toute l'étendue du territoire national.</p>
-                                <a href="#" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft action-stats-btn" data-category="Global">En savoir plus</a>
-                                <a href="#" class="btn btn-light py-md-3 px-md-5 animated slideInRight action-stats-btn" data-category="Global">Accéder au portail</a>
+                                <a href="javascript:void(0);" onclick="showGlobalStatsModal('teachers')" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft"><i class="fa fa-chalkboard-teacher me-2"></i>Corps Enseignant</a>
+                                <a href="javascript:void(0);" onclick="showGlobalStatsModal('students')" class="btn btn-light py-md-3 px-md-5 animated slideInRight"><i class="fa fa-user-graduate me-2"></i>Effectif Élèves</a>
                             </div>
                         </div>
                     </div>
@@ -99,8 +108,8 @@
                                 <h5 class="text-primary text-uppercase mb-3 animated slideInDown">Couverture Nationale</h5>
                                 <h1 class="display-3 text-white animated slideInDown">Modernisation du Système Éducatif</h1>
                                 <p class="fs-5 text-white mb-4 pb-2">Gérez efficacement les inscriptions, le suivi personnalisé des élèves et l'identification par cartes QR à travers les 26 provinces.</p>
-                                <a href="#" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft action-stats-btn" data-category="Global">En savoir plus</a>
-                                <a href="#" class="btn btn-light py-md-3 px-md-5 animated slideInRight action-stats-btn" data-category="Global">Accéder au portail</a>
+                                <a href="javascript:void(0);" onclick="showGlobalStatsModal('schools')" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft"><i class="fa fa-school me-2"></i>Voir Écoles</a>
+                                <a href="javascript:void(0);" onclick="showGlobalStatsModal('admin')" class="btn btn-light py-md-3 px-md-5 animated slideInRight"><i class="fa fa-sitemap me-2"></i>Direction & Cadres</a>
                             </div>
                         </div>
                     </div>
@@ -111,43 +120,47 @@
     <!-- Carousel End -->
 
 
-    <!-- Service Start -->
+    <!-- Service Start (Cartes interactives liées aux statistiques d'apprentissage) -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-4">
                 <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="service-item text-center pt-3">
+                    <div class="service-item text-center pt-3 interactive-card" onclick="showGlobalStatsModal('teachers')">
                         <div class="p-4">
                             <i class="fa fa-3x fa-graduation-cap text-primary mb-4"></i>
                             <h5 class="mb-3">Personnel Enseignant</h5>
-                            <p>Gestion des carrières, affectations et suivi professionnel du corps professoral</p>
+                            <p>Consulter la liste nominative des professeurs enregistrés par école.</p>
+                            <span class="badge bg-primary px-3 py-2 mt-2" id="badge-teachers-count">0 Enseignant(s)</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="service-item text-center pt-3">
+                    <div class="service-item text-center pt-3 interactive-card" onclick="showGlobalStatsModal('students')">
                         <div class="p-4">
-                            <i class="fa fa-3x fa-globe text-primary mb-4"></i>
-                            <h5 class="mb-3">Couverture Nationale</h5>
-                            <p>Supervision centralisée des provinces éducationnelles de la RDC</p>
+                            <i class="fa fa-3x fa-user-graduate text-primary mb-4"></i>
+                            <h5 class="mb-3">Effectif des Élèves</h5>
+                            <p>Suivi des élèves inscrits, répartition par classe et matricules.</p>
+                            <span class="badge bg-success px-3 py-2 mt-2" id="badge-students-count">0 Élève(s)</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="service-item text-center pt-3">
+                    <div class="service-item text-center pt-3 interactive-card" onclick="showGlobalStatsModal('schools')">
                         <div class="p-4">
                             <i class="fa fa-3x fa-home text-primary mb-4"></i>
                             <h5 class="mb-3">Gestion des Écoles</h5>
-                            <p>Suivi administratif, infrastructures et dossiers complets des établissements</p>
+                            <p>Répertoire des établissements scolaires actifs enregistrés.</p>
+                            <span class="badge bg-warning text-dark px-3 py-2 mt-2" id="badge-schools-count">0 École(s)</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.7s">
-                    <div class="service-item text-center pt-3">
+                    <div class="service-item text-center pt-3 interactive-card" onclick="showGlobalStatsModal('admin')">
                         <div class="p-4">
-                            <i class="fa fa-3x fa-book-open text-primary mb-4"></i>
-                            <h5 class="mb-3">Système d'Évaluation</h5>
-                            <p>Suivi académique rigoureux, gestion des notes et bulletins scolaires</p>
+                            <i class="fa fa-3x fa-sitemap text-primary mb-4"></i>
+                            <h5 class="mb-3">Direction & Cadres</h5>
+                            <p>Liste des directeurs, préfets et membres de la hiérarchie.</p>
+                            <span class="badge bg-info text-dark px-3 py-2 mt-2" id="badge-admin-count">0 Cadre(s)</span>
                         </div>
                     </div>
                 </div>
@@ -173,25 +186,25 @@
                     <p class="mb-4">Sous la tutelle du Ministère de l'Éducation Nationale et Nouvelle Citoyenneté, notre mission est d'offrir des outils modernes pour le suivi des élèves et des enseignants.</p>
                     <div class="row gy-2 gx-4 mb-4">
                         <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Personnel Qualifié</p>
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('admin')"><i class="fa fa-arrow-right text-primary me-2"></i>Personnel Qualifié</p>
                         </div>
                         <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Classes et Écoles</p>
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('schools')"><i class="fa fa-arrow-right text-primary me-2"></i>Classes et Écoles</p>
                         </div>
                         <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Cartes d'Identification QR</p>
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('students')"><i class="fa fa-arrow-right text-primary me-2"></i>Cartes d'Identification QR</p>
                         </div>
                         <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Personnel Enseignant</p>
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('teachers')"><i class="fa fa-arrow-right text-primary me-2"></i>Personnel Enseignant</p>
                         </div>
                         <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Suivi des Élèves</p>
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('students')"><i class="fa fa-arrow-right text-primary me-2"></i>Suivi des Élèves</p>
                         </div>
                         <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Certifications Officielles</p>
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('schools')"><i class="fa fa-arrow-right text-primary me-2"></i>Certifications Officielles</p>
                         </div>
                     </div>
-                    <a class="btn btn-primary py-3 px-5 mt-2 action-stats-btn" data-category="Global" href="">En savoir plus</a>
+                    <a class="btn btn-primary py-3 px-5 mt-2" href="javascript:void(0);" onclick="showGlobalStatsModal('schools')">Consulter la Banque de Données</a>
                 </div>
             </div>
         </div>
@@ -210,7 +223,7 @@
                 <div class="col-lg-7 col-md-6">
                     <div class="row g-3">
                         <div class="col-lg-12 col-md-12 wow zoomIn" data-wow-delay="0.1s">
-                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Primaire" href="">
+                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Primaire" href="javascript:void(0);" onclick="filterCategoryModal('Primaire')">
                                 <img class="img-fluid" src="img/cat-1.jpg" alt="">
                                 <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin: 1px;">
                                     <h5 class="m-0">Enseignement Primaire</h5>
@@ -219,7 +232,7 @@
                             </a>
                         </div>
                         <div class="col-lg-6 col-md-12 wow zoomIn" data-wow-delay="0.3s">
-                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Secondaire" href="">
+                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Secondaire" href="javascript:void(0);" onclick="filterCategoryModal('Secondaire')">
                                 <img class="img-fluid" src="img/cat-2.jpg" alt="">
                                 <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin: 1px;">
                                     <h5 class="m-0">Enseignement Secondaire</h5>
@@ -228,7 +241,7 @@
                             </a>
                         </div>
                         <div class="col-lg-6 col-md-12 wow zoomIn" data-wow-delay="0.5s">
-                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Technique" href="">
+                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Technique" href="javascript:void(0);" onclick="filterCategoryModal('Technique')">
                                 <img class="img-fluid" src="img/cat-3.jpg" alt="">
                                 <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin: 1px;">
                                     <h5 class="m-0">Enseignement Technique</h5>
@@ -239,9 +252,9 @@
                     </div>
                 </div>
                 <div class="col-lg-5 col-md-6 wow zoomIn" data-wow-delay="0.7s" style="min-height: 350px;">
-                    <a class="position-relative d-block h-100 overflow-hidden action-stats-btn" data-category="Humanitaire" href="">
+                    <a class="position-relative d-block h-100 overflow-hidden action-stats-btn" data-category="Humanitaire" href="javascript:void(0);" onclick="filterCategoryModal('Humanitaire')">
                         <img class="img-fluid position-absolute w-100 h-100" src="img/cat-4.jpg" alt="" style="object-fit: cover;">
-                        <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin:  1px;">
+                        <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin: 1px;">
                             <h5 class="m-0">Secteur Humanitaire & Social</h5>
                             <small class="text-primary" id="count-humanitaire">3,500 Écoles</small>
                         </div>
@@ -259,7 +272,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="input-group mb-4 shadow-sm">
-                        <input type="text" id="searchSchoolInput" class="form-control border-primary py-3 ps-4" placeholder="Rechercher une école enregistrée..." oninput="filterSchools()" onclick="filterSchools()">
+                        <input type="text" id="searchSchoolInput" class="form-control border-primary py-3 ps-4" placeholder="Rechercher une école par nom, province, commune..." oninput="filterSchools()" onclick="filterSchools()">
                         <button type="button" class="btn btn-primary px-4" onclick="filterSchools()">Rechercher</button>
                     </div>
                 </div>
@@ -275,90 +288,7 @@
                 <h1 class="mb-5">Institutions Enregistrées</h1>
             </div>
             <div class="row g-4 justify-content-center" id="schoolsContainer">
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="course-item bg-light">
-                        <div class="position-relative overflow-hidden">
-                            <img class="img-fluid" src="img/course-1.jpg" alt="">
-                            <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">Détails</a>
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Consulter</a>
-                            </div>
-                        </div>
-                        <div class="text-center p-4 pb-0">
-                            <h3 class="mb-0">Kinshasa I</h3>
-                            <div class="mb-3">
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small>(123)</small>
-                            </div>
-                            <h5 class="mb-4">Complexe Scolaire Référence - Province Éduc.</h5>
-                        </div>
-                        <div class="d-flex border-top">
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-user-tie text-primary me-2"></i>Dir. Provincial</small>
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-clock text-primary me-2"></i>Actif</small>
-                            <small class="flex-fill text-center py-2"><i class="fa fa-user text-primary me-2"></i>1,450 Élèves</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="course-item bg-light">
-                        <div class="position-relative overflow-hidden">
-                            <img class="img-fluid" src="img/course-2.jpg" alt="">
-                            <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">Détails</a>
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Consulter</a>
-                            </div>
-                        </div>
-                        <div class="text-center p-4 pb-0">
-                            <h3 class="mb-0">Haut-Katanga</h3>
-                            <div class="mb-3">
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small>(98)</small>
-                            </div>
-                            <h5 class="mb-4">Institut Technique Supérieur - Lubumbashi</h5>
-                        </div>
-                        <div class="d-flex border-top">
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-user-tie text-primary me-2"></i>Dir. Provincial</small>
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-clock text-primary me-2"></i>Actif</small>
-                            <small class="flex-fill text-center py-2"><i class="fa fa-user text-primary me-2"></i>1,200 Élèves</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="course-item bg-light">
-                        <div class="position-relative overflow-hidden">
-                            <img class="img-fluid" src="img/course-3.jpg" alt="">
-                            <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">Détails</a>
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Consulter</a>
-                            </div>
-                        </div>
-                        <div class="text-center p-4 pb-0">
-                            <h3 class="mb-0">Kongo Central</h3>
-                            <div class="mb-3">
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small>(75)</small>
-                            </div>
-                            <h5 class="mb-4">Lycée Moderne de Matadi - Enseignement</h5>
-                        </div>
-                        <div class="d-flex border-top">
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-user-tie text-primary me-2"></i>Dir. Provincial</small>
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-clock text-primary me-2"></i>Actif</small>
-                            <small class="flex-fill text-center py-2"><i class="fa fa-user text-primary me-2"></i>980 Élèves</small>
-                        </div>
-                    </div>
-                </div>
+                <!-- Généré dynamiquement à partir de localStorage ou données témoins -->
             </div>
         </div>
     </div>
@@ -374,7 +304,7 @@
             </div>
             <div class="row g-4">
                 <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="team-item bg-light">
+                    <div class="team-item bg-light interactive-card" onclick="showGlobalStatsModal('admin')">
                         <div class="overflow-hidden">
                             <img class="img-fluid" src="img/team-1.jpg" alt="">
                         </div>
@@ -386,13 +316,13 @@
                             </div>
                         </div>
                         <div class="text-center p-4">
-                            <h5 class="mb-0">Nom du Responsable</h5>
-                            <small>Directeur Central</small>
+                            <h5 class="mb-0">Direction Centrale</h5>
+                            <small>Inspection & Suivi</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="team-item bg-light">
+                    <div class="team-item bg-light interactive-card" onclick="showGlobalStatsModal('teachers')">
                         <div class="overflow-hidden">
                             <img class="img-fluid" src="img/team-2.jpg" alt="">
                         </div>
@@ -404,13 +334,13 @@
                             </div>
                         </div>
                         <div class="text-center p-4">
-                            <h5 class="mb-0">Nom du Responsable</h5>
-                            <small>Inspecteur Général</small>
+                            <h5 class="mb-0">Corps Professoral</h5>
+                            <small>Enseignants & Titulaires</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="team-item bg-light">
+                    <div class="team-item bg-light interactive-card" onclick="showGlobalStatsModal('students')">
                         <div class="overflow-hidden">
                             <img class="img-fluid" src="img/team-3.jpg" alt="">
                         </div>
@@ -422,13 +352,13 @@
                             </div>
                         </div>
                         <div class="text-center p-4">
-                            <h5 class="mb-0">Nom du Responsable</h5>
-                            <small>Coordonnateur Technique</small>
+                            <h5 class="mb-0">Effectif Scolaire</h5>
+                            <small>Élèves & Cartes QR</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
-                    <div class="team-item bg-light">
+                    <div class="team-item bg-light interactive-card" onclick="showGlobalStatsModal('schools')">
                         <div class="overflow-hidden">
                             <img class="img-fluid" src="img/team-4.jpg" alt="">
                         </div>
@@ -440,8 +370,8 @@
                             </div>
                         </div>
                         <div class="text-center p-4">
-                            <h5 class="mb-0">Nom du Responsable</h5>
-                            <small>Administrateur Système</small>
+                            <h5 class="mb-0">Administration</h5>
+                            <small>Base de Données Nationales</small>
                         </div>
                     </div>
                 </div>
@@ -464,7 +394,7 @@
                     <h5 class="mb-0">Jean-Paul Mukendi</h5>
                     <p>Préfet d'Institut</p>
                     <div class="testimonial-text bg-light text-center p-4">
-                    <p class="mb-0">La gestion informatisée des dossiers d'élèves et des notes nous a permis de gagner un temps précieux dans notre établissement.</p>
+                        <p class="mb-0">La gestion informatisée des dossiers d'élèves et des notes nous a permis de gagner un temps précieux dans notre établissement.</p>
                     </div>
                 </div>
                 <div class="testimonial-item text-center">
@@ -472,7 +402,7 @@
                     <h5 class="mb-0">Marie Kabamba</h5>
                     <p>Directrice d'École Primaire</p>
                     <div class="testimonial-text bg-light text-center p-4">
-                    <p class="mb-0">Un outil indispensable pour le suivi des enseignants et la fluidité des rapports statistiques transmis au niveau provincial.</p>
+                        <p class="mb-0">Un outil indispensable pour le suivi des enseignants et la fluidité des rapports statistiques transmis au niveau provincial.</p>
                     </div>
                 </div>
                 <div class="testimonial-item text-center">
@@ -480,7 +410,7 @@
                     <h5 class="mb-0">Alain Tshimanga</h5>
                     <p>Secrétaire Administratif</p>
                     <div class="testimonial-text bg-light text-center p-4">
-                    <p class="mb-0">Le système de cartes d'identification sécurisées par QR Code simplifie grandement l'authentification des élèves.</p>
+                        <p class="mb-0">Le système de cartes d'identification sécurisées par QR Code simplifie grandement l'authentification des élèves.</p>
                     </div>
                 </div>
                 <div class="testimonial-item text-center">
@@ -488,7 +418,7 @@
                     <h5 class="mb-0">Chantal Ndaya</h5>
                     <p>Promotrice d'Établissement</p>
                     <div class="testimonial-text bg-light text-center p-4">
-                    <p class="mb-0">Une plateforme moderne, intuitive et parfaitement adaptée aux exigences du Ministère de l'Éducation Nationale.</p>
+                        <p class="mb-0">Une plateforme moderne, intuitive et parfaitement adaptée aux exigences du Ministère de l'Éducation Nationale.</p>
                     </div>
                 </div>
             </div>
@@ -559,7 +489,6 @@
                 <div class="row">
                     <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                         &copy; <a class="border-bottom" href="#">EDU-RDC</a>, Tous Droits Réservés.
-
                         Conçu pour la Gestion des Institutions Éducationnelles en RDC
                     </div>
                     <div class="col-md-6 text-center text-md-end">
@@ -577,6 +506,26 @@
     <!-- Footer End -->
 
 
+    <!-- MODAL DE DÉTAILS ET INSPECTION DES DONNÉES (ENSEIGNANTS / ÉLÈVES / ÉCOLES / CADRES) -->
+    <div class="modal fade" id="statsDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title text-white fw-bold" id="statsModalTitle"><i class="fa fa-info-circle me-2"></i>Détails des Données</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="statsModalContent">
+                    <!-- Généré dynamiquement -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer le Rapport</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 
@@ -592,56 +541,197 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- Script dynamique et interactif -->
+    <!-- SCRIPT DYNAMIQUE ET INTELLIGENT DE CONNEXION DES DONNÉES LOCALES ET ÉCOLES -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
 
         window.onload = function() {
             updateRealCounts();
-
-            // Gestion dynamique des clics sur les boutons et catégories (Primaire, Secondaire, Technique, Humanitaire)
-            document.querySelectorAll('.action-stats-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const category = this.getAttribute('data-category');
-                    let allSchools = getStoredSchools();
-                    let totalCount = allSchools.length;
-
-                    if (category === "Global") {
-                        alert(`Ministère de l'Éducation Nationale (EDU-RDC) :\nTotal des établissements enregistrés et synchronisés sur toute l'étendue de la RDC : ${totalCount} école(s).`);
-                    } else {
-                        let matches = allSchools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes(category.toLowerCase()));
-                        alert(`Statistiques pour le secteur [ ${category} ] en RDC :\n- Nombre total enregistré : ${matches.length} école(s) sur ${totalCount} au total.`);
-                    }
-                });
-            });
+            filterSchools();
         };
 
         function getStoredSchools() {
             let allSchools = [];
-            let savedItem = localStorage.getItem(STORAGE_KEY);
-            if (savedItem) {
-                try {
-                    let parsed = JSON.parse(savedItem);
-                    allSchools = Array.isArray(parsed) ? parsed : (parsed.schools || []);
-                } catch(e) {}
+            let keysToTry = [STORAGE_KEY, "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
+            
+            keysToTry.forEach(key => {
+                let savedItem = localStorage.getItem(key);
+                if (savedItem) {
+                    try {
+                        let parsed = JSON.parse(savedItem);
+                        let list = Array.isArray(parsed) ? parsed : (parsed.schools || []);
+                        list.forEach(s => {
+                            if (s && s.id && !allSchools.some(existing => existing.id === s.id)) {
+                                allSchools.push(s);
+                            }
+                        });
+                    } catch(e) {}
+                }
+            });
+
+            // Données par défaut de secours si la base locale est vide
+            if (allSchools.length === 0) {
+                allSchools = [
+                    {
+                        id: "SCH-001",
+                        name: "C.S. LA RÉVOLUTION",
+                        appartenance: "Non Conventionnée (Privée)",
+                        province: "KINSHASA-LUKUNGA",
+                        commune: "KALAMU",
+                        logo: "img/course-1.jpg",
+                        teachers: [
+                            { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" },
+                            { name: "MUKENDI Marie", phone: "0810000002", titulaireClass: "8ème EB B", secretCode: "AGT-1002" }
+                        ],
+                        students: [
+                            { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" },
+                            { id: "STU-2", mat: "ELV-002", name: "MBOMBO Sarah", sexe: "F", classe: "7ème EB A" }
+                        ],
+                        staff: [
+                            { role: "Préfet des Études", name: "KALOMBO Mike" },
+                            { role: "Directeur des Études", name: "NSAPU Eric" }
+                        ]
+                    },
+                    {
+                        id: "SCH-002",
+                        name: "INSTITUT TECHNIQUE DE LUBUMBASHI",
+                        appartenance: "Officielle / Publique (Technique)",
+                        province: "HAUT-KATANGA",
+                        commune: "LUBUMBASHI",
+                        logo: "img/course-2.jpg",
+                        teachers: [
+                            { name: "KAZADI Pierre", phone: "0990000001", titulaireClass: "1ère Mechanics", secretCode: "AGT-2001" }
+                        ],
+                        students: [
+                            { id: "STU-3", mat: "ELV-003", name: "ILUNGA David", sexe: "M", classe: "1ère Mechanics" }
+                        ],
+                        staff: [
+                            { role: "Directeur Provincial", name: "MWAMBA Joseph" }
+                        ]
+                    }
+                ];
             }
+
             return allSchools;
         }
 
         function updateRealCounts() {
-            let allSchools = getStoredSchools();
-            if (allSchools.length > 0) {
-                let primaireCount = allSchools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('primaire')).length;
-                let secondaireCount = allSchools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('secondaire')).length;
-                let techniqueCount = allSchools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('technique')).length;
-                let humanitaireCount = allSchools.filter(s => s.appartenance && (s.appartenance.toLowerCase().includes('humanitaire') || s.appartenance.toLowerCase().includes('social'))).length;
+            let schools = getStoredSchools();
+            let totalTeachers = 0;
+            let totalStudents = 0;
+            let totalAdmin = 0;
 
-                if(document.getElementById('count-primaire')) document.getElementById('count-primaire').innerText = `${15200 + primaireCount} Écoles`;
-                if(document.getElementById('count-secondaire')) document.getElementById('count-secondaire').innerText = `${12400 + secondaireCount} Écoles`;
-                if(document.getElementById('count-technique')) document.getElementById('count-technique').innerText = `${8100 + techniqueCount} Écoles`;
-                if(document.getElementById('count-humanitaire')) document.getElementById('count-humanitaire').innerText = `${3500 + humanitaireCount} Écoles`;
+            schools.forEach(s => {
+                totalTeachers += (s.teachers ? s.teachers.length : 0);
+                totalStudents += (s.students ? s.students.length : 0);
+                totalAdmin += (s.staff ? s.staff.length : 0);
+            });
+
+            if(document.getElementById('badge-teachers-count')) document.getElementById('badge-teachers-count').innerText = `${totalTeachers} Enseignant(s)`;
+            if(document.getElementById('badge-students-count')) document.getElementById('badge-students-count').innerText = `${totalStudents} Élève(s)`;
+            if(document.getElementById('badge-schools-count')) document.getElementById('badge-schools-count').innerText = `${schools.length} École(s)`;
+            if(document.getElementById('badge-admin-count')) document.getElementById('badge-admin-count').innerText = `${totalAdmin} Cadre(s)`;
+
+            let primaireCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('primaire')).length;
+            let secondaireCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('secondaire')).length;
+            let techniqueCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('technique')).length;
+            let humanitaireCount = schools.filter(s => s.appartenance && (s.appartenance.toLowerCase().includes('humanitaire') || s.appartenance.toLowerCase().includes('social'))).length;
+
+            if(document.getElementById('count-primaire')) document.getElementById('count-primaire').innerText = `${15200 + primaireCount} Écoles`;
+            if(document.getElementById('count-secondaire')) document.getElementById('count-secondaire').innerText = `${12400 + secondaireCount} Écoles`;
+            if(document.getElementById('count-technique')) document.getElementById('count-technique').innerText = `${8100 + techniqueCount} Écoles`;
+            if(document.getElementById('count-humanitaire')) document.getElementById('count-humanitaire').innerText = `${3500 + humanitaireCount} Écoles`;
+        }
+
+        function showGlobalStatsModal(type, targetSchoolId = null) {
+            let schools = getStoredSchools();
+            if (targetSchoolId) {
+                schools = schools.filter(s => s.id === targetSchoolId);
             }
+
+            let titleEl = document.getElementById('statsModalTitle');
+            let contentEl = document.getElementById('statsModalContent');
+
+            if (type === 'teachers') {
+                titleEl.innerHTML = `<i class="fa fa-chalkboard-teacher me-2"></i>Répertoire Nominatif des Enseignants & Professeurs`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>École</th><th>Nom & Prénom de l'Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Agent</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.teachers || []).forEach(t => {
+                        count++;
+                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-dark text-warning">${t.secretCode || 'AGT-XXXX'}</span></td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            } 
+            else if (type === 'students') {
+                titleEl.innerHTML = `<i class="fa fa-user-graduate me-2"></i>Palmarès & Effectif Global des Élèves`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>Matricule</th><th>Nom & Prénom de l'Élève</th><th>Sexe</th><th>Classe</th><th>Établissement</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.students || []).forEach(st => {
+                        count++;
+                        html += `<tr><td><b class="text-success">${st.mat || 'ELV-00'}</b></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province})</td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+            else if (type === 'admin') {
+                titleEl.innerHTML = `<i class="fa fa-sitemap me-2"></i>Répertoire des Cadres de Direction & Administration`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>Poste / Fonction</th><th>Nom & Prénom</th><th>Établissement</th><th>Province / Localisation</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.staff || []).forEach(st => {
+                        count++;
+                        html += `<tr><td><span class="badge bg-danger p-2 fs-6">${st.role}</span></td><td><b>${st.name}</b></td><td><b class="text-primary">${s.name}</b></td><td>${s.province} / ${s.commune}</td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="4" class="text-center text-muted py-3">Aucun cadre administratif enregistré.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+            else if (type === 'schools') {
+                titleEl.innerHTML = `<i class="fa fa-school me-2"></i>Registre des Institutions Scolaires Enregistrées`;
+                let html = `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l'École</th><th>Régime / Appartenance</th><th>Province / Commune</th><th>Effectifs (Profs / Élèves)</th><th>Action</th></tr></thead><tbody>`;
+                schools.forEach(s => {
+                    let profCount = (s.teachers || []).length;
+                    let elvCount = (s.students || []).length;
+                    html += `<tr><td><b class="text-primary fs-6">${s.name}</b></td><td>${s.appartenance || 'Général'}</td><td>${s.province} / ${s.commune}</td><td><b>${profCount}</b> Profs | <b>${elvCount}</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+
+            let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
+            modal.show();
+        }
+
+        function filterCategoryModal(category) {
+            let schools = getStoredSchools();
+            let matches = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes(category.toLowerCase()));
+            let titleEl = document.getElementById('statsModalTitle');
+            let contentEl = document.getElementById('statsModalContent');
+
+            titleEl.innerHTML = `<i class="fa fa-list me-2"></i>Écoles du Secteur [ ${category} ]`;
+            let html = `<div class="alert alert-info fw-bold">Nombre total d'établissements enregistrés dans ce secteur : ${matches.length}</div>`;
+            html += `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>École</th><th>Régime</th><th>Province</th><th>Actions</th></tr></thead><tbody>`;
+            
+            if(matches.length === 0) {
+                html += `<tr><td colspan="4" class="text-center text-muted py-3">Aucune école spécifique trouvée pour le secteur ${category}.</td></tr>`;
+            } else {
+                matches.forEach(s => {
+                    html += `<tr><td><b>${s.name}</b></td><td>${s.appartenance}</td><td>${s.province}</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')">Consulter Effectif</button></td></tr>`;
+                });
+            }
+            html += `</tbody></table></div>`;
+            contentEl.innerHTML = html;
+
+            let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
+            modal.show();
         }
 
         function filterSchools() {
@@ -652,8 +742,6 @@
             let allSchools = getStoredSchools();
             const container = document.getElementById('schoolsContainer');
             if (!container) return;
-
-            if (!allSchools.length) return; 
 
             const filtered = query === "" ? allSchools : allSchools.filter(s => {
                 const nameMatch = s.name ? s.name.toLowerCase().includes(query) : false;
@@ -666,19 +754,24 @@
                 container.innerHTML = filtered.map(s => {
                     const logoSrc = s.logo || 'img/course-1.jpg';
                     const schoolName = s.name || 'Nom de l\'école';
-                    const schoolApp = s.appartenance || s.description || 'Établissement Enregistré';
+                    const schoolApp = s.appartenance || 'Établissement Enregistré';
                     const schoolProv = s.province || 'Province';
                     const schoolCom = s.commune || 'Commune';
+                    const profCount = (s.teachers || []).length;
+                    const studentCount = (s.students || []).length;
 
                     return `
                         <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                            <div class="course-item bg-light rounded overflow-hidden shadow-sm">
+                            <div class="course-item bg-light rounded overflow-hidden shadow-sm interactive-card" onclick="showGlobalStatsModal('students', '${s.id}')">
                                 <div class="position-relative overflow-hidden text-center p-3 bg-white" style="height: 200px; display: flex; align-items: center; justify-content: center;">
                                     <img class="img-fluid rounded" src="${logoSrc}" alt="Photo École" style="max-height: 100%; max-width: 100%; object-fit: cover;">
+                                    <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-3">
+                                        <span class="btn btn-sm btn-primary px-3 shadow" style="border-radius: 30px;"><i class="fa fa-users me-1"></i> ${studentCount} Élève(s) | ${profCount} Prof(s)</span>
+                                    </div>
                                 </div>
                                 <div class="text-center p-4 pb-0">
                                     <h3 class="mb-0 text-primary">${schoolName}</h3>
-                                    <div class="mb-3 text-muted">
+                                    <div class="mb-2 text-muted">
                                         <small class="fa fa-star text-primary"></small>
                                         <small class="fa fa-star text-primary"></small>
                                         <small class="fa fa-star text-primary"></small>
@@ -686,7 +779,7 @@
                                         <small class="fa fa-star text-primary"></small>
                                         <small>(Enregistré)</small>
                                     </div>
-                                    <h5 class="mb-4">${schoolApp}</h5>
+                                    <h5 class="mb-3">${schoolApp}</h5>
                                 </div>
                                 <div class="d-flex border-top">
                                     <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>${schoolProv}</small>
@@ -696,6 +789,8 @@
                         </div>
                     `;
                 }).join('');
+            } else {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Aucun établissement ne correspond à votre recherche "${query}".</div></div>`;
             }
         }
     </script>
