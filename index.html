@@ -253,6 +253,20 @@
     <!-- Categories Start -->
 
 
+    <!-- Search Bar & Dynamic Schools Section Integration -->
+    <div class="container-fluid py-3">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="input-group mb-4 shadow-sm">
+                        <input type="text" id="searchSchoolInput" class="form-control border-primary py-3 ps-4" placeholder="Cliquez ou recherchez une école enregistrée..." oninput="filterSchools()" onclick="filterSchools()">
+                        <button type="button" class="btn btn-primary px-4" onclick="filterSchools()">Rechercher</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Courses Start -->
     <div class="container-xxl py-5">
         <div class="container">
@@ -260,7 +274,7 @@
                 <h6 class="section-title bg-white text-center text-primary px-3">Établissements</h6>
                 <h1 class="mb-5">Institutions Enregistrées</h1>
             </div>
-            <div class="row g-4 justify-content-center">
+            <div class="row g-4 justify-content-center" id="schoolsContainer">
                 <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="course-item bg-light">
                         <div class="position-relative overflow-hidden">
@@ -577,6 +591,74 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+
+    <!-- Script de liaison dynamique pour la barre de recherche et les écoles enregistrées -->
+    <script>
+        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+
+        function filterSchools() {
+            const queryInput = document.getElementById('searchSchoolInput');
+            if (!queryInput) return;
+            const query = queryInput.value.toLowerCase().trim();
+            
+            let allSchools = [];
+            let savedItem = localStorage.getItem(STORAGE_KEY);
+            if (savedItem) {
+                try {
+                    let parsed = JSON.parse(savedItem);
+                    allSchools = Array.isArray(parsed) ? parsed : (parsed.schools || []);
+                } catch(e) {}
+            }
+
+            const container = document.getElementById('schoolsContainer');
+            if (!container) return;
+
+            if (!allSchools.length) return; // Garde les cartes par défaut si aucune donnée enregistrée
+
+            const filtered = query === "" ? allSchools : allSchools.filter(s => {
+                const nameMatch = s.name ? s.name.toLowerCase().includes(query) : false;
+                const provMatch = s.province ? s.province.toLowerCase().includes(query) : false;
+                const comMatch = s.commune ? s.commune.toLowerCase().includes(query) : false;
+                return nameMatch || provMatch || comMatch;
+            });
+
+            if (filtered.length > 0) {
+                container.innerHTML = filtered.map(s => {
+                    const logoSrc = s.logo || 'img/course-1.jpg';
+                    const schoolName = s.name || 'Nom de l\'école';
+                    const schoolApp = s.appartenance || s.description || 'Établissement Enregistré';
+                    const schoolProv = s.province || 'Province';
+                    const schoolCom = s.commune || 'Commune';
+
+                    return `
+                        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                            <div class="course-item bg-light rounded overflow-hidden shadow-sm">
+                                <div class="position-relative overflow-hidden text-center p-3 bg-white" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                                    <img class="img-fluid rounded" src="${logoSrc}" alt="Photo École" style="max-height: 100%; max-width: 100%; object-fit: cover;">
+                                </div>
+                                <div class="text-center p-4 pb-0">
+                                    <h3 class="mb-0 text-primary">${schoolName}</h3>
+                                    <div class="mb-3 text-muted">
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small>(Enregistré)</small>
+                                    </div>
+                                    <h5 class="mb-4">${schoolApp}</h5>
+                                </div>
+                                <div class="d-flex border-top">
+                                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>${schoolProv}</small>
+                                    <small class="flex-fill text-center py-2"><i class="fa fa-building text-primary me-2"></i>${schoolCom}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+    </script>
 </body>
 
 </html>
