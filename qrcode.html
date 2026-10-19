@@ -228,7 +228,7 @@
                     <button class="nav-link active fw-bold" id="create-tab" data-bs-toggle="tab" data-bs-target="#createPane" type="button">Créer & Enregistrer</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button" onclick="loadSavedCardsVault()">Boîte de Stockage Cloud (<span id="vaultCount">0</span>)</button>
+                    <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button">Boîte de Stockage Cloud (<span id="vaultCount">0</span>)</button>
                 </li>
             </ul>
 
@@ -241,7 +241,7 @@
                                 <form id="cardForm">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Catégorie</label>
-                                        <select class="form-select" id="cardCategory" onchange="previewCardUpdate()">
+                                        <select class="form-select" id="cardCategory">
                                             <option value="Élève" selected>Élève</option>
                                             <option value="Enseignant">Enseignant</option>
                                             <option value="Professeur">Professeur</option>
@@ -249,20 +249,20 @@
                                         </select>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" required oninput="previewCardUpdate()"></div>
-                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" required oninput="previewCardUpdate()"></div>
-                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" required oninput="previewCardUpdate()"></div>
+                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" required></div>
+                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" required></div>
+                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" required></div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" required oninput="previewCardUpdate()"></div>
-                                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" required oninput="previewCardUpdate()"></div>
+                                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" required></div>
+                                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" required></div>
                                     </div>
-                                    <div class="mb-3"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète" required oninput="previewCardUpdate()"></div>
+                                    <div class="mb-3"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète" required></div>
                                     <div class="mb-3">
                                         <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
-                                        <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*" onchange="loadUserPhoto(event)">
+                                        <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*">
                                     </div>
-                                    <button type="button" onclick="saveCardToFirebase()" id="btnSaveCard" class="btn btn-primary w-100 py-2 fw-bold">
+                                    <button type="button" id="btnSaveCard" class="btn btn-primary w-100 py-2 fw-bold">
                                         <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud
                                     </button>
                                 </form>
@@ -317,22 +317,10 @@
         </div>
     </div>
 
-    <!-- Script Module Firebase -->
+    <!-- Script Module Principal Unique -->
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, deleteDoc, doc } from './js/firebase-config.js';
 
-        window.dbRef = db;
-        window.colCards = collection(db, "cards");
-        window.colSchools = collection(db, "schools");
-        window.getDocsFunc = getDocs;
-        window.addDocFunc = addDoc;
-        window.queryFunc = query;
-        window.whereFunc = where;
-        window.deleteDocFunc = deleteDoc;
-        window.docFunc = doc;
-    </script>
-
-    <script>
         let currentSchoolData = null;
         let tempPhotoBase64 = "img/team-1.jpg";
 
@@ -346,7 +334,7 @@
             container.appendChild(img);
         }
 
-        // Vérification stricte de l'école dans Firebase Firestore
+        // Authentification stricte vérifiée dans Firestore
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const inputName = document.getElementById('authSchoolName').value.trim();
@@ -359,12 +347,11 @@
             btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Vérification dans la base...';
 
             try {
-                const querySnapshot = await window.getDocsFunc(window.colSchools);
+                const querySnapshot = await getDocs(collection(db, "schools"));
                 let foundSchool = null;
 
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    // Vérification exacte du nom et du code propriétaire
                     if (data.name && data.name.trim().toLowerCase() === inputName.toLowerCase() && 
                         data.code && data.code.toString().trim() === inputCode.toString().trim()) {
                         foundSchool = data;
@@ -428,7 +415,11 @@
             renderQRCodeInContainer(document.getElementById('qrcodePreview'), `EDU-RDC:${currentSchoolData.name}:${category}:${matricule}`);
         }
 
-        function loadUserPhoto(event) {
+        ['cardCategory', 'inputNom', 'inputPostnom', 'inputPrenom', 'inputMatricule', 'inputProvince', 'inputAdresse'].forEach(id => {
+            document.getElementById(id)?.addEventListener('input', previewCardUpdate);
+        });
+
+        document.getElementById('inputPhoto').addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -447,15 +438,15 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-        }
+        });
 
-        // Enregistrement fiable dans Firebase Cloud
-        async function saveCardToFirebase() {
+        // Enregistrement dans Firebase Cloud
+        document.getElementById('btnSaveCard').addEventListener('click', async () => {
             if (!currentSchoolData) return;
 
             const btn = document.getElementById('btnSaveCard');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Enregistrement Cloud en cours...';
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Enregistrement Cloud...';
 
             const cardData = {
                 category: document.getElementById('cardCategory').value,
@@ -472,17 +463,17 @@
             };
 
             try {
-                await window.addDocFunc(window.colCards, cardData);
+                await addDoc(collection(db, "cards"), cardData);
                 alert("Carte enregistrée avec succès dans Firebase Cloud !");
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud';
                 loadSavedCardsVault();
             } catch (err) {
-                alert("Erreur lors de l'enregistrement Cloud : " + err.message);
+                alert("Erreur Cloud : " + err.message);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud';
             }
-        }
+        });
 
         async function loadSavedCardsVault() {
             if (!currentSchoolData) return;
@@ -490,8 +481,8 @@
             container.innerHTML = '<div class="col-12 text-center py-4"><i class="fa fa-spinner fa-spin fa-2x"></i> Chargement des cartes...</div>';
 
             try {
-                const q = window.queryFunc(window.colCards, window.whereFunc("schoolName", "==", currentSchoolData.name));
-                const querySnapshot = await window.getDocsFunc(q);
+                const q = query(collection(db, "cards"), where("schoolName", "==", currentSchoolData.name));
+                const querySnapshot = await getDocs(q);
                 document.getElementById('vaultCount').innerText = querySnapshot.size;
 
                 if (querySnapshot.empty) {
@@ -530,7 +521,7 @@
                                 <div class="qr-container" id="vault-qr-${cardId}"></div>
                                 <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
                             </div>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCardCloud('${cardId}')"><i class="fa fa-trash me-1"></i>Supprimer</button>
+                            <button class="btn btn-sm btn-outline-danger btn-delete-card" data-id="${cardId}"><i class="fa fa-trash me-1"></i>Supprimer</button>
                         </div>
                     `;
                     container.innerHTML += cardHtml;
@@ -541,21 +532,26 @@
                     renderQRCodeInContainer(document.getElementById(`vault-qr-${docSnap.id}`), `EDU-RDC:${card.schoolName}:${card.category}:${card.matricule}`);
                 });
 
+                document.querySelectorAll('.btn-delete-card').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        if (confirm("Supprimer cette carte de Firebase ?")) {
+                            try {
+                                await deleteDoc(doc(db, "cards", id));
+                                loadSavedCardsVault();
+                            } catch(err) {
+                                alert("Erreur de suppression : " + err.message);
+                            }
+                        }
+                    });
+                });
+
             } catch (err) {
                 container.innerHTML = `<div class="col-12 text-center text-muted py-4">Erreur de chargement des cartes.</div>`;
             }
         }
 
-        async function deleteCardCloud(cardId) {
-            if (confirm("Supprimer cette carte de Firebase ?")) {
-                try {
-                    await window.deleteDocFunc(window.docFunc(window.dbRef, "cards", cardId));
-                    loadSavedCardsVault();
-                } catch(err) {
-                    alert("Erreur de suppression : " + err.message);
-                }
-            }
-        }
+        document.getElementById('vault-tab').addEventListener('click', loadSavedCardsVault);
     </script>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
