@@ -277,11 +277,13 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm border-0 text-center p-4 school-card bg-light" onclick="openJobApplicationSection()">
+                    <div class="card h-100 shadow-sm border-0 text-center p-4 bg-light">
                         <i class="fa fa-briefcase fa-3x text-warning mb-3"></i>
                         <h4 class="fw-bold">3. Demande d'Emploi</h4>
                         <p class="text-muted small">Postuler à un poste d'enseignant ou d'administratif.</p>
-                        <button class="btn btn-outline-warning btn-sm mt-2 fw-bold">Soumettre candidature</button>
+                        <button class="btn btn-outline-warning btn-sm mt-2 fw-bold" onclick="openJobApplicationSection()">Soumettre candidature</button>
+                        <!-- Bouton placé ici entre "Soumettre candidature" et "publication école" -->
+                        <a href="qrcode.html" class="btn btn-info btn-sm mt-2 fw-bold text-white"><i class="fa fa-id-card me-1"></i> carte élève et Administratifs</a>
                     </div>
                 </div>
             </div>
@@ -440,8 +442,6 @@
                             <div class="col-12"><label class="fw-bold">Lettre de Motivation / Message :</label><textarea id="jobMessage" class="form-control" rows="3" placeholder="Saisir votre demande d'emploi ici..." required></textarea></div>
                             <div class="col-12 d-flex gap-2">
                                 <button type="submit" class="btn btn-warning fw-bold px-4">Soumettre candidature</button>
-                                <!-- Bouton replacé ici entre "Soumettre candidature" et "publication école" / retour -->
-                                <a href="qrcode.html" class="btn btn-info fw-bold px-4 text-white"><i class="fa fa-id-card me-1"></i> Carte élèves ou Administratif</a>
                                 <button type="button" class="btn btn-secondary fw-bold" onclick="showSection('view-portal')">Fermer</button>
                             </div>
                         </div>
