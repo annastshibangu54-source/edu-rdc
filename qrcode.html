@@ -47,6 +47,29 @@
             print-color-adjust: exact !important;
         }
 
+        /* Logo en transparence en arrière-plan de la carte */
+        .id-card::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3.5cm;
+            height: 3.5cm;
+            background-image: var(--school-bg-logo);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.12;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .id-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
         .id-card * {
             color: #ffffff !important;
         }
@@ -59,7 +82,7 @@
         }
 
         .id-card .header-title {
-            font-size: 0.42rem;
+            font-size: 0.40rem;
             font-weight: 800;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -68,7 +91,7 @@
         }
 
         .id-card .school-title {
-            font-size: 0.48rem;
+            font-size: 0.45rem;
             font-weight: 700;
             color: #ffffff !important;
             margin-top: 1px;
@@ -79,8 +102,8 @@
         }
 
         .card-photo {
-            width: 1.5cm;
-            height: 1.8cm;
+            width: 1.4cm;
+            height: 1.7cm;
             object-fit: cover;
             border: 1.5px solid #ffffff;
             border-radius: 4px;
@@ -88,8 +111,8 @@
         }
 
         .school-logo {
-            width: 0.9cm;
-            height: 0.9cm;
+            width: 0.8cm;
+            height: 0.8cm;
             object-fit: contain;
             border-radius: 50%;
             background: #ffffff;
@@ -97,8 +120,8 @@
         }
 
         .card-details {
-            font-size: 0.38rem;
-            line-height: 1.25;
+            font-size: 0.36rem;
+            line-height: 1.2;
             margin-left: 4px;
         }
 
@@ -108,20 +131,23 @@
 
         .footer-assistance {
             position: absolute;
-            bottom: 3px;
+            bottom: 2px;
             left: 0;
             width: 100%;
             text-align: center;
-            font-size: 0.32rem;
+            font-size: 0.28rem;
             font-style: italic;
-            opacity: 0.9;
+            opacity: 0.95;
             border-top: 0.5px solid rgba(255,255,255,0.3);
             padding-top: 1px;
+            line-height: 1.1;
+            padding-left: 4px;
+            padding-right: 4px;
         }
 
         .qr-container {
             position: absolute;
-            bottom: 12px;
+            bottom: 15px;
             right: 8px;
             background: #ffffff;
             padding: 2px;
@@ -133,14 +159,16 @@
             body * {
                 visibility: hidden;
             }
-            #cardPreview, #cardPreview * {
+            #cardPreviewContainer, #cardPreviewContainer * {
                 visibility: visible;
             }
-            #cardPreview {
+            #cardPreviewContainer {
                 position: absolute;
                 left: 0;
                 top: 0;
                 margin: 0;
+            }
+            .id-card {
                 background: #0088cc !important;
                 background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%) !important;
                 -webkit-print-color-adjust: exact !important;
@@ -205,7 +233,7 @@
                                 <input type="password" id="authOwnerCode" class="form-control" placeholder="••••••••" required>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
-                                <i class="fa fa-key me-2"></i>Accéder au Générateur de Carte
+                                <i class="fa fa-key me-2"></i>Accéder au Gestionnaire de Cartes
                             </button>
                         </form>
                     </div>
@@ -214,7 +242,7 @@
         </div>
     </div>
 
-    <!-- ZONE DE SAISIE ET APERÇU DE CARTE (Masquée par défaut avant authentification) -->
+    <!-- ZONE DE SAISIE ET BOÎTE DE STOCKAGE (Masquée par défaut avant authentification) -->
     <div class="container-xxl py-3 d-none" id="cardGeneratorSection">
         <div class="container">
             <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
@@ -222,108 +250,149 @@
                 <button class="btn btn-sm btn-outline-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt me-1"></i>Déconnexion</button>
             </div>
 
-            <div class="row g-4">
-                <!-- Formulaire de Saisie -->
-                <div class="col-lg-6">
-                    <div class="bg-light p-4 rounded shadow-sm">
-                        <h4 class="mb-3 text-primary"><i class="fa fa-id-card me-2"></i>Informations du Bénéficiaire</h4>
-                        <form id="cardForm">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Bénéficiaire de la Carte</label>
-                                <select class="form-select" id="cardCategory" onchange="generateCard()">
-                                    <option value="ÉLÈVE" selected>Élève</option>
-                                    <option value="PROFESSEUR">Professeurs / Enseignants</option>
-                                    <option value="ADMINISTRATEUR">Administrateur (Fonction)</option>
-                                </select>
+            <!-- Onglets de Navigation : Création vs Boîte d'Archives & Impression -->
+            <ul class="nav nav-tabs mb-4" id="cardTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fw-bold" id="create-tab" data-bs-toggle="tab" data-bs-target="#createPane" type="button" role="tab">Créer & Enregistrer une Carte</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button" role="tab" onclick="loadSavedCardsVault()">Boîte de Stockage & Impression (<span id="vaultCount">0</span>)</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="cardTabsContent">
+                <!-- PANNEAU 1 : FORMULAIRE DE CRÉATION ET APERÇU -->
+                <div class="tab-pane fade show active" id="createPane" role="tabpanel">
+                    <div class="row g-4">
+                        <!-- Formulaire de Saisie -->
+                        <div class="col-lg-6">
+                            <div class="bg-light p-4 rounded shadow-sm">
+                                <h4 class="mb-3 text-primary"><i class="fa fa-id-card me-2"></i>Informations du Bénéficiaire</h4>
+                                <form id="cardForm">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Bénéficiaire de la Carte</label>
+                                        <select class="form-select" id="cardCategory" onchange="previewCardUpdate()">
+                                            <option value="Élève" selected>Élève</option>
+                                            <option value="Enseignant">Enseignant</option>
+                                            <option value="Professeur">Professeur</option>
+                                            <option value="Administrateur">Administrateur (Fonction)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <label class="form-label small fw-bold">Nom</label>
+                                            <input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" required oninput="previewCardUpdate()">
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <label class="form-label small fw-bold">Postnom</label>
+                                            <input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" required oninput="previewCardUpdate()">
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <label class="form-label small fw-bold">Prénom</label>
+                                            <input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" required oninput="previewCardUpdate()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label small fw-bold">Numéro Matricule</label>
+                                            <input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" required oninput="previewCardUpdate()">
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label small fw-bold">Province</label>
+                                            <input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" required oninput="previewCardUpdate()">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Adresse Complète</label>
+                                        <input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Avenue, Quartier, Commune" required oninput="previewCardUpdate()">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Photo du Bénéficiaire (Téléphone / Ordinateur)</label>
+                                        <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*" onchange="loadUserPhoto(event)">
+                                    </div>
+
+                                    <button type="button" onclick="saveAndRegisterCard()" class="btn btn-primary w-100 py-2 fw-bold">
+                                        <i class="fa fa-save me-2"></i>Enregistrer dans la Boîte de Stockage & Générer
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Aperçu Visuel de la Carte au Format Réel (8.5 Cm x 5.5 Cm) -->
+                        <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
+                            <h5 class="mb-3 text-muted">Aperçu Conforme (8,5 cm x 5,5 cm)</h5>
+                            
+                            <div id="cardPreviewContainer">
+                                <!-- Carte Plastifiée Virtuelle -->
+                                <div class="id-card" id="cardPreview" style="--school-bg-logo: url('img/course-1.jpg');">
+                                    <header>
+                                        <div class="header-title">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
+                                        <div class="header-title" style="font-size: 0.32rem; font-weight: normal;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
+                                        <div class="school-title d-flex justify-content-between align-items-center px-1">
+                                            <span id="cardSchoolName">NOM DE L'ÉCOLE</span>
+                                            <img id="cardSchoolLogo" src="img/course-1.jpg" class="school-logo" alt="Logo">
+                                        </div>
+                                    </header>
+
+                                    <div class="d-flex align-items-start mt-1">
+                                        <div>
+                                            <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
+                                        </div>
+                                        <div class="card-details">
+                                            <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.32rem; padding: 1px 4px;">ÉLÈVE</strong></div>
+                                            <div><strong>Nom :</strong> <span id="cardNom">---</span></div>
+                                            <div><strong>Postnom :</strong> <span id="cardPostnom">---</span></div>
+                                            <div><strong>Prénom :</strong> <span id="cardPrenom">---</span></div>
+                                            <div><strong>Matricule :</strong> <span id="cardMatricule">---</span></div>
+                                            <div><strong>Adresse :</strong> <span id="cardAdresse">---</span></div>
+                                            <div><strong>Province :</strong> <span id="cardProvince">---</span></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- QR Code généré en bas à droite -->
+                                    <div class="qr-container">
+                                        <div id="qrcodePreview"></div>
+                                    </div>
+
+                                    <!-- Mot d'assistance aux autorités militaires et civiles -->
+                                    <div class="footer-assistance">
+                                        Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-4 mb-2">
-                                    <label class="form-label small fw-bold">Nom</label>
-                                    <input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" required oninput="generateCard()">
-                                </div>
-                                <div class="col-md-4 mb-2">
-                                    <label class="form-label small fw-bold">Postnom</label>
-                                    <input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" required oninput="generateCard()">
-                                </div>
-                                <div class="col-md-4 mb-2">
-                                    <label class="form-label small fw-bold">Prénom</label>
-                                    <input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" required oninput="generateCard()">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-2">
-                                    <label class="form-label small fw-bold">Numéro Matricule</label>
-                                    <input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" required oninput="generateCard()">
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <label class="form-label small fw-bold">Province</label>
-                                    <input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" required oninput="generateCard()">
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Adresse Complète</label>
-                                <input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Avenue, Quartier, Commune" required oninput="generateCard()">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Photo du Bénéficiaire (Téléphone / Ordinateur)</label>
-                                <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*" onchange="loadUserPhoto(event)">
-                            </div>
-
-                            <button type="button" onclick="generateCard()" class="btn btn-primary w-100 py-2 fw-bold">
-                                <i class="fa fa-qrcode me-2"></i>Actualiser le QR Code
+                            <button onclick="window.print()" class="btn btn-success mt-4 py-2 px-4 fw-bold">
+                                <i class="fa fa-print me-2"></i>Imprimer cette Carte (Couleurs Conservées)
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Aperçu Visuel de la Carte au Format Réel (8.5 Cm x 5.5 Cm) -->
-                <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
-                    <h5 class="mb-3 text-muted">Aperçu Conforme (8,5 cm x 5,5 cm)</h5>
-                    
-                    <!-- Carte Plastifiée Virtuelle -->
-                    <div class="id-card" id="cardPreview">
-                        <header>
-                            <div class="header-title">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
-                            <div class="header-title" style="font-size: 0.35rem; font-weight: normal;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
-                            <div class="school-title d-flex justify-content-between align-items-center px-1">
-                                <span id="cardSchoolName">NOM DE L'ÉCOLE</span>
-                                <img id="cardSchoolLogo" src="img/course-1.jpg" class="school-logo" alt="Logo">
-                            </div>
-                        </header>
-
-                        <div class="d-flex align-items-start mt-1">
+                <!-- PANNEAU 2 : BOÎTE DE STOCKAGE ET ARCHIVES DES CARTES -->
+                <div class="tab-pane fade" id="vaultPane" role="tabpanel">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                            <h5 class="m-0 text-white"><i class="fa fa-archive me-2"></i>Boîte de Stockage de toutes les Cartes de l'Établissement</h5>
                             <div>
-                                <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo Bénéficiaire">
-                            </div>
-                            <div class="card-details">
-                                <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.35rem; padding: 1px 4px;">ÉLÈVE</strong></div>
-                                <div><strong>Nom :</strong> <span id="cardNom">---</span></div>
-                                <div><strong>Postnom :</strong> <span id="cardPostnom">---</span></div>
-                                <div><strong>Prénom :</strong> <span id="cardPrenom">---</span></div>
-                                <div><strong>Matricule :</strong> <span id="cardMatricule">---</span></div>
-                                <div><strong>Adresse :</strong> <span id="cardAdresse">---</span></div>
-                                <div><strong>Province :</strong> <span id="cardProvince">---</span></div>
+                                <select id="filterCategory" class="form-select form-select-sm d-inline-block w-auto" onchange="loadSavedCardsVault()">
+                                    <option value="ALL">Toutes les Catégories</option>
+                                    <option value="Élève">Élève</option>
+                                    <option value="Enseignant">Enseignant</option>
+                                    <option value="Professeur">Professeur</option>
+                                    <option value="Administrateur">Administrateur</option>
+                                </select>
                             </div>
                         </div>
-
-                        <!-- QR Code positionné à droite en bas -->
-                        <div class="qr-container">
-                            <div id="qrcode"></div>
-                        </div>
-
-                        <!-- Pied de page -->
-                        <div class="footer-assistance">
-                            En bas de tout le monde d'assistance
+                        <div class="card-body p-4">
+                            <div id="vaultCardsContainer" class="row g-4">
+                                <!-- Cartes stockées affichées dynamiquement ici -->
+                            </div>
                         </div>
                     </div>
-
-                    <button onclick="window.print()" class="btn btn-success mt-4 py-2 px-4 fw-bold">
-                        <i class="fa fa-print me-2"></i>Imprimer la Carte Plastifiée (Couleurs Conservées)
-                    </button>
                 </div>
             </div>
         </div>
@@ -338,16 +407,16 @@
     </div>
     <!-- Footer End -->
 
-    <!-- LOGIQUE JAVASCRIPT ET AUTHENTIFICATION -->
+    <!-- LOGIQUE JAVASCRIPT ET GESTION DU STOCKAGE DES CARTES -->
     <script>
         let currentSchoolData = null;
+        let tempPhotoBase64 = "img/team-1.jpg";
 
         function unlockSchoolForm(e) {
             e.preventDefault();
             const schoolNameInput = document.getElementById('authSchoolName').value.trim();
             const ownerCodeInput = document.getElementById('authOwnerCode').value.trim();
 
-            // Récupération des écoles enregistrées
             let keysToTry = ["EDURDC_FULL_PLATFORM_V10", "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
             let allSchools = [];
 
@@ -362,7 +431,6 @@
                 }
             });
 
-            // Écoles par défaut si le stockage local est vide
             if (allSchools.length === 0) {
                 allSchools = [
                     { name: "C.S. LA RÉVOLUTION", province: "KINSHASA", commune: "KALAMU", logo: "img/course-1.jpg" },
@@ -370,7 +438,6 @@
                 ];
             }
 
-            // Vérification simple d'accès
             let match = allSchools.find(s => s.name.toLowerCase() === schoolNameInput.toLowerCase());
 
             if (match || schoolNameInput.length > 2) {
@@ -386,9 +453,10 @@
 
                 document.getElementById('lockedSchoolTitle').innerText = currentSchoolData.name;
                 document.getElementById('cardSchoolName').innerText = currentSchoolData.name;
-                if (currentSchoolData.logo) {
-                    document.getElementById('cardSchoolLogo').src = currentSchoolData.logo;
-                }
+                
+                let logoUrl = currentSchoolData.logo || "img/course-1.jpg";
+                document.getElementById('cardSchoolLogo').src = logoUrl;
+                document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${logoUrl}')`);
 
                 // Valeurs par défaut
                 document.getElementById('inputNom').value = "KALOMBO";
@@ -398,7 +466,8 @@
                 document.getElementById('inputProvince').value = currentSchoolData.province || "KINSHASA";
                 document.getElementById('inputAdresse').value = "Av. de l'École N°12, Kalamu";
 
-                generateCard();
+                previewCardUpdate();
+                updateVaultCount();
             } else {
                 alert("Nom d'établissement ou code propriétaire invalide !");
             }
@@ -407,14 +476,15 @@
         function loadUserPhoto(event) {
             const reader = new FileReader();
             reader.onload = function() {
-                document.getElementById('cardUserPhoto').src = reader.result;
+                tempPhotoBase64 = reader.result;
+                document.getElementById('cardUserPhoto').src = tempPhotoBase64;
             };
             if (event.target.files[0]) {
                 reader.readAsDataURL(event.target.files[0]);
             }
         }
 
-        function generateCard() {
+        function previewCardUpdate() {
             const category = document.getElementById('cardCategory').value;
             const nom = document.getElementById('inputNom').value || '---';
             const postnom = document.getElementById('inputPostnom').value || '---';
@@ -423,28 +493,205 @@
             const province = document.getElementById('inputProvince').value || '---';
             const adresse = document.getElementById('inputAdresse').value || '---';
 
-            document.getElementById('cardRoleBadge').innerText = category;
+            document.getElementById('cardRoleBadge').innerText = category.toUpperCase();
             document.getElementById('cardNom').innerText = nom;
             document.getElementById('cardPostnom').innerText = postnom;
             document.getElementById('cardPrenom').innerText = prenom;
             document.getElementById('cardMatricule').innerText = matricule;
             document.getElementById('cardProvince').innerText = province;
             document.getElementById('cardAdresse').innerText = adresse;
+            document.getElementById('cardUserPhoto').src = tempPhotoBase64;
 
-            // QR Code
-            const qrContainer = document.getElementById('qrcode');
+            // Génération du QR Code dans l'aperçu
+            const qrContainer = document.getElementById('qrcodePreview');
             qrContainer.innerHTML = "";
 
-            const qrData = `RDC-EDU\nÉcole: ${currentSchoolData ? currentSchoolData.name : ''}\nRole: ${category}\nNom: ${nom} ${postnom} ${prenom}\nMatricule: ${matricule}\nProv: ${province}`;
+            const qrData = `EDU-RDC VERIFIED\nÉcole: ${currentSchoolData.name}\nCat: ${category}\nNom: ${nom} ${postnom} ${prenom}\nMatricule: ${matricule}\nProv: ${province}`;
 
             new QRCode(qrContainer, {
                 text: qrData,
-                width: 48,
-                height: 48,
+                width: 44,
+                height: 44,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.M
             });
+        }
+
+        function getVaultStorageKey() {
+            return `EDURDC_VAULT_CARDS_${currentSchoolData.name.replace(/\s+/g, '_')}`;
+        }
+
+        function saveAndRegisterCard() {
+            const cardData = {
+                id: 'CARD-' + Date.now(),
+                category: document.getElementById('cardCategory').value,
+                nom: document.getElementById('inputNom').value || '---',
+                postnom: document.getElementById('inputPostnom').value || '---',
+                prenom: document.getElementById('inputPrenom').value || '---',
+                matricule: document.getElementById('inputMatricule').value || '---',
+                province: document.getElementById('inputProvince').value || '---',
+                adresse: document.getElementById('inputAdresse').value || '---',
+                photo: tempPhotoBase64,
+                schoolName: currentSchoolData.name,
+                schoolLogo: currentSchoolData.logo || "img/course-1.jpg",
+                createdAt: new Date().toLocaleDateString()
+            };
+
+            let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
+            vault.push(cardData);
+            localStorage.setItem(getVaultStorageKey(), JSON.stringify(vault));
+
+            alert("Carte enregistrée avec succès dans la boîte de stockage de l'établissement !");
+            updateVaultCount();
+            document.getElementById('vault-tab').click();
+        }
+
+        function updateVaultCount() {
+            let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
+            document.getElementById('vaultCount').innerText = vault.length;
+        }
+
+        function loadSavedCardsVault() {
+            updateVaultCount();
+            let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
+            const filterCat = document.getElementById('filterCategory').value;
+            const container = document.getElementById('vaultCardsContainer');
+
+            let filtered = filterCat === "ALL" ? vault : vault.filter(c => c.category === filterCat);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-12 text-center text-muted py-4">Aucune carte archivée dans cette catégorie pour le moment.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(card => `
+                <div class="col-md-6 col-lg-6 d-flex flex-column align-items-center">
+                    <div class="id-card mb-2" id="vault-card-${card.id}" style="--school-bg-logo: url('${card.schoolLogo}');">
+                        <header>
+                            <div class="header-title">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
+                            <div class="header-title" style="font-size: 0.32rem; font-weight: normal;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
+                            <div class="school-title d-flex justify-content-between align-items-center px-1">
+                                <span>${card.schoolName}</span>
+                                <img src="${card.schoolLogo}" class="school-logo" alt="Logo">
+                            </div>
+                        </header>
+
+                        <div class="d-flex align-items-start mt-1">
+                            <div>
+                                <img src="${card.photo}" class="card-photo" alt="Photo">
+                            </div>
+                            <div class="card-details">
+                                <div><strong class="badge bg-warning text-dark" style="font-size: 0.32rem; padding: 1px 4px;">${card.category.toUpperCase()}</strong></div>
+                                <div><strong>Nom :</strong> ${card.nom}</div>
+                                <div><strong>Postnom :</strong> ${card.postnom}</div>
+                                <div><strong>Prénom :</strong> ${card.prenom}</div>
+                                <div><strong>Matricule :</strong> ${card.matricule}</div>
+                                <div><strong>Adresse :</strong> ${card.adresse}</div>
+                                <div><strong>Province :</strong> ${card.province}</div>
+                            </div>
+                        </div>
+
+                        <div class="qr-container" id="vault-qr-${card.id}"></div>
+
+                        <div class="footer-assistance">
+                            Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.
+                        </div>
+                    </div>
+
+                    <div class="btn-group shadow-sm">
+                        <button onclick="printSpecificCard('${card.id}')" class="btn btn-sm btn-success fw-bold"><i class="fa fa-print me-1"></i> Imprimer cette Carte</button>
+                        <button onclick="deleteCard('${card.id}')" class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Génération des QR codes pour chaque carte dans le coffre
+            filtered.forEach(card => {
+                const qrEl = document.getElementById(`vault-qr-${card.id}`);
+                qrEl.innerHTML = "";
+                const qrData = `EDU-RDC VERIFIED\nÉcole: ${card.schoolName}\nCat: ${card.category}\nNom: ${card.nom} ${card.postnom} ${card.prenom}\nMatricule: ${card.matricule}\nProv: ${card.province}`;
+                new QRCode(qrEl, {
+                    text: qrData,
+                    width: 44,
+                    height: 44,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            });
+        }
+
+        function printSpecificCard(cardId) {
+            const cardHtml = document.getElementById(`vault-card-${cardId}`).outerHTML;
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Impression Carte - EDU-RDC</title>
+                    <link href="css/bootstrap.min.css" rel="stylesheet">
+                    <style>
+                        .id-card {
+                            width: 8.5cm;
+                            height: 5.5cm;
+                            background: #0088cc !important;
+                            background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%) !important;
+                            border-radius: 8px;
+                            color: #ffffff !important;
+                            padding: 8px 10px;
+                            position: relative;
+                            box-sizing: border-box;
+                            font-family: 'Heebo', sans-serif;
+                            overflow: hidden;
+                            margin: 20px auto;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        .id-card::before {
+                            content: "";
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            width: 3.5cm;
+                            height: 3.5cm;
+                            background-image: var(--school-bg-logo);
+                            background-repeat: no-repeat;
+                            background-position: center;
+                            background-size: contain;
+                            opacity: 0.12;
+                            z-index: 0;
+                            pointer-events: none;
+                        }
+                        .id-card > * { position: relative; z-index: 1; }
+                        .id-card * { color: #ffffff !important; }
+                        .id-card header { text-align: center; border-bottom: 1px solid rgba(255,255,255,0.4); padding-bottom: 2px; margin-bottom: 4px; }
+                        .id-card .header-title { font-size: 0.40rem; font-weight: 800; text-transform: uppercase; margin: 0; line-height: 1.1; }
+                        .id-card .school-title { font-size: 0.45rem; font-weight: 700; text-transform: uppercase; }
+                        .card-photo { width: 1.4cm; height: 1.7cm; object-fit: cover; border: 1.5px solid #ffffff; border-radius: 4px; background: #fff; }
+                        .school-logo { width: 0.8cm; height: 0.8cm; object-fit: contain; border-radius: 50%; background: #fff; padding: 1px; }
+                        .card-details { font-size: 0.36rem; line-height: 1.2; margin-left: 4px; }
+                        .footer-assistance { position: absolute; bottom: 2px; left: 0; width: 100%; text-align: center; font-size: 0.28rem; font-style: italic; border-top: 0.5px solid rgba(255,255,255,0.3); padding-top: 1px; }
+                        .qr-container { position: absolute; bottom: 15px; right: 8px; background: #ffffff; padding: 2px; border-radius: 3px; }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <div class="d-flex justify-content-center align-items-center vh-100">
+                        ${cardHtml}
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        function deleteCard(cardId) {
+            if (confirm("Voulez-vous vraiment supprimer cette carte de la boîte de stockage ?")) {
+                let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
+                vault = vault.filter(c => c.id !== cardId);
+                localStorage.setItem(getVaultStorageKey(), JSON.stringify(vault));
+                loadSavedCardsVault();
+            }
         }
     </script>
 
