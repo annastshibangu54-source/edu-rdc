@@ -196,19 +196,17 @@
                         <h4 class="m-0 text-white"><i class="fa fa-lock me-2"></i>Accès Propriétaire d'Établissement</h4>
                     </div>
                     <div class="card-body p-4">
-                        <form id="authForm">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Nom Complet de l'École</label>
-                                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Code Secret Propriétaire</label>
-                                <input type="password" id="authOwnerCode" class="form-control" placeholder="••••••••" required>
-                            </div>
-                            <button type="submit" id="btnSubmitAuth" class="btn btn-primary w-100 py-2 fw-bold">
-                                <i class="fa fa-key me-2"></i>Accéder au Cloud
-                            </button>
-                        </form>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nom Complet de l'École</label>
+                            <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Code Secret Propriétaire</label>
+                            <input type="password" id="authOwnerCode" class="form-control" placeholder="••••••••">
+                        </div>
+                        <button type="button" onclick="window.handleLogin()" id="btnSubmitAuth" class="btn btn-primary w-100 py-2 fw-bold">
+                            <i class="fa fa-key me-2"></i>Accéder au Cloud
+                        </button>
                     </div>
                 </div>
             </div>
@@ -228,7 +226,7 @@
                     <button class="nav-link active fw-bold" id="create-tab" data-bs-toggle="tab" data-bs-target="#createPane" type="button">Créer & Enregistrer</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button">Boîte de Stockage Cloud (<span id="vaultCount">0</span>)</button>
+                    <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button" onclick="window.loadSavedCardsVault()">Boîte de Stockage Cloud (<span id="vaultCount">0</span>)</button>
                 </li>
             </ul>
 
@@ -238,34 +236,32 @@
                         <div class="col-lg-6">
                             <div class="bg-light p-4 rounded shadow-sm">
                                 <h4 class="mb-3 text-primary"><i class="fa fa-id-card me-2"></i>Informations du Bénéficiaire</h4>
-                                <form id="cardForm">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Catégorie</label>
-                                        <select class="form-select" id="cardCategory">
-                                            <option value="Élève" selected>Élève</option>
-                                            <option value="Enseignant">Enseignant</option>
-                                            <option value="Professeur">Professeur</option>
-                                            <option value="Administrateur">Administrateur</option>
-                                        </select>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" required></div>
-                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" required></div>
-                                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" required></div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" required></div>
-                                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" required></div>
-                                    </div>
-                                    <div class="mb-3"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète" required></div>
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
-                                        <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*">
-                                    </div>
-                                    <button type="button" id="btnSaveCard" class="btn btn-primary w-100 py-2 fw-bold">
-                                        <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud
-                                    </button>
-                                </form>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Catégorie</label>
+                                    <select class="form-select" id="cardCategory" onchange="window.previewCardUpdate()">
+                                        <option value="Élève" selected>Élève</option>
+                                        <option value="Enseignant">Enseignant</option>
+                                        <option value="Professeur">Professeur</option>
+                                        <option value="Administrateur">Administrateur</option>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" oninput="window.previewCardUpdate()"></div>
+                                    <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" oninput="window.previewCardUpdate()"></div>
+                                    <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" oninput="window.previewCardUpdate()"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" oninput="window.previewCardUpdate()"></div>
+                                    <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" oninput="window.previewCardUpdate()"></div>
+                                </div>
+                                <div class="mb-3"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète" oninput="window.previewCardUpdate()"></div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
+                                    <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*" onchange="window.handleUserPhoto(event)">
+                                </div>
+                                <button type="button" onclick="window.saveCardToFirebase()" id="btnSaveCard" class="btn btn-primary w-100 py-2 fw-bold">
+                                    <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud
+                                </button>
                             </div>
                         </div>
 
@@ -317,7 +313,7 @@
         </div>
     </div>
 
-    <!-- Script Module Ultra-Fluide -->
+    <!-- Script Module Globale -->
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, deleteDoc, doc } from './js/firebase-config.js';
 
@@ -334,15 +330,19 @@
             container.appendChild(img);
         }
 
-        // Connexion immédiate et intelligente
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        window.handleLogin = async function() {
             const inputName = document.getElementById('authSchoolName').value.trim();
             const inputCode = document.getElementById('authOwnerCode').value.trim();
 
-            if (!inputName) return;
+            if (!inputName) {
+                alert("Veuillez entrer le nom de l'école.");
+                return;
+            }
 
-            // Configuration par défaut basée sur la saisie de l'utilisateur
+            const btn = document.getElementById('btnSubmitAuth');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Ouverture instantanée...';
+
             currentSchoolData = {
                 name: inputName.toUpperCase(),
                 code: inputCode,
@@ -350,20 +350,19 @@
                 logo: "img/course-1.jpg"
             };
 
-            // Tente de récupérer l'école depuis Firestore en arrière-plan sans bloquer l'ouverture
+            // Vérification optionnelle dans Firestore en arrière-plan
             try {
                 const querySnapshot = await getDocs(collection(db, "schools"));
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     if (data.name && data.name.trim().toLowerCase() === inputName.toLowerCase()) {
-                        currentSchoolData = data; // Récupère le vrai logo et les vraies infos si trouvées
+                        currentSchoolData = data;
                     }
                 });
             } catch (err) {
-                console.log("Utilisation des paramètres saisis (mode direct).");
+                console.log("Mode direct activé.");
             }
 
-            // Ouverture instantanée de l'interface
             document.getElementById('authSection').classList.add('d-none');
             document.getElementById('cardGeneratorSection').classList.remove('d-none');
             document.getElementById('lockedSchoolTitle').innerText = currentSchoolData.name;
@@ -373,18 +372,19 @@
             document.getElementById('cardSchoolLogo').src = logoUrl;
             document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${logoUrl}')`);
 
-            previewCardUpdate();
-            loadSavedCardsVault();
-        });
+            document.getElementById('inputProvince').value = currentSchoolData.province || "KINSHASA";
+            window.previewCardUpdate();
+            window.loadSavedCardsVault();
+        };
 
-        function previewCardUpdate() {
+        window.previewCardUpdate = function() {
             if (!currentSchoolData) return;
             const category = document.getElementById('cardCategory').value;
             const nom = document.getElementById('inputNom').value || '---';
             const postnom = document.getElementById('inputPostnom').value || '---';
             const prenom = document.getElementById('inputPrenom').value || '---';
             const matricule = document.getElementById('inputMatricule').value || '---';
-            const province = document.getElementById('inputProvince').value || '---';
+            const province = document.getElementById('inputProvince').value || 'KINSHASA';
             const adresse = document.getElementById('inputAdresse').value || '---';
 
             document.getElementById('cardRoleBadge').innerText = category.toUpperCase();
@@ -397,13 +397,9 @@
             document.getElementById('cardUserPhoto').src = tempPhotoBase64;
 
             renderQRCodeInContainer(document.getElementById('qrcodePreview'), `EDU-RDC:${currentSchoolData.name}:${category}:${matricule}`);
-        }
+        };
 
-        ['cardCategory', 'inputNom', 'inputPostnom', 'inputPrenom', 'inputMatricule', 'inputProvince', 'inputAdresse'].forEach(id => {
-            document.getElementById(id)?.addEventListener('input', previewCardUpdate);
-        });
-
-        document.getElementById('inputPhoto').addEventListener('change', (event) => {
+        window.handleUserPhoto = function(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -417,15 +413,14 @@
                     ctx.drawImage(img, 0, 0, 150, 180);
                     tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
                     document.getElementById('cardUserPhoto').src = tempPhotoBase64;
-                    previewCardUpdate();
+                    window.previewCardUpdate();
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-        });
+        };
 
-        // Enregistrement cloud Firebase garanti
-        document.getElementById('btnSaveCard').addEventListener('click', async () => {
+        window.saveCardToFirebase = async function() {
             if (!currentSchoolData) return;
 
             const btn = document.getElementById('btnSaveCard');
@@ -438,7 +433,7 @@
                 postnom: document.getElementById('inputPostnom').value || '---',
                 prenom: document.getElementById('inputPrenom').value || '---',
                 matricule: document.getElementById('inputMatricule').value || '---',
-                province: document.getElementById('inputProvince').value || '---',
+                province: document.getElementById('inputProvince').value || 'KINSHASA',
                 adresse: document.getElementById('inputAdresse').value || '---',
                 photo: tempPhotoBase64,
                 schoolName: currentSchoolData.name,
@@ -451,15 +446,15 @@
                 alert("Carte enregistrée avec succès dans Firebase Cloud !");
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud';
-                loadSavedCardsVault();
+                window.loadSavedCardsVault();
             } catch (err) {
                 alert("Erreur Cloud : " + err.message);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud';
             }
-        });
+        };
 
-        async function loadSavedCardsVault() {
+        window.loadSavedCardsVault = async function() {
             if (!currentSchoolData) return;
             const container = document.getElementById('vaultCardsContainer');
             container.innerHTML = '<div class="col-12 text-center py-4"><i class="fa fa-spinner fa-spin fa-2x"></i> Chargement des cartes...</div>';
@@ -505,7 +500,7 @@
                                 <div class="qr-container" id="vault-qr-${cardId}"></div>
                                 <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
                             </div>
-                            <button class="btn btn-sm btn-outline-danger btn-delete-card" data-id="${cardId}"><i class="fa fa-trash me-1"></i>Supprimer</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="window.deleteCardCloud('${cardId}')"><i class="fa fa-trash me-1"></i>Supprimer</button>
                         </div>
                     `;
                     container.innerHTML += cardHtml;
@@ -516,26 +511,21 @@
                     renderQRCodeInContainer(document.getElementById(`vault-qr-${docSnap.id}`), `EDU-RDC:${card.schoolName}:${card.category}:${card.matricule}`);
                 });
 
-                document.querySelectorAll('.btn-delete-card').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const id = e.target.getAttribute('data-id');
-                        if (confirm("Supprimer cette carte de Firebase ?")) {
-                            try {
-                                await deleteDoc(doc(db, "cards", id));
-                                loadSavedCardsVault();
-                            } catch(err) {
-                                alert("Erreur de suppression : " + err.message);
-                            }
-                        }
-                    });
-                });
-
             } catch (err) {
                 container.innerHTML = `<div class="col-12 text-center text-muted py-4">Connexion Cloud en attente.</div>`;
             }
-        }
+        };
 
-        document.getElementById('vault-tab').addEventListener('click', loadSavedCardsVault);
+        window.deleteCardCloud = async function(cardId) {
+            if (confirm("Supprimer cette carte de Firebase ?")) {
+                try {
+                    await deleteDoc(doc(db, "cards", cardId));
+                    window.loadSavedCardsVault();
+                } catch(err) {
+                    alert("Erreur de suppression : " + err.message);
+                }
+            }
+        };
     </script>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
