@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>EDU-RDC - Connexion Espace Sécurisé</title>
+    <title>EDU-RDC - Compte Professionnel & Authentification</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -29,6 +29,11 @@
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+
+    <style>
+        .auth-step { display: none; }
+        .auth-step.active { display: block; }
+    </style>
 </head>
 
 <body>
@@ -40,97 +45,135 @@
     </div>
     <!-- Spinner End -->
 
-
-   <!-- Navigation Principale Harmonisée -->
-<nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-    <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-        <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
-    </a>
-    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-        <div class="navbar-nav ms-auto p-4 p-lg-0">
-            <a href="index.html" class="nav-item nav-link">Accueil</a>
-            <a href="about.html" class="nav-item nav-link">À propos</a>
-            <a href="courses.html" class="nav-item nav-link">Établissements</a>
-            <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
-                <div class="dropdown-menu fade-down m-0">
-                    <a href="team.html" class="dropdown-item">Notre Équipe</a>
-                    <a href="testimonial.html" class="dropdown-item">Témoignages</a>
-                    <a href="404.html" class="dropdown-item">Page 404</a>
-                </div>
+    <!-- Navigation Principale Harmonisée -->
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
+        </a>
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                <a href="index.html" class="nav-item nav-link">Accueil</a>
+                <a href="about.html" class="nav-item nav-link">À propos</a>
+                <a href="courses.html" class="nav-item nav-link">Établissements</a>
+                <a href="contact.html" class="nav-item nav-link">Contact</a>
             </div>
-            <a href="contact.html" class="nav-item nav-link">Contact</a>
+            <a href="login.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
-        <a href="login.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
-    </div>
-</nav>
-
-
-
+    </nav>
 
     <!-- Header Start -->
     <div class="container-fluid bg-primary py-5 mb-5 page-header">
         <div class="container py-5">
             <div class="row justify-content-center">
                 <div class="col-lg-10 text-center">
-                    <h1 class="display-3 text-white animated slideInDown">Espace Sécurisé</h1>
-                    <p class="fs-4 text-white animated slideInDown">Portail d'Accès Réservé aux Gestionnaires Éducatifs</p>
+                    <h1 class="display-3 text-white animated slideInDown">Espace Professionnel</h1>
+                    <p class="fs-4 text-white animated slideInDown">Création de Compte & Authentification Sécurisée (Firebase)</p>
                 </div>
             </div>
         </div>
     </div>
     <!-- Header End -->
 
-
-    <!-- Login Start -->
+    <!-- Auth Start -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-8 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="bg-light p-5 rounded shadow-sm">
-                        <div class="text-center mb-4">
-                            <i class="fa fa-user-shield fa-3x text-primary mb-3"></i>
-                            <h3 class="mb-1">Authentification EDU-RDC</h3>
-                            <p class="text-muted">Ministère de l'Éducation Nationale et Nouvelle Citoyenneté</p>
-                        </div>
-                        <form action="dashboard.html" method="GET">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="matricule" placeholder="Matricule / Identifiant" required>
-                                <label for="matricule"><i class="fa fa-id-card me-2"></i>Matricule ou Identifiant Officiel</label>
+                        
+                        <!-- Onglets de basculement Connexion / Inscription -->
+                        <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold" id="tab-login" onclick="switchMode('login')">Se Connecter</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold" id="tab-register" onclick="switchMode('register')">Créer un Compte</button>
+                            </li>
+                        </ul>
+
+                        <!-- ================= FORMULAIRE DE CONNEXION ================= -->
+                        <div id="section-login">
+                            <div class="text-center mb-4">
+                                <i class="fa fa-user-shield fa-3x text-primary mb-3"></i>
+                                <h3 class="mb-1">Connexion Professionnelle</h3>
+                                <p class="text-muted small">Ministère de l'Éducation Nationale et Nouvelle Citoyenneté</p>
                             </div>
-                            <div class="form-floating mb-3">
-                                <input type="password" class="form-control" id="password" placeholder="Mot de passe" required>
-                                <label for="password"><i class="fa fa-lock me-2"></i>Mot de passe</label>
-                            </div>
-                            <div class="form-floating mb-4">
-                                <select class="form-select" id="role" required>
-                                    <option value="" selected disabled>Sélectionnez votre profil...</option>
-                                    <option value="chef">Chef d'Établissement / Préfet</option>
-                                    <option value="inspecteur">Inspecteur Provincial</option>
-                                    <option value="sous_div">Chef de Sous-Division (PROVED)</option>
-                                    <option value="admin">Administrateur Central (EDU-NC)</option>
-                                </select>
-                                <label for="role"><i class="fa fa-user-tag me-2"></i>Profil utilisateur</label>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="remember">
-                                    <label class="form-check-label" for="remember">Se souvenir de moi</label>
+                            <form onsubmit="handleLogin(event)">
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="loginEmail" placeholder="nom@exemple.com" required>
+                                    <label for="loginEmail"><i class="fa fa-envelope me-2"></i>Adresse E-mail vérifiée</label>
                                 </div>
-                                <a href="#" class="text-primary text-decoration-none small">Mot de passe oublié ?</a>
+                                <div class="form-floating mb-4">
+                                    <input type="password" class="form-control" id="loginPassword" placeholder="Mot de passe ou Code Secret" required>
+                                    <label for="loginPassword"><i class="fa fa-lock me-2"></i>Code Secret ou Mot de passe</label>
+                                </div>
+                                <button class="btn btn-primary w-100 py-3 fw-bold fs-5" type="submit"><i class="fa fa-sign-in-alt me-2"></i>Se Connecter</button>
+                            </form>
+                        </div>
+
+                        <!-- ================= FORMULAIRE DE CRÉATION DE COMPTE ================= -->
+                        <div id="section-register" style="display: none;">
+                            <div class="text-center mb-4">
+                                <i class="fa fa-user-plus fa-3x text-success mb-3"></i>
+                                <h3 class="mb-1">Créer un Compte Professionnel</h3>
+                                <p class="text-muted small">Enregistrement sécurisé sur Firebase</p>
                             </div>
-                            <button class="btn btn-primary w-100 py-3 fw-bold fs-5" type="submit">Se Connecter <i class="fa fa-sign-in-alt ms-2"></i></button>
-                        </form>
+
+                            <!-- Étape 1 : Saisie Nom et Contact -->
+                            <div id="reg-step-1" class="auth-step active">
+                                <form onsubmit="sendVerificationCode(event)">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="regName" placeholder="Nom complet" required>
+                                        <label for="regName"><i class="fa fa-user me-2"></i>Nom Complet</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="regContact" placeholder="Email ou Numéro de téléphone" required>
+                                        <label for="regContact"><i class="fa id-card me-2"></i>Adresse E-mail ou Téléphone</label>
+                                    </div>
+                                    <button class="btn btn-success w-100 py-3 fw-bold fs-5" type="submit"><i class="fa fa-paper-plane me-2"></i>Envoyer le code de vérification</button>
+                                </form>
+                            </div>
+
+                            <!-- Étape 2 : Saisie des 6 chiffres -->
+                            <div id="reg-step-2" class="auth-step">
+                                <div class="alert alert-info text-center small">
+                                    Un code de vérification à 6 chiffres a été envoyé à <b id="displayContactSent"></b>.
+                                </div>
+                                <form onsubmit="verifyCodeAndCreateAccount(event)">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control text-center fs-3 letter-spacing-2" id="regCodeInput" placeholder="000000" maxlength="6" required>
+                                        <label for="regCodeInput" class="text-center w-100">Saisir les 6 chiffres</label>
+                                    </div>
+                                    <button class="btn btn-success w-100 py-3 fw-bold fs-5" type="submit"><i class="fa fa-check-circle me-2"></i>Valider & Créer le compte</button>
+                                </form>
+                            </div>
+
+                            <!-- Étape 3 : Succès et Affichage du Code Secret -->
+                            <div id="reg-step-3" class="auth-step text-center">
+                                <div class="alert alert-success">
+                                    <i class="fa fa-check-circle fa-3x mb-2 text-success"></i>
+                                    <h4 class="alert-heading fw-bold">Compte Créé avec Succès !</h4>
+                                    <p class="small mb-0">Vos données ont été enregistrées sur la base de données <b>Firebase</b>.</p>
+                                </div>
+                                <div class="p-3 bg-white border rounded mb-3">
+                                    <span class="text-muted small d-block">Votre Code Secret Professionnel attribué :</span>
+                                    <h2 class="text-danger fw-bold my-2" id="generatedSecretCode">PRO-0000</h2>
+                                    <small class="text-muted">Conservez ce code précieusement. Il vous sera demandé avec votre e-mail pour vous connecter.</small>
+                                </div>
+                                <button class="btn btn-primary w-100 py-2 fw-bold" onclick="switchMode('login')">Aller à la page de Connexion</button>
+                            </div>
+
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Login End -->
-
+    <!-- Auth End -->
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
@@ -140,40 +183,12 @@
                     <h4 class="text-white mb-3">Liens Rapides</h4>
                     <a class="btn btn-link" href="about.html">À propos de nous</a>
                     <a class="btn btn-link" href="contact.html">Contactez-nous</a>
-                    <a class="btn btn-link" href="">Politique de Confidentialité</a>
-                    <a class="btn btn-link" href="">Termes & Conditions</a>
-                    <a class="btn btn-link" href="">Aide & FAQ</a>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-white mb-3">Contact</h4>
                     <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>Avenue de l'Enseignement, Kinshasa, RDC</p>
                     <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+243 81 000 0000</p>
                     <p class="mb-2"><i class="fa fa-envelope me-3"></i>contact@edu-nc.gouv.cd</p>
-                    <div class="d-flex pt-2">
-                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
-                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-white mb-3">Galerie</h4>
-                    <div class="row g-2 pt-2">
-                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-1.jpg" alt=""></div>
-                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-2.jpg" alt=""></div>
-                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-3.jpg" alt=""></div>
-                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-2.jpg" alt=""></div>
-                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-3.jpg" alt=""></div>
-                        <div class="col-4"><img class="img-fluid bg-light p-1" src="img/course-1.jpg" alt=""></div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-white mb-3">Bulletin d'Information</h4>
-                    <p>Restez informés des communiqués officiels du Ministère de l'Éducation Nationale.</p>
-                    <div class="position-relative mx-auto" style="max-width: 400px;">
-                        <input class="form-control border-0 w-100 py-3 ps-4 pe-5" type="text" placeholder="Votre email">
-                        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">S'inscrire</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -182,14 +197,6 @@
                 <div class="row">
                     <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                         &copy; <a class="border-bottom" href="#">EDU-RDC</a>, Tous Droits Réservés.
-                    </div>
-                    <div class="col-md-6 text-center text-md-end">
-                        <div class="footer-menu">
-                            <a href="index.html">Accueil</a>
-                            <a href="">Cookies</a>
-                            <a href="">Aide</a>
-                            <a href="">FAQ</a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -208,6 +215,128 @@
     <script src="lib/waypoints/waypoints.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
+
+    <!-- Intégration Firebase et Logique d'Authentification -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Configuration Firebase (Remplacez par vos informations de projet Firebase)
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "votre-projet.firebaseapp.com",
+            projectId: "votre-projet-id",
+            storageBucket: "votre-projet.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let simulatedVerificationCode = "";
+        let pendingUserData = {};
+
+        // Basculer entre Connexion et Inscription
+        window.switchMode = function(mode) {
+            if(mode === 'login') {
+                document.getElementById('section-login').style.display = 'block';
+                document.getElementById('section-register').style.display = 'none';
+                document.getElementById('tab-login').classList.add('active');
+                document.getElementById('tab-register').classList.remove('active');
+            } else {
+                document.getElementById('section-login').style.display = 'none';
+                document.getElementById('section-register').style.display = 'block';
+                document.getElementById('tab-register').classList.add('active');
+                document.getElementById('tab-login').classList.remove('active');
+            }
+        };
+
+        // Étape 1 : Envoi du code de vérification à 6 chiffres
+        window.sendVerificationCode = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const contact = document.getElementById('regContact').value.trim();
+
+            if(!name || !contact) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            // Générer un code aléatoire à 6 chiffres
+            simulatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            pendingUserData = { name, contact };
+
+            // Affichage de l'alerte simulant l'envoi du message sur l'e-mail ou le numéro
+            document.getElementById('displayContactSent').innerText = contact;
+            alert(`[SIMULATION ENVOI SMS/EMAIL]\nUn message a été envoyé à : ${contact}\n\nCODE DE VÉRIFICATION : ${simulatedVerificationCode}`);
+
+            // Passer à l'étape 2 (Saisie du code)
+            document.getElementById('reg-step-1').classList.remove('active');
+            document.getElementById('reg-step-2').classList.add('active');
+        };
+
+        // Étape 2 : Vérification du code et enregistrement Firebase
+        window.verifyCodeAndCreateAccount = async function(e) {
+            e.preventDefault();
+            const inputCode = document.getElementById('regCodeInput').value.trim();
+
+            if(inputCode !== simulatedVerificationCode) {
+                alert("Code de vérification incorrect. Veuillez réessayer.");
+                return;
+            }
+
+            // Génération d'un code secret professionnel unique pour le compte
+            const secretCode = 'PRO-' + Math.floor(1000 + Math.random() * 9000);
+
+            try {
+                // Enregistrement dans la base de données Firebase Firestore (Collection "professional_users")
+                await addDoc(collection(db, "professional_users"), {
+                    name: pendingUserData.name,
+                    contact: pendingUserData.contact,
+                    secretCode: secretCode,
+                    createdAt: new Date().toISOString()
+                });
+
+                document.getElementById('generatedSecretCode').innerText = secretCode;
+
+                // Passer à l'étape 3 (Succès)
+                document.getElementById('reg-step-2').classList.remove('active');
+                document.getElementById('reg-step-3').classList.add('active');
+
+            } catch (error) {
+                console.error("Erreur Firebase : ", error);
+                alert("Erreur lors de l'enregistrement dans la base de données Firebase.");
+            }
+        };
+
+        // Connexion avec l'email vérifié et le code secret ou mot de passe
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            try {
+                // Vérification dans Firestore si le contact et le code secret correspondent
+                const q = query(
+                    collection(db, "professional_users"), 
+                    where("contact", "==", email), 
+                    where("secretCode", "==", password)
+                );
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    alert("Connexion réussie ! Bienvenue dans l'espace professionnel EDU-RDC.");
+                    window.location.href = "dashboard.html"; // Redirection vers le tableau de bord
+                } else {
+                    alert("Identifiants incorrects. Vérifiez votre e-mail ou votre code secret.");
+                }
+            } catch (error) {
+                console.error("Erreur de connexion Firebase : ", error);
+                alert("Erreur de connexion avec la base de données.");
+            }
+        };
+    </script>
 </body>
 
 </html>
