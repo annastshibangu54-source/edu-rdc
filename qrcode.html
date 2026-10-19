@@ -2,11 +2,16 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>EDU-RDC - Générateur de Cartes Multi-Écoles</title>
+    <title>EDU-RDC - Générateur de Cartes Multi-Écoles (Firebase)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- SDK Firebase (compatibilité v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
         .id-card {
             width: 8.5cm;
@@ -98,6 +103,20 @@
             height: 1.05cm;
         }
         .qr-container img { width: 100%; height: 100%; object-fit: contain; }
+        .archive-item {
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .archive-item:hover {
+            transform: translateY(-2px);
+            background-color: #f1f8ff !important;
+            border-color: #0083b0 !important;
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #cardPreviewContainer, #cardPreviewContainer * { visibility: visible; }
+            #cardPreviewContainer { position: absolute; left: 0; top: 0; margin: 0; }
+        }
     </style>
 </head>
 <body style="background-color: #f8f9fa; padding: 10px;">
@@ -124,7 +143,7 @@
         </div>
     </div>
 
-    <!-- Espace de Génération et Stockage -->
+    <!-- Espace de Génération et Stockage Firebase -->
     <div class="container" id="cardGeneratorSection" style="display: none; margin-top: 10px; max-width: 950px;">
         <div class="alert alert-success d-flex justify-content-between align-items-center mb-3">
             <span><i class="fa fa-shield-alt me-2"></i>Établissement Actif : <strong id="lockedSchoolTitle">---</strong></span>
@@ -136,7 +155,7 @@
                 <button class="nav-link active fw-bold" id="create-tab" data-bs-toggle="tab" data-bs-target="#createPane" type="button">Créer & Imprimer</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button" onclick="afficherArchives()">Cartes Enregistrées (<span id="vaultCount">0</span>)</button>
+                <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button" onclick="chargerArchivesFirebase()">Cartes Enregistrées (<span id="vaultCount">0</span>)</button>
             </li>
         </ul>
 
@@ -170,8 +189,8 @@
                                 <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
                                 <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*" onchange="chargerPhoto(event)">
                             </div>
-                            <button type="button" onclick="enregistrerCarte()" class="btn btn-outline-primary w-100 py-2 fw-bold">
-                                <i class="fa fa-save me-2"></i>Enregistrer dans la base de l'école
+                            <button type="button" onclick="enregistrerSurFirebase()" class="btn btn-outline-primary w-100 py-2 fw-bold">
+                                <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans la base Firebase
                             </button>
                         </div>
                     </div>
@@ -179,29 +198,31 @@
                     <!-- Aperçu de la Carte Conforme avec Logo en haut à droite -->
                     <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
                         <h6 class="text-muted mb-2">Aperçu Conforme (8,5 cm x 5,5 cm)</h6>
-                        <div class="id-card" id="cardPreview" style="--school-bg-logo: url('img/course-1.jpg');">
-                            <header>
-                                <div style="font-size: 0.38rem; font-weight: bold;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
-                                <div style="font-size: 0.32rem;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
-                                <div class="school-header-row px-1">
-                                    <span id="cardSchoolName" style="font-size: 0.42rem; font-weight: bold; text-transform: uppercase;">NOM DE L'ÉCOLE</span>
-                                    <img id="cardSchoolLogoImg" src="img/course-1.jpg" class="school-logo-img" alt="Logo">
+                        <div id="cardPreviewContainer">
+                            <div class="id-card" id="cardPreview" style="--school-bg-logo: url('img/course-1.jpg');">
+                                <header>
+                                    <div style="font-size: 0.38rem; font-weight: bold;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
+                                    <div style="font-size: 0.32rem;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
+                                    <div class="school-header-row px-1">
+                                        <span id="cardSchoolName" style="font-size: 0.42rem; font-weight: bold; text-transform: uppercase;">NOM DE L'ÉCOLE</span>
+                                        <img id="cardSchoolLogoImg" src="img/course-1.jpg" class="school-logo-img" alt="Logo">
+                                    </div>
+                                </header>
+                                <div class="d-flex align-items-start mt-1">
+                                    <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
+                                    <div class="card-details">
+                                        <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.3rem;">ÉLÈVE</strong></div>
+                                        <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
+                                        <div><strong>Postnom :</strong> <span id="viewPostnom">TSHIBANGU</span></div>
+                                        <div><strong>Prénom :</strong> <span id="viewPrenom">Mike</span></div>
+                                        <div><strong>Matricule :</strong> <span id="viewMatricule">MAT-001</span></div>
+                                        <div><strong>Adresse :</strong> <span id="viewAdresse">Avenue de la Paix</span></div>
+                                        <div><strong>Province :</strong> <span id="viewProvince">KINSHASA</span></div>
+                                    </div>
                                 </div>
-                            </header>
-                            <div class="d-flex align-items-start mt-1">
-                                <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
-                                <div class="card-details">
-                                    <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.3rem;">ÉLÈVE</strong></div>
-                                    <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
-                                    <div><strong>Postnom :</strong> <span id="viewPostnom">TSHIBANGU</span></div>
-                                    <div><strong>Prénom :</strong> <span id="viewPrenom">Mike</span></div>
-                                    <div><strong>Matricule :</strong> <span id="viewMatricule">MAT-001</span></div>
-                                    <div><strong>Adresse :</strong> <span id="viewAdresse">Avenue de la Paix</span></div>
-                                    <div><strong>Province :</strong> <span id="viewProvince">KINSHASA</span></div>
-                                </div>
+                                <div class="qr-container" id="qrcodePreview"></div>
+                                <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
                             </div>
-                            <div class="qr-container" id="qrcodePreview"></div>
-                            <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
                         </div>
                         <button onclick="window.print()" class="btn btn-success mt-3 py-2 px-4 fw-bold shadow-sm">
                             <i class="fa fa-print me-2"></i>Imprimer cette Carte
@@ -213,9 +234,9 @@
             <!-- Onglet Archives / Cartes Enregistrées -->
             <div class="tab-pane fade" id="vaultPane">
                 <div class="card p-3 shadow-sm border-0">
-                    <h5 class="text-primary mb-3"><i class="fa fa-archive me-2"></i>Cartes enregistrées pour <span id="vaultSchoolName">---</span></h5>
+                    <h5 class="text-primary mb-3"><i class="fa fa-archive me-2"></i>Cartes dans Firebase pour <span id="vaultSchoolName">---</span> <small class="text-muted fs-6">(Cliquez pour ouvrir et imprimer)</small></h5>
                     <div id="vaultListContainer" class="row g-3">
-                        <!-- Les cartes enregistrées s'afficheront ici -->
+                        <div class="col-12 text-center text-muted py-3">Chargement depuis Firebase...</div>
                     </div>
                 </div>
             </div>
@@ -226,9 +247,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // CONFIGURATION FIREBASE (Remplacez avec vos identifiants Firebase si ce n'est pas déjà fait dans votre projet)
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-votre-cle-api",
+            authDomain: "edu-rdc.firebaseapp.com",
+            projectId: "edu-rdc",
+            storageBucket: "edu-rdc.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcde"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
         var currentSchool = "";
         var schoolLogoBase64 = "img/course-1.jpg";
         var tempPhotoBase64 = "img/team-1.jpg";
+        var cachedCards = []; // Stockage temporaire en mémoire des cartes récupérées
 
         function ouvrirEspace() {
             var nomEcole = document.getElementById('authSchoolName').value.trim();
@@ -243,8 +280,17 @@
             if (logoInput) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    schoolLogoBase64 = e.target.result;
-                    validerOuvertureEspace();
+                    var img = new Image();
+                    img.onload = function() {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        canvas.width = 100;
+                        canvas.height = 100;
+                        ctx.drawImage(img, 0, 0, 100, 100);
+                        schoolLogoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+                        validerOuvertureEspace();
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(logoInput);
             } else {
@@ -264,7 +310,7 @@
             document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${schoolLogoBase64}')`);
 
             mettreAJour();
-            compterArchives();
+            compterArchivesFirebase();
         }
 
         function mettreAJour() {
@@ -300,10 +346,10 @@
                 img.onload = function() {
                     var canvas = document.createElement('canvas');
                     var ctx = canvas.getContext('2d');
-                    canvas.width = 120;  // Taille optimisée pour éviter la saturation mémoire
-                    canvas.height = 140;
-                    ctx.drawImage(img, 0, 0, 120, 140);
-                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6); // Compression JPEG 60%
+                    canvas.width = 90;
+                    canvas.height = 110;
+                    ctx.drawImage(img, 0, 0, 90, 110);
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.4);
                     document.getElementById('cardUserPhoto').src = tempPhotoBase64;
                     mettreAJour();
                 };
@@ -312,10 +358,9 @@
             reader.readAsDataURL(file);
         }
 
-        // Enregistrement optimisé avec compression et nettoyage automatique
-        function enregistrerCarte() {
+        // ENREGISTREMENT DANS FIREBASE FIRESTORE
+        function enregistrerSurFirebase() {
             var carteData = {
-                id: 'CARD-' + Date.now(),
                 school: currentSchool,
                 category: document.getElementById('cardCategory').value,
                 nom: document.getElementById('inputNom').value || '---',
@@ -325,54 +370,88 @@
                 province: document.getElementById('inputProvince').value || 'KINSHASA',
                 adresse: document.getElementById('inputAdresse').value || '---',
                 photo: tempPhotoBase64,
-                date: new Date().toLocaleDateString()
+                date: new Date().toLocaleDateString(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            try {
-                // Utilisation d'une clé distincte par école pour ne jamais saturer
-                var storageKey = 'edu_rdc_cartes_' + currentSchool.replace(/\s+/g, '_');
-                var stock = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                stock.push(carteData);
-                localStorage.setItem(storageKey, JSON.stringify(stock));
-                
-                alert("Succès ! Carte enregistrée pour l'école " + currentSchool + ".");
-                compterArchives();
-                afficherArchives();
-            } catch (err) {
-                alert("Espace saturé. Veuillez vider le cache ou utiliser des photos plus légères.");
-            }
+            db.collection("cartes_ecoles").add(carteData)
+            .then(function() {
+                alert("Succès ! Carte enregistrée dans la base de données Firebase pour " + currentSchool + ".");
+                compterArchivesFirebase();
+            })
+            .catch(function(error) {
+                alert("Erreur lors de l'enregistrement Firebase : " + error.message);
+            });
         }
 
-        function compterArchives() {
-            var storageKey = 'edu_rdc_cartes_' + currentSchool.replace(/\s+/g, '_');
-            var stock = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            document.getElementById('vaultCount').innerText = stock.length;
+        // COMPTER LES CARTES DE L'ÉCOLE DANS FIREBASE
+        function compterArchivesFirebase() {
+            db.collection("cartes_ecoles").where("school", "==", currentSchool).get()
+            .then(function(querySnapshot) {
+                document.getElementById('vaultCount').innerText = querySnapshot.size;
+            });
         }
 
-        function afficherArchives() {
+        // CHARGER ET AFFICHER LES ARCHIVES DEPUIS FIREBASE
+        function chargerArchivesFirebase() {
             var container = document.getElementById('vaultListContainer');
-            var storageKey = 'edu_rdc_cartes_' + currentSchool.replace(/\s+/g, '_');
-            var stock = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            container.innerHTML = '<div class="col-12 text-center text-muted py-3">Chargement depuis Firebase...</div>';
 
-            if (stock.length === 0) {
-                container.innerHTML = '<div class="col-12 text-center text-muted py-3">Aucune carte enregistrée pour cette école pour le moment.</div>';
-                return;
-            }
+            db.collection("cartes_ecoles").where("school", "==", currentSchool).get()
+            .then(function(querySnapshot) {
+                cachedCards = [];
+                querySnapshot.forEach(function(doc) {
+                    cachedCards.push({ id: doc.id, ...doc.data() });
+                });
 
-            container.innerHTML = '';
-            stock.forEach(function(c) {
-                container.innerHTML += `
-                    <div class="col-md-6">
-                        <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center">
-                            <img src="${c.photo}" style="width: 40px; height: 50px; object-fit: cover; border-radius: 3px; margin-right: 10px;">
-                            <div>
-                                <strong class="text-primary">${c.category.toUpperCase()} : ${c.nom} ${c.prenom}</strong><br>
-                                <small class="text-muted">Matricule : ${c.matricule} | Enregistré le : ${c.date}</small>
+                document.getElementById('vaultCount').innerText = cachedCards.length;
+
+                if (cachedCards.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-center text-muted py-3">Aucune carte enregistrée pour cette école dans Firebase.</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                cachedCards.forEach(function(c, index) {
+                    container.innerHTML += `
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center archive-item" onclick="chargerCarteArchive(${index})">
+                                <img src="${c.photo}" style="width: 45px; height: 55px; object-fit: cover; border-radius: 3px; margin-right: 12px; border: 1px solid #ddd;">
+                                <div>
+                                    <strong class="text-primary">${c.category.toUpperCase()} : ${c.nom} ${c.prenom}</strong><br>
+                                    <small class="text-muted">Matricule : ${c.matricule} | Date : ${c.date}</small><br>
+                                    <span class="badge bg-success text-white" style="font-size: 0.65rem;"><i class="fa fa-cloud me-1"></i> Firebase - Cliquer pour imprimer</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                });
+            })
+            .catch(function(error) {
+                container.innerHTML = '<div class="col-12 text-center text-danger py-3">Erreur de chargement Firebase : ' + error.message + '</div>';
             });
+        }
+
+        // RECHARGER LA CARTE DEPUIS LE CLIC POUR L'IMPRIMER
+        function chargerCarteArchive(index) {
+            var c = cachedCards[index];
+            if (!c) return;
+
+            document.getElementById('cardCategory').value = c.category;
+            document.getElementById('inputNom').value = c.nom;
+            document.getElementById('inputPostnom').value = c.postnom;
+            document.getElementById('inputPrenom').value = c.prenom;
+            document.getElementById('inputMatricule').value = c.matricule;
+            document.getElementById('inputProvince').value = c.province;
+            document.getElementById('inputAdresse').value = c.adresse;
+            tempPhotoBase64 = c.photo;
+
+            mettreAJour();
+
+            var createTab = new bootstrap.Tab(document.getElementById('create-tab'));
+            createTab.show();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
