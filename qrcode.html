@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>EDU-RDC - Générateur de Cartes Cloud</title>
+    <title>EDU-RDC - Générateur de Cartes</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <link href="img/favicon.ico" rel="icon">
@@ -19,7 +19,6 @@
         .id-card {
             width: 8.5cm;
             height: 5.5cm;
-            background: #0088cc !important;
             background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%) !important;
             border-radius: 8px;
             color: #ffffff !important;
@@ -180,8 +179,8 @@
         <div class="container py-5">
             <div class="row justify-content-center">
                 <div class="col-lg-10 text-center">
-                    <h1 class="display-3 text-white animated slideInDown">Générateur de Cartes Cloud</h1>
-                    <p class="fs-4 text-white animated slideInDown">Stockage illimité et sécurisé sur Firebase</p>
+                    <h1 class="display-3 text-white animated slideInDown">Générateur de Cartes Établissement</h1>
+                    <p class="fs-4 text-white animated slideInDown">Plateforme Officielle EDU-RDC</p>
                 </div>
             </div>
         </div>
@@ -204,8 +203,8 @@
                             <label class="form-label fw-bold">Code Secret Propriétaire</label>
                             <input type="password" id="authOwnerCode" class="form-control" placeholder="••••••••">
                         </div>
-                        <button type="button" id="btnSubmitAuth" class="btn btn-primary w-100 py-2 fw-bold">
-                            <i class="fa fa-key me-2"></i>Accéder au Cloud
+                        <button type="button" onclick="handleLogin()" id="btnAccess" class="btn btn-primary w-100 py-2 fw-bold">
+                            <i class="fa fa-key me-2"></i>Accéder à la Génération
                         </button>
                     </div>
                 </div>
@@ -213,132 +212,106 @@
         </div>
     </div>
 
-    <!-- Zone de Génération -->
-    <div class="container-xxl py-3 d-none" id="cardGeneratorSection">
+    <!-- Zone de Génération (Masquée au départ via style.display) -->
+    <div class="container-xxl py-3" id="cardGeneratorSection" style="display: none;">
         <div class="container">
             <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
-                <span><i class="fa fa-cloud-check me-2"></i>Établissement Connecté : <strong id="lockedSchoolTitle">---</strong></span>
+                <span><i class="fa fa-school me-2"></i>Établissement Connecté : <strong id="lockedSchoolTitle">---</strong></span>
                 <button class="btn btn-sm btn-outline-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt me-1"></i>Déconnexion</button>
             </div>
 
-            <ul class="nav nav-tabs mb-4" id="cardTabs" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link active fw-bold" id="create-tab" data-bs-toggle="tab" data-bs-target="#createPane" type="button">Créer & Enregistrer</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link fw-bold" id="vault-tab" data-bs-toggle="tab" data-bs-target="#vaultPane" type="button">Boîte de Stockage Cloud (<span id="vaultCount">0</span>)</button>
-                </li>
-            </ul>
-
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="createPane">
-                    <div class="row g-4">
-                        <div class="col-lg-6">
-                            <div class="bg-light p-4 rounded shadow-sm">
-                                <h4 class="mb-3 text-primary"><i class="fa fa-id-card me-2"></i>Informations du Bénéficiaire</h4>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Catégorie</label>
-                                    <select class="form-select" id="cardCategory">
-                                        <option value="Élève" selected>Élève</option>
-                                        <option value="Enseignant">Enseignant</option>
-                                        <option value="Professeur">Professeur</option>
-                                        <option value="Administrateur">Administrateur</option>
-                                    </select>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom"></div>
-                                    <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom"></div>
-                                    <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom"></div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule"></div>
-                                    <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province"></div>
-                                </div>
-                                <div class="mb-3"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète"></div>
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
-                                    <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*">
-                                </div>
-                                <button type="button" id="btnSaveCard" class="btn btn-primary w-100 py-2 fw-bold">
-                                    <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud
-                                </button>
-                            </div>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="bg-light p-4 rounded shadow-sm">
+                        <h4 class="mb-3 text-primary"><i class="fa fa-id-card me-2"></i>Informations du Bénéficiaire</h4>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Catégorie</label>
+                            <select class="form-select" id="cardCategory">
+                                <option value="Élève" selected>Élève</option>
+                                <option value="Enseignant">Enseignant</option>
+                                <option value="Professeur">Professeur</option>
+                                <option value="Administrateur">Administrateur</option>
+                            </select>
                         </div>
-
-                        <!-- Aperçu Carte -->
-                        <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
-                            <h5 class="mb-3 text-muted">Aperçu Conforme (8,5 cm x 5,5 cm)</h5>
-                            <div id="cardPreviewContainer">
-                                <div class="id-card" id="cardPreview" style="--school-bg-logo: url('img/course-1.jpg');">
-                                    <header>
-                                        <div class="header-title">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
-                                        <div class="header-title" style="font-size: 0.32rem; font-weight: normal;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
-                                        <div class="school-title d-flex justify-content-between align-items-center px-1">
-                                            <span id="cardSchoolName">NOM DE L'ÉCOLE</span>
-                                            <img id="cardSchoolLogo" src="img/course-1.jpg" class="school-logo" alt="Logo">
-                                        </div>
-                                    </header>
-                                    <div class="d-flex align-items-start mt-1">
-                                        <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
-                                        <div class="card-details">
-                                            <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.32rem;">ÉLÈVE</strong></div>
-                                            <div><strong>Nom :</strong> <span id="cardNom">---</span></div>
-                                            <div><strong>Postnom :</strong> <span id="cardPostnom">---</span></div>
-                                            <div><strong>Prénom :</strong> <span id="cardPrenom">---</span></div>
-                                            <div><strong>Matricule :</strong> <span id="cardMatricule">---</span></div>
-                                            <div><strong>Adresse :</strong> <span id="cardAdresse">---</span></div>
-                                            <div><strong>Province :</strong> <span id="cardProvince">---</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="qr-container"><div id="qrcodePreview"></div></div>
-                                    <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
-                                </div>
-                            </div>
-                            <button onclick="window.print()" class="btn btn-success mt-4 py-2 px-4 fw-bold"><i class="fa fa-print me-2"></i>Imprimer cette Carte</button>
+                        <div class="row">
+                            <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" value="KALOMBO"></div>
+                            <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" value="TSHIBANGU"></div>
+                            <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" value="Mike"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" value="MAT-2026-001"></div>
+                            <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" value="KINSHASA"></div>
+                        </div>
+                        <div class="mb-3"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète" value="Avenue de l'École N°12"></div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
+                            <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*">
                         </div>
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="vaultPane">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                            <h5 class="m-0 text-white"><i class="fa fa-database me-2"></i>Cartes Stockées dans Firebase Cloud</h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <div id="vaultCardsContainer" class="row g-4"></div>
+                <!-- Aperçu Carte -->
+                <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
+                    <h5 class="mb-3 text-muted">Aperçu Conforme (8,5 cm x 5,5 cm)</h5>
+                    <div id="cardPreviewContainer">
+                        <div class="id-card" id="cardPreview" style="--school-bg-logo: url('img/course-1.jpg');">
+                            <header>
+                                <div class="header-title">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
+                                <div class="header-title" style="font-size: 0.32rem; font-weight: normal;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
+                                <div class="school-title d-flex justify-content-between align-items-center px-1">
+                                    <span id="cardSchoolName">NOM DE L'ÉCOLE</span>
+                                    <img id="cardSchoolLogo" src="img/course-1.jpg" class="school-logo" alt="Logo">
+                                </div>
+                            </header>
+                            <div class="d-flex align-items-start mt-1">
+                                <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
+                                <div class="card-details">
+                                    <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.32rem;">ÉLÈVE</strong></div>
+                                    <div><strong>Nom :</strong> <span id="cardNom">---</span></div>
+                                    <div><strong>Postnom :</strong> <span id="cardPostnom">---</span></div>
+                                    <div><strong>Prénom :</strong> <span id="cardPrenom">---</span></div>
+                                    <div><strong>Matricule :</strong> <span id="cardMatricule">---</span></div>
+                                    <div><strong>Adresse :</strong> <span id="cardAdresse">---</span></div>
+                                    <div><strong>Province :</strong> <span id="cardProvince">---</span></div>
+                                </div>
+                            </div>
+                            <div class="qr-container"><div id="qrcodePreview"></div></div>
+                            <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
                         </div>
                     </div>
+                    <button onclick="window.print()" class="btn btn-success mt-4 py-2 px-4 fw-bold"><i class="fa fa-print me-2"></i>Imprimer cette Carte</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Script Logique Sécurisé -->
-    <script type="module">
-        import { db, collection, addDoc, getDocs, query, where, deleteDoc, doc } from './js/firebase-config.js';
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
 
-        let currentSchoolData = null;
-        let tempPhotoBase64 = "img/team-1.jpg";
+    <script>
+        var currentSchool = "";
+        var tempPhotoBase64 = "img/team-1.jpg";
 
         function renderQRCodeInContainer(container, textData) {
             if (!container) return;
             container.innerHTML = "";
-            let safeUrl = encodeURIComponent(textData);
-            let img = document.createElement("img");
-            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${safeUrl}`;
+            var safeUrl = encodeURIComponent(textData);
+            var img = document.createElement("img");
+            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" + safeUrl;
             img.alt = "QR Code";
             container.appendChild(img);
         }
 
-        function previewCardUpdate() {
-            if (!currentSchoolData) return;
-            const category = document.getElementById('cardCategory').value;
-            const nom = document.getElementById('inputNom').value || '---';
-            const postnom = document.getElementById('inputPostnom').value || '---';
-            const prenom = document.getElementById('inputPrenom').value || '---';
-            const matricule = document.getElementById('inputMatricule').value || '---';
-            const province = document.getElementById('inputProvince').value || 'KINSHASA';
-            const adresse = document.getElementById('inputAdresse').value || '---';
+        function updateCardPreview() {
+            if (!currentSchool) return;
+            var category = document.getElementById('cardCategory').value;
+            var nom = document.getElementById('inputNom').value || '---';
+            var postnom = document.getElementById('inputPostnom').value || '---';
+            var prenom = document.getElementById('inputPrenom').value || '---';
+            var matricule = document.getElementById('inputMatricule').value || '---';
+            var province = document.getElementById('inputProvince').value || 'KINSHASA';
+            var adresse = document.getElementById('inputAdresse').value || '---';
 
             document.getElementById('cardRoleBadge').innerText = category.toUpperCase();
             document.getElementById('cardNom').innerText = nom;
@@ -349,202 +322,58 @@
             document.getElementById('cardAdresse').innerText = adresse;
             document.getElementById('cardUserPhoto').src = tempPhotoBase64;
 
-            renderQRCodeInContainer(document.getElementById('qrcodePreview'), `EDU-RDC:${currentSchoolData.name}:${category}:${matricule}`);
+            renderQRCodeInContainer(document.getElementById('qrcodePreview'), "EDU-RDC:" + currentSchool + ":" + category + ":" + matricule);
         }
 
-        async function loadSavedCardsVault() {
-            if (!currentSchoolData) return;
-            const container = document.getElementById('vaultCardsContainer');
-            container.innerHTML = '<div class="col-12 text-center py-4"><i class="fa fa-spinner fa-spin fa-2x"></i> Chargement des cartes...</div>';
-
-            try {
-                const q = query(collection(db, "cards"), where("schoolName", "==", currentSchoolData.name));
-                const querySnapshot = await getDocs(q);
-                document.getElementById('vaultCount').innerText = querySnapshot.size;
-
-                if (querySnapshot.empty) {
-                    container.innerHTML = `<div class="col-12 text-center text-muted py-4">Aucune carte enregistrée dans le Cloud pour cette école.</div>`;
-                    return;
-                }
-
-                container.innerHTML = '';
-                querySnapshot.forEach((docSnap) => {
-                    const card = docSnap.data();
-                    const cardId = docSnap.id;
-
-                    const cardHtml = `
-                        <div class="col-md-6 d-flex flex-column align-items-center">
-                            <div class="id-card mb-2" style="--school-bg-logo: url('${card.schoolLogo}');">
-                                <header>
-                                    <div class="header-title">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
-                                    <div class="header-title" style="font-size: 0.32rem; font-weight: normal;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
-                                    <div class="school-title d-flex justify-content-between align-items-center px-1">
-                                        <span>${card.schoolName}</span>
-                                        <img src="${card.schoolLogo}" class="school-logo" alt="Logo">
-                                    </div>
-                                </header>
-                                <div class="d-flex align-items-start mt-1">
-                                    <img src="${card.photo}" class="card-photo" alt="Photo">
-                                    <div class="card-details">
-                                        <div><strong class="badge bg-warning text-dark" style="font-size: 0.32rem;">${card.category.toUpperCase()}</strong></div>
-                                        <div><strong>Nom :</strong> ${card.nom}</div>
-                                        <div><strong>Postnom :</strong> ${card.postnom}</div>
-                                        <div><strong>Prénom :</strong> ${card.prenom}</div>
-                                        <div><strong>Matricule :</strong> ${card.matricule}</div>
-                                        <div><strong>Adresse :</strong> ${card.adresse}</div>
-                                        <div><strong>Province :</strong> ${card.province}</div>
-                                    </div>
-                                </div>
-                                <div class="qr-container" id="vault-qr-${cardId}"></div>
-                                <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-danger btn-delete-card" data-id="${cardId}"><i class="fa fa-trash me-1"></i>Supprimer</button>
-                        </div>
-                    `;
-                    container.innerHTML += cardHtml;
-                });
-
-                querySnapshot.forEach((docSnap) => {
-                    const card = docSnap.data();
-                    renderQRCodeInContainer(document.getElementById(`vault-qr-${docSnap.id}`), `EDU-RDC:${card.schoolName}:${card.category}:${card.matricule}`);
-                });
-
-                document.querySelectorAll('.btn-delete-card').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const id = e.target.getAttribute('data-id');
-                        if (confirm("Supprimer cette carte de Firebase ?")) {
-                            try {
-                                await deleteDoc(doc(db, "cards", id));
-                                loadSavedCardsVault();
-                            } catch(err) {
-                                alert("Erreur de suppression : " + err.message);
-                            }
-                        }
-                    });
-                });
-
-            } catch (err) {
-                container.innerHTML = `<div class="col-12 text-center text-muted py-4">Connexion Cloud en attente.</div>`;
-            }
-        }
-
-        // Événement Connexion / Authentification
-        document.getElementById('btnSubmitAuth').addEventListener('click', async () => {
-            const inputName = document.getElementById('authSchoolName').value.trim();
-            const inputCode = document.getElementById('authOwnerCode').value.trim();
-
-            if (!inputName) {
-                alert("Veuillez entrer le nom de l'école.");
+        function handleLogin() {
+            var schoolName = document.getElementById('authSchoolName').value.trim();
+            if (!schoolName) {
+                alert("Veuillez saisir le nom de votre établissement.");
                 return;
             }
 
-            const btn = document.getElementById('btnSubmitAuth');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Vérification...';
+            currentSchool = schoolName.toUpperCase();
+            
+            // Masquer l'authentification et afficher la zone de génération
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('cardGeneratorSection').style.display = 'block';
+            
+            document.getElementById('lockedSchoolTitle').innerText = currentSchool;
+            document.getElementById('cardSchoolName').innerText = currentSchool;
 
-            currentSchoolData = {
-                name: inputName.toUpperCase(),
-                code: inputCode,
-                province: "KINSHASA",
-                logo: "img/course-1.jpg"
-            };
+            updateCardPreview();
+        }
 
-            try {
-                const querySnapshot = await getDocs(collection(db, "schools"));
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    if (data.name && data.name.trim().toLowerCase() === inputName.toLowerCase()) {
-                        currentSchoolData = data;
-                    }
-                });
-            } catch (err) {
-                console.log("Mode direct activé.");
+        // Activation des écouteurs en temps réel
+        ['cardCategory', 'inputNom', 'inputPostnom', 'inputPrenom', 'inputMatricule', 'inputProvince', 'inputAdresse'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.oninput = updateCardPreview;
+                el.onchange = updateCardPreview;
             }
-
-            document.getElementById('authSection').classList.add('d-none');
-            document.getElementById('cardGeneratorSection').classList.remove('d-none');
-            document.getElementById('lockedSchoolTitle').innerText = currentSchoolData.name;
-            document.getElementById('cardSchoolName').innerText = currentSchoolData.name;
-
-            let logoUrl = currentSchoolData.logo || "img/course-1.jpg";
-            document.getElementById('cardSchoolLogo').src = logoUrl;
-            document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${logoUrl}')`);
-            document.getElementById('inputProvince').value = currentSchoolData.province || "KINSHASA";
-
-            previewCardUpdate();
-            loadSavedCardsVault();
         });
 
-        // Événements de saisie en temps réel
-        ['cardCategory', 'inputNom', 'inputPostnom', 'inputPrenom', 'inputMatricule', 'inputProvince', 'inputAdresse'].forEach(id => {
-            document.getElementById(id)?.addEventListener('input', previewCardUpdate);
-        });
-
-        document.getElementById('cardCategory')?.addEventListener('change', previewCardUpdate);
-
-        // Gestion de la photo
-        document.getElementById('inputPhoto').addEventListener('change', (event) => {
-            const file = event.target.files[0];
+        document.getElementById('inputPhoto').onchange = function(event) {
+            var file = event.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
                     canvas.width = 150;
                     canvas.height = 180;
                     ctx.drawImage(img, 0, 0, 150, 180);
                     tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
                     document.getElementById('cardUserPhoto').src = tempPhotoBase64;
-                    previewCardUpdate();
+                    updateCardPreview();
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-        });
-
-        // Enregistrement dans Firebase Cloud
-        document.getElementById('btnSaveCard').addEventListener('click', async () => {
-            if (!currentSchoolData) return;
-
-            const btn = document.getElementById('btnSaveCard');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Enregistrement Cloud...';
-
-            const cardData = {
-                category: document.getElementById('cardCategory').value,
-                nom: document.getElementById('inputNom').value || '---',
-                postnom: document.getElementById('inputPostnom').value || '---',
-                prenom: document.getElementById('inputPrenom').value || '---',
-                matricule: document.getElementById('inputMatricule').value || '---',
-                province: document.getElementById('inputProvince').value || 'KINSHASA',
-                adresse: document.getElementById('inputAdresse').value || '---',
-                photo: tempPhotoBase64,
-                schoolName: currentSchoolData.name,
-                schoolLogo: currentSchoolData.logo || "img/course-1.jpg",
-                createdAt: new Date().toISOString()
-            };
-
-            try {
-                await addDoc(collection(db, "cards"), cardData);
-                alert("Carte enregistrée avec succès dans Firebase Cloud !");
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud';
-                loadSavedCardsVault();
-            } catch (err) {
-                alert("Erreur Cloud : " + err.message);
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans Firebase Cloud';
-            }
-        });
-
-        document.getElementById('vault-tab').addEventListener('click', loadSavedCardsVault);
+        };
     </script>
-
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/main.js"></script>
 </body>
 
 </html>
