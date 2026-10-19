@@ -2,10 +2,11 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>EDU-RDC - Générateur de Cartes</title>
+    <title>EDU-RDC - Générateur de Cartes Cloud</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <style>
         .id-card {
             width: 8.5cm;
@@ -36,6 +37,25 @@
             border-radius: 4px;
             background-color: #ffffff;
         }
+        .card-details {
+            font-size: 0.35rem;
+            line-height: 1.2;
+            margin-left: 4px;
+            color: #ffffff !important;
+        }
+        .footer-assistance {
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.24rem;
+            font-style: italic;
+            opacity: 0.95;
+            border-top: 0.5px solid rgba(255,255,255,0.3);
+            padding-top: 1px;
+            line-height: 1.1;
+        }
         .qr-container {
             position: absolute;
             bottom: 10px;
@@ -46,65 +66,101 @@
             width: 1.05cm;
             height: 1.05cm;
         }
-        .qr-container img { width: 100%; height: 100%; }
+        .qr-container img { width: 100%; height: 100%; object-fit: contain; }
     </style>
 </head>
-<body style="background-color: #f8f9fa; padding: 20px;">
+<body style="background-color: #f8f9fa; padding: 10px;">
 
-    <div class="container" id="authSection" style="max-width: 500px; margin-top: 50px;">
-        <div class="card shadow p-4 bg-white rounded">
-            <h3 class="text-center text-primary mb-4">Accès Établissement</h3>
+    <!-- Écran d'Authentification -->
+    <div class="container" id="authSection" style="max-width: 500px; margin-top: 40px;">
+        <div class="card shadow p-4 bg-white rounded border-0">
+            <h3 class="text-center text-primary mb-4"><i class="fa fa-lock me-2"></i>Accès Propriétaire</h3>
             <div class="mb-3">
-                <label class="form-label fw-bold">Nom de l'École</label>
-                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION">
+                <label class="form-label fw-bold">Nom Complet de l'École</label>
+                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: JSD ou C.S. LA RÉVOLUTION">
             </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Code Secret</label>
                 <input type="password" id="authOwnerCode" class="form-control" placeholder="••••••••">
             </div>
-            <button type="button" onclick="ouvrirEspace()" class="btn btn-primary w-100 py-2 fw-bold">Accéder</button>
+            <button type="button" onclick="ouvrirEspace()" class="btn btn-primary w-100 py-2 fw-bold">
+                <i class="fa fa-key me-2"></i>Accéder à l'Espace
+            </button>
         </div>
     </div>
 
-    <div class="container" id="cardGeneratorSection" style="display: none; margin-top: 20px;">
-        <div class="alert alert-success d-flex justify-content-between align-items-center">
-            <span>École connectée : <strong id="lockedSchoolTitle">---</strong></span>
-            <button class="btn btn-sm btn-danger" onclick="location.reload()">Quitter</button>
+    <!-- Espace de Génération (Toutes les rubriques) -->
+    <div class="container" id="cardGeneratorSection" style="display: none; margin-top: 10px; max-width: 900px;">
+        <div class="alert alert-success d-flex justify-content-between align-items-center mb-3">
+            <span><i class="fa fa-school me-2"></i>Établissement : <strong id="lockedSchoolTitle">---</strong></span>
+            <button class="btn btn-sm btn-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt"></i> Quitter</button>
         </div>
 
-        <div class="card p-4 bg-white shadow">
-            <h4 class="text-primary mb-3">Création de Carte</h4>
-            <div class="mb-3">
-                <label class="form-label">Nom du Bénéficiaire</label>
-                <input type="text" id="inputNom" class="form-control" value="KALOMBO" oninput="mettreAJour()">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Matricule</label>
-                <input type="text" id="inputMatricule" class="form-control" value="001" oninput="mettreAJour()">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="bg-white p-3 rounded shadow-sm border">
+                    <h5 class="text-primary mb-3"><i class="fa fa-id-card me-2"></i>Formulaire de la Carte</h5>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Catégorie</label>
+                        <select class="form-select form-select-sm" id="cardCategory" onchange="mettreAJour()">
+                            <option value="Élève" selected>Élève</option>
+                            <option value="Enseignant">Enseignant</option>
+                            <option value="Professeur">Professeur</option>
+                            <option value="Administrateur">Administrateur</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputNom" placeholder="Nom" value="KALOMBO" oninput="mettreAJour()"></div>
+                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPostnom" placeholder="Postnom" value="TSHIBANGU" oninput="mettreAJour()"></div>
+                        <div class="col-md-4 mb-2"><input type="text" class="form-control form-control-sm" id="inputPrenom" placeholder="Prénom" value="Mike" oninput="mettreAJour()"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputMatricule" placeholder="Matricule" value="MAT-001" oninput="mettreAJour()"></div>
+                        <div class="col-md-6 mb-2"><input type="text" class="form-control form-control-sm" id="inputProvince" placeholder="Province" value="KINSHASA" oninput="mettreAJour()"></div>
+                    </div>
+                    <div class="mb-2"><input type="text" class="form-control form-control-sm" id="inputAdresse" placeholder="Adresse complète" value="Avenue de la Paix" oninput="mettreAJour()"></div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Photo du Bénéficiaire</label>
+                        <input type="file" class="form-control form-control-sm" id="inputPhoto" accept="image/*" onchange="chargerPhoto(event)">
+                    </div>
+                </div>
             </div>
 
-            <div class="text-center mt-4">
+            <!-- Aperçu de la Carte Conforme -->
+            <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center">
+                <h6 class="text-muted mb-2">Aperçu Conforme (8,5 cm x 5,5 cm)</h6>
                 <div class="id-card" id="cardPreview">
                     <header>
-                        <div style="font-size: 10px; font-weight: bold;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
-                        <div style="font-size: 9px;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
-                        <div id="cardSchoolName" style="font-size: 11px; font-weight: bold; margin-top: 2px;">NOM DE L'ÉCOLE</div>
+                        <div style="font-size: 0.38rem; font-weight: bold;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
+                        <div style="font-size: 0.32rem;">MINISTÈRE DE L'ÉDUCATION NATIONALE</div>
+                        <div id="cardSchoolName" style="font-size: 0.42rem; font-weight: bold; text-transform: uppercase; margin-top: 1px;">NOM DE L'ÉCOLE</div>
                     </header>
                     <div class="d-flex align-items-start mt-1">
                         <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
-                        <div style="font-size: 10px; margin-left: 8px; text-align: left; color: white;">
+                        <div class="card-details">
+                            <div><strong id="cardRoleBadge" class="badge bg-warning text-dark" style="font-size: 0.3rem;">ÉLÈVE</strong></div>
                             <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
-                            <div><strong>Matricule :</strong> <span id="viewMatricule">001</span></div>
+                            <div><strong>Postnom :</strong> <span id="viewPostnom">TSHIBANGU</span></div>
+                            <div><strong>Prénom :</strong> <span id="viewPrenom">Mike</span></div>
+                            <div><strong>Matricule :</strong> <span id="viewMatricule">MAT-001</span></div>
+                            <div><strong>Adresse :</strong> <span id="viewAdresse">Avenue de la Paix</span></div>
+                            <div><strong>Province :</strong> <span id="viewProvince">KINSHASA</span></div>
                         </div>
                     </div>
                     <div class="qr-container" id="qrcodePreview"></div>
+                    <div class="footer-assistance">Prière d'assister ce porteur, agent ou élève de l'EDU-RDC, par les autorités civiles et militaires.</div>
                 </div>
-                <button onclick="window.print()" class="btn btn-success mt-3">Imprimer la Carte</button>
+                <button onclick="window.print()" class="btn btn-success mt-3 py-2 px-4 fw-bold shadow-sm">
+                    <i class="fa fa-print me-2"></i>Imprimer cette Carte
+                </button>
             </div>
         </div>
     </div>
 
     <script>
+        var currentSchool = "";
+        var tempPhotoBase64 = "img/team-1.jpg";
+
         function ouvrirEspace() {
             var nomEcole = document.getElementById('authSchoolName').value.trim();
             if (!nomEcole) {
@@ -112,24 +168,58 @@
                 return;
             }
 
-            // Masquer l'authentification et afficher la génération instantanément
+            currentSchool = nomEcole.toUpperCase();
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('cardGeneratorSection').style.display = 'block';
 
-            document.getElementById('lockedSchoolTitle').innerText = nomEcole.toUpperCase();
-            document.getElementById('cardSchoolName').innerText = nomEcole.toUpperCase();
+            document.getElementById('lockedSchoolTitle').innerText = currentSchool;
+            document.getElementById('cardSchoolName').innerText = currentSchool;
             mettreAJour();
         }
 
         function mettreAJour() {
+            if (!currentSchool) return;
+            var category = document.getElementById('cardCategory').value;
             var nom = document.getElementById('inputNom').value || '---';
-            var mat = document.getElementById('inputMatricule').value || '---';
+            var postnom = document.getElementById('inputPostnom').value || '---';
+            var prenom = document.getElementById('inputPrenom').value || '---';
+            var matricule = document.getElementById('inputMatricule').value || '---';
+            var province = document.getElementById('inputProvince').value || 'KINSHASA';
+            var adresse = document.getElementById('inputAdresse').value || '---';
 
+            document.getElementById('cardRoleBadge').innerText = category.toUpperCase();
             document.getElementById('viewNom').innerText = nom;
-            document.getElementById('viewMatricule').innerText = mat;
+            document.getElementById('viewPostnom').innerText = postnom;
+            document.getElementById('viewPrenom').innerText = prenom;
+            document.getElementById('viewMatricule').innerText = matricule;
+            document.getElementById('viewProvince').innerText = province;
+            document.getElementById('viewAdresse').innerText = adresse;
+            document.getElementById('cardUserPhoto').src = tempPhotoBase64;
 
+            var qrText = "EDU-RDC:" + currentSchool + ":" + category + ":" + matricule;
             var qrDiv = document.getElementById('qrcodePreview');
-            qrDiv.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(nom + '-' + mat) + '" alt="QR">';
+            qrDiv.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(qrText) + '" alt="QR">';
+        }
+
+        function chargerPhoto(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    canvas.width = 150;
+                    canvas.height = 180;
+                    ctx.drawImage(img, 0, 0, 150, 180);
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    document.getElementById('cardUserPhoto').src = tempPhotoBase64;
+                    mettreAJour();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
     </script>
 </body>
