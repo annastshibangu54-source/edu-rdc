@@ -417,60 +417,40 @@
             const schoolNameInput = document.getElementById('authSchoolName').value.trim();
             const ownerCodeInput = document.getElementById('authOwnerCode').value.trim();
 
-            let keysToTry = ["EDURDC_FULL_PLATFORM_V10", "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
-            let allSchools = [];
-
-            keysToTry.forEach(key => {
-                let saved = localStorage.getItem(key);
-                if (saved) {
-                    try {
-                        let parsed = JSON.parse(saved);
-                        let list = Array.isArray(parsed) ? parsed : (parsed.schools || []);
-                        list.forEach(s => allSchools.push(s));
-                    } catch(err) {}
-                }
-            });
-
-            if (allSchools.length === 0) {
-                allSchools = [
-                    { name: "C.S. LA RÉVOLUTION", province: "KINSHASA", commune: "KALAMU", logo: "img/course-1.jpg" },
-                    { name: "INSTITUT TECHNIQUE DE LUBUMBASHI", province: "HAUT-KATANGA", commune: "LUBUMBASHI", logo: "img/course-2.jpg" }
-                ];
+            if (!schoolNameInput || !ownerCodeInput) {
+                alert("Veuillez remplir tous les champs d'authentification.");
+                return;
             }
 
-            let match = allSchools.find(s => s.name.toLowerCase() === schoolNameInput.toLowerCase());
+            // Définition immédiate ou récupération de l'école (création automatique si elle n'existe pas)
+            currentSchoolData = {
+                name: schoolNameInput.toUpperCase(),
+                code: ownerCodeInput,
+                province: "KINSHASA",
+                commune: "CENTRE",
+                logo: "img/course-1.jpg"
+            };
 
-            if (match || schoolNameInput.length > 2) {
-                currentSchoolData = match || {
-                    name: schoolNameInput.toUpperCase(),
-                    province: "KINSHASA",
-                    commune: "CENTRE",
-                    logo: "img/course-1.jpg"
-                };
+            document.getElementById('authSection').classList.add('d-none');
+            document.getElementById('cardGeneratorSection').classList.remove('d-none');
 
-                document.getElementById('authSection').classList.add('d-none');
-                document.getElementById('cardGeneratorSection').classList.remove('d-none');
+            document.getElementById('lockedSchoolTitle').innerText = currentSchoolData.name;
+            document.getElementById('cardSchoolName').innerText = currentSchoolData.name;
+            
+            let logoUrl = currentSchoolData.logo;
+            document.getElementById('cardSchoolLogo').src = logoUrl;
+            document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${logoUrl}')`);
 
-                document.getElementById('lockedSchoolTitle').innerText = currentSchoolData.name;
-                document.getElementById('cardSchoolName').innerText = currentSchoolData.name;
-                
-                let logoUrl = currentSchoolData.logo || "img/course-1.jpg";
-                document.getElementById('cardSchoolLogo').src = logoUrl;
-                document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${logoUrl}')`);
+            // Valeurs par défaut de test
+            document.getElementById('inputNom').value = "KABONGO";
+            document.getElementById('inputPostnom').value = "TSHIBANGU";
+            document.getElementById('inputPrenom').value = "Paul";
+            document.getElementById('inputMatricule').value = "MAT-2026-001";
+            document.getElementById('inputProvince').value = "KINSHASA";
+            document.getElementById('inputAdresse').value = "Avenue de l'École N°12";
 
-                // Valeurs par défaut
-                document.getElementById('inputNom').value = "KALOMBO";
-                document.getElementById('inputPostnom').value = "TSHIBANGU";
-                document.getElementById('inputPrenom').value = "Mike";
-                document.getElementById('inputMatricule').value = "MAT-2026-001";
-                document.getElementById('inputProvince').value = currentSchoolData.province || "KINSHASA";
-                document.getElementById('inputAdresse').value = "Av. de l'École N°12, Kalamu";
-
-                previewCardUpdate();
-                updateVaultCount();
-            } else {
-                alert("Nom d'établissement ou code propriétaire invalide !");
-            }
+            previewCardUpdate();
+            updateVaultCount();
         }
 
         function loadUserPhoto(event) {
@@ -485,6 +465,8 @@
         }
 
         function previewCardUpdate() {
+            if (!currentSchoolData) return;
+
             const category = document.getElementById('cardCategory').value;
             const nom = document.getElementById('inputNom').value || '---';
             const postnom = document.getElementById('inputPostnom').value || '---';
@@ -504,21 +486,11 @@
 
             // Génération sécurisée du QR Code dans l'aperçu
             const qrContainer = document.getElementById('qrcodePreview');
-            qrContainer.innerHTML = "";
+            if (qrContainer) {
+                qrContainer.innerHTML = "";
+                const qrData = `EDU-RDC VERIFIED\nÉcole: ${currentSchoolData.name}\nCat: ${category}\nNom: ${nom} ${postnom} ${prenom}\nMatricule: ${matricule}\nProv: ${province}`;
 
-            const qrData = `EDU-RDC VERIFIED\nÉcole: ${currentSchoolData.name}\nCat: ${category}\nNom: ${nom} ${postnom} ${prenom}\nMatricule: ${matricule}\nProv: ${province}`;
-
-            if (typeof QRCode !== 'undefined') {
-                new QRCode(qrContainer, {
-                    text: qrData,
-                    width: 44,
-                    height: 44,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.M
-                });
-            } else {
-                setTimeout(() => {
+                try {
                     if (typeof QRCode !== 'undefined') {
                         new QRCode(qrContainer, {
                             text: qrData,
@@ -529,15 +501,23 @@
                             correctLevel: QRCode.CorrectLevel.M
                         });
                     }
-                }, 500);
+                } catch (err) {
+                    console.error("Erreur QR Code :", err);
+                }
             }
         }
 
         function getVaultStorageKey() {
+            if (!currentSchoolData) return "EDURDC_VAULT_DEFAULT";
             return `EDURDC_VAULT_CARDS_${currentSchoolData.name.replace(/\s+/g, '_')}`;
         }
 
         function saveAndRegisterCard() {
+            if (!currentSchoolData) {
+                alert("Veuillez d'abord vous authentifier !");
+                return;
+            }
+
             const cardData = {
                 id: 'CARD-' + Date.now(),
                 category: document.getElementById('cardCategory').value,
@@ -553,28 +533,53 @@
                 createdAt: new Date().toLocaleDateString()
             };
 
-            let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
-            vault.push(cardData);
-            localStorage.setItem(getVaultStorageKey(), JSON.stringify(vault));
+            let storageKey = getVaultStorageKey();
+            let vault = [];
+            try {
+                vault = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            } catch(e) {
+                vault = [];
+            }
 
-            alert("Carte enregistrée avec succès dans la boîte de stockage de l'établissement !");
+            vault.push(cardData);
+            localStorage.setItem(storageKey, JSON.stringify(vault));
+
+            alert("Carte enregistrée avec succès dans la boîte de stockage !");
             updateVaultCount();
-            document.getElementById('vault-tab').click();
+            
+            // Basculer vers l'onglet de la boîte de stockage pour voir la carte enregistrée
+            const vaultTab = document.getElementById('vault-tab');
+            if (vaultTab) {
+                vaultTab.click();
+            }
             loadSavedCardsVault();
         }
 
         function updateVaultCount() {
             if (!currentSchoolData) return;
-            let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
+            let vault = [];
+            try {
+                vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
+            } catch(e) {
+                vault = [];
+            }
             const countEl = document.getElementById('vaultCount');
             if (countEl) countEl.innerText = vault.length;
         }
 
         function loadSavedCardsVault() {
             updateVaultCount();
-            let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
-            const filterCat = document.getElementById('filterCategory').value;
+            let vault = [];
+            try {
+                vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
+            } catch(e) {
+                vault = [];
+            }
+
+            const filterCatEl = document.getElementById('filterCategory');
+            const filterCat = filterCatEl ? filterCatEl.value : "ALL";
             const container = document.getElementById('vaultCardsContainer');
+            if (!container) return;
 
             let filtered = filterCat === "ALL" ? vault : vault.filter(c => c.category === filterCat);
 
@@ -617,35 +622,39 @@
                         </div>
                     </div>
 
-                    <div class="btn-group shadow-sm">
-                        <button onclick="printSpecificCard('${card.id}')" class="btn btn-sm btn-success fw-bold"><i class="fa fa-print me-1"></i> Imprimer cette Carte</button>
-                        <button onclick="deleteCard('${card.id}')" class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i></button>
+                    <div class="btn-group shadow-sm mt-2">
+                        <button onclick="printSpecificCard('${card.id}')" class="btn btn-sm btn-success fw-bold"><i class="fa fa-print me-1"></i> Imprimer</button>
+                        <button onclick="deleteCard('${card.id}')" class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i> Supprimer</button>
                     </div>
                 </div>
             `).join('');
 
-            // Génération des QR codes pour chaque carte stockée dans le coffre
-            filtered.forEach(card => {
-                const qrEl = document.getElementById(`vault-qr-${card.id}`);
-                if (qrEl) {
-                    qrEl.innerHTML = "";
-                    const qrData = `EDU-RDC VERIFIED\nÉcole: ${card.schoolName}\nCat: ${card.category}\nNom: ${card.nom} ${card.postnom} ${card.prenom}\nMatricule: ${card.matricule}\nProv: ${card.province}`;
-                    if (typeof QRCode !== 'undefined') {
-                        new QRCode(qrEl, {
-                            text: qrData,
-                            width: 44,
-                            height: 44,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.M
-                        });
+            // Génération différée des QR codes pour chaque carte dans le coffre
+            setTimeout(() => {
+                filtered.forEach(card => {
+                    const qrEl = document.getElementById(`vault-qr-${card.id}`);
+                    if (qrEl) {
+                        qrEl.innerHTML = "";
+                        const qrData = `EDU-RDC VERIFIED\nÉcole: ${card.schoolName}\nCat: ${card.category}\nNom: ${card.nom} ${card.postnom} ${card.prenom}\nMatricule: ${card.matricule}\nProv: ${card.province}`;
+                        if (typeof QRCode !== 'undefined') {
+                            new QRCode(qrEl, {
+                                text: qrData,
+                                width: 44,
+                                height: 44,
+                                colorDark: "#000000",
+                                colorLight: "#ffffff",
+                                correctLevel: QRCode.CorrectLevel.M
+                            });
+                        }
                     }
-                }
-            });
+                });
+            }, 100);
         }
 
         function printSpecificCard(cardId) {
-            const cardHtml = document.getElementById(`vault-card-${cardId}`).outerHTML;
+            const cardElement = document.getElementById(`vault-card-${cardId}`);
+            if (!cardElement) return;
+            const cardHtml = cardElement.outerHTML;
             const printWindow = window.open('', '', 'height=600,width=800');
             printWindow.document.write(`
                 <html>
@@ -708,10 +717,16 @@
         }
 
         function deleteCard(cardId) {
-            if (confirm("Voulez-vous vraiment supprimer cette carte de la boîte de stockage ?")) {
-                let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
+            if (confirm("Voulez-vous vraiment supprimer définitivement cette carte de la boîte de stockage ?")) {
+                let storageKey = getVaultStorageKey();
+                let vault = [];
+                try {
+                    vault = JSON.parse(localStorage.getItem(storageKey) || "[]");
+                } catch(e) {
+                    vault = [];
+                }
                 vault = vault.filter(c => c.id !== cardId);
-                localStorage.setItem(getVaultStorageKey(), JSON.stringify(vault));
+                localStorage.setItem(storageKey, JSON.stringify(vault));
                 loadSavedCardsVault();
             }
         }
