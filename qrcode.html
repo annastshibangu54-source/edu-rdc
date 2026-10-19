@@ -143,7 +143,7 @@
             padding-right: 4px;
         }
 
-        /* POSITIONNEMENT ET ALIGNEMENT PARFAIT DU CADRE QR CODE */
+        /* CADRAGE ET ALIGNEMENT PARFAIT DU QR CODE */
         .qr-container {
             position: absolute;
             bottom: 10px;
@@ -415,7 +415,7 @@
         </div>
     </div>
 
-    <!-- LOGIQUE JAVASCRIPT CORRIGÉE POUR UN QR CODE PARFAIT ET UNE SAUGARDE LÉGÈRE -->
+    <!-- LOGIQUE JAVASCRIPT CORRIGÉE AVEC COMPRESSION ULTRA-LÉGÈRE DE SÉCURITÉ -->
     <script>
         let currentSchoolData = null;
         let tempPhotoBase64 = "img/team-1.jpg";
@@ -493,7 +493,7 @@
             updateVaultCount();
         }
 
-        // COMPRESSION DE LA PHOTO OPTIMISÉE POUR LE STOCKAGE LOCAL
+        // COMPRESSION ULTRA-LÉGÈRE POUR EMPÊCHER TOUTE SATURATION DU STOCKAGE LOCAL
         function loadUserPhoto(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -504,10 +504,10 @@
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    canvas.width = 120;
-                    canvas.height = 140;
-                    ctx.drawImage(img, 0, 0, 120, 140);
-                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    canvas.width = 80;
+                    canvas.height = 95;
+                    ctx.drawImage(img, 0, 0, 80, 95);
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.4);
                     document.getElementById('cardUserPhoto').src = tempPhotoBase64;
                     previewCardUpdate();
                 };
@@ -577,11 +577,25 @@
             }
 
             vault.push(cardData);
+            
+            // Gestion propre du stockage avec nettoyage automatique des anciennes cartes si la limite s'approche
             try {
                 localStorage.setItem(storageKey, JSON.stringify(vault));
                 alert("Carte enregistrée avec succès dans la boîte de stockage !");
             } catch(e) {
-                alert("Erreur de stockage : Espace saturé sur le navigateur.");
+                // Si le stockage est plein, on garde les 20 dernières cartes enregistrées
+                try {
+                    if (vault.length > 20) {
+                        vault = vault.slice(vault.length - 20);
+                        localStorage.setItem(storageKey, JSON.stringify(vault));
+                        alert("Carte enregistrée avec succès (Anciennes cartes purgées pour libérer de l'espace) !");
+                    } else {
+                        throw new Error("Plein");
+                    }
+                } catch(err) {
+                    alert("Erreur critique : Espace de stockage du navigateur saturé.");
+                    return;
+                }
             }
 
             updateVaultCount();
