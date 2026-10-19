@@ -83,8 +83,8 @@
                                 <h5 class="text-primary text-uppercase mb-3 animated slideInDown">Ministère de l'Éducation Nationale</h5>
                                 <h1 class="display-3 text-white animated slideInDown">Plateforme de Gestion des Écoles en RDC</h1>
                                 <p class="fs-5 text-white mb-4 pb-2">Système centralisé de suivi des établissements scolaires, des élèves et du corps enseignant sur toute l'étendue du territoire national.</p>
-                                <a href="#" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft action-trigger" data-action="about">En savoir plus</a>
-                                <a href="#" class="btn btn-light py-md-3 px-md-5 animated slideInRight action-trigger" data-action="portal">Accéder au portail</a>
+                                <a href="#" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft action-stats-btn" data-category="Global">En savoir plus</a>
+                                <a href="#" class="btn btn-light py-md-3 px-md-5 animated slideInRight action-stats-btn" data-category="Global">Accéder au portail</a>
                             </div>
                         </div>
                     </div>
@@ -99,8 +99,8 @@
                                 <h5 class="text-primary text-uppercase mb-3 animated slideInDown">Couverture Nationale</h5>
                                 <h1 class="display-3 text-white animated slideInDown">Modernisation du Système Éducatif</h1>
                                 <p class="fs-5 text-white mb-4 pb-2">Gérez efficacement les inscriptions, le suivi personnalisé des élèves et l'identification par cartes QR à travers les 26 provinces.</p>
-                                <a href="#" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft action-trigger" data-action="about">En savoir plus</a>
-                                <a href="#" class="btn btn-light py-md-3 px-md-5 animated slideInRight action-trigger" data-action="portal">Accéder au portail</a>
+                                <a href="#" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft action-stats-btn" data-category="Global">En savoir plus</a>
+                                <a href="#" class="btn btn-light py-md-3 px-md-5 animated slideInRight action-stats-btn" data-category="Global">Accéder au portail</a>
                             </div>
                         </div>
                     </div>
@@ -191,7 +191,7 @@
                             <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Certifications Officielles</p>
                         </div>
                     </div>
-                    <a class="btn btn-primary py-3 px-5 mt-2 action-trigger" data-action="about" href="#">En savoir plus</a>
+                    <a class="btn btn-primary py-3 px-5 mt-2 action-stats-btn" data-category="Global" href="">En savoir plus</a>
                 </div>
             </div>
         </div>
@@ -210,47 +210,47 @@
                 <div class="col-lg-7 col-md-6">
                     <div class="row g-3">
                         <div class="col-lg-12 col-md-12 wow zoomIn" data-wow-delay="0.1s">
-                            <a class="position-relative d-block overflow-hidden action-trigger" data-action="category" href="#">
+                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Primaire" href="">
                                 <img class="img-fluid" src="img/cat-1.jpg" alt="">
                                 <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin: 1px;">
                                     <h5 class="m-0">Enseignement Primaire</h5>
-                                    <small class="text-primary">15,200 Écoles</small>
+                                    <small class="text-primary" id="count-primaire">15,200 Écoles</small>
                                 </div>
                             </a>
                         </div>
                         <div class="col-lg-6 col-md-12 wow zoomIn" data-wow-delay="0.3s">
-                            <a class="position-relative d-block overflow-hidden action-trigger" data-action="category" href="#">
+                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Secondaire" href="">
                                 <img class="img-fluid" src="img/cat-2.jpg" alt="">
                                 <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin: 1px;">
                                     <h5 class="m-0">Enseignement Secondaire</h5>
-                                    <small class="text-primary">12,400 Écoles</small>
+                                    <small class="text-primary" id="count-secondaire">12,400 Écoles</small>
                                 </div>
                             </a>
                         </div>
                         <div class="col-lg-6 col-md-12 wow zoomIn" data-wow-delay="0.5s">
-                            <a class="position-relative d-block overflow-hidden action-trigger" data-action="category" href="#">
+                            <a class="position-relative d-block overflow-hidden action-stats-btn" data-category="Technique" href="">
                                 <img class="img-fluid" src="img/cat-3.jpg" alt="">
                                 <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin: 1px;">
                                     <h5 class="m-0">Enseignement Technique</h5>
-                                    <small class="text-primary">8,100 Écoles</small>
+                                    <small class="text-primary" id="count-technique">8,100 Écoles</small>
                                 </div>
                             </a>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-5 col-md-6 wow zoomIn" data-wow-delay="0.7s" style="min-height: 350px;">
-                    <a class="position-relative d-block h-100 overflow-hidden action-trigger" data-action="category" href="#">
+                    <a class="position-relative d-block h-100 overflow-hidden action-stats-btn" data-category="Humanitaire" href="">
                         <img class="img-fluid position-absolute w-100 h-100" src="img/cat-4.jpg" alt="" style="object-fit: cover;">
                         <div class="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style="margin:  1px;">
-                            <h5 class="m-0">Provinces Éducationnelles</h5>
-                            <small class="text-primary">26 Provinces</small>
+                            <h5 class="m-0">Secteur Humanitaire & Social</h5>
+                            <small class="text-primary" id="count-humanitaire">3,500 Écoles</small>
                         </div>
                     </a>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Categories End -->
+    <!-- Categories Start -->
 
 
     <!-- Search Bar & Dynamic Schools Section Integration -->
@@ -259,7 +259,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="input-group mb-4 shadow-sm">
-                        <input type="text" id="searchSchoolInput" class="form-control border-primary py-3 ps-4" placeholder="Cliquez ou tapez pour rechercher une école enregistrée..." oninput="filterSchools()" onclick="filterSchools()">
+                        <input type="text" id="searchSchoolInput" class="form-control border-primary py-3 ps-4" placeholder="Rechercher une école enregistrée..." oninput="filterSchools()" onclick="filterSchools()">
                         <button type="button" class="btn btn-primary px-4" onclick="filterSchools()">Rechercher</button>
                     </div>
                 </div>
@@ -280,8 +280,8 @@
                         <div class="position-relative overflow-hidden">
                             <img class="img-fluid" src="img/course-1.jpg" alt="">
                             <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end school-detail-btn" style="border-radius: 30px 0 0 30px;">Détails</a>
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 school-consult-btn" style="border-radius: 0 30px 30px 0;">Consulter</a>
+                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">Détails</a>
+                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Consulter</a>
                             </div>
                         </div>
                         <div class="text-center p-4 pb-0">
@@ -308,8 +308,8 @@
                         <div class="position-relative overflow-hidden">
                             <img class="img-fluid" src="img/course-2.jpg" alt="">
                             <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end school-detail-btn" style="border-radius: 30px 0 0 30px;">Détails</a>
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 school-consult-btn" style="border-radius: 0 30px 30px 0;">Consulter</a>
+                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">Détails</a>
+                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Consulter</a>
                             </div>
                         </div>
                         <div class="text-center p-4 pb-0">
@@ -336,8 +336,8 @@
                         <div class="position-relative overflow-hidden">
                             <img class="img-fluid" src="img/course-3.jpg" alt="">
                             <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end school-detail-btn" style="border-radius: 30px 0 0 30px;">Détails</a>
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 school-consult-btn" style="border-radius: 0 30px 30px 0;">Consulter</a>
+                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">Détails</a>
+                                <a href="#" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Consulter</a>
                             </div>
                         </div>
                         <div class="text-center p-4 pb-0">
@@ -380,9 +380,9 @@
                         </div>
                         <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
                             <div class="bg-light d-flex justify-content-center pt-2 px-1">
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-instagram"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-instagram"></i></a>
                             </div>
                         </div>
                         <div class="text-center p-4">
@@ -398,9 +398,9 @@
                         </div>
                         <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
                             <div class="bg-light d-flex justify-content-center pt-2 px-1">
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-instagram"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-instagram"></i></a>
                             </div>
                         </div>
                         <div class="text-center p-4">
@@ -416,9 +416,9 @@
                         </div>
                         <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
                             <div class="bg-light d-flex justify-content-center pt-2 px-1">
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-instagram"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-instagram"></i></a>
                             </div>
                         </div>
                         <div class="text-center p-4">
@@ -434,9 +434,9 @@
                         </div>
                         <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
                             <div class="bg-light d-flex justify-content-center pt-2 px-1">
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-instagram"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-instagram"></i></a>
                             </div>
                         </div>
                         <div class="text-center p-4">
@@ -503,8 +503,8 @@
             <div class="row g-5">
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-white mb-3">Liens Rapides</h4>
-                    <a class="btn btn-link action-trigger" data-action="about" href="">À propos de nous</a>
-                    <a class="btn btn-link action-trigger" data-action="contact" href="">Contactez-nous</a>
+                    <a class="btn btn-link" href="">À propos de nous</a>
+                    <a class="btn btn-link" href="">Contactez-nous</a>
                     <a class="btn btn-link" href="">Politique de Confidentialité</a>
                     <a class="btn btn-link" href="">Termes & Conditions</a>
                     <a class="btn btn-link" href="">Aide & FAQ</a>
@@ -515,10 +515,10 @@
                     <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+243 000 000 000</p>
                     <p class="mb-2"><i class="fa fa-envelope me-3"></i>contact@edu-nc.gouv.cd</p>
                     <div class="d-flex pt-2">
-                        <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-youtube"></i></a>
-                        <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
+                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -548,8 +548,8 @@
                     <h4 class="text-white mb-3">Bulletin d'Information</h4>
                     <p>Restez informés des communiqués officiels du Ministère de l'Éducation Nationale.</p>
                     <div class="position-relative mx-auto" style="max-width: 400px;">
-                        <input class="form-control border-0 w-100 py-3 ps-4 pe-5 newsletter-input" type="text" placeholder="Votre email">
-                        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2 newsletter-btn">S'inscrire</button>
+                        <input class="form-control border-0 w-100 py-3 ps-4 pe-5" type="text" placeholder="Votre email">
+                        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">S'inscrire</button>
                     </div>
                 </div>
             </div>
@@ -564,10 +564,10 @@
                     </div>
                     <div class="col-md-6 text-center text-md-end">
                         <div class="footer-menu">
-                            <a href="#">Accueil</a>
-                            <a href="#">Cookies</a>
-                            <a href="#">Aide</a>
-                            <a href="#">FAQ</a>
+                            <a href="">Accueil</a>
+                            <a href="">Cookies</a>
+                            <a href="">Aide</a>
+                            <a href="">FAQ</a>
                         </div>
                     </div>
                 </div>
@@ -592,42 +592,32 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- Script de liaison fonctionnelle et recherche dynamique -->
+    <!-- Script dynamique et interactif -->
     <script>
         const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
 
         window.onload = function() {
-            // Activer la recherche au chargement initial si des données existent
-            filterSchools();
-            
-            // Gestion interactive des boutons d'action
-            document.querySelectorAll('.action-trigger, .school-detail-btn, .school-consult-btn').forEach(btn => {
+            updateRealCounts();
+
+            // Gestion dynamique des clics sur les boutons et catégories (Primaire, Secondaire, Technique, Humanitaire)
+            document.querySelectorAll('.action-stats-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    alert("Redirection ou affichage des détails de l'établissement sélectionné.");
-                });
-            });
+                    const category = this.getAttribute('data-category');
+                    let allSchools = getStoredSchools();
+                    let totalCount = allSchools.length;
 
-            // Newsletter
-            const nBtn = document.querySelector('.newsletter-btn');
-            if(nBtn) {
-                nBtn.addEventListener('click', function() {
-                    const input = document.querySelector('.newsletter-input');
-                    if(input && input.value.trim() !== '') {
-                        alert("Merci ! Votre inscription au bulletin d'information a été enregistrée.");
-                        input.value = '';
+                    if (category === "Global") {
+                        alert(`Ministère de l'Éducation Nationale (EDU-RDC) :\nTotal des établissements enregistrés et synchronisés sur toute l'étendue de la RDC : ${totalCount} école(s).`);
                     } else {
-                        alert("Veuillez entrer une adresse email valide.");
+                        let matches = allSchools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes(category.toLowerCase()));
+                        alert(`Statistiques pour le secteur [ ${category} ] en RDC :\n- Nombre total enregistré : ${matches.length} école(s) sur ${totalCount} au total.`);
                     }
                 });
-            }
+            });
         };
 
-        function filterSchools() {
-            const queryInput = document.getElementById('searchSchoolInput');
-            if (!queryInput) return;
-            const query = queryInput.value.toLowerCase().trim();
-            
+        function getStoredSchools() {
             let allSchools = [];
             let savedItem = localStorage.getItem(STORAGE_KEY);
             if (savedItem) {
@@ -636,11 +626,33 @@
                     allSchools = Array.isArray(parsed) ? parsed : (parsed.schools || []);
                 } catch(e) {}
             }
+            return allSchools;
+        }
 
+        function updateRealCounts() {
+            let allSchools = getStoredSchools();
+            if (allSchools.length > 0) {
+                let primaireCount = allSchools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('primaire')).length;
+                let secondaireCount = allSchools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('secondaire')).length;
+                let techniqueCount = allSchools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('technique')).length;
+                let humanitaireCount = allSchools.filter(s => s.appartenance && (s.appartenance.toLowerCase().includes('humanitaire') || s.appartenance.toLowerCase().includes('social'))).length;
+
+                if(document.getElementById('count-primaire')) document.getElementById('count-primaire').innerText = `${15200 + primaireCount} Écoles`;
+                if(document.getElementById('count-secondaire')) document.getElementById('count-secondaire').innerText = `${12400 + secondaireCount} Écoles`;
+                if(document.getElementById('count-technique')) document.getElementById('count-technique').innerText = `${8100 + techniqueCount} Écoles`;
+                if(document.getElementById('count-humanitaire')) document.getElementById('count-humanitaire').innerText = `${3500 + humanitaireCount} Écoles`;
+            }
+        }
+
+        function filterSchools() {
+            const queryInput = document.getElementById('searchSchoolInput');
+            if (!queryInput) return;
+            const query = queryInput.value.toLowerCase().trim();
+            
+            let allSchools = getStoredSchools();
             const container = document.getElementById('schoolsContainer');
             if (!container) return;
 
-            // Si aucune école n'est enregistrée dans le localStorage, on garde les cartes par défaut du code 1
             if (!allSchools.length) return; 
 
             const filtered = query === "" ? allSchools : allSchools.filter(s => {
