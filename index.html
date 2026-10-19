@@ -659,7 +659,8 @@
                 schools.forEach(s => {
                     (s.teachers || []).forEach(t => {
                         count++;
-                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-dark text-warning">${t.secretCode || 'AGT-XXXX'}</span></td></tr>`;
+                        // Code secret Enseignant masqué
+                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué securisé">••••••••</span></td></tr>`;
                     });
                 });
                 if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>`;
@@ -673,7 +674,8 @@
                 schools.forEach(s => {
                     (s.students || []).forEach(st => {
                         count++;
-                        html += `<tr><td><b class="text-success">${st.mat || 'ELV-00'}</b></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province})</td></tr>`;
+                        // Matricule / Code Élève masqué
+                        html += `<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province})</td></tr>`;
                     });
                 });
                 if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>`;
@@ -700,7 +702,8 @@
                 schools.forEach(s => {
                     let profCount = (s.teachers || []).length;
                     let elvCount = (s.students || []).length;
-                    html += `<tr><td><b class="text-primary fs-6">${s.name}</b></td><td>${s.appartenance || 'Général'}</td><td>${s.province} / ${s.commune}</td><td><b>${profCount}</b> Profs | <b>${elvCount}</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>`;
+                    // Code secret Propriétaire de l'école masqué ou non affiché dans le tableau global
+                    html += `<tr><td><b class="text-primary fs-6">${s.name}</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>${s.appartenance || 'Général'}</td><td>${s.province} / ${s.commune}</td><td><b>${profCount}</b> Profs | <b>${elvCount}</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>`;
                 });
                 html += `</tbody></table></div>`;
                 contentEl.innerHTML = html;
@@ -724,7 +727,7 @@
                 html += `<tr><td colspan="4" class="text-center text-muted py-3">Aucune école spécifique trouvée pour le secteur ${category}.</td></tr>`;
             } else {
                 matches.forEach(s => {
-                    html += `<tr><td><b>${s.name}</b></td><td>${s.appartenance}</td><td>${s.province}</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')">Consulter Effectif</button></td></tr>`;
+                    html += `<tr><td><b>${s.name}</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>${s.appartenance}</td><td>${s.province}</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')">Consulter Effectif</button></td></tr>`;
                 });
             }
             html += `</tbody></table></div>`;
