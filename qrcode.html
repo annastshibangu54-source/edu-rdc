@@ -222,7 +222,7 @@
                         <h4 class="m-0 text-white"><i class="fa fa-lock me-2"></i>Accès Propriétaire d'Établissement</h4>
                     </div>
                     <div class="card-body p-4">
-                        <p class="text-muted small text-center mb-4">Veuillez introduire le nom complet de votre école ainsi que votre code secret propriétaire pour déverrouiller la zone de saisie exclusive à votre établissement.</p>
+                        <p class="text-muted small text-center mb-4">Saisissez le nom de l'école (telle qu'enregistrée dans la gestion) ainsi que votre code secret pour ouvrir votre session d'impression.</p>
                         <form id="authForm" onsubmit="unlockSchoolForm(event)">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Nom Complet de l'École</label>
@@ -407,46 +407,73 @@
     </div>
     <!-- Footer End -->
 
-    <!-- LOGIQUE JAVASCRIPT ET GESTION DU STOCKAGE DES CARTES -->
+    <!-- LOGIQUE JAVASCRIPT CORRIGÉE ET INTERCONNECTÉE AVEC LA GESTION D'ÉCOLE -->
     <script>
         let currentSchoolData = null;
         let tempPhotoBase64 = "img/team-1.jpg";
 
+        // Récupération globale des écoles sauvegardées depuis la gestion
+        function getStoredPlatformSchools() {
+            let keysToTry = ["EDURDC_FULL_PLATFORM_V10", "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
+            let found = [];
+            keysToTry.forEach(k => {
+                let raw = localStorage.getItem(k);
+                if (raw) {
+                    try {
+                        let parsed = JSON.parse(raw);
+                        let list = Array.isArray(parsed) ? parsed : (parsed.schools || []);
+                        list.forEach(s => {
+                            if (s && s.name && !found.some(x => x.name.toLowerCase() === s.name.toLowerCase())) {
+                                found.push(s);
+                            }
+                        });
+                    } catch(e) {}
+                }
+            });
+            return found;
+        }
+
         function unlockSchoolForm(e) {
             e.preventDefault();
-            const schoolNameInput = document.getElementById('authSchoolName').value.trim();
-            const ownerCodeInput = document.getElementById('authOwnerCode').value.trim();
+            const inputName = document.getElementById('authSchoolName').value.trim();
+            const inputCode = document.getElementById('authOwnerCode').value.trim();
 
-            if (!schoolNameInput || !ownerCodeInput) {
-                alert("Veuillez remplir tous les champs d'authentification.");
+            if (!inputName) {
+                alert("Veuillez saisir le nom de votre établissement.");
                 return;
             }
 
-            // Définition immédiate ou récupération de l'école (création automatique si elle n'existe pas)
-            currentSchoolData = {
-                name: schoolNameInput.toUpperCase(),
-                code: ownerCodeInput,
-                province: "KINSHASA",
-                commune: "CENTRE",
-                logo: "img/course-1.jpg"
-            };
+            let savedSchools = getStoredPlatformSchools();
+            let match = savedSchools.find(s => s.name.toLowerCase() === inputName.toLowerCase());
+
+            // Utilise l'école issue de la gestion ou en crée une nouvelle dynamiquement
+            if (match) {
+                currentSchoolData = match;
+            } else {
+                currentSchoolData = {
+                    name: inputName.toUpperCase(),
+                    code: inputCode,
+                    province: "KINSHASA",
+                    commune: "CENTRE",
+                    logo: "img/course-1.jpg"
+                };
+            }
 
             document.getElementById('authSection').classList.add('d-none');
             document.getElementById('cardGeneratorSection').classList.remove('d-none');
 
             document.getElementById('lockedSchoolTitle').innerText = currentSchoolData.name;
             document.getElementById('cardSchoolName').innerText = currentSchoolData.name;
-            
-            let logoUrl = currentSchoolData.logo;
+
+            let logoUrl = currentSchoolData.logo || "img/course-1.jpg";
             document.getElementById('cardSchoolLogo').src = logoUrl;
             document.getElementById('cardPreview').style.setProperty('--school-bg-logo', `url('${logoUrl}')`);
 
-            // Valeurs par défaut de test
-            document.getElementById('inputNom').value = "KABONGO";
+            document.getElementById('inputNom').value = "KALOMBO";
             document.getElementById('inputPostnom').value = "TSHIBANGU";
-            document.getElementById('inputPrenom').value = "Paul";
+            document.getElementById('inputPrenom').value = "Mike";
             document.getElementById('inputMatricule').value = "MAT-2026-001";
-            document.getElementById('inputProvince').value = "KINSHASA";
+            document.getElementById('inputProvince').value = currentSchoolData.province || "KINSHASA";
             document.getElementById('inputAdresse').value = "Avenue de l'École N°12";
 
             previewCardUpdate();
@@ -458,6 +485,7 @@
             reader.onload = function() {
                 tempPhotoBase64 = reader.result;
                 document.getElementById('cardUserPhoto').src = tempPhotoBase64;
+                previewCardUpdate();
             };
             if (event.target.files[0]) {
                 reader.readAsDataURL(event.target.files[0]);
@@ -484,32 +512,28 @@
             document.getElementById('cardAdresse').innerText = adresse;
             document.getElementById('cardUserPhoto').src = tempPhotoBase64;
 
-            // Génération sécurisée du QR Code dans l'aperçu
+            // Génération dynamique garantie du QR Code
             const qrContainer = document.getElementById('qrcodePreview');
             if (qrContainer) {
                 qrContainer.innerHTML = "";
                 const qrData = `EDU-RDC VERIFIED\nÉcole: ${currentSchoolData.name}\nCat: ${category}\nNom: ${nom} ${postnom} ${prenom}\nMatricule: ${matricule}\nProv: ${province}`;
 
-                try {
-                    if (typeof QRCode !== 'undefined') {
-                        new QRCode(qrContainer, {
-                            text: qrData,
-                            width: 44,
-                            height: 44,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.M
-                        });
-                    }
-                } catch (err) {
-                    console.error("Erreur QR Code :", err);
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(qrContainer, {
+                        text: qrData,
+                        width: 44,
+                        height: 44,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
                 }
             }
         }
 
         function getVaultStorageKey() {
             if (!currentSchoolData) return "EDURDC_VAULT_DEFAULT";
-            return `EDURDC_VAULT_CARDS_${currentSchoolData.name.replace(/\s+/g, '_')}`;
+            return `EDURDC_VAULT_CARDS_${currentSchoolData.name.replace(/[^a-zA-Z0-9]/g, '_')}`;
         }
 
         function saveAndRegisterCard() {
@@ -544,14 +568,12 @@
             vault.push(cardData);
             localStorage.setItem(storageKey, JSON.stringify(vault));
 
-            alert("Carte enregistrée avec succès dans la boîte de stockage !");
+            alert("Carte enregistrée avec succès dans la boîte de stockage de l'établissement !");
             updateVaultCount();
             
-            // Basculer vers l'onglet de la boîte de stockage pour voir la carte enregistrée
+            // Basculement automatique vers la boîte de stockage
             const vaultTab = document.getElementById('vault-tab');
-            if (vaultTab) {
-                vaultTab.click();
-            }
+            if (vaultTab) vaultTab.click();
             loadSavedCardsVault();
         }
 
@@ -584,7 +606,7 @@
             let filtered = filterCat === "ALL" ? vault : vault.filter(c => c.category === filterCat);
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="col-12 text-center text-muted py-4">Aucune carte archivée dans cette catégorie pour le moment.</div>`;
+                container.innerHTML = `<div class="col-12 text-center text-muted py-4">Aucune carte enregistrée dans cette catégorie pour le moment.</div>`;
                 return;
             }
 
@@ -629,7 +651,7 @@
                 </div>
             `).join('');
 
-            // Génération différée des QR codes pour chaque carte dans le coffre
+            // Régénération dynamique des QR codes dans la grille d'affichage
             setTimeout(() => {
                 filtered.forEach(card => {
                     const qrEl = document.getElementById(`vault-qr-${card.id}`);
@@ -717,7 +739,7 @@
         }
 
         function deleteCard(cardId) {
-            if (confirm("Voulez-vous vraiment supprimer définitivement cette carte de la boîte de stockage ?")) {
+            if (confirm("Voulez-vous supprimer définitivement cette carte de la boîte de stockage ?")) {
                 let storageKey = getVaultStorageKey();
                 let vault = [];
                 try {
