@@ -502,20 +502,35 @@
             document.getElementById('cardAdresse').innerText = adresse;
             document.getElementById('cardUserPhoto').src = tempPhotoBase64;
 
-            // Génération du QR Code dans l'aperçu
+            // Génération sécurisée du QR Code dans l'aperçu
             const qrContainer = document.getElementById('qrcodePreview');
             qrContainer.innerHTML = "";
 
             const qrData = `EDU-RDC VERIFIED\nÉcole: ${currentSchoolData.name}\nCat: ${category}\nNom: ${nom} ${postnom} ${prenom}\nMatricule: ${matricule}\nProv: ${province}`;
 
-            new QRCode(qrContainer, {
-                text: qrData,
-                width: 44,
-                height: 44,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
-            });
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(qrContainer, {
+                    text: qrData,
+                    width: 44,
+                    height: 44,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } else {
+                setTimeout(() => {
+                    if (typeof QRCode !== 'undefined') {
+                        new QRCode(qrContainer, {
+                            text: qrData,
+                            width: 44,
+                            height: 44,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                    }
+                }, 500);
+            }
         }
 
         function getVaultStorageKey() {
@@ -545,11 +560,14 @@
             alert("Carte enregistrée avec succès dans la boîte de stockage de l'établissement !");
             updateVaultCount();
             document.getElementById('vault-tab').click();
+            loadSavedCardsVault();
         }
 
         function updateVaultCount() {
+            if (!currentSchoolData) return;
             let vault = JSON.parse(localStorage.getItem(getVaultStorageKey()) || "[]");
-            document.getElementById('vaultCount').innerText = vault.length;
+            const countEl = document.getElementById('vaultCount');
+            if (countEl) countEl.innerText = vault.length;
         }
 
         function loadSavedCardsVault() {
@@ -606,19 +624,23 @@
                 </div>
             `).join('');
 
-            // Génération des QR codes pour chaque carte dans le coffre
+            // Génération des QR codes pour chaque carte stockée dans le coffre
             filtered.forEach(card => {
                 const qrEl = document.getElementById(`vault-qr-${card.id}`);
-                qrEl.innerHTML = "";
-                const qrData = `EDU-RDC VERIFIED\nÉcole: ${card.schoolName}\nCat: ${card.category}\nNom: ${card.nom} ${card.postnom} ${card.prenom}\nMatricule: ${card.matricule}\nProv: ${card.province}`;
-                new QRCode(qrEl, {
-                    text: qrData,
-                    width: 44,
-                    height: 44,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.M
-                });
+                if (qrEl) {
+                    qrEl.innerHTML = "";
+                    const qrData = `EDU-RDC VERIFIED\nÉcole: ${card.schoolName}\nCat: ${card.category}\nNom: ${card.nom} ${card.postnom} ${card.prenom}\nMatricule: ${card.matricule}\nProv: ${card.province}`;
+                    if (typeof QRCode !== 'undefined') {
+                        new QRCode(qrEl, {
+                            text: qrData,
+                            width: 44,
+                            height: 44,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                    }
+                }
             });
         }
 
