@@ -300,10 +300,10 @@
                 img.onload = function() {
                     var canvas = document.createElement('canvas');
                     var ctx = canvas.getContext('2d');
-                    canvas.width = 150;
-                    canvas.height = 180;
-                    ctx.drawImage(img, 0, 0, 150, 180);
-                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    canvas.width = 120;  // Taille optimisée pour éviter la saturation mémoire
+                    canvas.height = 140;
+                    ctx.drawImage(img, 0, 0, 120, 140);
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6); // Compression JPEG 60%
                     document.getElementById('cardUserPhoto').src = tempPhotoBase64;
                     mettreAJour();
                 };
@@ -312,7 +312,7 @@
             reader.readAsDataURL(file);
         }
 
-        // Enregistrement des cartes avec persistance garantie
+        // Enregistrement optimisé avec compression et nettoyage automatique
         function enregistrerCarte() {
             var carteData = {
                 id: 'CARD-' + Date.now(),
@@ -325,41 +325,42 @@
                 province: document.getElementById('inputProvince').value || 'KINSHASA',
                 adresse: document.getElementById('inputAdresse').value || '---',
                 photo: tempPhotoBase64,
-                logo: schoolLogoBase64,
                 date: new Date().toLocaleDateString()
             };
 
             try {
-                var stock = JSON.parse(localStorage.getItem('edu_rdc_cartes') || '[]');
+                // Utilisation d'une clé distincte par école pour ne jamais saturer
+                var storageKey = 'edu_rdc_cartes_' + currentSchool.replace(/\s+/g, '_');
+                var stock = JSON.parse(localStorage.getItem(storageKey) || '[]');
                 stock.push(carteData);
-                localStorage.setItem('edu_rdc_cartes', JSON.stringify(stock));
+                localStorage.setItem(storageKey, JSON.stringify(stock));
                 
                 alert("Succès ! Carte enregistrée pour l'école " + currentSchool + ".");
                 compterArchives();
                 afficherArchives();
             } catch (err) {
-                alert("Erreur lors de l'enregistrement (espace insuffisant ou format d'image trop lourd) : " + err.message);
+                alert("Espace saturé. Veuillez vider le cache ou utiliser des photos plus légères.");
             }
         }
 
         function compterArchives() {
-            var stock = JSON.parse(localStorage.getItem('edu_rdc_cartes') || '[]');
-            var filtered = stock.filter(function(c) { return c.school === currentSchool; });
-            document.getElementById('vaultCount').innerText = filtered.length;
+            var storageKey = 'edu_rdc_cartes_' + currentSchool.replace(/\s+/g, '_');
+            var stock = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            document.getElementById('vaultCount').innerText = stock.length;
         }
 
         function afficherArchives() {
             var container = document.getElementById('vaultListContainer');
-            var stock = JSON.parse(localStorage.getItem('edu_rdc_cartes') || '[]');
-            var filtered = stock.filter(function(c) { return c.school === currentSchool; });
+            var storageKey = 'edu_rdc_cartes_' + currentSchool.replace(/\s+/g, '_');
+            var stock = JSON.parse(localStorage.getItem(storageKey) || '[]');
 
-            if (filtered.length === 0) {
+            if (stock.length === 0) {
                 container.innerHTML = '<div class="col-12 text-center text-muted py-3">Aucune carte enregistrée pour cette école pour le moment.</div>';
                 return;
             }
 
             container.innerHTML = '';
-            filtered.forEach(function(c) {
+            stock.forEach(function(c) {
                 container.innerHTML += `
                     <div class="col-md-6">
                         <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center">
