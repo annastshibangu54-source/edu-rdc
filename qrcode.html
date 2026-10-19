@@ -392,7 +392,7 @@
             });
         }
 
-        // CHARGER ET AFFICHER LES ARCHIVES DEPUIS FIREBASE
+        // CHARGER ET AFFICHER LES ARCHIVES DEPUIS FIREBASE AVEC BOUTON DE SUPPRESSION
         function chargerArchivesFirebase() {
             var container = document.getElementById('vaultListContainer');
             container.innerHTML = '<div class="col-12 text-center text-muted py-3">Chargement depuis Firebase...</div>';
@@ -415,12 +415,19 @@
                 cachedCards.forEach(function(c, index) {
                     container.innerHTML += `
                         <div class="col-md-6">
-                            <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center archive-item" onclick="chargerCarteArchive(${index})">
-                                <img src="${c.photo}" style="width: 45px; height: 55px; object-fit: cover; border-radius: 3px; margin-right: 12px; border: 1px solid #ddd;">
+                            <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center justify-content-between archive-item">
+                                <div class="d-flex align-items-center flex-grow-1" onclick="chargerCarteArchive(${index})" style="cursor: pointer;">
+                                    <img src="${c.photo}" style="width: 45px; height: 55px; object-fit: cover; border-radius: 3px; margin-right: 12px; border: 1px solid #ddd;">
+                                    <div>
+                                        <strong class="text-primary">${c.category.toUpperCase()} : ${c.nom} ${c.prenom}</strong><br>
+                                        <small class="text-muted">Matricule : ${c.matricule} | Date : ${c.date}</small><br>
+                                        <span class="badge bg-success text-white" style="font-size: 0.65rem;"><i class="fa fa-cloud me-1"></i> Firebase - Cliquer pour imprimer</span>
+                                    </div>
+                                </div>
                                 <div>
-                                    <strong class="text-primary">${c.category.toUpperCase()} : ${c.nom} ${c.prenom}</strong><br>
-                                    <small class="text-muted">Matricule : ${c.matricule} | Date : ${c.date}</small><br>
-                                    <span class="badge bg-success text-white" style="font-size: 0.65rem;"><i class="fa fa-cloud me-1"></i> Firebase - Cliquer pour imprimer</span>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="supprimerCarteFirebase(event, '${c.id}')" title="Supprimer cette carte">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -430,6 +437,21 @@
             .catch(function(error) {
                 container.innerHTML = '<div class="col-12 text-center text-danger py-3">Erreur de chargement Firebase : ' + error.message + '</div>';
             });
+        }
+
+        // SUPPRIMER UNE CARTE DANS FIREBASE
+        function supprimerCarteFirebase(event, docId) {
+            event.stopPropagation(); // Empêche de déclencher le clic de chargement de la carte
+            if (confirm("Voulez-vous vraiment supprimer cette carte de la base Firebase ?")) {
+                db.collection("cartes_ecoles").doc(docId).delete()
+                .then(function() {
+                    alert("Carte supprimée avec succès.");
+                    chargerArchivesFirebase(); // Recharger la liste
+                })
+                .catch(function(error) {
+                    alert("Erreur lors de la suppression : " + error.message);
+                });
+            }
         }
 
         // RECHARGER LA CARTE DEPUIS LE CLIC POUR L'IMPRIMER
