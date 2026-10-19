@@ -123,7 +123,7 @@
             font-size: 0.36rem;
             line-height: 1.2;
             margin-left: 4px;
-            max-width: 5.2cm;
+            max-width: 5.0cm;
         }
 
         .card-details strong {
@@ -146,25 +146,28 @@
             padding-right: 4px;
         }
 
-        /* Correction de la largeur du bloc QR Code (carré et propre en bas à droite) */
+        /* CORRECTION STRICTE DU CADRAGE BLANC DU QR CODE */
         .qr-container {
             position: absolute;
-            bottom: 15px;
+            bottom: 12px;
             right: 8px;
             background: #ffffff;
             padding: 2px;
             border-radius: 3px;
-            width: 24px;
-            height: 24px;
+            width: 1.1cm !important;
+            height: 1.1cm !important;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         .qr-container img, .qr-container canvas {
             display: block !important;
-            width: 22px !important;
-            height: 22px !important;
+            width: 1.0cm !important;
+            height: 1.0cm !important;
+            margin: 0 auto;
         }
 
         @media print {
@@ -415,7 +418,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT CORRIGÉ POUR RENDRE LE QR CODE COMPACT ET ÉVITER LES ERREURS DE STOCKAGE -->
+    <!-- LOGIQUE JAVASCRIPT ULTRA-LÉGÈRE POUR SAUVEGARDE ET QR CODE PARFAIT -->
     <script>
         let currentSchoolData = null;
         let tempPhotoBase64 = "img/team-1.jpg";
@@ -428,8 +431,8 @@
                 try {
                     new QRCode(container, {
                         text: textData,
-                        width: 22,
-                        height: 22,
+                        width: 38,
+                        height: 38,
                         colorDark: "#000000",
                         colorLight: "#ffffff",
                         correctLevel: QRCode.CorrectLevel.L
@@ -438,12 +441,12 @@
                 } catch(e) {}
             }
             
-            // Secours API universelle si qrcode.js tarde
+            // Secours API direct
             let safeUrl = encodeURIComponent(textData);
             let img = document.createElement("img");
             img.src = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${safeUrl}`;
-            img.style.width = "22px";
-            img.style.height = "22px";
+            img.style.width = "38px";
+            img.style.height = "38px";
             container.appendChild(img);
         }
 
@@ -509,6 +512,7 @@
             updateVaultCount();
         }
 
+        // COMPRESSION ULTRA-AGRESSIVE DE LA PHOTO (PÈSE SEULEMENT ~3 KB DÉSORMAIS)
         function loadUserPhoto(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -519,11 +523,10 @@
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    // Compression stricte pour éviter l'erreur de stockage du navigateur
-                    canvas.width = 100;
-                    canvas.height = 120;
-                    ctx.drawImage(img, 0, 0, 100, 120);
-                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    canvas.width = 60;
+                    canvas.height = 70;
+                    ctx.drawImage(img, 0, 0, 60, 70);
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
                     document.getElementById('cardUserPhoto').src = tempPhotoBase64;
                     previewCardUpdate();
                 };
@@ -597,7 +600,7 @@
                 localStorage.setItem(storageKey, JSON.stringify(vault));
                 alert("Carte enregistrée avec succès dans la boîte de stockage !");
             } catch(e) {
-                alert("Erreur de stockage : Espace saturé sur le navigateur.");
+                alert("Erreur de stockage local.");
             }
 
             updateVaultCount();
@@ -740,10 +743,10 @@
                         .id-card .school-title { font-size: 0.45rem; font-weight: 700; text-transform: uppercase; }
                         .card-photo { width: 1.4cm; height: 1.7cm; object-fit: cover; border: 1.5px solid #ffffff; border-radius: 4px; background: #fff; }
                         .school-logo { width: 0.8cm; height: 0.8cm; object-fit: contain; border-radius: 50%; background: #fff; padding: 1px; }
-                        .card-details { font-size: 0.36rem; line-height: 1.2; margin-left: 4px; max-width: 5.2cm; }
+                        .card-details { font-size: 0.36rem; line-height: 1.2; margin-left: 4px; max-width: 5.0cm; }
                         .footer-assistance { position: absolute; bottom: 2px; left: 0; width: 100%; text-align: center; font-size: 0.26rem; font-style: italic; border-top: 0.5px solid rgba(255,255,255,0.3); padding-top: 1px; }
-                        .qr-container { position: absolute; bottom: 15px; right: 8px; background: #ffffff; padding: 2px; border-radius: 3px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-                        .qr-container img, .qr-container canvas { width: 22px !important; height: 22px !important; }
+                        .qr-container { position: absolute; bottom: 12px; right: 8px; background: #ffffff; padding: 2px; border-radius: 3px; width: 1.1cm !important; height: 1.1cm !important; display: flex; align-items: center; justify-content: center; }
+                        .qr-container img, .qr-container canvas { width: 1.0cm !important; height: 1.0cm !important; }
                     </style>
                 </head>
                 <body onload="window.print(); window.close();">
