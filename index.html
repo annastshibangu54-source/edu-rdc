@@ -909,7 +909,7 @@
         }
     </script>
 
-    <!-- SCRIPT FIREBASE POUR LA MODALE DE CONNEXION / IDENTIFICATION -->
+        <!-- SCRIPT FIREBASE POUR LA MODALE DE CONNEXION / IDENTIFICATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1010,7 +1010,9 @@
                 if (!snapshot.empty) {
                     alert("Connexion réussie ! Bienvenue dans votre espace sécurisé.");
                     localStorage.setItem("edu_is_logged", "true");
-                    location.reload(); 
+                    
+                    // REDIRECTION AUTOMATIQUE VERS LA PAGE DE GESTION DES ÉCOLES
+                    window.location.href = "gestion_ecole.html"; 
                 } else {
                     alert("Email ou Code Secret incorrect.");
                 }
@@ -1019,7 +1021,7 @@
                 alert("Erreur de connexion Firebase.");
             }
         };
-    </script>
+                    </script>
 </body>
 
 </html>
