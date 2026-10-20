@@ -635,7 +635,7 @@
     <!-- SCRIPT FIREBASE ET GESTION GLOBALE DES ÉCOLES EN LIGNE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC8PVf2sKt-n_8ANjUr7Iiv1PQkGJrjB-E",
@@ -654,15 +654,13 @@
         let simulatedCode = "";
         let tempUser = {};
 
-        // Chargement en temps réel des écoles depuis Firebase pour tous les appareils
+        // Chargement en temps réel depuis le document global partagé sur Firebase
         window.addEventListener('DOMContentLoaded', () => {
-            onSnapshot(collection(db, "schools"), (snapshot) => {
-                cachedSchools = [];
-                snapshot.forEach((doc) => {
-                    cachedSchools.push({ id: doc.id, ...doc.data() });
-                });
-
-                if (cachedSchools.length === 0) {
+            onSnapshot(doc(db, "edu_rdc_data", "global_state"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    cachedSchools = data.schools || [];
+                } else {
                     cachedSchools = [
                         {
                             id: "SCH-001",
