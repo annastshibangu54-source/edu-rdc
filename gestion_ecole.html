@@ -33,6 +33,11 @@
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
 
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+
     <style>
     .view-section { display: none; }
     .view-section.active { display: block; }
@@ -1436,61 +1441,77 @@
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ RESTAURÉE -->
+    <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ FIREBASE RESTAURÉE -->
     <script>
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
+        let db = null;
         let appData = { schools: [], adminRequests: [], jobApplications: [] };
         let activeSchoolId = null;
         let currentUserSession = { role: null, name: null, assignedClass: null, secretCode: null };
         let chartSexeInstance = null;
         let chartFinancesInstance = null;
 
-        window.onload = function() {
-            let keysToTry = [STORAGE_KEY, "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
-            let combinedSchools = [];
-            
-            keysToTry.forEach(key => {
-                let savedItem = localStorage.getItem(key);
-                if (savedItem) {
-                    try {
-                        let parsed = JSON.parse(savedItem);
-                        let list = Array.isArray(parsed) ? parsed : (parsed.schools || []);
-                        list.forEach(school => {
-                            if (school && school.id && !combinedSchools.some(s => s.id === school.id)) {
-                                combinedSchools.push(school);
-                            }
-                        });
-                        if (parsed.adminRequests && Array.isArray(parsed.adminRequests)) {
-                            appData.adminRequests = [...new Set([...appData.adminRequests, ...parsed.adminRequests])];
-                        }
-                        if (parsed.jobApplications && Array.isArray(parsed.jobApplications)) {
-                            appData.jobApplications = [...new Set([...appData.jobApplications, ...parsed.jobApplications])];
-                        }
-                    } catch(e) {}
+        window.onload = async function() {
+            try {
+                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                    db = firebase.firestore();
                 }
-            });
+            } catch (e) {
+                console.warn("Firestore non initialisé, mode local activé.", e);
+            }
 
-            if (combinedSchools.length > 0) {
-                appData.schools = combinedSchools;
-            } else {
-                let saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) { 
-                    try { appData = JSON.parse(saved); } catch(e){} 
+            await loadDataFromFirebaseOrLocal();
+            renderSchoolsList();
+            renderPublicEvents();
+        };
+
+        async function loadDataFromFirebaseOrLocal() {
+            if (db) {
+                try {
+                    const docRef = db.collection("edu_rdc_data").doc("global_state");
+                    const doc = await docRef.get();
+                    if (doc.exists) {
+                        appData = doc.data();
+                    } else {
+                        await syncDataToFirebase();
+                    }
+                } catch (err) {
+                    console.error("Erreur Firestore, chargement local par défaut :", err);
+                    loadLocalFallback();
                 }
+            } else {
+                loadLocalFallback();
             }
 
             if(!appData.adminRequests) appData.adminRequests = [];
             if(!appData.jobApplications) appData.jobApplications = [];
             if(!appData.schools) appData.schools = [];
+        }
 
-            saveData();
-            renderSchoolsList();
-            renderPublicEvents();
-        };
+        function loadLocalFallback() {
+            let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V10");
+            if (saved) { 
+                try { appData = JSON.parse(saved); } catch(e){} 
+            }
+        }
 
-        function saveData() { 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); 
+        async function saveData() {
+            localStorage.setItem("EDURDC_FULL_PLATFORM_V10", JSON.stringify(appData));
+            if (db) {
+                try {
+                    await db.collection("edu_rdc_data").doc("global_state").set(appData);
+                } catch (err) {
+                    console.error("Erreur de synchronisation Firestore :", err);
+                }
+            }
+        }
+
+        async function syncDataToFirebase() {
+            if (db) {
+                try {
+                    await db.collection("edu_rdc_data").doc("global_state").set(appData);
+                } catch(e) {}
+            }
         }
 
         function generateSecretCode(prefix = 'SEC') {
@@ -1990,20 +2011,6 @@
 
         function handleSaveSchool(e) {
             e.preventDefault();
-            let saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    let parsed = JSON.parse(saved);
-                    if (parsed && parsed.schools) {
-                        parsed.schools.forEach(sch => {
-                            if (!appData.schools.some(s => s.id === sch.id)) {
-                                appData.schools.push(sch);
-                            }
-                        });
-                    }
-                } catch(err){}
-            }
-
             const id = document.getElementById('editSchoolId').value;
             const name = document.getElementById('schoolName').value.trim();
             const appartenance = document.getElementById('schoolAppartenance').value;
