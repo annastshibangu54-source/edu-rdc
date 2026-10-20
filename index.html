@@ -45,11 +45,13 @@
 </head>
 
 <body>
-    <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-            <span class="sr-only">Chargement...</span>
+    <!-- Spinner avec Logo au centre -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex flex-column align-items-center justify-content-center" style="z-index: 9999;">
+        <div class="position-relative d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary position-absolute" style="width: 5rem; height: 5rem;" role="status"></div>
+            <img src="img/logo.jpg" alt="Logo EDU-RDC" class="rounded-circle shadow-sm" style="width: 3.5rem; height: 3.5rem; object-fit: cover;">
         </div>
+        <span class="text-primary fw-bold mt-3">Chargement d'EDU-RDC...</span>
     </div>
     <!-- Spinner End -->
 
@@ -57,7 +59,8 @@
     <!-- Navigation Principale Harmonisée -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
         <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
+            <img src="img/logo.jpg" alt="Logo EDU-RDC" class="me-3 rounded-circle" style="width: 45px; height: 45px; object-fit: cover;">
+            <h2 class="m-0 text-primary">EDU-RDC</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
@@ -632,7 +635,7 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- SCRIPT FIREBASE ET GESTION GLOBALE DES ÉCOLES EN LIGNE -->
+    <!-- SCRIPT FIREBASE HYBRIDE ET MULTI-EMPLACEMENT POUR RÉCUPÉRATION DES ÉCOLES EN TEMPS RÉEL -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -654,56 +657,33 @@
         let simulatedCode = "";
         let tempUser = {};
 
-        // Chargement en temps réel depuis le document global partagé sur Firebase
+        // Récupération simultanée : Écoute du document global ET de la collection 'schools'
         window.addEventListener('DOMContentLoaded', () => {
+            // 1. Écoute de la collection d'écoles individuelles
+            onSnapshot(collection(db, "schools"), (snapshot) => {
+                let schoolsFromCollection = [];
+                snapshot.forEach((doc) => {
+                    schoolsFromCollection.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (schoolsFromCollection.length > 0) {
+                    cachedSchools = schoolsFromCollection;
+                    updateRealCounts();
+                    filterSchools();
+                }
+            }, (err) => console.log("Note collection schools:", err));
+
+            // 2. Écoute du document d'état global
             onSnapshot(doc(db, "edu_rdc_data", "global_state"), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    cachedSchools = data.schools || [];
-                } else {
-                    cachedSchools = [
-                        {
-                            id: "SCH-001",
-                            name: "C.S. LA RÉVOLUTION",
-                            appartenance: "Enseignement Primaire - Privé Non Conventionné",
-                            province: "KINSHASA",
-                            territoire: "Kinshasa / Lukunga",
-                            commune: "KALAMU",
-                            logo: "img/course-1.jpg",
-                            teachers: [
-                                { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" }
-                            ],
-                            students: [
-                                { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" }
-                            ],
-                            staff: [
-                                { role: "Préfet des Études", name: "KALOMBO Mike" }
-                            ]
-                        },
-                        {
-                            id: "SCH-002",
-                            name: "INSTITUT TECHNIQUE DE LUBUMBASHI",
-                            appartenance: "Enseignement Secondaire - Officiel Public",
-                            province: "HAUT-KATANGA",
-                            territoire: "Lubumbashi Urbain",
-                            commune: "LUBUMBASHI",
-                            logo: "img/course-2.jpg",
-                            teachers: [
-                                { name: "KAZADI Pierre", phone: "0990000001", titulaireClass: "1ère Mechanics", secretCode: "AGT-2001" }
-                            ],
-                            students: [
-                                { id: "STU-3", mat: "ELV-003", name: "ILUNGA David", sexe: "M", classe: "1ère Mechanics" }
-                            ],
-                            staff: [
-                                { role: "Directeur Provincial", name: "MWAMBA Joseph" }
-                            ]
-                        }
-                    ];
+                    if (data.schools && data.schools.length > 0) {
+                        cachedSchools = data.schools;
+                        updateRealCounts();
+                        filterSchools();
+                    }
                 }
-
-                updateRealCounts();
-                filterSchools();
-            });
+            }, (err) => console.log("Note global_state:", err));
         });
 
         function getStoredSchools() {
