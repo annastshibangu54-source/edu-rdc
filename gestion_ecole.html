@@ -1441,7 +1441,7 @@
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
 
-    <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ FIREBASE RESTAURÉE -->
+    <!-- SCRIPT JS DE GESTION COMPLÈTE & COMPATIBILITÉ FIREBASE EN TEMPS RÉEL CORRIGÉE -->
     <script>
         const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
         let db = null;
@@ -1451,38 +1451,40 @@
         let chartSexeInstance = null;
         let chartFinancesInstance = null;
 
-        window.onload = async function() {
+        window.onload = function() {
             try {
                 if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
                     db = firebase.firestore();
+                    // Écoute en temps réel de Firestore pour synchroniser les écoles entre utilisateurs instantanément
+                    db.collection("edu_rdc_data").doc("global_state").onSnapshot((doc) => {
+                        if (doc.exists) {
+                            appData = doc.data();
+                        } else {
+                            syncDataToFirebase();
+                        }
+                        validateAppDataStructure();
+                        renderSchoolsList();
+                        renderPublicEvents();
+                    }, (err) => {
+                        console.error("Erreur écoute Firestore en temps réel :", err);
+                        loadLocalFallback();
+                        renderSchoolsList();
+                        renderPublicEvents();
+                    });
+                } else {
+                    loadLocalFallback();
+                    renderSchoolsList();
+                    renderPublicEvents();
                 }
             } catch (e) {
-                console.warn("Firestore non initialisé, mode local activé.", e);
+                console.warn("Mode local activé par défaut.", e);
+                loadLocalFallback();
+                renderSchoolsList();
+                renderPublicEvents();
             }
-
-            await loadDataFromFirebaseOrLocal();
-            renderSchoolsList();
-            renderPublicEvents();
         };
 
-        async function loadDataFromFirebaseOrLocal() {
-            if (db) {
-                try {
-                    const docRef = db.collection("edu_rdc_data").doc("global_state");
-                    const doc = await docRef.get();
-                    if (doc.exists) {
-                        appData = doc.data();
-                    } else {
-                        await syncDataToFirebase();
-                    }
-                } catch (err) {
-                    console.error("Erreur Firestore, chargement local par défaut :", err);
-                    loadLocalFallback();
-                }
-            } else {
-                loadLocalFallback();
-            }
-
+        function validateAppDataStructure() {
             if(!appData.adminRequests) appData.adminRequests = [];
             if(!appData.jobApplications) appData.jobApplications = [];
             if(!appData.schools) appData.schools = [];
@@ -1493,6 +1495,7 @@
             if (saved) { 
                 try { appData = JSON.parse(saved); } catch(e){} 
             }
+            validateAppDataStructure();
         }
 
         async function saveData() {
@@ -1534,7 +1537,9 @@
 
         function renderSchoolsList(filterQuery = '') {
             const container = document.getElementById('schoolsListContainer');
+            if(!container) return;
             container.innerHTML = "";
+            
             if(!appData.schools || !appData.schools.length) {
                 container.innerHTML = `<div class="col-12"><div class="alert alert-secondary text-center">Aucune école enregistrée pour le moment. Cliquez sur « 1. Créer une École » ci-dessus.</div></div>`;
                 return;
