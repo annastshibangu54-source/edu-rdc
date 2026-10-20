@@ -291,7 +291,7 @@
                 <h1 class="mb-5">Institutions Enregistrées</h1>
             </div>
             <div class="row g-4 justify-content-center" id="schoolsContainer">
-                <!-- Généré dynamiquement à partir de localStorage ou données témoins -->
+                <!-- Généré dynamiquement à partir de Firebase -->
             </div>
             
             <!-- Bouton "Créer et Numériser votre École" relié à la modale d'authentification/inscription -->
@@ -632,79 +632,87 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- SCRIPT DYNAMIQUE ET INTELLIGENT DE CONNEXION DES DONNÉES LOCALES ET ÉCOLES -->
-    <script>
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+    <!-- SCRIPT FIREBASE ET GESTION GLOBALE DES ÉCOLES EN LIGNE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        window.onload = function() {
-            updateRealCounts();
-            filterSchools();
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8PVf2sKt-n_8ANjUr7Iiv1PQkGJrjB-E",
+            authDomain: "edu-rdc.firebaseapp.com",
+            projectId: "edu-rdc",
+            storageBucket: "edu-rdc.firebasestorage.app",
+            messagingSenderId: "567182543451",
+            appId: "1:567182543451:web:0d08c9303bfb18e4200d7e",
+            measurementId: "G-3ELD77JK5N"
         };
 
-        function getStoredSchools() {
-            let allSchools = [];
-            let keysToTry = [STORAGE_KEY, "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
-            
-            keysToTry.forEach(key => {
-                let savedItem = localStorage.getItem(key);
-                if (savedItem) {
-                    try {
-                        let parsed = JSON.parse(savedItem);
-                        let list = Array.isArray(parsed) ? parsed : (parsed.schools || []);
-                        list.forEach(s => {
-                            if (s && s.id && !allSchools.some(existing => existing.id === s.id)) {
-                                allSchools.push(s);
-                            }
-                        });
-                    } catch(e) {}
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let cachedSchools = [];
+        let simulatedCode = "";
+        let tempUser = {};
+
+        // Chargement en temps réel des écoles depuis Firebase pour tous les appareils
+        window.addEventListener('DOMContentLoaded', () => {
+            onSnapshot(collection(db, "schools"), (snapshot) => {
+                cachedSchools = [];
+                snapshot.forEach((doc) => {
+                    cachedSchools.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (cachedSchools.length === 0) {
+                    cachedSchools = [
+                        {
+                            id: "SCH-001",
+                            name: "C.S. LA RÉVOLUTION",
+                            appartenance: "Enseignement Primaire - Privé Non Conventionné",
+                            province: "KINSHASA",
+                            territoire: "Kinshasa / Lukunga",
+                            commune: "KALAMU",
+                            logo: "img/course-1.jpg",
+                            teachers: [
+                                { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" }
+                            ],
+                            students: [
+                                { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" }
+                            ],
+                            staff: [
+                                { role: "Préfet des Études", name: "KALOMBO Mike" }
+                            ]
+                        },
+                        {
+                            id: "SCH-002",
+                            name: "INSTITUT TECHNIQUE DE LUBUMBASHI",
+                            appartenance: "Enseignement Secondaire - Officiel Public",
+                            province: "HAUT-KATANGA",
+                            territoire: "Lubumbashi Urbain",
+                            commune: "LUBUMBASHI",
+                            logo: "img/course-2.jpg",
+                            teachers: [
+                                { name: "KAZADI Pierre", phone: "0990000001", titulaireClass: "1ère Mechanics", secretCode: "AGT-2001" }
+                            ],
+                            students: [
+                                { id: "STU-3", mat: "ELV-003", name: "ILUNGA David", sexe: "M", classe: "1ère Mechanics" }
+                            ],
+                            staff: [
+                                { role: "Directeur Provincial", name: "MWAMBA Joseph" }
+                            ]
+                        }
+                    ];
                 }
+
+                updateRealCounts();
+                filterSchools();
             });
+        });
 
-            if (allSchools.length === 0) {
-                allSchools = [
-                    {
-                        id: "SCH-001",
-                        name: "C.S. LA RÉVOLUTION",
-                        appartenance: "Enseignement Primaire - Privé Non Conventionné",
-                        province: "KINSHASA",
-                        territoire: "Kinshasa / Lukunga",
-                        commune: "KALAMU",
-                        logo: "img/course-1.jpg",
-                        teachers: [
-                            { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" }
-                        ],
-                        students: [
-                            { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" }
-                        ],
-                        staff: [
-                            { role: "Préfet des Études", name: "KALOMBO Mike" }
-                        ]
-                    },
-                    {
-                        id: "SCH-002",
-                        name: "INSTITUT TECHNIQUE DE LUBUMBASHI",
-                        appartenance: "Enseignement Secondaire - Officiel Public",
-                        province: "HAUT-KATANGA",
-                        territoire: "Lubumbashi Urbain",
-                        commune: "LUBUMBASHI",
-                        logo: "img/course-2.jpg",
-                        teachers: [
-                            { name: "KAZADI Pierre", phone: "0990000001", titulaireClass: "1ère Mechanics", secretCode: "AGT-2001" }
-                        ],
-                        students: [
-                            { id: "STU-3", mat: "ELV-003", name: "ILUNGA David", sexe: "M", classe: "1ère Mechanics" }
-                        ],
-                        staff: [
-                            { role: "Directeur Provincial", name: "MWAMBA Joseph" }
-                        ]
-                    }
-                ];
-            }
-
-            return allSchools;
+        function getStoredSchools() {
+            return cachedSchools;
         }
 
-        function updateRealCounts() {
+        window.updateRealCounts = function() {
             let schools = getStoredSchools();
             let totalTeachers = 0;
             let totalStudents = 0;
@@ -730,9 +738,9 @@
             if(document.getElementById('count-secondaire')) document.getElementById('count-secondaire').innerText = `${12400 + secondaireCount} Écoles`;
             if(document.getElementById('count-technique')) document.getElementById('count-technique').innerText = `${8100 + techniqueCount} Écoles`;
             if(document.getElementById('count-humanitaire')) document.getElementById('count-humanitaire').innerText = `${3500 + humanitaireCount} Écoles`;
-        }
+        };
 
-        function showGlobalStatsModal(type, targetSchoolId = null) {
+        window.showGlobalStatsModal = function(type, targetSchoolId = null) {
             let schools = getStoredSchools();
             if (targetSchoolId) {
                 schools = schools.filter(s => s.id === targetSchoolId);
@@ -797,9 +805,9 @@
 
             let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
             modal.show();
-        }
+        };
 
-        function filterCategoryModal(category) {
+        window.filterCategoryModal = function(category) {
             let schools = getStoredSchools();
             let matches = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes(category.toLowerCase()));
             let titleEl = document.getElementById('statsModalTitle');
@@ -846,9 +854,9 @@
 
             let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
             modal.show();
-        }
+        };
 
-        function filterSchools() {
+        window.filterSchools = function() {
             const queryInput = document.getElementById('searchSchoolInput');
             if (!queryInput) return;
             const query = queryInput.value.toLowerCase().trim();
@@ -906,29 +914,7 @@
             } else {
                 container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Aucun établissement ne correspond à votre recherche "${query}".</div></div>`;
             }
-        }
-    </script>
-
-        <!-- SCRIPT FIREBASE POUR LA MODALE DE CONNEXION / IDENTIFICATION -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyC8PVf2sKt-n_8ANjUr7Iiv1PQkGJrjB-E",
-            authDomain: "edu-rdc.firebaseapp.com",
-            projectId: "edu-rdc",
-            storageBucket: "edu-rdc.firebasestorage.app",
-            messagingSenderId: "567182543451",
-            appId: "1:567182543451:web:0d08c9303bfb18e4200d7e",
-            measurementId: "G-3ELD77JK5N"
         };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let simulatedCode = "";
-        let tempUser = {};
 
         window.switchModalMode = function(mode) {
             if(mode === 'login') {
@@ -1010,8 +996,6 @@
                 if (!snapshot.empty) {
                     alert("Connexion réussie ! Bienvenue dans votre espace sécurisé.");
                     localStorage.setItem("edu_is_logged", "true");
-                    
-                    // REDIRECTION AUTOMATIQUE VERS LA PAGE DE GESTION DES ÉCOLES
                     window.location.href = "gestion_ecole.html"; 
                 } else {
                     alert("Email ou Code Secret incorrect.");
@@ -1021,7 +1005,7 @@
                 alert("Erreur de connexion Firebase.");
             }
         };
-                    </script>
+    </script>
 </body>
 
 </html>
