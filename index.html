@@ -559,7 +559,7 @@
 
                     <!-- SECTION CONNEXION -->
                     <div id="modal-section-login">
-                        <form onsubmit="handleModalLogin(event)">
+                        <form onsubmit="return handleModalLogin(event)">
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control" id="modalLoginEmail" placeholder="nom@exemple.com" required>
                                 <label for="modalLoginEmail"><i class="fa fa-envelope me-2"></i>Adresse E-mail vérifiée</label>
@@ -575,7 +575,7 @@
                     <!-- SECTION CRÉATION DE COMPTE / IDENTIFICATION -->
                     <div id="modal-section-register" style="display: none;">
                         <div id="modal-reg-step-1" class="modal-auth-step active">
-                            <form onsubmit="modalSendCode(event)">
+                            <form onsubmit="return modalSendCode(event)">
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="modalRegName" placeholder="Nom complet" required>
                                     <label for="modalRegName"><i class="fa fa-user me-2"></i>Nom Complet</label>
@@ -592,7 +592,7 @@
                             <div class="alert alert-info text-center small">
                                 Code de vérification envoyé à <b id="modalDisplayContact"></b>.
                             </div>
-                            <form onsubmit="modalVerifyAndCreate(event)">
+                            <form onsubmit="return modalVerifyAndCreate(event)">
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control text-center fs-3 letter-spacing-2" id="modalRegCode" placeholder="000000" maxlength="6" required>
                                     <label for="modalRegCode" class="text-center w-100">Saisir les 6 chiffres</label>
@@ -950,6 +950,7 @@
 
             document.getElementById('modal-reg-step-1').style.display = 'none';
             document.getElementById('modal-reg-step-2').style.display = 'block';
+            return false;
         };
 
         window.modalVerifyAndCreate = async function(e) {
@@ -958,7 +959,7 @@
 
             if(entered !== simulatedCode) {
                 alert("Code incorrect !");
-                return;
+                return false;
             }
 
             const secretCode = 'PRO-' + Math.floor(1000 + Math.random() * 9000);
@@ -979,6 +980,7 @@
                 console.error(error);
                 alert("Erreur d'enregistrement Firebase.");
             }
+            return false;
         };
 
         window.handleModalLogin = async function(e) {
@@ -1005,6 +1007,7 @@
                 console.error(error);
                 alert("Erreur de connexion Firebase.");
             }
+            return false;
         };
     </script>
 </body>
