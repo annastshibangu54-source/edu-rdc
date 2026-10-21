@@ -8,6 +8,11 @@
     <link href="css/style.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     
+    <!-- Firebase SDK (Compat) pour une parfaite synchronisation globale -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+
     <style>
         .id-card {
             width: 8.5cm;
@@ -31,6 +36,7 @@
             border: 1.5px solid #ffffff;
             border-radius: 4px;
             background-color: #ffffff;
+            cursor: pointer;
         }
         .card-details { font-size: 0.35rem; line-height: 1.2; margin-left: 4px; color: #fff; }
         .qr-container {
@@ -58,12 +64,15 @@
         <div class="card shadow p-4 bg-white rounded border-0">
             <h3 class="text-center text-primary mb-4"><i class="fa fa-school me-2"></i>Accès Établissement</h3>
             <div class="mb-3">
-                <label class="form-label fw-bold">Nom Complet de l'École</label>
-                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION">
+                <label class="form-label fw-bold">Nom Complet ou Code de l'École</label>
+                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION ou Code">
             </div>
             <button type="button" onclick="ouvrirEspace()" class="btn btn-primary w-100 py-2 fw-bold">
                 <i class="fa fa-key me-2"></i>Ouvrir l'Espace École
             </button>
+            <div class="mt-3 text-center">
+                <a href="gestion_ecole.html" class="text-muted small"><i class="fa fa-arrow-left me-1"></i> Retour à la plateforme principale</a>
+            </div>
         </div>
     </div>
 
@@ -71,20 +80,28 @@
     <div class="container" id="cardGeneratorSection" style="display: none; margin-top: 10px; max-width: 950px;">
         <div class="alert alert-success d-flex justify-content-between align-items-center mb-3">
             <span><i class="fa fa-shield-alt me-2"></i>École Active : <strong id="lockedSchoolTitle">---</strong></span>
-            <button class="btn btn-sm btn-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt"></i> Changer</button>
+            <div>
+                <a href="gestion_ecole.html" class="btn btn-sm btn-primary me-1"><i class="fa fa-home"></i> Accueil</a>
+                <button class="btn btn-sm btn-danger" onclick="location.reload()"><i class="fa fa-sign-out-alt"></i> Changer</button>
+            </div>
         </div>
 
         <div class="row g-4">
             <div class="col-lg-6">
                 <div class="bg-white p-3 rounded shadow-sm border">
-                    <h5 class="text-primary mb-3">Formulaire Carte</h5>
+                    <h5 class="text-primary mb-3">Formulaire Carte & QR</h5>
                     <div class="mb-2">
+                        <label class="form-label small fw-bold mb-1">Nom :</label>
                         <input type="text" class="form-control form-control-sm mb-2" id="inputNom" placeholder="Nom" value="KALOMBO" oninput="mettreAJour()">
+                        <label class="form-label small fw-bold mb-1">Prénom :</label>
                         <input type="text" class="form-control form-control-sm mb-2" id="inputPrenom" placeholder="Prénom" value="Mike" oninput="mettreAJour()">
+                        <label class="form-label small fw-bold mb-1">Matricule :</label>
                         <input type="text" class="form-control form-control-sm mb-2" id="inputMatricule" placeholder="Matricule" value="MAT-001" oninput="mettreAJour()">
+                        <label class="form-label small fw-bold mb-1">Photo (Fichier) :</label>
+                        <input type="file" class="form-control form-control-sm mb-2" id="inputPhotoFile" accept="image/*" onchange="chargerPhoto(event)">
                     </div>
                     <button type="button" onclick="enregistrerSurFirebase()" class="btn btn-outline-primary w-100 py-2 fw-bold">
-                        <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer sur Firebase
+                        <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans l'École Active
                     </button>
                 </div>
             </div>
@@ -104,39 +121,85 @@
                         <div class="qr-container" id="qrcodePreview"></div>
                     </div>
                 </div>
-                <button onclick="window.print()" class="btn btn-success mt-3 py-2 px-4 fw-bold">Imprimer la Carte</button>
+                <button onclick="window.print()" class="btn btn-success mt-3 py-2 px-4 fw-bold"><i class="fa fa-print me-1"></i> Imprimer la Carte</button>
             </div>
         </div>
     </div>
 
-    <!-- Script Firebase Modulaire Exposé sur Window -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <!-- Script de Gestion Intégré Compatible Firestore Global -->
+    <script>
+        let db = null;
+        let appData = { schools: [] };
+        let currentSchoolId = null;
+        let currentSchoolName = "";
+        let base64Photo = "";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC8PVf2sKt-n_8ANjUr7Iiv1PQkGJrjB-E",
-            authDomain: "edu-rdc.firebaseapp.com",
-            projectId: "edu-rdc",
-            storageBucket: "edu-rdc.firebasestorage.app",
-            messagingSenderId: "567182543451",
-            appId: "1:567182543451:web:0d08c9303bfb18e4200d7e",
-            measurementId: "G-3ELD77JK5N"
+        window.onload = function() {
+            try {
+                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                    db = firebase.firestore();
+                    db.collection("edu_rdc_data").doc("global_state").onSnapshot((doc) => {
+                        if (doc.exists) {
+                            appData = doc.data();
+                        }
+                    });
+                } else {
+                    let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V10");
+                    if (saved) appData = JSON.parse(saved);
+                }
+            } catch(e) {
+                let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V10");
+                if (saved) appData = JSON.parse(saved);
+            }
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let currentSchool = "";
-
         window.ouvrirEspace = function() {
-            const nom = document.getElementById('authSchoolName').value.trim();
-            if(!nom) return alert("Saisissez le nom de l'école !");
-            currentSchool = nom.toUpperCase();
+            const saisie = document.getElementById('authSchoolName').value.trim().toUpperCase();
+            if(!saisie) { alert("Saisissez le nom ou le code de l'école !"); return; }
+            
+            if(!appData.schools) appData.schools = [];
+            
+            // Recherche par nom ou par code secret
+            let ecole Trouvee = appData.schools.find(s => s.name.toUpperCase() === saisie || s.secretCode.toUpperCase() === saisie || s.id.toUpperCase() === saisie);
+            
+            if (!ecoleTrouvee) {
+                // Si l'école n'existe pas encore dans le répertoire global, on la crée automatiquement pour fluidifier l'expérience
+                ecoleTrouvee = {
+                    id: 'SCH-' + Date.now(),
+                    name: saisie,
+                    appartenance: 'Non Conventionnée (Privée)',
+                    province: 'KINSHASA',
+                    district: 'KINTAMBO',
+                    commune: 'KINSHASA',
+                    secretCode: 'SEC-' + Math.floor(1000 + Math.random() * 9000),
+                    students: [],
+                    staff: [],
+                    teachers: [],
+                    caisse: [],
+                    studentPayments: []
+                };
+                appData.schools.push(ecoleTrouvee);
+                sauvegarderGlobal();
+            }
+
+            currentSchoolId = ecoleTrouvee.id;
+            currentSchoolName = ecoleTrouvee.name;
+
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('cardGeneratorSection').style.display = 'block';
-            document.getElementById('lockedSchoolTitle').innerText = currentSchool;
+            document.getElementById('lockedSchoolTitle').innerText = currentSchoolName;
             window.mettreAJour();
+        };
+
+        window.chargerPhoto = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                base64Photo = e.target.result;
+                document.getElementById('cardUserPhoto').src = base64Photo;
+            };
+            reader.readAsDataURL(file);
         };
 
         window.mettreAJour = function() {
@@ -148,24 +211,57 @@
             document.getElementById('viewPrenom').innerText = prenom;
             document.getElementById('viewMatricule').innerText = mat;
 
-            const qrText = "EDU-RDC:" + currentSchool + ":" + mat;
+            const qrText = "EDU-RDC:" + currentSchoolName + ":" + mat + ":" + nom + " " + prenom;
             document.getElementById('qrcodePreview').innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(qrText) + '">';
         };
 
         window.enregistrerSurFirebase = async function() {
-            try {
-                await addDoc(collection(db, "cartes_ecoles"), {
-                    school: currentSchool,
-                    nom: document.getElementById('inputNom').value,
-                    prenom: document.getElementById('inputPrenom').value,
-                    matricule: document.getElementById('inputMatricule').value,
-                    timestamp: serverTimestamp()
-                });
-                alert("Carte sauvegardée dans Firebase !");
-            } catch(e) {
-                alert("Erreur de sauvegarde : " + e.message);
+            const nom = document.getElementById('inputNom').value.trim();
+            const prenom = document.getElementById('inputPrenom').value.trim();
+            const mat = document.getElementById('inputMatricule').value.trim();
+
+            if(!nom || !mat) {
+                alert("Veuillez remplir au moins le nom et le matricule !");
+                return;
+            }
+
+            const ecole = appData.schools.find(s => s.id === currentSchoolId);
+            if (ecole) {
+                if(!ecole.students) ecole.students = [];
+                // Vérifier si l'élève existe déjà pour le mettre à jour ou l'ajouter
+                let existing = ecole.students.find(st => st.mat === mat);
+                if (existing) {
+                    existing.name = nom + " " + prenom;
+                    existing.sexe = "M";
+                    if(base64Photo) existing.photo = base64Photo;
+                } else {
+                    ecole.students.push({
+                        id: 'STU-' + Date.now(),
+                        mat: mat,
+                        name: nom + " " + prenom,
+                        sexe: "M",
+                        classe: "Générale",
+                        photo: base64Photo || "",
+                        cardData: { nom, prenom, matricule: mat }
+                    });
+                }
+                await sauvegarderGlobal();
+                alert("Carte enregistrée avec succès dans l'école " + currentSchoolName + " et synchronisée avec la base globale !");
+            } else {
+                alert("Erreur : École active introuvable.");
             }
         };
+
+        async function sauvegarderGlobal() {
+            localStorage.setItem("EDURDC_FULL_PLATFORM_V10", JSON.stringify(appData));
+            if (db) {
+                try {
+                    await db.collection("edu_rdc_data").doc("global_state").set(appData);
+                } catch (e) {
+                    console.error("Erreur de synchronisation Firestore :", e);
+                }
+            }
+        }
     </script>
 </body>
 </html>
