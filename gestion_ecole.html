@@ -223,7 +223,7 @@
     </div>
     <!-- Spinner End -->
 
-    <!-- NAVIGATION PRINCIPALE HARMONISÉE (NORMES CODE 1) -->
+    <!-- NAVIGATION PRINCIPALE HARMONISÉE -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0 no-print">
         <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5" onclick="showSection('view-portal')">
             <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
@@ -241,7 +241,7 @@
         </div>
     </nav>
 
-    <!-- Header Start (STYLE CODE 1) -->
+    <!-- Header Start -->
     <div class="container-fluid bg-primary py-5 mb-5 page-header">
         <div class="container py-5">
             <div class="row justify-content-center">
@@ -286,7 +286,6 @@
                         <h4 class="fw-bold">3. Demande d'Emploi</h4>
                         <p class="text-muted small">Postuler à un poste d'enseignant ou d'administratif.</p>
                         <button class="btn btn-outline-warning btn-sm mt-2 fw-bold" onclick="openJobApplicationSection()">Soumettre candidature</button>
-                        <!-- Bouton placé ici entre "Soumettre candidature" et "publication école" -->
                         <a href="qrcode.html" class="btn btn-info btn-sm mt-2 fw-bold text-white"><i class="fa fa-id-card me-1"></i> carte élève et Administratifs</a>
                     </div>
                 </div>
@@ -303,7 +302,7 @@
                 </div>
             </div>
 
-            <!-- BARRE DE RECHERCHE DYNAMIQUE DE L'ÉCOLE (STYLE CODE 1) -->
+            <!-- BARRE DE RECHERCHE DYNAMIQUE DE L'ÉCOLE -->
             <div class="container py-3">
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
@@ -1330,7 +1329,7 @@
 
     </div>
 
-    <!-- Footer Start (STYLE CODE 1) -->
+    <!-- Footer Start -->
     <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn no-print" data-wow-delay="0.1s">
         <div class="container py-5">
             <div class="row g-5">
@@ -3174,15 +3173,6 @@
       if(codeEcoleInput) codeEcoleInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') validerCode(); });
     })();
     </script>
-        <!-- Vos propres scripts de l'application -->
-    <script src="js/app.js"></script> <!-- ou le nom de votre script principal -->
-
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <!-- Votre fichier de configuration créé à l'étape 1 -->
-    <script src="js/firebase-config.js"></script>
-
 </body>
 
 </html>
