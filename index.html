@@ -45,7 +45,7 @@
 </head>
 
 <body>
-    <!-- Spinner avec Logo au centre -->
+    <!-- Spinner Start avec logo intégré au centre -->
     <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex flex-column align-items-center justify-content-center" style="z-index: 9999;">
         <div class="position-relative d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary position-absolute" style="width: 5rem; height: 5rem;" role="status"></div>
@@ -59,7 +59,7 @@
     <!-- Navigation Principale Harmonisée -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
         <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <img src="img/logo.jpg" alt="Logo EDU-RDC" class="me-3 rounded-circle" style="width: 45px; height: 45px; object-fit: cover;">
+            <img src="img/logo.jpg" alt="Logo" class="me-3 rounded-circle" style="width: 45px; height: 45px; object-fit: cover;">
             <h2 class="m-0 text-primary">EDU-RDC</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -81,7 +81,7 @@
                 <a href="contact.html" class="nav-item nav-link">Contact</a>
             </div>
             <!-- Bouton Espace Sécurisé lié à la modale -->
-            <a href="javascript:void(0);" onclick="openRegisterModal()" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
+            <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#authModal" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
     </nav>
 
@@ -297,16 +297,10 @@
                 <!-- Généré dynamiquement à partir de Firebase -->
             </div>
             
-            <!-- BOUTONS ACTIONNÉS CORRIGÉS (Création / Inscription / Candidature) -->
-            <div class="text-center mt-5 d-flex flex-wrap justify-content-center gap-3">
-                <button type="button" class="btn btn-primary btn-lg py-3 px-4 shadow fw-bold" style="border-radius: 30px;" onclick="openRegisterModal('register')">
-                    <i class="fa fa-plus-circle me-2"></i>Accéder à la création
-                </button>
-                <button type="button" class="btn btn-success btn-lg py-3 px-4 shadow fw-bold" style="border-radius: 30px;" onclick="openRegisterModal('register')">
-                    <i class="fa fa-user-plus me-2"></i>Procéder à l'inscription
-                </button>
-                <button type="button" class="btn btn-warning btn-lg py-3 px-4 shadow fw-bold text-dark" style="border-radius: 30px;" onclick="openRegisterModal('register')">
-                    <i class="fa fa-paper-plane me-2"></i>Soumettre candidature
+            <!-- Bouton "Créer et Numériser votre École" relié à la modale d'authentification/inscription -->
+            <div class="text-center mt-5">
+                <button type="button" class="btn btn-primary btn-lg py-3 px-5 shadow fw-bold" style="border-radius: 30px;" data-bs-toggle="modal" data-bs-target="#authModal">
+                    <i class="fa fa-plus-circle me-2"></i>Créer et Numérisés votre École 
                 </button>
             </div>
         </div>
@@ -525,7 +519,7 @@
     <!-- Footer End -->
 
 
-    <!-- MODAL DE DÉTAILS ET INSPECTION DES DONNÉES -->
+    <!-- MODAL DE DÉTAILS ET INSPECTION DES DONNÉES (ENSEIGNANTS / ÉLÈVES / ÉCOLES / CADRES) -->
     <div class="modal fade" id="statsDetailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
@@ -533,7 +527,9 @@
                     <h5 class="modal-title text-white fw-bold" id="statsModalTitle"><i class="fa fa-info-circle me-2"></i>Détails des Données</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4" id="statsModalContent"></div>
+                <div class="modal-body p-4" id="statsModalContent">
+                    <!-- Généré dynamiquement -->
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Fermer</button>
                     <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer le Rapport</button>
@@ -543,7 +539,7 @@
     </div>
 
 
-    <!-- ================= MODALE DE CONNEXION / INSCRIPTION (FIREBASE) ================= -->
+    <!-- ================= MODALE DE CONNEXION / IDENTIFICATION (FIREBASE) ================= -->
     <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
@@ -563,7 +559,7 @@
 
                     <!-- SECTION CONNEXION -->
                     <div id="modal-section-login">
-                        <form onsubmit="return handleModalLogin(event)">
+                        <form onsubmit="handleModalLogin(event)">
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control" id="modalLoginEmail" placeholder="nom@exemple.com" required>
                                 <label for="modalLoginEmail"><i class="fa fa-envelope me-2"></i>Adresse E-mail vérifiée</label>
@@ -576,17 +572,17 @@
                         </form>
                     </div>
 
-                    <!-- SECTION CRÉATION DE COMPTE / INSCRIPTION / CANDIDATURE -->
+                    <!-- SECTION CRÉATION DE COMPTE / IDENTIFICATION -->
                     <div id="modal-section-register" style="display: none;">
                         <div id="modal-reg-step-1" class="modal-auth-step active">
-                            <form onsubmit="return modalSendCode(event)">
+                            <form onsubmit="modalSendCode(event)">
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="modalRegName" placeholder="Nom complet" required>
                                     <label for="modalRegName"><i class="fa fa-user me-2"></i>Nom Complet</label>
                                 </div>
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="modalRegContact" placeholder="Email ou Téléphone" required>
-                                    <label for="modalRegContact"><i class="fa fa-id-card me-2"></i>Email ou Numéro de téléphone</label>
+                                    <label for="modalRegContact"><i class="fa id-card me-2"></i>Email ou Numéro de téléphone</label>
                                 </div>
                                 <button type="submit" class="btn btn-success w-100 py-3 fw-bold"><i class="fa fa-paper-plane me-2"></i>Envoyer le code (6 chiffres)</button>
                             </form>
@@ -596,7 +592,7 @@
                             <div class="alert alert-info text-center small">
                                 Code de vérification envoyé à <b id="modalDisplayContact"></b>.
                             </div>
-                            <form onsubmit="return modalVerifyAndCreate(event)">
+                            <form onsubmit="modalVerifyAndCreate(event)">
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control text-center fs-3 letter-spacing-2" id="modalRegCode" placeholder="000000" maxlength="6" required>
                                     <label for="modalRegCode" class="text-center w-100">Saisir les 6 chiffres</label>
@@ -639,7 +635,7 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- SCRIPT FIREBASE GLOBAL ET OPÉRATIONNEL -->
+    <!-- SCRIPT FIREBASE ET GESTION GLOBALE DES ÉCOLES EN LIGNE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -661,134 +657,69 @@
         let simulatedCode = "";
         let tempUser = {};
 
+        // Chargement en temps réel depuis le document global partagé sur Firebase
         window.addEventListener('DOMContentLoaded', () => {
-            onSnapshot(collection(db, "schools"), (snapshot) => {
-                let list = [];
-                snapshot.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                if (list.length > 0) {
-                    cachedSchools = list;
-                    window.updateRealCounts();
-                    window.filterSchools();
+            onSnapshot(doc(db, "edu_rdc_data", "global_state"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    cachedSchools = data.schools || [];
+                } else {
+                    cachedSchools = [
+                        {
+                            id: "SCH-001",
+                            name: "C.S. LA RÉVOLUTION",
+                            appartenance: "Enseignement Primaire - Privé Non Conventionné",
+                            province: "KINSHASA",
+                            territoire: "Kinshasa / Lukunga",
+                            commune: "KALAMU",
+                            logo: "img/course-1.jpg",
+                            teachers: [
+                                { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" }
+                            ],
+                            students: [
+                                { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" }
+                            ],
+                            staff: [
+                                { role: "Préfet des Études", name: "KALOMBO Mike" }
+                            ]
+                        },
+                        {
+                            id: "SCH-002",
+                            name: "INSTITUT TECHNIQUE DE LUBUMBASHI",
+                            appartenance: "Enseignement Secondaire - Officiel Public",
+                            province: "HAUT-KATANGA",
+                            territoire: "Lubumbashi Urbain",
+                            commune: "LUBUMBASHI",
+                            logo: "img/course-2.jpg",
+                            teachers: [
+                                { name: "KAZADI Pierre", phone: "0990000001", titulaireClass: "1ère Mechanics", secretCode: "AGT-2001" }
+                            ],
+                            students: [
+                                { id: "STU-3", mat: "ELV-003", name: "ILUNGA David", sexe: "M", classe: "1ère Mechanics" }
+                            ],
+                            staff: [
+                                { role: "Directeur Provincial", name: "MWAMBA Joseph" }
+                            ]
+                        }
+                    ];
                 }
-            }, (err) => console.log(err));
+
+                updateRealCounts();
+                filterSchools();
+            });
         });
 
-        // Fonction globale rattachée pour ouvrir la modale depuis n'importe quel bouton (Création, Inscription, Candidature)
-        window.openRegisterModal = function(mode = 'register') {
-            window.switchModalMode(mode);
-            const modalEl = document.getElementById('authModal');
-            if (modalEl) {
-                const bsModal = new bootstrap.Modal(modalEl);
-                bsModal.show();
-            }
-        };
-
-        window.switchModalMode = function(mode) {
-            const loginSec = document.getElementById('modal-section-login');
-            const regSec = document.getElementById('modal-section-register');
-            const tabLogin = document.getElementById('modal-tab-login');
-            const tabReg = document.getElementById('modal-tab-register');
-
-            if(mode === 'login') {
-                if(loginSec) loginSec.style.display = 'block';
-                if(regSec) regSec.style.display = 'none';
-                if(tabLogin) tabLogin.classList.add('active');
-                if(tabReg) tabReg.classList.remove('active');
-            } else {
-                if(loginSec) loginSec.style.display = 'none';
-                if(regSec) regSec.style.display = 'block';
-                if(tabReg) tabReg.classList.add('active');
-                if(tabLogin) tabLogin.classList.remove('active');
-                
-                const step1 = document.getElementById('modal-reg-step-1');
-                const step2 = document.getElementById('modal-reg-step-2');
-                const step3 = document.getElementById('modal-reg-step-3');
-                if(step1) step1.style.display = 'block';
-                if(step2) step2.style.display = 'none';
-                if(step3) step3.style.display = 'none';
-            }
-        };
-
-        window.modalSendCode = function(e) {
-            if (e && e.preventDefault) e.preventDefault();
-            const name = document.getElementById('modalRegName').value.trim();
-            const contact = document.getElementById('modalRegContact').value.trim();
-
-            if(!name || !contact) {
-                alert("Veuillez remplir tous les champs.");
-                return false;
-            }
-
-            simulatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-            tempUser = { name, contact };
-
-            document.getElementById('modalDisplayContact').innerText = contact;
-            alert(`[SIMULATION SMS/EMAIL]\nCode envoyé à ${contact}\n\nCODE À 6 CHIFFRES : ${simulatedCode}`);
-
-            document.getElementById('modal-reg-step-1').style.display = 'none';
-            document.getElementById('modal-reg-step-2').style.display = 'block';
-            return false;
-        };
-
-        window.modalVerifyAndCreate = async function(e) {
-            if (e && e.preventDefault) e.preventDefault();
-            const entered = document.getElementById('modalRegCode').value.trim();
-
-            if(entered !== simulatedCode) {
-                alert("Code incorrect !");
-                return false;
-            }
-
-            const secretCode = 'PRO-' + Math.floor(1000 + Math.random() * 9000);
-
-            try {
-                await addDoc(collection(db, "professional_users"), {
-                    name: tempUser.name,
-                    contact: tempUser.contact,
-                    secretCode: secretCode,
-                    createdAt: new Date().toISOString()
-                });
-
-                document.getElementById('modalGeneratedSecret').innerText = secretCode;
-                document.getElementById('modal-reg-step-2').style.display = 'none';
-                document.getElementById('modal-reg-step-3').style.display = 'block';
-            } catch (error) {
-                console.error(error);
-                alert("Erreur d'enregistrement Firebase.");
-            }
-            return false;
-        };
-
-        window.handleModalLogin = async function(e) {
-            if (e && e.preventDefault) e.preventDefault();
-            const email = document.getElementById('modalLoginEmail').value.trim();
-            const password = document.getElementById('modalLoginPassword').value.trim();
-
-            try {
-                const q = query(
-                    collection(db, "professional_users"), 
-                    where("contact", "==", email), 
-                    where("secretCode", "==", password)
-                );
-                const snapshot = await getDocs(q);
-
-                if (!snapshot.empty) {
-                    alert("Connexion réussie ! Bienvenue dans votre espace sécurisé.");
-                    localStorage.setItem("edu_is_logged", "true");
-                    window.location.href = "gestion_ecole.html"; 
-                } else {
-                    alert("Email ou Code Secret incorrect.");
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Erreur de connexion Firebase.");
-            }
-            return false;
-        };
+        function getStoredSchools() {
+            return cachedSchools;
+        }
 
         window.updateRealCounts = function() {
-            let totalTeachers = 0, totalStudents = 0, totalAdmin = 0;
-            cachedSchools.forEach(s => {
+            let schools = getStoredSchools();
+            let totalTeachers = 0;
+            let totalStudents = 0;
+            let totalAdmin = 0;
+
+            schools.forEach(s => {
                 totalTeachers += (s.teachers ? s.teachers.length : 0);
                 totalStudents += (s.students ? s.students.length : 0);
                 totalAdmin += (s.staff ? s.staff.length : 0);
@@ -796,18 +727,146 @@
 
             if(document.getElementById('badge-teachers-count')) document.getElementById('badge-teachers-count').innerText = `${totalTeachers} Enseignant(s)`;
             if(document.getElementById('badge-students-count')) document.getElementById('badge-students-count').innerText = `${totalStudents} Élève(s)`;
-            if(document.getElementById('badge-schools-count')) document.getElementById('badge-schools-count').innerText = `${cachedSchools.length} École(s)`;
+            if(document.getElementById('badge-schools-count')) document.getElementById('badge-schools-count').innerText = `${schools.length} École(s)`;
             if(document.getElementById('badge-admin-count')) document.getElementById('badge-admin-count').innerText = `${totalAdmin} Cadre(s)`;
+
+            let primaireCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('primaire')).length;
+            let secondaireCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('secondaire')).length;
+            let techniqueCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('technique')).length;
+            let humanitaireCount = schools.filter(s => s.appartenance && (s.appartenance.toLowerCase().includes('humanitaire') || s.appartenance.toLowerCase().includes('social'))).length;
+
+            if(document.getElementById('count-primaire')) document.getElementById('count-primaire').innerText = `${15200 + primaireCount} Écoles`;
+            if(document.getElementById('count-secondaire')) document.getElementById('count-secondaire').innerText = `${12400 + secondaireCount} Écoles`;
+            if(document.getElementById('count-technique')) document.getElementById('count-technique').innerText = `${8100 + techniqueCount} Écoles`;
+            if(document.getElementById('count-humanitaire')) document.getElementById('count-humanitaire').innerText = `${3500 + humanitaireCount} Écoles`;
+        };
+
+        window.showGlobalStatsModal = function(type, targetSchoolId = null) {
+            let schools = getStoredSchools();
+            if (targetSchoolId) {
+                schools = schools.filter(s => s.id === targetSchoolId);
+            }
+
+            let titleEl = document.getElementById('statsModalTitle');
+            let contentEl = document.getElementById('statsModalContent');
+
+            if (type === 'teachers') {
+                titleEl.innerHTML = `<i class="fa fa-chalkboard-teacher me-2"></i>Répertoire Nominatif des Enseignants & Professeurs`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>École</th><th>Nom & Prénom de l'Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Agent</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.teachers || []).forEach(t => {
+                        count++;
+                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué securisé">••••••••</span></td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            } 
+            else if (type === 'students') {
+                titleEl.innerHTML = `<i class="fa fa-user-graduate me-2"></i>Palmarès & Effectif Global des Élèves`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>Matricule</th><th>Nom & Prénom de l'Élève</th><th>Sexe</th><th>Classe</th><th>Établissement</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.students || []).forEach(st => {
+                        count++;
+                        html += `<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province})</td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+            else if (type === 'admin') {
+                titleEl.innerHTML = `<i class="fa fa-sitemap me-2"></i>Répertoire des Cadres de Direction & Administration`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>Poste / Fonction</th><th>Nom & Prénom</th><th>Établissement</th><th>Province / Localisation</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.staff || []).forEach(st => {
+                        count++;
+                        html += `<tr><td><span class="badge bg-danger p-2 fs-6">${st.role}</span></td><td><b>${st.name}</b></td><td><b class="text-primary">${s.name}</b></td><td>${s.province} / ${s.commune || st.commune || ''}</td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="4" class="text-center text-muted py-3">Aucun cadre administratif enregistré.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+            else if (type === 'schools') {
+                titleEl.innerHTML = `<i class="fa fa-school me-2"></i>Registre des Institutions Scolaires Enregistrées`;
+                let html = `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l'École</th><th>Régime / Appartenance</th><th>Province / Territoire / Commune</th><th>Effectifs</th><th>Action</th></tr></thead><tbody>`;
+                schools.forEach(s => {
+                    let profCount = (s.teachers || []).length;
+                    let elvCount = (s.students || []).length;
+                    html += `<tr><td><b class="text-primary fs-6">${s.name}</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>${s.appartenance || 'Général'}</td><td><b>Prov:</b> ${s.province || 'N/A'}<br><b>Terr:</b> ${s.territoire || 'N/A'}<br><b>Commune:</b> ${s.commune || 'N/A'}</td><td><b>${profCount}</b> Profs | <b>${elvCount}</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+
+            let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
+            modal.show();
+        };
+
+        window.filterCategoryModal = function(category) {
+            let schools = getStoredSchools();
+            let matches = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes(category.toLowerCase()));
+            let titleEl = document.getElementById('statsModalTitle');
+            let contentEl = document.getElementById('statsModalContent');
+
+            titleEl.innerHTML = `<i class="fa fa-list me-2"></i>Écoles du Secteur [ ${category} ] - RDC`;
+            let html = `<div class="alert alert-info fw-bold">Nombre total d'établissements répertoriés dans toute la RDC pour ce secteur : ${matches.length > 0 ? matches.length : '15,200+ (Base Nationale)'}</div>`;
+            html += `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l'Établissement</th><th>Régime Éducatif</th><th>Province</th><th>Territoire</th><th>Commune</th><th>Action</th></tr></thead><tbody>`;
+            
+            if(matches.length === 0) {
+                html += `
+                    <tr>
+                        <td><b>C.S. LA RÉVOLUTION</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td>
+                        <td>Enseignement ${category} - Privé Non Conventionné</td>
+                        <td>KINSHASA</td>
+                        <td>Kinshasa / Lukunga</td>
+                        <td>KALAMU</td>
+                        <td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('schools')">Détails</button></td>
+                    </tr>
+                    <tr>
+                        <td><b>INSTITUT TECHNIQUE DE LUBUMBASHI</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td>
+                        <td>Enseignement ${category} - Officiel Public</td>
+                        <td>HAUT-KATANGA</td>
+                        <td>Lubumbashi Urbain</td>
+                        <td>LUBUMBASHI</td>
+                        <td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('schools')">Détails</button></td>
+                    </tr>
+                    <tr>
+                        <td><b>LYCÉE MODÈLE DE MATADI</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td>
+                        <td>Enseignement ${category} - Conventionné Catholique</td>
+                        <td>KONGO CENTRAL</td>
+                        <td>Matadi</td>
+                        <td>MATADI</td>
+                        <td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('schools')">Détails</button></td>
+                    </tr>
+                `;
+            } else {
+                matches.forEach(s => {
+                    html += `<tr><td><b>${s.name}</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>${s.appartenance}</td><td>${s.province || 'RDC'}</td><td>${s.territoire || 'Standard'}</td><td>${s.commune || 'Centre'}</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')">Consulter Effectif</button></td></tr>`;
+                });
+            }
+            html += `</tbody></table></div>`;
+            contentEl.innerHTML = html;
+
+            let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
+            modal.show();
         };
 
         window.filterSchools = function() {
             const queryInput = document.getElementById('searchSchoolInput');
             if (!queryInput) return;
             const query = queryInput.value.toLowerCase().trim();
+            
+            let allSchools = getStoredSchools();
             const container = document.getElementById('schoolsContainer');
             if (!container) return;
 
-            const filtered = query === "" ? cachedSchools : cachedSchools.filter(s => {
+            const filtered = query === "" ? allSchools : allSchools.filter(s => {
                 const nameMatch = s.name ? s.name.toLowerCase().includes(query) : false;
                 const provMatch = s.province ? s.province.toLowerCase().includes(query) : false;
                 const comMatch = s.commune ? s.commune.toLowerCase().includes(query) : false;
@@ -858,38 +917,96 @@
             }
         };
 
-        window.showGlobalStatsModal = function(type, targetSchoolId = null) {
-            let schools = cachedSchools;
-            if (targetSchoolId) schools = schools.filter(s => s.id === targetSchoolId);
-            let titleEl = document.getElementById('statsModalTitle');
-            let contentEl = document.getElementById('statsModalContent');
-
-            if (type === 'teachers') {
-                titleEl.innerHTML = `<i class="fa fa-chalkboard-teacher me-2"></i>Répertoire Nominatif des Enseignants & Professeurs`;
-                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>École</th><th>Nom & Prénom</th><th>Téléphone</th><th>Classe Titulaire</th></tr></thead><tbody>`;
-                let count = 0;
-                schools.forEach(s => {
-                    (s.teachers || []).forEach(t => {
-                        count++;
-                        html += `<tr><td><b>${s.name}</b></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td>${t.titulaireClass || '—'}</td></tr>`;
-                    });
-                });
-                if(count === 0) html += `<tr><td colspan="4" class="text-center text-muted">Aucun enseignant enregistré.</td></tr>`;
-                html += `</tbody></table></div>`;
-                contentEl.innerHTML = html;
+        window.switchModalMode = function(mode) {
+            if(mode === 'login') {
+                document.getElementById('modal-section-login').style.display = 'block';
+                document.getElementById('modal-section-register').style.display = 'none';
+                document.getElementById('modal-tab-login').classList.add('active');
+                document.getElementById('modal-tab-register').classList.remove('active');
             } else {
-                titleEl.innerHTML = `<i class="fa fa-info-circle me-2"></i>Détails Globaux`;
-                contentEl.innerHTML = `<p class="text-center">Informations chargées depuis la base de données.</p>`;
+                document.getElementById('modal-section-login').style.display = 'none';
+                document.getElementById('modal-section-register').style.display = 'block';
+                document.getElementById('modal-tab-register').classList.add('active');
+                document.getElementById('modal-tab-login').classList.remove('active');
+                
+                document.getElementById('modal-reg-step-1').style.display = 'block';
+                document.getElementById('modal-reg-step-2').style.display = 'none';
+                document.getElementById('modal-reg-step-3').style.display = 'none';
             }
-            new bootstrap.Modal(document.getElementById('statsDetailModal')).show();
+        };
+
+        window.modalSendCode = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('modalRegName').value.trim();
+            const contact = document.getElementById('modalRegContact').value.trim();
+
+            if(!name || !contact) return alert("Remplissez tous les champs.");
+
+            simulatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+            tempUser = { name, contact };
+
+            document.getElementById('modalDisplayContact').innerText = contact;
+            alert(`[SIMULATION SMS/EMAIL]\nCode envoyé à ${contact}\n\nCODE À 6 CHIFFRES : ${simulatedCode}`);
+
+            document.getElementById('modal-reg-step-1').style.display = 'none';
+            document.getElementById('modal-reg-step-2').style.display = 'block';
+        };
+
+        window.modalVerifyAndCreate = async function(e) {
+            e.preventDefault();
+            const entered = document.getElementById('modalRegCode').value.trim();
+
+            if(entered !== simulatedCode) {
+                alert("Code incorrect !");
+                return;
+            }
+
+            const secretCode = 'PRO-' + Math.floor(1000 + Math.random() * 9000);
+
+            try {
+                await addDoc(collection(db, "professional_users"), {
+                    name: tempUser.name,
+                    contact: tempUser.contact,
+                    secretCode: secretCode,
+                    createdAt: new Date().toISOString()
+                });
+
+                document.getElementById('modalGeneratedSecret').innerText = secretCode;
+                document.getElementById('modal-reg-step-2').style.display = 'none';
+                document.getElementById('modal-reg-step-3').style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                alert("Erreur d'enregistrement Firebase.");
+            }
+        };
+
+        window.handleModalLogin = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('modalLoginEmail').value.trim();
+            const password = document.getElementById('modalLoginPassword').value.trim();
+
+            try {
+                const q = query(
+                    collection(db, "professional_users"), 
+                    where("contact", "==", email), 
+                    where("secretCode", "==", password)
+                );
+                const snapshot = await getDocs(q);
+
+                if (!snapshot.empty) {
+                    alert("Connexion réussie ! Bienvenue dans votre espace sécurisé.");
+                    localStorage.setItem("edu_is_logged", "true");
+                    window.location.href = "gestion_ecole.html"; 
+                } else {
+                    alert("Email ou Code Secret incorrect.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Erreur de connexion Firebase.");
+            }
         };
     </script>
-
-    <!-- Scripts additionnels -->
-    <script src="js/app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-
 </body>
+
 </html>
