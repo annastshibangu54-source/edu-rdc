@@ -1453,7 +1453,6 @@
             try {
                 if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
                     db = firebase.firestore();
-                    // Écoute en temps réel de Firestore pour synchroniser les écoles entre utilisateurs instantanément
                     db.collection("edu_rdc_data").doc("global_state").onSnapshot((doc) => {
                         if (doc.exists) {
                             appData = doc.data();
