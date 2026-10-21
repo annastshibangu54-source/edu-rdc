@@ -9,5 +9,6 @@ const firebaseConfig = {
   measurementId: "G-3ELD77JK5N"
 };
 
-// Initialisation de Firebase
+// Initialisation globale de Firebase et Firestore
 firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
