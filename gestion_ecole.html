@@ -101,7 +101,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div id="schoolsListContainer" class="row g-3"></div>
 </div>
 
-<!-- FORMULAIRE CRÉATION ÉCOLE (AVEC TOUTES LES RUBRIQUES CONFORME RDC) -->
+<!-- FORMULAIRE CRÉATION ÉCOLE -->
 <div id="view-create-school" class="view-section">
 <button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
 <div class="card shadow-sm border-0">
@@ -131,12 +131,61 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <h5 class="text-primary fw-bold mb-3"><i class="fa fa-map-marker-alt me-2"></i>2. Localisation Administrative</h5>
 <div class="row g-3 mb-4">
-<div class="col-md-4"><label class="form-label fw-bold">Province Éducationnelle : *</label><input type="text" id="schoolProvince" class="form-control" placeholder="Ex: KINSHASA-LUKUNGA" required></div>
+<div class="col-md-4">
+<label class="form-label fw-bold">Province Éducationnelle : *</label>
+<select id="schoolProvince" class="form-select" onchange="updateSubDivisions()" required>
+<option value="">-- Choisir une Province Éducationnelle --</option>
+<option value="KINSHASA-LUKUNGA">KINSHASA-LUKUNGA</option>
+<option value="KINSHASA-MONT AMBA">KINSHASA-MONT AMBA</option>
+<option value="KINSHASA-FUNA">KINSHASA-FUNA</option>
+<option value="KINSHASA-TSHANGA">KINSHASA-TSHANGA</option>
+<option value="KINSHASA-EST">KINSHASA-EST</option>
+<option value="BAS-UELE">BAS-UELE</option>
+<option value="EQUATEUR 1">EQUATEUR 1</option>
+<option value="EQUATEUR 2">EQUATEUR 2</option>
+<option value="HAUT-KATANGA 1">HAUT-KATANGA 1</option>
+<option value="HAUT-KATANGA 2">HAUT-KATANGA 2</option>
+<option value="HAUT-LOMAMI 1">HAUT-LOMAMI 1</option>
+<option value="HAUT-UELE">HAUT-UELE</option>
+<option value="ITURI 1">ITURI 1</option>
+<option value="ITURI 2">ITURI 2</option>
+<option value="KASAI 1">KASAI 1</option>
+<option value="KASAI 2">KASAI 2</option>
+<option value="KASAI CENTRAL 1">KASAI CENTRAL 1</option>
+<option value="KASAI ORIENTAL 1">KASAI ORIENTAL 1</option>
+<option value="KATANGA HAUT-LOMAMI">KATANGA HAUT-LOMAMI</option>
+<option value="KINSHASA OUEST">KINSHASA OUEST</option>
+<option value="KONGO CENTRAL 1">KONGO CENTRAL 1</option>
+<option value="KONGO CENTRAL 2">KONGO CENTRAL 2</option>
+<option value="KWANGO 1">KWANGO 1</option>
+<option value="KWILU 1">KWILU 1</option>
+<option value="KWILU 2">KWILU 2</option>
+<option value="LOMAMI 1">LOMAMI 1</option>
+<option value="LUALABA 1">LUALABA 1</option>
+<option value="MAI-NDOMBE 1">MAI-NDOMBE 1</option>
+<option value="MANIEMA 1">MANIEMA 1</option>
+<option value="MONGALA 1">MONGALA 1</option>
+<option value="NORD-KIVU 1">NORD-KIVU 1</option>
+<option value="NORD-KIVU 2">NORD-KIVU 2</option>
+<option value="NORD-KIVU 3">NORD-KIVU 3</option>
+<option value="SANKURU 1">SANKURU 1</option>
+<option value="SUD-KIVU 1">SUD-KIVU 1</option>
+<option value="SUD-KIVU 2">SUD-KIVU 2</option>
+<option value="SUD-UBANGI 1">SUD-UBANGI 1</option>
+<option value="TANGANYIKA 1">TANGANYIKA 1</option>
+<option value="TSHOPO 1">TSHOPO 1</option>
+<option value="TSHUAPA 1">TSHUAPA 1</option>
+</select>
+</div>
 <div class="col-md-4"><label class="form-label fw-bold">Division Provençale (PROVED) :</label><input type="text" id="schoolDivision" class="form-control" placeholder="Ex: Lukunga 1"></div>
-<div class="col-md-4"><label class="form-label fw-bold">Sous-Division :</label><input type="text" id="schoolSubDivision" class="form-control" placeholder="Ex: Bandalungwa"></div>
-<div class="col-md-4"><label class="form-label fw-bold">District / District Scout : *</label><input type="text" id="schoolDistrict" class="form-control" placeholder="Ex: Lukunga" required></div>
+<div class="col-md-4">
+<label class="form-label fw-bold">Sous-Division : *</label>
+<select id="schoolSubDivision" class="form-select" required>
+<option value="">-- D'abord choisir la Province --</option>
+</select>
+</div>
 <div class="col-md-4"><label class="form-label fw-bold">Commune : *</label><input type="text" id="schoolCommune" class="form-control" placeholder="Ex: Bandalungwa" required></div>
-<div class="col-md-4"><label class="form-label fw-bold">Adresse Physique Complexe : *</label><input type="text" id="schoolAddress" class="form-control" placeholder="Ex: Av. Kasa-Vubu N° 124" required></div>
+<div class="col-md-8"><label class="form-label fw-bold">Adresse Physique Complexe : *</label><input type="text" id="schoolAddress" class="form-control" placeholder="Ex: Av. Kasa-Vubu N° 124" required></div>
 </div>
 
 <h5 class="text-primary fw-bold mb-3"><i class="fa fa-balance-scale me-2"></i>3. Identification Fiscale & Juridique</h5>
@@ -164,7 +213,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="card-body p-4">
 <h5>Registre Général des Écoles & Codes Secrets</h5>
 <table class="table table-bordered align-middle">
-<thead><tr><th>Logo</th><th>Établissement</th><th>Province / Division</th><th>Identifiants (NIF/RCCM/ID)</th><th>Code Secret</th><th>Action</th></tr></thead>
+<thead><tr><th>Logo</th><th>Établissement</th><th>Province / Sous-Div</th><th>Identifiants (NIF/RCCM/ID)</th><th>Code Secret</th><th>Action</th></tr></thead>
 <tbody id="adminSchoolsTableBody"></tbody>
 </table>
 </div>
@@ -462,6 +511,67 @@ const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
 let appData = { schools: [], adminRequests: [], jobApplications: [] };
 let activeSchoolId = null;
 
+// Base de données des sous-divisions par province éducationnelle en RDC
+const subDivisionsData = {
+    "KINSHASA-LUKUNGA": ["Bandalungwa", "Gombe", "Kintambo", "Lingwala", "Ngaliema"],
+    "KINSHASA-MONT AMBA": ["Kisenso", "Lemba", "Matete", "Ngaba", "Selembao"],
+    "KINSHASA-FUNA": ["Bumbu", "Kalamu", "Kasa-Vubu", "Makala", "Ngiri-Ngiri", "Selembao"],
+    "KINSHASA-TSHANGA": ["Kimbanseke", "Masina", "Nsele"],
+    "KINSHASA-EST": ["Ndjili", "Masina", "Kimbanseke"],
+    "BAS-UELE": ["Buta", "Aketi", "Bondo", "Ango", "Poko"],
+    "EQUATEUR 1": ["Mbandaka 1", "Mbandaka 2", "Wangata", "Lukolela", "Bikoro"],
+    "EQUATEUR 2": ["Basankusu", "Boende", "Koko"],
+    "HAUT-KATANGA 1": ["Lubumbashi 1", "Lubumbashi 2", "Kafubu", "Kipushi", "Kasenga"],
+    "HAUT-KATANGA 2": ["Likasi 1", "Likasi 2", "Kambove", "Sakania"],
+    "HAUT-LOMAMI 1": ["Kamina", "Bukama", "Kaniama", "Malemba-Nkulu"],
+    "HAUT-UELE": ["Isiro", "Wamba", "Dungu", "Faradje", "Niangara"],
+    "ITURI 1": ["Bunia 1", "Bunia 2", "Irumu", "Djugu"],
+    "ITURI 2": ["Mahagi", "Aru", "Mambasa"],
+    "KASAI 1": ["Tshikapa 1", "Tshikapa 2", "Kamuesha", "Luebo"],
+    "KASAI 2": ["Ilebo", "Mweka", "Dekese"],
+    "KASAI CENTRAL 1": ["Kananga 1", "Kananga 2", "Dibaya", "Demba"],
+    "KASAI ORIENTAL 1": ["Mbuji-Mayi 1", "Mbuji-Mayi 2", "Katanda", "Luebo"],
+    "KATANGA HAUT-LOMAMI": ["Kamina", "Bukama"],
+    "KINSHASA OUEST": ["Ngaliema", "Kintambo"],
+    "KONGO CENTRAL 1": ["Matadi", "Boma", "Muanda", "Tshela"],
+    "KONGO CENTRAL 2": ["Mbanza-Ngungu", "Kinsantu", "Songololo", "Luozi"],
+    "KWANGO 1": ["Kenge", "Kasa", "Popokabaka", "Feshi", "Kahemba"],
+    "KWILU 1": ["Kikwit 1", "Kikwit 2", "Idiofa", "Bulungu"],
+    "KWILU 2": ["Bandundu", "Masi-Manimba", "Gungu"],
+    "LOMAMI 1": ["Kabinda", "Ngandajika", "Lubao", "Kamiji"],
+    "LUALABA 1": ["Kolwezi 1", "Kolwezi 2", "Fungurume", "Mutshatsha", "Dilolo"],
+    "MAI-NDOMBE 1": ["Inongo", "Kutu", "Oshwe", "Kilemsi"],
+    "MANIEMA 1": ["Kindu", "Kasongo", "Pangi", "Lubutu", "Kibombo"],
+    "MONGALA 1": ["Lisala", "Bumba", "Bongandanga"],
+    "NORD-KIVU 1": ["Goma", "Nyiragongo", "Masisi"],
+    "NORD-KIVU 2": ["Butembo", "Beni", "Lubero"],
+    "NORD-KIVU 3": ["Walikale", "Rutshuru"],
+    "SANKURU 1": ["Lodja", "Lusambo", "Kole", "Katako-Kombe", "Tshumbe"],
+    "SUD-KIVU 1": ["Bukavu", "Walungu", "Kabare", "Kalehe"],
+    "SUD-KIVU 2": ["Uvira", "Fizi", "Baraka", "Mwenga"],
+    "SUD-UBANGI 1": ["Gemena", "Zongo", "Budjala", "Kungu"],
+    "TANGANYIKA 1": ["Kalemie", "Kongolo", "Kabalo", "Manono", "Nyunzu"],
+    "TSHOPO 1": ["Kisangani 1", "Kisangani 2", "Ubundu", "Basoko", "Opala"],
+    "TSHUAPA 1": ["Boende", "Befale", "Ikela", "Djolu", "Monkoto"]
+};
+
+function updateSubDivisions() {
+    const provinceSelect = document.getElementById('schoolProvince');
+    const subDivSelect = document.getElementById('schoolSubDivision');
+    const selectedProvince = provinceSelect.value;
+
+    subDivSelect.innerHTML = '<option value="">-- Choisir une Sous-Division --</option>';
+
+    if (selectedProvince && subDivisionsData[selectedProvince]) {
+        subDivisionsData[selectedProvince].forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub;
+            opt.textContent = sub;
+            subDivSelect.appendChild(opt);
+        });
+    }
+}
+
 window.onload = function() {
     let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V12");
     if (saved) { try { appData = JSON.parse(saved); } catch(e){} }
@@ -486,8 +596,7 @@ function openSchoolForm() {
     document.getElementById('schoolName').value = "";
     document.getElementById('schoolProvince').value = "";
     document.getElementById('schoolDivision').value = "";
-    document.getElementById('schoolSubDivision').value = "";
-    document.getElementById('schoolDistrict').value = "";
+    document.getElementById('schoolSubDivision').innerHTML = '<option value="">-- D\'abord choisir la Province --</option>';
     document.getElementById('schoolCommune').value = "";
     document.getElementById('schoolAddress').value = "";
     document.getElementById('schoolNif').value = "";
@@ -505,7 +614,6 @@ function handleSaveSchool(e) {
     const province = document.getElementById('schoolProvince').value.trim();
     const division = document.getElementById('schoolDivision').value.trim();
     const subDivision = document.getElementById('schoolSubDivision').value.trim();
-    const district = document.getElementById('schoolDistrict').value.trim();
     const commune = document.getElementById('schoolCommune').value.trim();
     const address = document.getElementById('schoolAddress').value.trim();
     const regime = document.getElementById('schoolRegime').value;
@@ -524,18 +632,18 @@ function handleSaveSchool(e) {
         const reader = new FileReader();
         reader.onload = function(evt) {
             logoUrl = evt.target.result;
-            finishSavingSchool(name, province, division, subDivision, district, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl);
+            finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl);
         };
         reader.readAsDataURL(fileInput.files[0]);
     } else {
-        finishSavingSchool(name, province, division, subDivision, district, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl);
+        finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl);
     }
 }
 
-function finishSavingSchool(name, province, division, subDivision, district, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl) {
+function finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl) {
     appData.schools.push({
         id: 'SCH-' + Date.now(),
-        name, province, division, subDivision, district, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl,
+        name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl,
         direction: [], staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {},
         caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: []
     });
@@ -557,7 +665,7 @@ function renderSchoolsList() {
                 <img src="${s.logoUrl || 'https://via.placeholder.com/70'}" class="school-logo-display" alt="Logo">
                 <div class="flex-grow-1">
                     <h5 class="fw-bold text-primary mb-1">${s.name}</h5>
-                    <div class="small text-muted mb-1"><b>Prov :</b> ${s.province} | <b>Commune :</b> ${s.commune}</div>
+                    <div class="small text-muted mb-1"><b>Prov :</b> ${s.province} | <b>Sous-Div :</b> ${s.subDivision || '-'}</div>
                     <div class="small text-muted"><b>NIF :</b> ${s.nif || '-'} | <b>RCCM :</b> ${s.rccm || '-'}</div>
                     <div class="mt-2 d-flex gap-2">
                         <button class="btn btn-primary btn-sm fw-bold" onclick="promptLoginCode('${s.id}')"><i class="fa fa-folder-open me-1"></i> Ouvrir</button>
@@ -982,7 +1090,7 @@ function openAdminCentralPanel() {
             <tr>
                 <td><img src="${s.logoUrl || ''}" class="school-logo-display" alt="Logo"></td>
                 <td><b>${s.name}</b><br><small class="text-muted">${s.regime || ''}</small></td>
-                <td>${s.province}<br><small class="text-muted">${s.division || ''} / ${s.subDivision || ''}</small></td>
+                <td>${s.province}<br><small class="text-muted">Sous-Div: ${s.subDivision || '-'}</small></td>
                 <td><small><b>NIF:</b> ${s.nif||'-'}<br><b>RCCM:</b> ${s.rccm||'-'}<br><b>ID Nat:</b> ${s.idNat||'-'}</small></td>
                 <td><b>${s.secretCode}</b></td>
                 <td><button class="btn btn-danger btn-sm fw-bold" onclick="promptCentralDeleteSchool('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer</button></td>
