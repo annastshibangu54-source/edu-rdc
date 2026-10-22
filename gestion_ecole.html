@@ -660,7 +660,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   </div>
 </div>
 
-<!-- COURRONS (ENTRANTS & SORTANTS) -->
+<!-- COURRIERS (ENTRANTS & SORTANTS) AVEC SECTION FICHIERS / DOCUMENTS SCANNÉS -->
 <div class="tab-pane" id="tab-courriers">
   <h5 class="text-primary fw-bold mb-3"><i class="fa fa-exchange-alt me-2"></i>Gestion des Documents Entrants et Sortants (Secrétariat)</h5>
   
@@ -684,12 +684,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
       <label class="form-label fw-bold small">N° de Référence :</label>
       <input type="text" id="courrierRef" class="form-control form-control-sm" placeholder="Ex: Réf: 012/ECOLE">
     </div>
-    <div class="col-md-9 mt-2">
+    <div class="col-md-8 mt-2">
       <label class="form-label fw-bold small">Objet du Document :</label>
       <input type="text" id="courrierObjet" class="form-control form-control-sm" placeholder="Ex: Demande de régularisation des fiches d'orientation..." required>
     </div>
-    <div class="col-md-3 mt-2 d-flex align-items-end">
-      <button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-save me-1"></i> Enregistrer</button>
+    <div class="col-md-4 mt-2">
+      <label class="form-label fw-bold small"><i class="fa fa-paperclip me-1"></i>Fichier / Document Scanné (Optionnel) :</label>
+      <input type="file" id="courrierFileInput" class="form-control form-control-sm" accept="image/*,.pdf">
+    </div>
+    <div class="col-12 mt-3 d-flex justify-content-end">
+      <button type="submit" class="btn btn-success btn-sm fw-bold px-4"><i class="fa fa-save me-1"></i> Enregistrer le Courrier</button>
     </div>
     <div class="col-12 action-bar mt-2">
       <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer le Registre</button>
@@ -706,6 +710,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
           <th>Réf. / N°</th>
           <th>Tiers (Exp./Dest.)</th>
           <th>Objet</th>
+          <th class="text-center">Pièce Jointe / Fichier</th>
           <th class="no-print">Action</th>
         </tr>
       </thead>
@@ -2379,7 +2384,7 @@ function renderPalmaresTable() {
     `;
 }
 
-// 3. Courriers Entrants / Sortants
+// 3. Courriers Entrants / Sortants (avec support optionnel de fichier joint)
 function refreshCourrierOptions() {
     renderCourriersTable();
     const today = new Date().toISOString().split('T')[0];
@@ -2397,9 +2402,21 @@ function handleSaveCourrier(e) {
     const tiers = document.getElementById('courrierTiers').value.trim();
     const ref = document.getElementById('courrierRef').value.trim();
     const objet = document.getElementById('courrierObjet').value.trim();
+    const fileInput = document.getElementById('courrierFileInput');
+    const file = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0] : null;
 
+    if (file) {
+        compressAndResizeImage(file, function(fileDataUrl) {
+            saveCourrierData(s, type, date, tiers, ref, objet, fileDataUrl);
+        });
+    } else {
+        saveCourrierData(s, type, date, tiers, ref, objet, '');
+    }
+}
+
+function saveCourrierData(s, type, date, tiers, ref, objet, fileUrl) {
     if(!s.courriers) s.courriers = [];
-    s.courriers.push({ id: 'COURR-' + Date.now(), type, date, tiers, ref, objet });
+    s.courriers.push({ id: 'COURR-' + Date.now(), type, date, tiers, ref, objet, fileUrl });
     saveData();
 
     document.getElementById('formCourrier').reset();
@@ -2421,11 +2438,14 @@ function renderCourriersTable() {
             <td><b>${c.ref || '-'}</b></td>
             <td>${esc(c.tiers)}</td>
             <td>${esc(c.objet)}</td>
+            <td class="text-center">
+                ${c.fileUrl ? `<a href="${c.fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-paperclip me-1"></i> Voir Pièce</a>` : '<span class="text-muted small">Aucun fichier</span>'}
+            </td>
             <td class="no-print">
                 <button class="btn btn-sm btn-outline-danger" onclick="deleteCourrier(${idx})"><i class="fa fa-trash"></i></button>
             </td>
         </tr>
-    `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucun courrier enregistré dans le registre</td></tr>';
+    `).join('') || '<tr><td colspan="7" class="text-center text-muted">Aucun courrier enregistré dans le registre</td></tr>';
 }
 
 function deleteCourrier(idx) {
