@@ -117,7 +117,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <h5 class="text-primary fw-bold mb-3"><i class="fa fa-school me-2"></i>1. Identité de l'Établissement</h5>
 <div class="row g-3 mb-4">
 <div class="col-md-6"><label class="form-label fw-bold">Nom Officiel de l'École : *</label><input type="text" id="schoolName" class="form-control" placeholder="Ex: C.S. LA REVOLUTION" required></div>
-<div class="col-md-6"><label class="form-label fw-bold">Logo de l'École (Image) :</label><input type="file" id="schoolLogoFile" class="form-control" accept="image/*"></div>
+<div class="col-md-6"><label class="form-label fw-bold">Logo de l'École (Image optionnelle) :</label><input type="file" id="schoolLogoFile" class="form-control" accept="image/*"></div>
 <div class="col-md-4">
 <label class="form-label fw-bold">Régime de Gestion : *</label>
 <select id="schoolRegime" class="form-select" required>
@@ -585,7 +585,11 @@ window.onload = function() {
 };
 
 function saveData() {
-    localStorage.setItem("EDURDC_FULL_PLATFORM_V12", JSON.stringify(appData));
+    try {
+        localStorage.setItem("EDURDC_FULL_PLATFORM_V12", JSON.stringify(appData));
+    } catch(err) {
+        alert("Attention : L'espace de stockage de votre appareil est plein (souvent à cause de photos trop lourdes). Essayez sans logo ou avec une image plus légère.");
+    }
 }
 
 function showSection(id) {
@@ -625,6 +629,9 @@ function handleSaveSchool(e) {
         reader.onload = function(evt) {
             finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, evt.target.result);
         };
+        reader.onerror = function() {
+            finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, "https://via.placeholder.com/70");
+        };
         reader.readAsDataURL(fileInput.files[0]);
     } else {
         finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, "https://via.placeholder.com/70");
@@ -639,10 +646,11 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
         direction: [], staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {},
         caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: []
     });
+    
     saveData();
     
-    // Alerte bloquante directe pour garantir l'obtention du code
-    alert("ÉTABLISSEMENT CRÉÉ AVEC SUCCÈS !\n\nVoici votre Code Secret d'accès : " + secretCode + "\n\nVeuillez le noter précieusement pour pouvoir ouvrir votre école.");
+    // Alerte bloquante directe garantie
+    window.alert("ÉTABLISSEMENT ENREGISTRÉ AVEC SUCCÈS !\n\nCODE SECRET : " + secretCode + "\n\nNotez bien ce code, il vous sera demandé pour ouvrir votre école.");
     
     document.getElementById('formCreateSchool').reset();
     showSection('view-portal');
@@ -655,7 +663,6 @@ function renderSchoolsList() {
         container.innerHTML = '<div class="col-12"><div class="alert alert-secondary text-center">Aucun établissement enregistré. Cliquez sur « 1. Créer une École ».</div></div>';
         return;
     }
-    // Masquage strict du code secret sur les cartes
     container.innerHTML = appData.schools.map(s => `
         <div class="col-md-6">
             <div class="card shadow-sm border-start border-4 border-primary p-3 bg-light d-flex flex-row align-items-center gap-3">
