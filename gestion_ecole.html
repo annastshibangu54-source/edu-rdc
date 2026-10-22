@@ -516,14 +516,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- NOTES -->
 <div class="tab-pane" id="tab-notes">
-<h5 class="text-primary fw-bold mb-3">Saisie de Notes</h5>
+<h5 class="text-primary fw-bold mb-3">Saisie de Notes (1P, 2P, Examen | 3P, 4P, Examen)</h5>
 <div class="row g-2 mb-3 no-print">
 <div class="col-md-6"><select id="notesClassSelect" class="form-select" onchange="loadStudentsForNotes()"></select></div>
 <div class="col-md-6"><select id="notesStudentSelect" class="form-select" onchange="renderNotesSheet()"></select></div>
 </div>
 <div id="notesSheetContainer" class="mb-3"></div>
 <div class="action-bar no-print">
-<button class="btn btn-success btn-sm fw-bold" onclick="alert('Notes enregistrées')"><i class="fa fa-save me-1"></i> Enregistrer</button>
+<button class="btn btn-success btn-sm fw-bold" onclick="alert('Notes enregistrées automatiquement à chaque saisie')"><i class="fa fa-save me-1"></i> Enregistrer</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
@@ -1101,7 +1101,7 @@ function renderCoursesTable() {
     document.getElementById('coursesTableBody').innerHTML = courses.map((c, idx) => `<tr><td>${c.name}</td><td>${c.max}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.courses['${cl}'].splice(${idx},1);saveData();renderCoursesTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucun cours</td></tr>';
 }
 
-// 6. NOTES
+// 6. NOTES (MIS À JOUR AVEC 1P, 2P, EXAMEN, 3P, 4P, EXAMEN)
 function refreshNotesOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const sel = document.getElementById('notesClassSelect');
@@ -1124,21 +1124,42 @@ function renderNotesSheet() {
     if(!stId || !courses.length) { container.innerHTML = '<p class="text-muted">Sélectionnez une classe et un élève.</p>'; return; }
     if(!s.notes) s.notes = {};
     if(!s.notes[stId]) s.notes[stId] = {};
-    container.innerHTML = `<table class="table table-sm table-bordered"><thead><tr><th>Cours</th><th>P1</th><th>P2</th></tr></thead><tbody>` +
+    
+    container.innerHTML = `<div class="table-responsive"><table class="table table-sm table-bordered align-middle text-center">
+        <thead>
+            <tr class="table-primary">
+                <th rowspan="2" class="align-middle text-start">Cours (Max)</th>
+                <th colspan="3">Premier Semestre</th>
+                <th colspan="3">Second Semestre</th>
+            </tr>
+            <tr class="table-light">
+                <th>1P</th><th>2P</th><th>Examen</th>
+                <th>3P</th><th>4P</th><th>Examen</th>
+            </tr>
+        </thead>
+        <tbody>` +
         courses.map(c => {
             const n = s.notes[stId][c.id] || {};
-            return `<tr><td>${c.name}</td><td><input type="number" value="${n.p1 || ''}" onchange="saveNote('${stId}','${c.id}','p1',this.value)"></td><td><input type="number" value="${n.p2 || ''}" onchange="saveNote('${stId}','${c.id}','p2',this.value)"></td></tr>`;
-        }).join('') + `</tbody></table>`;
+            return `<tr>
+                <td class="text-start"><b>${esc(c.name)}</b> <span class="text-muted small">(Max: ${c.max})</span></td>
+                <td><input type="number" class="form-control form-control-sm text-center" value="${n.p1 !== undefined ? n.p1 : ''}" onchange="saveNote('${stId}','${c.id}','p1',this.value)"></td>
+                <td><input type="number" class="form-control form-control-sm text-center" value="${n.p2 !== undefined ? n.p2 : ''}" onchange="saveNote('${stId}','${c.id}','p2',this.value)"></td>
+                <td><input type="number" class="form-control form-control-sm text-center" value="${n.e1 !== undefined ? n.e1 : ''}" onchange="saveNote('${stId}','${c.id}','e1',this.value)"></td>
+                <td><input type="number" class="form-control form-control-sm text-center" value="${n.p3 !== undefined ? n.p3 : ''}" onchange="saveNote('${stId}','${c.id}','p3',this.value)"></td>
+                <td><input type="number" class="form-control form-control-sm text-center" value="${n.p4 !== undefined ? n.p4 : ''}" onchange="saveNote('${stId}','${c.id}','p4',this.value)"></td>
+                <td><input type="number" class="form-control form-control-sm text-center" value="${n.e2 !== undefined ? n.e2 : ''}" onchange="saveNote('${stId}','${c.id}','e2',this.value)"></td>
+            </tr>`;
+        }).join('') + `</tbody></table></div>`;
 }
 function saveNote(stId, crsId, period, val) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s.notes[stId]) s.notes[stId] = {};
     if(!s.notes[stId][crsId]) s.notes[stId][crsId] = {};
-    s.notes[stId][crsId][period] = parseFloat(val) || 0;
+    s.notes[stId][crsId][period] = val !== '' ? parseFloat(val) : '';
     saveData();
 }
 
-// 7. BULLETIN (ADAPTÉ AU SYSTÈME DE LA PLATEFORME EDU-RDC)
+// 7. BULLETIN (MIS À JOUR AVEC GESTION COMPLÈTE 1P, 2P, EXAMEN & 3P, 4P, EXAMEN ET COURS DE LA CLASSE)
 function refreshBulletinOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -1172,60 +1193,98 @@ function renderBulletinFromSystem() {
         return;
     }
 
-    // Calculs automatiques des notes et totaux pour l'élève
     const stNotes = (s.notes && s.notes[student.id]) ? s.notes[student.id] : {};
     
     let totalMaxP1 = 0, totalObtP1 = 0;
     let totalMaxP2 = 0, totalObtP2 = 0;
+    let totalMaxExam1 = 0, totalObtExam1 = 0;
     let totalMaxS1 = 0, totalObtS1 = 0;
+
+    let totalMaxP3 = 0, totalObtP3 = 0;
+    let totalMaxP4 = 0, totalObtP4 = 0;
+    let totalMaxExam2 = 0, totalObtExam2 = 0;
+    let totalMaxS2 = 0, totalObtS2 = 0;
+
     let totalMaxGen = 0, totalObtGen = 0;
 
     let coursesRowsHtml = courses.map(c => {
         const n = stNotes[c.id] || {};
-        const p1 = n.p1 !== undefined && n.p1 !== '' ? parseFloat(n.p1) : null;
-        const p2 = n.p2 !== undefined && n.p2 !== '' ? parseFloat(n.p2) : null;
-        const maxCour = parseFloat(c.max) || 20;
+        const p1 = (n.p1 !== undefined && n.p1 !== '') ? parseFloat(n.p1) : null;
+        const p2 = (n.p2 !== undefined && n.p2 !== '') ? parseFloat(n.p2) : null;
+        const e1 = (n.e1 !== undefined && n.e1 !== '') ? parseFloat(n.e1) : null;
         
+        const p3 = (n.p3 !== undefined && n.p3 !== '') ? parseFloat(n.p3) : null;
+        const p4 = (n.p4 !== undefined && n.p4 !== '') ? parseFloat(n.p4) : null;
+        const e2 = (n.e2 !== undefined && n.e2 !== '') ? parseFloat(n.e2) : null;
+
+        const maxCour = parseFloat(c.max) || 20;
+        const maxExamCour = maxCour * 2;
+        const maxSemCour = maxCour * 4; // Max P1 + P2 + Examen(Max*2)
+
+        // Totaux Semestre 1
         totalMaxP1 += maxCour;
         if(p1 !== null) totalObtP1 += p1;
 
         totalMaxP2 += maxCour;
         if(p2 !== null) totalObtP2 += p2;
 
-        const totS1Max = maxCour * 2;
-        const totS1Obt = (p1 !== null ? p1 : 0) + (p2 !== null ? p2 : 0);
-        
-        totalMaxS1 += totS1Max;
+        totalMaxExam1 += maxExamCour;
+        if(e1 !== null) totalObtExam1 += e1;
+
+        const totS1Obt = (p1 !== null ? p1 : 0) + (p2 !== null ? p2 : 0) + (e1 !== null ? e1 : 0);
+        totalMaxS1 += maxSemCour;
         totalObtS1 += totS1Obt;
 
-        totalMaxGen += totS1Max;
-        totalObtGen += totS1Obt;
+        // Totaux Semestre 2
+        totalMaxP3 += maxCour;
+        if(p3 !== null) totalObtP3 += p3;
+
+        totalMaxP4 += maxCour;
+        if(p4 !== null) totalObtP4 += p4;
+
+        totalMaxExam2 += maxExamCour;
+        if(e2 !== null) totalObtExam2 += e2;
+
+        const totS2Obt = (p3 !== null ? p3 : 0) + (p4 !== null ? p4 : 0) + (e2 !== null ? e2 : 0);
+        totalMaxS2 += maxSemCour;
+        totalObtS2 += totS2Obt;
+
+        // Total Général Annuel
+        const tgMax = maxSemCour * 2;
+        const tgObt = totS1Obt + totS2Obt;
+        totalMaxGen += tgMax;
+        totalObtGen += tgObt;
 
         return `<tr>
             <td class="nm">${esc(c.name)}</td>
             <td>${maxCour}</td>
             <td>${p1 !== null ? p1 : ''}</td>
             <td>${p2 !== null ? p2 : ''}</td>
-            <td>${totS1Max}</td>
-            <td>${totS1Obt > 0 ? totS1Obt : ''}</td>
-            <td></td>
-            <td>${totS1Max}</td>
-            <td>${totS1Obt > 0 ? totS1Obt : ''}</td>
-            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+            <td>${maxExamCour}</td>
+            <td>${e1 !== null ? e1 : ''}</td>
+            <td><b>${totS1Obt > 0 ? totS1Obt : ''}</b></td>
+            <td>${maxCour}</td>
+            <td>${p3 !== null ? p3 : ''}</td>
+            <td>${p4 !== null ? p4 : ''}</td>
+            <td>${maxExamCour}</td>
+            <td>${e2 !== null ? e2 : ''}</td>
+            <td><b>${totS2Obt > 0 ? totS2Obt : ''}</b></td>
+            <td><b>${tgObt > 0 ? tgObt : ''}</b></td>
+            <td></td><td></td>
         </tr>`;
     }).join('') || '<tr><td colspan="16" class="text-center text-muted">Aucun cours enregistré pour cette classe. Veuillez ajouter des cours dans la section Pondération.</td></tr>';
 
-    // Calcul pourcentage S1 / Général
-    const pctS1 = totalMaxS1 > 0 ? ((totalObtS1 / totalMaxS1) * 100).toFixed(1) + ' %' : '0 %';
+    // Pourcentages et Rangs
+    const pctGen = totalMaxGen > 0 ? ((totalObtGen / totalMaxGen) * 100).toFixed(1) + ' %' : '0 %';
 
-    // Calcul de la place de l'élève dans la classe (basé sur le total S1)
     let classStudents = (s.students || []).filter(st => st.classe === clName);
     let studentTotals = classStudents.map(st => {
         let stN = (s.notes && s.notes[st.id]) ? s.notes[st.id] : {};
         let tObt = 0;
         courses.forEach(c => {
             let cn = stN[c.id] || {};
-            tObt += (parseFloat(cn.p1) || 0) + (parseFloat(cn.p2) || 0);
+            tObt += (parseFloat(cn.p1) || 0) + (parseFloat(cn.p2) || 0) + (parseFloat(cn.e1) || 0) + 
+                    (parseFloat(cn.p3) || 0) + (parseFloat(cn.p4) || 0) + (parseFloat(cn.e2) || 0);
         });
         return { id: st.id, total: tObt };
     });
@@ -1268,33 +1327,35 @@ function renderBulletinFromSystem() {
                 <tr>
                     <th rowspan="2">MAX</th>
                     <th colspan="2">TRAVAUX JOURNAL</th>
-                    <th colspan="2" rowspan="2">MAX EXAMEN</th>
+                    <th colspan="2">EXAMEN</th>
                     <th rowspan="2">TOT</th>
                     <th rowspan="2">MAX</th>
                     <th colspan="2">TRAVAUX JOURNAL</th>
-                    <th colspan="2" rowspan="2">EXAMEN</th>
+                    <th colspan="2">EXAMEN</th>
                     <th rowspan="2">TOT</th>
                     <th rowspan="2">%</th>
                     <th rowspan="2">Sign. Prof</th>
                 </tr>
                 <tr>
                     <th>1ère P</th><th>2ème P</th>
+                    <th colspan="2">1er Ex</th>
                     <th>3ème P</th><th>4ème P</th>
+                    <th colspan="2">2e Ex</th>
                 </tr>
             </thead>
             <tbody>
                 ${coursesRowsHtml}
                 <tr class="bold">
                     <td class="nm">MAXIMA GÉNÉRAUX</td>
-                    <td>${totalMaxP1}</td><td></td><td></td><td>${totalMaxP1 * 2}</td><td></td><td>${totalMaxS1}</td>
-                    <td>${totalMaxP2}</td><td></td><td></td><td>${totalMaxP2 * 2}</td><td></td><td>${totalMaxS1}</td>
+                    <td>${totalMaxP1}</td><td></td><td></td><td>${totalMaxExam1}</td><td></td><td>${totalMaxS1}</td>
+                    <td>${totalMaxP3}</td><td></td><td></td><td>${totalMaxExam2}</td><td></td><td>${totalMaxS2}</td>
                     <td>${totalMaxGen}</td><td colspan="2"></td>
                 </tr>
                 <tr class="bold">
                     <td class="nm">TOTAUX</td>
-                    <td></td><td>${totalObtP1}</td><td>${totalObtP2}</td><td></td><td></td><td>${totalObtS1}</td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td>${totalObtS1}</td><td colspan="2" rowspan="4" class="side">
+                    <td></td><td>${totalObtP1}</td><td>${totalObtP2}</td><td></td><td>${totalObtExam1}</td><td>${totalObtS1}</td>
+                    <td></td><td>${totalObtP3}</td><td>${totalObtP4}</td><td></td><td>${totalObtExam2}</td><td>${totalObtS2}</td>
+                    <td>${totalObtGen}</td><td colspan="2" rowspan="4" class="side">
                         <div>◆ PASSE (1)</div>
                         <div>◆ DOUBLE (1)</div>
                         <div>Le chef d’Etablissement</div>
@@ -1305,7 +1366,7 @@ function renderBulletinFromSystem() {
                     <td class="nm">POURCENTAGE</td>
                     <td colspan="6"></td>
                     <td colspan="6"></td>
-                    <td><b>${pctS1}</b></td>
+                    <td><b>${pctGen}</b></td>
                 </tr>
                 <tr class="bold">
                     <td class="nm">PLACE / NBRE D’ÉLÈVES</td>
