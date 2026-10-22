@@ -65,19 +65,23 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   </div>
 </div>
 
-<!-- NAVIGATION -->
+
+  <!-- NAVIGATION -->
 <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0 no-print">
-<a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5" onclick="showSection('view-portal')">
+<a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
 <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EDU-RDC</h2>
 </a>
 <div class="collapse navbar-collapse" id="navbarCollapse">
 <div class="navbar-nav ms-auto p-4 p-lg-0 align-items-center">
-<a href="javascript:void(0);" class="nav-item nav-link active" onclick="showSection('view-portal')">Accueil</a>
-<button class="btn btn-outline-warning btn-sm fw-bold mx-2 my-1" onclick="showSection('view-check-candidate-reply')"><i class="fa fa-envelope-open me-1"></i> Suivi Réponse Emploi</button>
-<button class="btn btn-outline-danger btn-sm fw-bold mx-2 my-1" onclick="openAdminCentralPanel()"><i class="fa fa-user-shield me-1"></i> Admin Central</button>
+<a href="index.html" class="nav-item nav-link">Accueil</a>
+<a href="contact.html" class="nav-item nav-link">Contact</a>
+<button class="btn btn-outline-danger btn-sm fw-bold mx-2 my-1" onclick="if(confirm('Voulez-vous vraiment quitter la gestion de cette école ?')) { window.location.href='index.html'; }"><i class="fa fa-sign-out-alt me-1"></i> Quitter la Gestion</button>
+<button class="btn btn-outline-primary btn-sm me-2" onclick="copySecretCodeModal()"><i class="fa fa-copy me-1"></i> Copier</button>
+<button class="btn btn-success btn-sm fw-bold px-4" onclick="closeSecretModal()"><i class="fa fa-check me-1"></i> J'ai noté le code</button>
 </div>
 </div>
 </nav>
+
 
 <!-- HEADER -->
 <div class="container-fluid bg-primary py-5 mb-5 no-print">
