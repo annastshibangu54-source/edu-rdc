@@ -28,6 +28,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .tab-pane.active { display: block; }
 .action-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
 
+/* DESIGN CARTE D'ÉLÈVE AVANCÉ */
+.student-card-container { position: relative; width: 380px; min-height: 230px; margin: 0 auto; background: #fff; border: 2px solid #0d6efd; border-radius: 12px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); overflow: hidden; font-family: 'Nunito', sans-serif; color: #000; text-align: left; }
+.student-card-bg-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; opacity: 0.08; object-fit: contain; pointer-events: none; z-index: 0; }
+.student-card-content { position: relative; z-index: 1; }
+
 /* POPUP CODE SECRET DESIGN */
 .secret-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; }
 .secret-modal-card { background: #fff; padding: 30px; border-radius: 12px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
@@ -43,7 +48,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 /* STYLE D'IMPRESSION PROPRE */
 @media print {
   body * { visibility: hidden; }
-  .tab-pane.active, .tab-pane.active *, .bulletin-container, .bulletin-container * { visibility: visible; }
+  .tab-pane.active, .tab-pane.active *, .bulletin-container, .bulletin-container *, .student-card-container, .student-card-container * { visibility: visible; }
   .tab-pane.active { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; padding: 0 !important; }
   .no-print, .navbar, .sidebar-menu, .action-bar, form, .btn, .card-header { display: none !important; }
 }
@@ -238,13 +243,22 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- ADMIN CENTRAL -->
 <div id="view-admin-central" class="view-section">
 <button class="btn btn-secondary btn-sm mb-3 no-print" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
-<div class="card shadow-sm border-0 border-start border-4 border-danger">
-<div class="card-header bg-dark text-white"><h4 class="m-0 text-white">Espace Administrateur Central</h4></div>
+<div class="card shadow-sm border-0 border-start border-4 border-danger mb-4">
+<div class="card-header bg-dark text-white"><h4 class="m-0 text-white">Espace Administrateur Central - Registre des Écoles</h4></div>
 <div class="card-body p-4">
-<h5>Registre Général des Écoles & Codes Secrets</h5>
 <table class="table table-bordered align-middle">
 <thead><tr><th>Logo</th><th>Établissement</th><th>Province / Sous-Div</th><th>Identifiants (NIF/RCCM/ID)</th><th>Code Secret</th><th>Action</th></tr></thead>
 <tbody id="adminSchoolsTableBody"></tbody>
+</table>
+</div>
+</div>
+
+<div class="card shadow-sm border-0 border-start border-4 border-warning">
+<div class="card-header bg-warning text-dark"><h4 class="m-0 fw-bold"><i class="fa fa-envelope-open-text me-2"></i>Demandes d'Assistance & Codes Oubliés Reçues</h4></div>
+<div class="card-body p-4">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Date</th><th>Type (École / Classe)</th><th>Nom de l'Entité / Cible</th><th>Motif / Raison de la Demande</th><th>Action</th></tr></thead>
+<tbody id="adminRequestsTableBody"></tbody>
 </table>
 </div>
 </div>
@@ -404,19 +418,39 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="col-md-4"><label>Élève :</label><select id="cardStudentSelect" class="form-select" onchange="populateCardFromSelectedStudent()"></select></div>
 <div class="col-md-4"><label>Photo de l'élève :</label><input type="file" id="cardPhotoInput" class="form-control" accept="image/*" onchange="previewStudentCardPhoto(event)"></div>
 </div>
-<div class="carte border p-3 bg-light mb-3 text-center" id="recto" style="max-width:350px; margin:0 auto; border-radius:8px;">
-<div class="mb-2"><img id="cardPhotoPreview" src="https://via.placeholder.com/80" alt="Photo Élève" style="width:80px; height:80px; object-fit:cover; border-radius:50%; border:2px solid #0d6efd;"></div>
-<h6 class="fw-bold">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</h6>
-<h5 class="text-primary fw-bold">CARTE D'ÉLÈVE</h5>
-<div id="cardSchoolName" class="fw-bold small text-muted mb-2"></div>
-<div><b>Matricule :</b> <span id="cardMatVal">-</span></div>
-<div><b>Nom & Prénom :</b> <span id="cardNomVal">-</span></div>
-<div><b>Sexe :</b> <span id="cardSexeVal">-</span></div>
-<div><b>Classe :</b> <span id="cardClasseVal">-</span></div>
+
+<!-- CARTE D'ÉLÈVE REVISÉE -->
+<div class="student-card-container" id="studentCardPrintArea">
+    <img id="cardBgLogo" src="" class="student-card-bg-logo" alt="Logo Filigrane">
+    <div class="student-card-content">
+        <div class="d-flex align-items-center justify-content-between mb-2 border-bottom pb-2">
+            <img id="cardSchoolLogo" src="" alt="Logo" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+            <div class="text-center flex-grow-1 px-2">
+                <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
+                <div id="cardSchoolName" class="text-primary fw-bold" style="font-size: 11px;">-</div>
+            </div>
+            <div style="width: 40px;"></div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-8">
+                <div style="font-size: 11px;"><b>Matricule :</b> <span id="cardMatVal">-</span></div>
+                <div style="font-size: 11px;"><b>Nom & Prénom :</b> <span id="cardNomVal">-</span></div>
+                <div style="font-size: 11px;"><b>Sexe :</b> <span id="cardSexeVal">-</span></div>
+                <div style="font-size: 11px;"><b>Classe :</b> <span id="cardClasseVal">-</span></div>
+            </div>
+            <div class="col-4 text-end">
+                <img id="cardPhotoPreview" src="https://via.placeholder.com/80" alt="Photo" style="width: 65px; height: 75px; object-fit: cover; border: 1px solid #0d6efd; border-radius: 4px;">
+            </div>
+        </div>
+        <div class="mt-2 pt-1 border-top text-center" style="font-size: 8px; font-weight: 700; color: #555;">
+            Prière aux autorités civiles et militaires de prêter assistance au porteur en cas de besoin.
+        </div>
+    </div>
 </div>
-<div class="action-bar justify-content-center no-print">
-<button class="btn btn-success btn-sm fw-bold" onclick="alert('Carte enregistrée')"><i class="fa fa-save me-1"></i> Enregistrer</button>
-<button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
+
+<div class="action-bar justify-content-center mt-3 no-print">
+<button class="btn btn-success btn-sm fw-bold" onclick="saveStudentCardData()"><i class="fa fa-save me-1"></i> Enregistrer la Carte</button>
+<button class="btn btn-primary btn-sm fw-bold" onclick="printStudentCard()"><i class="fa fa-print me-1"></i> Imprimer / Télécharger</button>
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </div>
@@ -609,6 +643,7 @@ window.onload = function() {
         try { appData = JSON.parse(saved); } catch(e){ appData = { schools: [], adminRequests: [], jobApplications: [] }; } 
     }
     if(!appData.schools) appData.schools = [];
+    if(!appData.adminRequests) appData.adminRequests = [];
     if(!appData.jobApplications) appData.jobApplications = [];
     renderSchoolsList();
 };
@@ -750,7 +785,19 @@ function promptLoginCode(id) {
     } else {
         const sendReq = confirm("Code incorrect ! Voulez-vous envoyer une demande de rappel/génération de code au Gestionnaire de l'École / Admin Central pour \"" + s.name + "\" ?");
         if(sendReq) {
-            alert("Demande envoyée pour l'école : " + s.name + ". L'Admin Central pourra vous attribuer ou vous renvoyer votre code.");
+            const reason = prompt("Veuillez préciser la raison ou le motif de votre demande pour l'école " + s.name + " :");
+            if(reason !== null) {
+                if(!appData.adminRequests) appData.adminRequests = [];
+                appData.adminRequests.push({
+                    date: new Date().toLocaleDateString('fr-FR'),
+                    type: "École",
+                    target: s.name,
+                    reason: reason.trim() || "Oubli de code secret",
+                    schoolId: s.id
+                });
+                saveData();
+                alert("Votre demande et votre motif ont été transmis avec succès à l'Admin Central !");
+            }
         }
     }
 }
@@ -899,7 +946,7 @@ function deleteClass(name) {
     renderClassesTable();
 }
 
-// 3. ENSEIGNANTS
+// 3. ENSEIGNANTS (RESTRICTION PAR CLASSE TITULAIRE)
 function refreshTeacherOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const sel = document.getElementById('teacherClass');
@@ -920,7 +967,45 @@ function handleSaveTeacher(e) {
 }
 function renderTeachersTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('teachersTableBody').innerHTML = (s.teachers || []).map((t, idx) => `<tr><td>${t.name}</td><td>${t.titulaireClass}</td><td><b>${t.secretCode}</b></td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.teachers.splice(${idx},1);saveData();renderTeachersTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun enseignant</td></tr>';
+    document.getElementById('teachersTableBody').innerHTML = (s.teachers || []).map((t, idx) => `
+        <tr>
+            <td>${t.name}</td>
+            <td><span class="badge bg-info text-dark">${t.titulaireClass}</span></td>
+            <td><b>${t.secretCode}</b></td>
+            <td class="no-print">
+                <button class="btn btn-sm btn-outline-primary" onclick="loginAsTeacher('${t.secretCode}','${t.titulaireClass}')"><i class="fa fa-sign-in-alt me-1"></i> Accéder</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="s.teachers.splice(${idx},1);saveData();renderTeachersTable();"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun enseignant</td></tr>';
+}
+
+function loginAsTeacher(code, classe) {
+    const entered = prompt("Entrez votre code secret enseignant ("+code+") :");
+    if(entered && entered.trim().toUpperCase() === code.toUpperCase()) {
+        alert("Accès autorisé uniquement à votre classe titulaire : " + classe);
+        // Restreindre l'affichage ou filtrer les vues élèves/notes pour cette classe spécifique
+        const studentClassSel = document.getElementById('studentClass');
+        if(studentClassSel) { studentClassSel.value = classe; studentClassSel.disabled = true; }
+        switchTab('tab-eleves-reg');
+    } else {
+        const req = confirm("Code incorrect ! Souhaitez-vous envoyer une demande de rappel de code à l'Admin Central pour la classe " + classe + " ?");
+        if(req) {
+            const reason = prompt("Précisez la raison de votre demande :");
+            if(reason !== null) {
+                if(!appData.adminRequests) appData.adminRequests = [];
+                appData.adminRequests.push({
+                    date: new Date().toLocaleDateString('fr-FR'),
+                    type: "Enseignant (Classe)",
+                    target: classe,
+                    reason: reason.trim() || "Oubli de code enseignant",
+                    schoolId: activeSchoolId
+                });
+                saveData();
+                alert("Demande envoyée à l'Admin Central.");
+            }
+        }
+    }
 }
 
 // 4. ELEVES
@@ -1175,6 +1260,7 @@ function openAdminCentralPanel() {
     const pass = prompt("Entrez le code secret Administrateur Central :");
     if(pass && pass.trim() === ADMIN_MASTER_PASSWORD) {
         showSection('view-admin-central');
+        // Rendu tableau écoles
         document.getElementById('adminSchoolsTableBody').innerHTML = appData.schools.map(s => `
             <tr>
                 <td><img src="${s.logoUrl || ''}" class="school-logo-display" alt="Logo"></td>
@@ -1183,13 +1269,35 @@ function openAdminCentralPanel() {
                 <td><small><b>NIF:</b> ${s.nif||'-'}<br><b>RCCM:</b> ${s.rccm||'-'}<br><b>ID Nat:</b> ${s.idNat||'-'}</small></td>
                 <td><b>${s.secretCode}</b></td>
                 <td>
-                    <button class="btn btn-warning btn-sm fw-bold mb-1" onclick="regenerateSchoolCode('${s.id}')"><i class="fa fa-sync me-1"></i> Générer un nouveau code</button>
+                    <button class="btn btn-warning btn-sm fw-bold mb-1" onclick="regenerateSchoolCode('${s.id}')"><i class="fa fa-sync me-1"></i> Générer un autre code</button>
                     <button class="btn btn-danger btn-sm fw-bold" onclick="promptCentralDeleteSchool('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer</button>
                 </td>
             </tr>
         `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucune école enregistrée</td></tr>';
+
+        // Rendu tableau demandes d'assistance / motifs
+        document.getElementById('adminRequestsTableBody').innerHTML = (appData.adminRequests || []).map((req, rIdx) => `
+            <tr>
+                <td>${req.date}</td>
+                <td><span class="badge bg-secondary">${req.type}</span></td>
+                <td><b>${req.target}</b></td>
+                <td><span class="text-danger fw-bold">${req.reason}</span></td>
+                <td>
+                    <button class="btn btn-success btn-sm fw-bold" onclick="resolveAdminRequest(${rIdx})"><i class="fa fa-check me-1"></i> Traiter / Résoudre</button>
+                </td>
+            </tr>
+        `).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucune demande en attente</td></tr>';
+
     } else if (pass !== null) {
         alert("Mot de passe incorrect.");
+    }
+}
+
+function resolveAdminRequest(index) {
+    if(confirm("Marquer cette demande comme traitée et la supprimer de la liste ?")) {
+        appData.adminRequests.splice(index, 1);
+        saveData();
+        openAdminCentralPanel();
     }
 }
 
@@ -1209,6 +1317,8 @@ function refreshCardOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     document.getElementById('cardClassSelect').innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     document.getElementById('cardSchoolName').innerText = s.name.toUpperCase();
+    document.getElementById('cardSchoolLogo').src = s.logoUrl || 'https://via.placeholder.com/40';
+    document.getElementById('cardBgLogo').src = s.logoUrl || 'https://via.placeholder.com/180';
     loadStudentsForCardSelect();
 }
 function loadStudentsForCardSelect() {
@@ -1250,6 +1360,15 @@ function previewStudentCardPhoto(e) {
             }
         });
     }
+}
+
+function saveStudentCardData() {
+    saveData();
+    alert("Carte d'élève enregistrée avec succès ! Elle est prête pour le téléchargement ou l'impression.");
+}
+
+function printStudentCard() {
+    window.print();
 }
 
 function openDirectRegistrationModal() {
