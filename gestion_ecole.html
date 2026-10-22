@@ -280,7 +280,7 @@ onclick="openSchoolForm()">
 <h4 class="fw-bold">1. Créer une École</h4>
 <p class="text-muted small">Enregistrer un nouvel établissement scolaire avec son
 identité complète.</p>
-<button class="btn btn-outline-primary btn-sm mt-2 fw-bold">Accéder à la
+<button class="btn btn-outline-primary btn-sm mt-2 fw-bold" onclick="event.stopPropagation(); openSchoolForm();">Accéder à la
 création</button>
 </div>
 </div>
@@ -290,7 +290,7 @@ onclick="openDirectRegistration()">
 <i class="fa fa-user-plus fa-3x text-success mb-3"></i>
 <h4 class="fw-bold">2. Inscription Élèves</h4>
 <p class="text-muted small">Inscrire directement un élève dans une école active.</p>
-<button class="btn btn-outline-success btn-sm mt-2 fw-bold">Procéder à
+<button class="btn btn-outline-success btn-sm mt-2 fw-bold" onclick="event.stopPropagation(); openDirectRegistration();">Procéder à
 l'inscription</button>
 </div>
 </div>
@@ -1796,7 +1796,8 @@ return prefix + '-' + Math.floor(1000 + Math.random() * 9000);
 }
 function showSection(id) {
 document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-document.getElementById(id).classList.add('active');
+const target = document.getElementById(id);
+if(target) target.classList.add('active');
 if (id === 'view-portal') {
 renderSchoolsList();
 renderPublicEvents();
@@ -1905,11 +1906,10 @@ tbody.innerHTML = results.map(x => `
 function openJobApplicationSection() {
 const select = document.getElementById('jobSchoolSelect');
 if(!appData.schools || !appData.schools.length) {
-select.innerHTML = '';
-alert("Aucune école n'est enregistrée sur le système.");
-return;
-}
+select.innerHTML = '<option value="">Aucune école disponible</option>';
+} else {
 select.innerHTML = appData.schools.map(s => '<option value="' + s.id + '">' + s.name + ' (' + s.province + ')</option>').join('');
+}
 showSection('view-job-application');
 }
 function handleSendJobApplication(e) {
@@ -2315,7 +2315,7 @@ if (confirm("Code incorrect ! Contacter l'Admin Central ?")) handleForgottenCode
 }
 function openDirectRegistration() {
 if(!appData.schools || !appData.schools.length) {
-alert("Créez d'abord une école.");
+alert("Aucune école enregistrée. Veuillez d'abord créer une école.");
 openSchoolForm();
 } else {
 promptLoginCode(appData.schools[0].id);
