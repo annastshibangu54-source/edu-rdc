@@ -360,6 +360,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-discipline', this)"><i class="fa fa-gavel me-2"></i> Discipline</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-communication', this)"><i class="fa fa-bullhorn me-2"></i> Communication</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-jobs-received', this)"><i class="fa fa-briefcase me-2"></i> Demandes Emploi</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-armoiries', this)"><i class="fa fa-shield-alt me-2"></i> Armoiries & Identité</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-palmares', this)"><i class="fa fa-trophy me-2"></i> Palmarès & Mérite</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-courriers', this)"><i class="fa fa-exchange-alt me-2"></i> Courrier (Entrants / Sortants)</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-dossiers-archivage', this)"><i class="fa fa-folder-open me-2"></i> Stockage & Dossiers</a>
 </div>
 </div>
 </div>
@@ -613,6 +617,180 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 
+<!-- 1. ARMOIRIES -->
+<div class="tab-pane" id="tab-armoiries">
+  <h5 class="text-primary fw-bold mb-3"><i class="fa fa-shield-alt me-2"></i>Armoiries & Devise de l'Établissement</h5>
+  <div class="card p-3 shadow-sm mb-4">
+    <form onsubmit="handleSaveArmoiries(event)" class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label fw-bold">Symbole / Armoiries de l'école :</label>
+        <input type="file" id="schoolArmoiriesFile" class="form-control" accept="image/*">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-bold">Devise Officielle de l'École :</label>
+        <input type="text" id="schoolDeviseInput" class="form-control" placeholder="Ex: Discipline - Travail - Excellence">
+      </div>
+      <div class="col-12 action-bar">
+        <button type="submit" class="btn btn-success btn-sm fw-bold"><i class="fa fa-save me-1"></i> Enregistrer les Armoiries</button>
+      </div>
+    </form>
+  </div>
+  <div class="text-center p-3 border rounded bg-light">
+    <h6>Aperçu du Filigrane / Symbole</h6>
+    <img id="armoiriesPreviewImg" src="https://via.placeholder.com/150" alt="Armoiries" style="max-width:150px; max-height:150px; object-fit:contain;">
+    <p id="armoiriesDeviseText" class="fst-italic text-muted mt-2">- Devise non définie -</p>
+  </div>
+</div>
+
+<!-- 2. PALMARÈS -->
+<div class="tab-pane" id="tab-palmares">
+  <h5 class="text-primary fw-bold mb-3"><i class="fa fa-trophy me-2"></i>Palmarès & Mérite Académique</h5>
+  <div class="row g-2 mb-3 no-print">
+    <div class="col-md-6">
+      <select id="palmaresClassSelect" class="form-select" onchange="renderPalmaresTable()">
+        <!-- Chargé dynamiquement -->
+      </select>
+    </div>
+    <div class="col-md-6">
+      <button class="btn btn-primary btn-sm fw-bold px-4" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer le Palmarès</button>
+    </div>
+  </div>
+  <div id="palmaresTableContainer">
+    <!-- Tableau dynamique généré JS -->
+  </div>
+</div>
+
+<!-- COURRONS (ENTRANTS & SORTANTS) -->
+<div class="tab-pane" id="tab-courriers">
+  <h5 class="text-primary fw-bold mb-3"><i class="fa fa-exchange-alt me-2"></i>Gestion des Documents Entrants et Sortants (Secrétariat)</h5>
+  
+  <form id="formCourrier" onsubmit="handleSaveCourrier(event)" class="row g-2 mb-4 no-print bg-light p-3 rounded">
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Type de Flux :</label>
+      <select id="courrierType" class="form-select form-select-sm" required>
+        <option value="Entrant">Courrier Entrant (Arrivée)</option>
+        <option value="Sortant">Courrier Sortant (Départ)</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Date :</label>
+      <input type="date" id="courrierDate" class="form-control form-control-sm" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Expéditeur / Destinataire :</label>
+      <input type="text" id="courrierTiers" class="form-control form-control-sm" placeholder="Ex: PROVED Lukunga" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">N° de Référence :</label>
+      <input type="text" id="courrierRef" class="form-control form-control-sm" placeholder="Ex: Réf: 012/ECOLE">
+    </div>
+    <div class="col-md-9 mt-2">
+      <label class="form-label fw-bold small">Objet du Document :</label>
+      <input type="text" id="courrierObjet" class="form-control form-control-sm" placeholder="Ex: Demande de régularisation des fiches d'orientation..." required>
+    </div>
+    <div class="col-md-3 mt-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-save me-1"></i> Enregistrer</button>
+    </div>
+    <div class="col-12 action-bar mt-2">
+      <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer le Registre</button>
+      <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+    </div>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead>
+        <tr class="table-primary">
+          <th>Date</th>
+          <th>Type</th>
+          <th>Réf. / N°</th>
+          <th>Tiers (Exp./Dest.)</th>
+          <th>Objet</th>
+          <th class="no-print">Action</th>
+        </tr>
+      </thead>
+      <tbody id="courriersTableBody">
+        <!-- Dynamique -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- STOCKAGE DES DOSSIERS (GED / ARCHIVES) -->
+<div class="tab-pane" id="tab-dossiers-archivage">
+  <h5 class="text-primary fw-bold mb-3"><i class="fa fa-folder-open me-2"></i>Stockage Numérique & Gestion des Dossiers Personnel & Élèves</h5>
+  
+  <!-- Formulaire d'ajout de document dans un dossier -->
+  <div class="card p-3 shadow-sm mb-4 border-0 bg-light no-print">
+    <form id="formDossierStorage" onsubmit="handleSaveDocumentDossier(event)" class="row g-2">
+      <div class="col-md-3">
+        <label class="form-label fw-bold small">Catégorie du Dossier :</label>
+        <select id="dossierCategory" class="form-select form-select-sm" onchange="updateDossierPersonOptions()" required>
+          <option value="Eleve">Dossier Élève</option>
+          <option value="Enseignant">Dossier Enseignant</option>
+          <option value="Administratif">Dossier Administratif</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label fw-bold small">Sélectionner la Personne :</label>
+        <select id="dossierTargetPerson" class="form-select form-select-sm" required>
+          <!-- Chargé dynamiquement -->
+        </select>
+      </div>
+
+      <div class="col-md-5">
+        <label class="form-label fw-bold small">Type de Pièce / Document :</label>
+        <input type="text" id="dossierDocType" class="form-control form-control-sm" placeholder="Ex: Acte de naissance, Diplôme d'État, CV, Contrat..." required>
+      </div>
+
+      <div class="col-md-8 mt-2">
+        <label class="form-label fw-bold small">Fichier / Document Scanné (Image ou PDF) :</label>
+        <input type="file" id="dossierFileInput" class="form-control form-control-sm" accept="image/*,.pdf" required>
+      </div>
+
+      <div class="col-md-4 mt-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-upload me-1"></i> Archiver le Document</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filtre de recherche des dossiers archivés -->
+  <div class="row g-2 mb-3 no-print">
+    <div class="col-md-4">
+      <select id="filterDossierCategory" class="form-select form-select-sm" onchange="renderDossiersStorageTable()">
+        <option value="ALL">-- Toutes les catégories --</option>
+        <option value="Eleve">Dossiers Élèves</option>
+        <option value="Enseignant">Dossiers Enseignants</option>
+        <option value="Administratif">Dossiers Administratifs</option>
+      </select>
+    </div>
+    <div class="col-md-8 text-end">
+      <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer le Répertoire des Archives</button>
+      <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+    </div>
+  </div>
+
+  <!-- Tableau récapitulatif des dossiers numérisés -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead>
+        <tr class="table-primary">
+          <th>Date d'Archivage</th>
+          <th>Catégorie</th>
+          <th>Nom & Prénom</th>
+          <th>Type de Document</th>
+          <th>Aperçu / Fichier</th>
+          <th class="no-print">Action</th>
+        </tr>
+      </thead>
+      <tbody id="dossiersStorageTableBody">
+        <!-- Rendu dynamique -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
 </div>
 </div>
 </div>
@@ -783,7 +961,7 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
         id: 'SCH-' + Date.now(),
         name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl,
         direction: [], staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {},
-        caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: [], savedCards: []
+        caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: [], savedCards: [], armoiries: '', devise: '', courriers: [], dossiersArchive: []
     });
     
     saveData();
@@ -959,6 +1137,10 @@ function switchTab(tabId, element) {
     else if(tabId === 'tab-communication') renderCommTable();
     else if(tabId === 'tab-jobs-received') renderSchoolJobApplications();
     else if(tabId === 'tab-carte-eleve') refreshCardOptions();
+    else if(tabId === 'tab-armoiries') refreshArmoiriesOptions();
+    else if(tabId === 'tab-palmares') refreshPalmaresOptions();
+    else if(tabId === 'tab-courriers') refreshCourrierOptions();
+    else if(tabId === 'tab-dossiers-archivage') refreshDossiersStorageOptions();
 }
 
 function refreshDashboardViews() {
@@ -2069,6 +2251,290 @@ function openDirectRegistrationModal() {
         return;
     }
     promptLoginCode(appData.schools[0].id);
+}
+
+// ====================================================
+// NOUVELLES FONCTIONS : ARMOIRIES, PALMARÈS, COURRIER, DOSSIERS
+// ====================================================
+
+// 1. Armoiries & Devise
+function refreshArmoiriesOptions() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    if(s.armoiries) {
+        document.getElementById('armoiriesPreviewImg').src = s.armoiries;
+    } else {
+        document.getElementById('armoiriesPreviewImg').src = s.logoUrl || "https://via.placeholder.com/150";
+    }
+    document.getElementById('armoiriesDeviseText').innerText = s.devise ? `« ${s.devise} »` : "- Devise non définie -";
+    if(s.devise) document.getElementById('schoolDeviseInput').value = s.devise;
+}
+
+function handleSaveArmoiries(e) {
+    e.preventDefault();
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const devise = document.getElementById('schoolDeviseInput').value.trim();
+    const fileInput = document.getElementById('schoolArmoiriesFile');
+    const file = (fileInput.files && fileInput.files[0]) ? fileInput.files[0] : null;
+
+    s.devise = devise;
+    if(file) {
+        compressAndResizeImage(file, function(compressedUrl) {
+            s.armoiries = compressedUrl;
+            saveData();
+            refreshArmoiriesOptions();
+            alert("Armoiries et devise enregistrées avec succès !");
+        });
+    } else {
+        saveData();
+        refreshArmoiriesOptions();
+        alert("Devise enregistrée avec succès !");
+    }
+}
+
+// 2. Palmarès & Mérite Académique
+function refreshPalmaresOptions() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const select = document.getElementById('palmaresClassSelect');
+    select.innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    renderPalmaresTable();
+}
+
+function renderPalmaresTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const clName = document.getElementById('palmaresClassSelect').value;
+    const container = document.getElementById('palmaresTableContainer');
+    const students = (s.students || []).filter(st => st.classe === clName);
+    const courses = (s.courses && s.courses[clName]) ? s.courses[clName] : [];
+
+    if(!students.length || !courses.length) {
+        container.innerHTML = '<div class="alert alert-secondary text-center">Aucun élève ou aucun cours enregistré dans cette classe pour générer le palmarès.</div>';
+        return;
+    }
+
+    // Calcul des totaux et pourcentages pour chaque élève
+    let studentResults = students.map(st => {
+        let stNotes = (s.notes && s.notes[st.id]) ? s.notes[st.id] : {};
+        let totalObtGen = 0;
+        let totalMaxGen = 0;
+
+        courses.forEach(c => {
+            let cn = stNotes[c.id] || {};
+            let p1 = parseFloat(cn.p1) || 0;
+            let p2 = parseFloat(cn.p2) || 0;
+            let e1 = parseFloat(cn.e1) || 0;
+            let p3 = parseFloat(cn.p3) || 0;
+            let p4 = parseFloat(cn.p4) || 0;
+            let e2 = parseFloat(cn.e2) || 0;
+
+            let s1Cour = p1 + p2 + e1;
+            let s2Cour = p3 + p4 + e2;
+            totalObtGen += (s1Cour + s2Cour);
+
+            let maxCour = parseFloat(c.max) || 20;
+            totalMaxGen += (maxCour * 4 * 2); // Max annuel total (S1 + S2)
+        });
+
+        let pct = totalMaxGen > 0 ? ((totalObtGen / totalMaxGen) * 100).toFixed(1) : 0;
+        return { student: st, totalObtGen, totalMaxGen, pct: parseFloat(pct) };
+    });
+
+    // Tri par ordre de mérite (pourcentage décroissant)
+    studentResults.sort((a, b) => b.pct - a.pct);
+
+    container.innerHTML = `
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm align-middle text-center">
+                <thead>
+                    <tr class="table-primary">
+                        <th>Place</th>
+                        <th>Matricule</th>
+                        <th>Nom & Prénom</th>
+                        <th>Sexe</th>
+                        <th>Total Obtenu</th>
+                        <th>Max Global</th>
+                        <th>Pourcentage (%)</th>
+                        <th>Mention / Décision</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${studentResults.map((res, idx) => `
+                        <tr>
+                            <td><b>${idx + 1}</b></td>
+                            <td>${res.student.mat}</td>
+                            <td class="text-start">${esc(res.student.name)}</td>
+                            <td>${res.student.sexe}</td>
+                            <td><b>${res.totalObtGen}</b></td>
+                            <td>${res.totalMaxGen}</td>
+                            <td><b>${res.pct} %</b></td>
+                            <td><span class="badge ${res.pct >= 50 ? 'bg-success' : 'bg-danger'}">${res.pct >= 50 ? 'Admis (Passe)' : 'Ajourné (Double)'}</span></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// 3. Courriers Entrants / Sortants
+function refreshCourrierOptions() {
+    renderCourriersTable();
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('courrierDate');
+    if(dateInput && !dateInput.value) dateInput.value = today;
+}
+
+function handleSaveCourrier(e) {
+    e.preventDefault();
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+
+    const type = document.getElementById('courrierType').value;
+    const date = document.getElementById('courrierDate').value;
+    const tiers = document.getElementById('courrierTiers').value.trim();
+    const ref = document.getElementById('courrierRef').value.trim();
+    const objet = document.getElementById('courrierObjet').value.trim();
+
+    if(!s.courriers) s.courriers = [];
+    s.courriers.push({ id: 'COURR-' + Date.now(), type, date, tiers, ref, objet });
+    saveData();
+
+    document.getElementById('formCourrier').reset();
+    document.getElementById('courrierDate').value = new Date().toISOString().split('T')[0];
+    renderCourriersTable();
+    alert("Document enregistré avec succès dans le registre !");
+}
+
+function renderCourriersTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const tbody = document.getElementById('courriersTableBody');
+    if(!tbody) return;
+
+    tbody.innerHTML = (s.courriers || []).map((c, idx) => `
+        <tr>
+            <td>${c.date}</td>
+            <td><span class="badge ${c.type === 'Entrant' ? 'bg-info text-dark' : 'bg-warning text-dark'}">${c.type}</span></td>
+            <td><b>${c.ref || '-'}</b></td>
+            <td>${esc(c.tiers)}</td>
+            <td>${esc(c.objet)}</td>
+            <td class="no-print">
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteCourrier(${idx})"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucun courrier enregistré dans le registre</td></tr>';
+}
+
+function deleteCourrier(idx) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(s && s.courriers) {
+        s.courriers.splice(idx, 1);
+        saveData();
+        renderCourriersTable();
+    }
+}
+
+// 4. Stockage / GED des Dossiers
+function refreshDossiersStorageOptions() {
+    updateDossierPersonOptions();
+    renderDossiersStorageTable();
+}
+
+function updateDossierPersonOptions() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const cat = document.getElementById('dossierCategory').value;
+    const targetSel = document.getElementById('dossierTargetPerson');
+
+    if (cat === 'Eleve') {
+        targetSel.innerHTML = (s.students || []).map(st => `<option value="${st.id}">${st.name} (${st.classe})</option>`).join('');
+    } else if (cat === 'Enseignant') {
+        targetSel.innerHTML = (s.teachers || []).map(t => `<option value="${t.name}">${t.name} (Titulaire: ${t.titulaireClass})</option>`).join('');
+    } else if (cat === 'Administratif') {
+        targetSel.innerHTML = (s.direction || []).map(d => `<option value="${d.name}">${d.name} (${d.role})</option>`).join('');
+    }
+}
+
+function handleSaveDocumentDossier(e) {
+    e.preventDefault();
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+
+    const category = document.getElementById('dossierCategory').value;
+    const targetPersonId = document.getElementById('dossierTargetPerson').value;
+    const selectElem = document.getElementById('dossierTargetPerson');
+    const targetPersonName = selectElem.options[selectElem.selectedIndex] ? selectElem.options[selectElem.selectedIndex].text : '';
+    const docType = document.getElementById('dossierDocType').value.trim();
+    const fileInput = document.getElementById('dossierFileInput');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Veuillez sélectionner un fichier à archiver.");
+        return;
+    }
+
+    compressAndResizeImage(file, function(fileDataUrl) {
+        if(!s.dossiersArchive) s.dossiersArchive = [];
+
+        s.dossiersArchive.push({
+            id: 'DOC-' + Date.now(),
+            date: new Date().toLocaleDateString('fr-FR'),
+            category,
+            targetPersonId,
+            targetPersonName,
+            docType,
+            fileUrl: fileDataUrl
+        });
+
+        saveData();
+        document.getElementById('formDossierStorage').reset();
+        updateDossierPersonOptions();
+        renderDossiersStorageTable();
+        alert("Document ajouté au dossier individuel avec succès !");
+    });
+}
+
+function renderDossiersStorageTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const tbody = document.getElementById('dossiersStorageTableBody');
+    const filterCat = document.getElementById('filterDossierCategory') ? document.getElementById('filterDossierCategory').value : 'ALL';
+    
+    if(!tbody) return;
+
+    let archives = s.dossiersArchive || [];
+    if(filterCat !== 'ALL') {
+        archives = archives.filter(doc => doc.category === filterCat);
+    }
+
+    tbody.innerHTML = archives.map((doc, idx) => `
+        <tr>
+            <td>${doc.date}</td>
+            <td><span class="badge ${doc.category === 'Eleve' ? 'bg-info text-dark' : doc.category === 'Enseignant' ? 'bg-success' : 'bg-warning text-dark'}">${doc.category}</span></td>
+            <td><b>${esc(doc.targetPersonName)}</b></td>
+            <td>${esc(doc.docType)}</td>
+            <td class="text-center">
+                <a href="${doc.fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-eye me-1"></i> Consulter</a>
+            </td>
+            <td class="no-print">
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteDossierDocument(${idx})"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucun document stocké pour le moment.</td></tr>';
+}
+
+function deleteDossierDocument(idx) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(s && s.dossiersArchive) {
+        if(confirm("Voulez-vous supprimer ce document du dossier ?")) {
+            s.dossiersArchive.splice(idx, 1);
+            saveData();
+            renderDossiersStorageTable();
+        }
+    }
 }
 
 // Fonction d'échappement utilitaire
