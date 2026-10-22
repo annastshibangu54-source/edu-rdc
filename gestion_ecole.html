@@ -38,12 +38,45 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .secret-modal-card { background: #fff; padding: 30px; border-radius: 12px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
 .secret-code-badge { font-size: 26px; font-weight: 800; color: #0d6efd; letter-spacing: 2px; background: #e7f1ff; padding: 10px 20px; border-radius: 8px; border: 2px dashed #0d6efd; display: inline-block; margin: 15px 0; }
 
-/* STYLES BULLETIN INTEGRE */
+/* STYLES BULLETIN INTEGRE (ADAPTÉS DEPUIS LE CODE FOURNI) */
 .bulletin-container .page { width:210mm; min-height:297mm; margin:0 auto; background:#fff; padding:7mm 8mm; font-size: 8px; box-shadow:0 2px 10px rgba(0,0,0,.25); color:#000; font-family: Arial, Helvetica, sans-serif; }
 .bulletin-container .hdr { display: flex; align-items:center; justify-content: space-between; margin-bottom:2px; }
 .bulletin-container .logo { width: 64px; height:50px; display: flex; align-items:center; justify-content:center; }
-.bulletin-container .logo img { max-width: 100%; max-height:100%; }
+.bulletin-container .logo img, .bulletin-container .logo svg { max-width: 100%; max-height:100%; }
 .bulletin-container .ht { text-align:center; font-weight:bold; font-size:11.5px; line-height:1.3; flex:1; padding:0 6px; }
+.bulletin-container .idn { display:inline-block; border:1px solid #000; padding:1px 4px; font-weight:bold; margin:2px 0; }
+.bulletin-container .idn input { width:160px; font:inherit; color:#000; border:0; background:transparent; outline:none; }
+.bulletin-container table.ident { width:100%; border-collapse:collapse; border:1px solid #000; margin-bottom:2px; }
+.bulletin-container table.ident td { padding:2px 4px; font-size:8.5px; border:0; vertical-align:bottom; white-space:nowrap; }
+.bulletin-container table.ident input { border-bottom:1px dotted #000; width:62%; font:inherit; color:#000; border-top:0; border-left:0; border-right:0; background:transparent; outline:none; }
+.bulletin-container table.ident input.s { width:12%; }
+.bulletin-container table.ident input.d { width:30%; }
+.bulletin-container table.ident input.bx { width:70%; letter-spacing:5px; border:1px solid #000; padding:1px 3px; }
+.bulletin-container .title { text-align:center; font-weight:bold; font-size:8.5px; border:1px solid #000; padding:2px; margin-bottom:2px; }
+.bulletin-container table.b { width:100%; border-collapse:collapse; table-layout:fixed; }
+.bulletin-container table.b td, .bulletin-container table.b th { border:1px solid #000; padding:0 1px; height:13.5px; text-align:center; font-size:8px; line-height:1.1; overflow:hidden; }
+.bulletin-container table.b th { font-weight:bold; }
+.bulletin-container table.b td.nm { text-align:left; padding-left:3px; position:relative; }
+.bulletin-container table.b tr.dom td { font-weight:bold; font-size:8.5px; position:relative; background:#f3f4f6; }
+.bulletin-container table.b tr.sub td { font-weight:bold; }
+.bulletin-container table.b tr.bold td { font-weight:bold; }
+.bulletin-container table.b td.blk { background:#000; }
+.bulletin-container table.b td.gry { background:#d1d5db; }
+.bulletin-container table.b td.tt { position:relative; font-weight:bold; }
+.bulletin-container table.b td.tt i { position:absolute; left:1px; top:0; font-size:6px; color:#444; font-style:normal; font-weight:normal; }
+.bulletin-container table.b td input { width:100%; border:0; text-align:center; padding:0; height:12px; background:transparent; outline:none; }
+.bulletin-container td.side { vertical-align:top; text-align:left !important; padding:3px 4px !important; font-size:8px; line-height:1.6; }
+.bulletin-container td.side .sc { text-align:center; margin-top:10px; }
+.bulletin-container .strk.on { text-decoration:line-through; }
+.bulletin-container .foot { margin-top:3px; font-size:8.5px; line-height:1.7; }
+.bulletin-container .foot .box { border:1px solid #000; padding:2px 4px; }
+.bulletin-container .foot input.long { width:38%; border-bottom:1px dotted #000; border-top:0; border-left:0; border-right:0; background:transparent; outline:none; }
+.bulletin-container .foot .row { display:flex; justify-content:space-between; }
+.bulletin-container .foot .c { text-align:center; }
+.bulletin-container .foot .r { text-align:right; }
+.bulletin-container .note { font-size:8px; margin-top:3px; }
+.bulletin-container .note .code { float:right; }
+.bulletin-container .dots { display:inline-block; min-width:60px; border-bottom:1px dotted #000; }
 
 /* STYLE D'IMPRESSION PROPRE */
 @media print {
@@ -744,7 +777,6 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
     
     saveData();
     
-    // Affichage de la modale du code secret
     currentCreatedSecretCode = secretCode;
     document.getElementById('modalSecretCodeDisplay').innerText = secretCode;
     document.getElementById('secretCodeModal').style.display = 'flex';
@@ -1106,31 +1138,205 @@ function saveNote(stId, crsId, period, val) {
     saveData();
 }
 
-// 7. BULLETIN
+// 7. BULLETIN (ADAPTÉ AU SYSTÈME DE LA PLATEFORME EDU-RDC)
 function refreshBulletinOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('bulletinClassSelect').innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    if(!s) return;
+    const clsSelect = document.getElementById('bulletinClassSelect');
+    clsSelect.innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     loadStudentsForBulletin();
 }
+
 function loadStudentsForBulletin() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
     const cl = document.getElementById('bulletinClassSelect').value;
-    document.getElementById('bulletinStudentSelect').innerHTML = (s.students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+    const studentSelect = document.getElementById('bulletinStudentSelect');
+    const filteredStudents = (s.students || []).filter(st => st.classe === cl);
+    studentSelect.innerHTML = filteredStudents.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
     renderBulletinFromSystem();
 }
+
 function renderBulletinFromSystem() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const page = document.getElementById('page');
+    if(!s) { page.innerHTML = '<p class="text-center text-muted">Aucune école active.</p>'; return; }
+    
+    const clName = document.getElementById('bulletinClassSelect').value;
     const stId = document.getElementById('bulletinStudentSelect').value;
     const student = (s.students || []).find(x => x.id === stId);
-    const page = document.getElementById('page');
-    if(!student) { page.innerHTML = '<p>Élève introuvable</p>'; return; }
+    const courses = (s.courses && s.courses[clName]) ? s.courses[clName] : [];
+
+    if(!student) {
+        page.innerHTML = '<p class="text-center text-muted">Veuillez sélectionner un élève valide.</p>';
+        return;
+    }
+
+    // Calculs automatiques des notes et totaux pour l'élève
+    const stNotes = (s.notes && s.notes[student.id]) ? s.notes[student.id] : {};
+    
+    let totalMaxP1 = 0, totalObtP1 = 0;
+    let totalMaxP2 = 0, totalObtP2 = 0;
+    let totalMaxS1 = 0, totalObtS1 = 0;
+    let totalMaxGen = 0, totalObtGen = 0;
+
+    let coursesRowsHtml = courses.map(c => {
+        const n = stNotes[c.id] || {};
+        const p1 = n.p1 !== undefined && n.p1 !== '' ? parseFloat(n.p1) : null;
+        const p2 = n.p2 !== undefined && n.p2 !== '' ? parseFloat(n.p2) : null;
+        const maxCour = parseFloat(c.max) || 20;
+        
+        totalMaxP1 += maxCour;
+        if(p1 !== null) totalObtP1 += p1;
+
+        totalMaxP2 += maxCour;
+        if(p2 !== null) totalObtP2 += p2;
+
+        const totS1Max = maxCour * 2;
+        const totS1Obt = (p1 !== null ? p1 : 0) + (p2 !== null ? p2 : 0);
+        
+        totalMaxS1 += totS1Max;
+        totalObtS1 += totS1Obt;
+
+        totalMaxGen += totS1Max;
+        totalObtGen += totS1Obt;
+
+        return `<tr>
+            <td class="nm">${esc(c.name)}</td>
+            <td>${maxCour}</td>
+            <td>${p1 !== null ? p1 : ''}</td>
+            <td>${p2 !== null ? p2 : ''}</td>
+            <td>${totS1Max}</td>
+            <td>${totS1Obt > 0 ? totS1Obt : ''}</td>
+            <td></td>
+            <td>${totS1Max}</td>
+            <td>${totS1Obt > 0 ? totS1Obt : ''}</td>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        </tr>`;
+    }).join('') || '<tr><td colspan="16" class="text-center text-muted">Aucun cours enregistré pour cette classe. Veuillez ajouter des cours dans la section Pondération.</td></tr>';
+
+    // Calcul pourcentage S1 / Général
+    const pctS1 = totalMaxS1 > 0 ? ((totalObtS1 / totalMaxS1) * 100).toFixed(1) + ' %' : '0 %';
+
+    // Calcul de la place de l'élève dans la classe (basé sur le total S1)
+    let classStudents = (s.students || []).filter(st => st.classe === clName);
+    let studentTotals = classStudents.map(st => {
+        let stN = (s.notes && s.notes[st.id]) ? s.notes[st.id] : {};
+        let tObt = 0;
+        courses.forEach(c => {
+            let cn = stN[c.id] || {};
+            tObt += (parseFloat(cn.p1) || 0) + (parseFloat(cn.p2) || 0);
+        });
+        return { id: st.id, total: tObt };
+    });
+    studentTotals.sort((a, b) => b.total - a.total);
+    let rankIndex = studentTotals.findIndex(item => item.id === student.id);
+    let studentRank = rankIndex !== -1 ? (rankIndex + 1) + '/' + classStudents.length : '1/' + classStudents.length;
+
     page.innerHTML = `
         <div class="hdr">
             <div class="logo"><img src="${s.logoUrl || ''}" alt="Logo"></div>
-            <div class="ht">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO<br>MINISTÈRE DE L'ÉDUCATION NATIONALE<br><b>${s.name.toUpperCase()}</b></div>
+            <div class="ht">
+                RÉPUBLIQUE DÉMOCRATIQUE DU CONGO<br>
+                MINISTÈRE DE L'ÉDUCATION NATIONALE ET NOUVELLE CITOYENNETÉ<br>
+                <b>${s.name.toUpperCase()}</b>
+            </div>
+            <div class="logo"><img src="${s.logoUrl || ''}" alt="Logo"></div>
         </div>
-        <hr>
-        <div style="text-align:center;"><h4>BULLETIN SCOLAIRE</h4><h5>${student.name} (${student.classe})</h5><p>Matricule : ${student.mat}</p></div>
+        <div class="idn"><b>N° ID :</b> ${student.mat}</div>
+        <table class="ident">
+            <tr><td colspan="2"><b>PROVINCE :</b> <input style="width:85%" value="${esc(s.province)}"></td></tr>
+            <tr><td style="width:50%"><b>VILLE :</b> <input value="${esc(s.ville || 'KINSHASA')}"></td>
+                <td><b>ÉLÈVE :</b> <input style="width:50%" value="${esc(student.name)}"> &nbsp;<b>SEXE :</b> <input class="s" value="${esc(student.sexe)}"></td></tr>
+            <tr><td><b>COMMUNE :</b> <input style="width:40%" value="${esc(s.commune)}"></td>
+                <td><b>CLASSE :</b> <input value="${esc(student.classe)}"></td></tr>
+            <tr><td><b>ÉCOLE :</b> <input value="${esc(s.name)}"></td>
+                <td><b>CODE ÉCOLE :</b> <input value="${esc(s.secretCode)}"></td></tr>
+        </table>
+        <div class="title">BULLETIN DE LA CYCLE TERMINAL DE L’EDUCATION DE BASE (CTEB)</div>
+
+        <table class="b">
+            <colgroup><col style="width:14%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5.6%"><col style="width:5%"><col style="width:6.9%"><col style="width:6.9%"></colgroup>
+            <thead>
+                <tr>
+                    <th rowspan="3">BRANCHE</th>
+                    <th colspan="6">PREMIER SEMESTRE</th>
+                    <th colspan="6">SECOND SEMESTRE</th>
+                    <th rowspan="3">T.G.</th>
+                    <th colspan="2">EXAMEN DE REPÊCHAGE</th>
+                </tr>
+                <tr>
+                    <th rowspan="2">MAX</th>
+                    <th colspan="2">TRAVAUX JOURNAL</th>
+                    <th colspan="2" rowspan="2">MAX EXAMEN</th>
+                    <th rowspan="2">TOT</th>
+                    <th rowspan="2">MAX</th>
+                    <th colspan="2">TRAVAUX JOURNAL</th>
+                    <th colspan="2" rowspan="2">EXAMEN</th>
+                    <th rowspan="2">TOT</th>
+                    <th rowspan="2">%</th>
+                    <th rowspan="2">Sign. Prof</th>
+                </tr>
+                <tr>
+                    <th>1ère P</th><th>2ème P</th>
+                    <th>3ème P</th><th>4ème P</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${coursesRowsHtml}
+                <tr class="bold">
+                    <td class="nm">MAXIMA GÉNÉRAUX</td>
+                    <td>${totalMaxP1}</td><td></td><td></td><td>${totalMaxP1 * 2}</td><td></td><td>${totalMaxS1}</td>
+                    <td>${totalMaxP2}</td><td></td><td></td><td>${totalMaxP2 * 2}</td><td></td><td>${totalMaxS1}</td>
+                    <td>${totalMaxGen}</td><td colspan="2"></td>
+                </tr>
+                <tr class="bold">
+                    <td class="nm">TOTAUX</td>
+                    <td></td><td>${totalObtP1}</td><td>${totalObtP2}</td><td></td><td></td><td>${totalObtS1}</td>
+                    <td></td><td></td><td></td><td></td><td></td><td></td>
+                    <td>${totalObtS1}</td><td colspan="2" rowspan="4" class="side">
+                        <div>◆ PASSE (1)</div>
+                        <div>◆ DOUBLE (1)</div>
+                        <div>Le chef d’Etablissement</div>
+                        <div class="sc">Sceau de l’école</div>
+                    </td>
+                </tr>
+                <tr class="bold">
+                    <td class="nm">POURCENTAGE</td>
+                    <td colspan="6"></td>
+                    <td colspan="6"></td>
+                    <td><b>${pctS1}</b></td>
+                </tr>
+                <tr class="bold">
+                    <td class="nm">PLACE / NBRE D’ÉLÈVES</td>
+                    <td colspan="6"></td>
+                    <td colspan="6"></td>
+                    <td><b>${studentRank}</b></td>
+                </tr>
+                <tr class="bold">
+                    <td class="nm">APPLICATION</td>
+                    <td colspan="6"></td>
+                    <td colspan="6"></td>
+                    <td></td>
+                </tr>
+                <tr class="bold">
+                    <td class="nm">CONDUITE</td>
+                    <td colspan="6"></td>
+                    <td colspan="6"></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="foot">
+            <div class="box">- L’élève ne pourra passer dans la classe supérieure (1) s’il n’a subi avec succès un examen de repêchage en <input class="long" value="${esc(student.rep || '')}"> (1)</div>
+            <div>- L’élève passe dans la classe supérieure (1)</div>
+            <div>- L’élève double la classe (1)</div>
+            <div class="row"><div>&nbsp;</div><div>Fait à ${esc(s.commune || 'Kinshasa')}, le ............/............/2026</div><div class="r">Le Chef d’Etablissement</div></div>
+            <div class="c">Sceau de l’école</div>
+            <div class="row"><div><b>Signature de l’élève</b></div><div class="r"><b>Nom et Signature</b></div></div>
+        </div>
+        <div class="note">(1) Biffer la mention inutile<br><i>Note importante : Le Bulletin est sans valeur s’il est raturé ou surchargé</i><span class="code">IDE/P.S./010</span></div>
     `;
 }
 
@@ -1393,7 +1599,6 @@ function saveStudentCardData() {
     saveData();
     renderSavedCardsTable();
 
-    // Vider la zone active de la carte pour laisser la place à une nouvelle carte
     document.getElementById('cardMatVal').innerText = '-';
     document.getElementById('cardNomVal').innerText = '-';
     document.getElementById('cardSexeVal').innerText = '-';
@@ -1424,7 +1629,6 @@ function renderSavedCardsTable() {
 }
 
 function printSpecificSavedCard(mat, name, sexe, classe, photo, schoolName, logoUrl) {
-    // Remplir temporairement la zone d'affichage pour impression
     document.getElementById('cardMatVal').innerText = mat;
     document.getElementById('cardNomVal').innerText = name;
     document.getElementById('cardSexeVal').innerText = sexe;
@@ -1458,6 +1662,9 @@ function openDirectRegistrationModal() {
     }
     promptLoginCode(appData.schools[0].id);
 }
+
+// Fonction d'échappement utilitaire
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 </script>
 
 <!-- Script JavaScript de Bootstrap indispensable pour ouvrir le menu mobile (les 3 barres) -->
