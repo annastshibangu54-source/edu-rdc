@@ -51,12 +51,12 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </head>
 <body>
 
-<!-- MODALE D'AFFICHAGE DU CODE SECRET (UNIQUE LORS DE LA CRÉATION) -->
+<!-- MODALE D'AFFICHAGE DU CODE SECRET -->
 <div id="secretCodeModal" class="secret-modal-overlay">
   <div class="secret-modal-card">
     <i class="fa fa-check-circle fa-4x text-success mb-3"></i>
     <h3 class="fw-bold">Établissement Créé avec Succès !</h3>
-    <p class="text-muted small">Voici votre <b>Code Secret</b> unique. Notez-le bien, il ne sera plus affiché publiquement pour des raisons de sécurité :</p>
+    <p class="text-muted small">Voici votre <b>Code Secret</b> unique. Notez-le bien, il ne sera plus affiché sur l'accueil pour des raisons de sécurité :</p>
     <div id="modalSecretCodeDisplay" class="secret-code-badge">SEC-0000</div>
     <div>
       <button class="btn btn-outline-primary btn-sm me-2" onclick="copySecretCodeModal()"><i class="fa fa-copy me-1"></i> Copier</button>
@@ -315,7 +315,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- 1. DIRECTION -->
 <div class="tab-pane" id="tab-direction">
 <h5 class="text-primary fw-bold mb-3">Direction & Membres Administratifs</h5>
-<form onsubmit="handleSaveDirection(event)" class="row g-2 mb-3 no-print">
+<form id="formDirection" onsubmit="handleSaveDirection(event)" class="row g-2 mb-3 no-print">
 <input type="hidden" id="dirEditIndex">
 <div class="col-md-4"><input type="text" id="dirName" class="form-control" placeholder="Nom et Prénom" required></div>
 <div class="col-md-4">
@@ -343,7 +343,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- 2. CLASSES -->
 <div class="tab-pane" id="tab-classes">
 <h5 class="text-primary fw-bold mb-3">Enregistrement des Classes</h5>
-<form onsubmit="handleSaveClass(event)" class="row g-2 mb-3 no-print">
+<form id="formClass" onsubmit="handleSaveClass(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-8"><input type="text" id="className" class="form-control" placeholder="Nom de la classe (ex: 1ère Année A)" required></div>
 <div class="col-md-4">
 <div class="action-bar m-0">
@@ -359,7 +359,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- 3. ENSEIGNANTS -->
 <div class="tab-pane" id="tab-profs">
 <h5 class="text-primary fw-bold mb-3">Enseignants & Titulaires</h5>
-<form onsubmit="handleSaveTeacher(event)" class="row g-2 mb-3 no-print">
+<form id="formTeacher" onsubmit="handleSaveTeacher(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-4"><input type="text" id="teacherName" class="form-control" placeholder="Nom de l'enseignant" required></div>
 <div class="col-md-4"><select id="teacherClass" class="form-select"></select></div>
 <div class="col-md-4">
@@ -376,7 +376,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- 4. ELEVES -->
 <div class="tab-pane" id="tab-eleves-reg">
 <h5 class="text-primary fw-bold mb-3">Inscription des Élèves</h5>
-<form onsubmit="handleSaveStudent(event)" class="row g-2 mb-3 no-print">
+<form id="formStudent" onsubmit="handleSaveStudent(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-4"><select id="studentClass" class="form-select" required></select></div>
 <div class="col-md-4"><input type="text" id="studentName" class="form-control" placeholder="Nom et Prénom" required></div>
 <div class="col-md-2"><select id="studentSexe" class="form-select"><option value="M">M</option><option value="F">F</option></select></div>
@@ -415,7 +415,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- COURS -->
 <div class="tab-pane" id="tab-cours">
 <h5 class="text-primary fw-bold mb-3">Cours & Pondération</h5>
-<form onsubmit="handleSaveCourse(event)" class="row g-2 mb-3 no-print">
+<form id="formCourse" onsubmit="handleSaveCourse(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-4"><select id="courseClassSelect" class="form-select" required></select></div>
 <div class="col-md-4"><input type="text" id="courseName" class="form-control" placeholder="Intitulé du cours" required></div>
 <div class="col-md-2"><input type="number" id="courseMax" class="form-control" placeholder="Max" required></div>
@@ -460,7 +460,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- FRAIS & FACTURATION -->
 <div class="tab-pane" id="tab-frais">
 <h5 class="text-primary fw-bold mb-3">Caisse & Facturation</h5>
-<form onsubmit="handleSaveStudentPayment(event)" class="row g-2 mb-3 no-print">
+<form id="formPayment" onsubmit="handleSaveStudentPayment(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-3"><select id="paySection" class="form-select" onchange="updatePayEntityOptions()" required><option value="Élève">Élève</option><option value="Enseignant">Enseignant</option><option value="Administratif">Administratif</option></select></div>
 <div class="col-md-3"><select id="payEntitySelect" class="form-select" required></select></div>
 <div class="col-md-2"><input type="number" id="payMontant" class="form-control" placeholder="Montant ($)" required></div>
@@ -489,7 +489,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- DISCIPLINE -->
 <div class="tab-pane" id="tab-discipline">
 <h5 class="text-primary fw-bold mb-3">Discipline & Sanctions</h5>
-<form onsubmit="handleSaveDiscipline(event)" class="row g-2 mb-3 no-print">
+<form id="formDiscipline" onsubmit="handleSaveDiscipline(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-4"><select id="discClassSelect" class="form-select" onchange="loadStudentsForDiscipline()" required></select></div>
 <div class="col-md-4"><select id="discStudentSelect" class="form-select" required></select></div>
 <div class="col-md-4"><input type="text" id="discobs" class="form-control" placeholder="Motif / Sanction" required></div>
@@ -692,6 +692,7 @@ function renderSchoolsList() {
         container.innerHTML = '<div class="col-12"><div class="alert alert-secondary text-center">Aucun établissement enregistré. Cliquez sur « 1. Créer une École ».</div></div>';
         return;
     }
+    // Code secret retiré de l'affichage de la carte
     container.innerHTML = appData.schools.map(s => `
         <div class="col-md-6">
             <div class="card shadow-sm border-start border-4 border-primary p-3 bg-light d-flex flex-row align-items-center gap-3">
@@ -799,8 +800,7 @@ function handleSaveDirection(e) {
         s.direction.push({ name, role, phone });
     }
     saveData();
-    document.getElementById('dirName').value = '';
-    document.getElementById('dirPhone').value = '';
+    document.getElementById('formDirection').reset();
     renderDirectionTable();
 }
 function renderDirectionTable() {
@@ -823,8 +823,7 @@ function editDirection(i) {
     document.getElementById('dirEditIndex').value = i;
 }
 function resetDirectionForm() {
-    document.getElementById('dirName').value = '';
-    document.getElementById('dirPhone').value = '';
+    document.getElementById('formDirection').reset();
     document.getElementById('dirEditIndex').value = '';
 }
 function deleteSelectedDirection() {
@@ -851,7 +850,7 @@ function handleSaveClass(e) {
     if(!s.classes) s.classes = [];
     s.classes.push({ name });
     saveData();
-    document.getElementById('className').value = '';
+    document.getElementById('formClass').reset();
     renderClassesTable();
 }
 function renderClassesTable() {
@@ -882,6 +881,7 @@ function handleSaveTeacher(e) {
     if(!s.teachers) s.teachers = [];
     s.teachers.push({ name, titulaireClass, secretCode });
     saveData();
+    document.getElementById('formTeacher').reset();
     renderTeachersTable();
 }
 function renderTeachersTable() {
@@ -906,6 +906,7 @@ function handleSaveStudent(e) {
     if(!s.students) s.students = [];
     s.students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe, cardData: {} });
     saveData();
+    document.getElementById('formStudent').reset();
     renderStudentsTable();
 }
 function renderStudentsTable() {
@@ -930,6 +931,7 @@ function handleSaveCourse(e) {
     if(!s.courses[cl]) s.courses[cl] = [];
     s.courses[cl].push({ id: 'CRS-' + Date.now(), name, max });
     saveData();
+    document.getElementById('formCourse').reset();
     renderCoursesTable();
 }
 function renderCoursesTable() {
@@ -1032,6 +1034,8 @@ function handleSaveStudentPayment(e) {
     if(!s.studentPayments) s.studentPayments = [];
     s.studentPayments.push({ date: new Date().toLocaleDateString('fr-FR'), section, entityName, motif, montant });
     saveData();
+    document.getElementById('formPayment').reset();
+    updatePayEntityOptions();
     renderStudentPayTable();
     alert("Facture / Reçu enregistré avec succès !");
 }
@@ -1083,6 +1087,8 @@ function handleSaveDiscipline(e) {
     if(!s.discipline) s.discipline = [];
     s.discipline.push({ studentName: stObj ? stObj.name : '', obs });
     saveData();
+    document.getElementById('formDiscipline').reset();
+    loadStudentsForDiscipline();
     renderDisciplineTable();
 }
 function renderDisciplineTable() {
@@ -1097,6 +1103,7 @@ function handleSaveCommunication() {
     if(!s.communications) s.communications = [];
     s.communications.push({ date: new Date().toLocaleDateString('fr-FR'), message });
     saveData();
+    document.getElementById('announcementText').value = '';
     renderCommTable();
 }
 function renderCommTable() {
