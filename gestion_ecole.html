@@ -50,6 +50,26 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </style>
 </head>
 <body>
+  <!-- Navigation Principale Harmonisée pour Gestion École -->
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+            <img src="img/logo.jpg" alt="Logo" class="me-3 rounded-circle" style="width: 45px; height: 45px; object-fit: cover;">
+            <h2 class="m-0 text-primary">EDU-RDC</h2>
+        </a>
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                <a href="index.html" class="nav-item nav-link">Accueil</a>
+                <a href="gestion_ecole.html" class="nav-item nav-link active">Gestion École</a>
+                <a href="contact.html" class="nav-item nav-link">Contact</a>
+            </div>
+            <!-- Bouton pour quitter ou revenir rapidement au portail principal -->
+            <a href="index.html" class="btn btn-danger py-4 px-lg-5 d-none d-lg-block text-white">Quitter la Gestion<i class="fa fa-sign-out-alt ms-3"></i></a>
+        </div>
+    </nav>
+
 
 <!-- MODALE D'AFFICHAGE DU CODE SECRET -->
 <div id="secretCodeModal" class="secret-modal-overlay">
