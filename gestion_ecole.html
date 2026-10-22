@@ -268,44 +268,33 @@ professionnelle des institutions éducationnelles en RDC</p>
 <div class="container-fluid py-4 px-lg-5">
 <!-- PORTAIL PRINCIPAL -->
 <div id="view-portal" class="view-section active">
-<div class="text-center mb-4">
-<h6 class="section-title bg-white text-center text-primary px-3">Portail Officiel</h6>
-<h1 class="mb-5">Services & Actions Principales</h1>
-</div>
 <div class="row g-4 mb-4">
 <div class="col-md-4">
-<div class="card h-100 shadow-sm border-0 text-center p-4 school-card bg-light"
-onclick="openSchoolForm()">
+<div class="card h-100 shadow-sm border-0 text-center p-4 bg-light">
 <i class="fa fa-university fa-3x text-primary mb-3"></i>
 <h4 class="fw-bold">1. Créer une École</h4>
-<p class="text-muted small">Enregistrer un nouvel établissement scolaire avec son
-identité complète.</p>
-<button class="btn btn-outline-primary btn-sm mt-2 fw-bold" onclick="event.stopPropagation(); openSchoolForm();">Accéder à la
-création</button>
-</div>
-</div>
-<div class="col-md-4">
-<div class="card h-100 shadow-sm border-0 text-center p-4 school-card bg-light"
-onclick="openDirectRegistration()">
-<i class="fa fa-user-plus fa-3x text-success mb-3"></i>
-<h4 class="fw-bold">2. Inscription Élèves</h4>
-<p class="text-muted small">Inscrire directement un élève dans une école active.</p>
-<button class="btn btn-outline-success btn-sm mt-2 fw-bold" onclick="event.stopPropagation(); openDirectRegistration();">Procéder à
-l'inscription</button>
+<p class="text-muted small">Enregistrer un nouvel établissement scolaire avec son identité complète.</p>
+<a href="javascript:void(0);" onclick="openSchoolForm();" class="btn btn-outline-primary btn-sm mt-2 fw-bold" style="position: relative; z-index: 5;">Accéder à la création</a>
 </div>
 </div>
 <div class="col-md-4">
 <div class="card h-100 shadow-sm border-0 text-center p-4 bg-light">
-<i class="fa fa-briefcase fa-3x text-warning mb-3"></i>
-<h4 class="fw-bold">3. Demande d'Emploi</h4>
+<i class="fa fa-user-plus fa-3x text-success mb-3"></i>
+<h4 class="fw-bold">2. Inscription Élèves</h4>
+<p class="text-muted small">Inscrire directement un élève dans une école active.</p>
+<a href="javascript:void(0);" onclick="openDirectRegistration();" class="btn btn-outline-success btn-sm mt-2 fw-bold" style="position: relative; z-index: 5;">Procéder à l'inscription</a>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card h-100 shadow-sm border-0 text-center p-4 bg-light">
 <p class="text-muted small">Postuler à un poste d'enseignant ou d'administratif.</p>
-<button class="btn btn-outline-warning btn-sm mt-2 fw-bold"
-onclick="openJobApplicationSection()">Soumettre candidature</button>
-<a href="qrcode.html" class="btn btn-info btn-sm mt-2 fw-bold text-white"><i
+<a href="javascript:void(0);" onclick="openJobApplicationSection();" class="btn btn-outline-warning btn-sm mt-2 fw-bold" style="position: relative; z-index: 5;">Soumettre candidature</a>
+<a href="qrcode.html" class="btn btn-info btn-sm mt-2 fw-bold text-white" style="position: relative; z-index: 5;"><i
 class="fa fa-id-card me-1"></i> carte élève et Administratifs</a>
 </div>
 </div>
 </div>
+
 <!-- ÉVÉNEMENTS SCOLAIRES EN LIGNE (PUBLICATION DE 7 JOURS SEULEMENT) -->
 <div class="card shadow-sm border-0 mb-4 bg-light">
 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-
