@@ -411,7 +411,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 </form>
-<table class="table table-bordered"><thead><tr><th>Classe</th><th class="no-print">Action</th></tr></thead><tbody id="classesTableBody"></tbody></table>
+<div id="classesContainerList"></div>
 </div>
 
 <!-- 3. ENSEIGNANTS -->
@@ -826,16 +826,16 @@ function renderSchoolsList() {
     `).join('');
 }
 
-// RENDU DES ANNONCES SUR LE PORTAIL PRINCIPAL
+// RENDU DES ANNONCES SUR LE PORTAIL PRINCIPAL AVEC SUPPRESSION PROPRIÉTAIRE
 function renderPortalAnnouncements() {
     const container = document.getElementById('portalAnnouncementsContainer');
     if(!container) return;
     let allComms = [];
     if(appData.schools) {
-        appData.schools.forEach(s => {
+        appData.schools.forEach((s, sIdx) => {
             if(s.communications && s.communications.length > 0) {
-                s.communications.forEach(c => {
-                    allComms.push({ schoolName: s.name, date: c.date, message: c.message });
+                s.communications.forEach((c, cIdx) => {
+                    allComms.push({ schoolId: s.id, schoolName: s.name, date: c.date, message: c.message, cIdx });
                 });
             }
         });
@@ -845,11 +845,29 @@ function renderPortalAnnouncements() {
         return;
     }
     container.innerHTML = allComms.map(item => `
-        <div class="alert alert-light border-start border-4 border-warning mb-2 py-2">
-            <div class="d-flex justify-content-between"><strong class="text-primary">${esc(item.schoolName)}</strong><small class="text-muted">${item.date}</small></div>
-            <div class="small mt-1">${esc(item.message)}</div>
+        <div class="alert alert-light border-start border-4 border-warning mb-2 py-2 d-flex justify-content-between align-items-center">
+            <div>
+                <div class="d-flex justify-content-between"><strong class="text-primary">${esc(item.schoolName)}</strong><small class="text-muted ms-2">${item.date}</small></div>
+                <div class="small mt-1">${esc(item.message)}</div>
+            </div>
+            <button class="btn btn-outline-danger btn-sm no-print" onclick="deletePortalAnnouncement('${item.schoolId}', ${item.cIdx})" title="Supprimer cette publication"><i class="fa fa-trash"></i></button>
         </div>
     `).join('');
+}
+
+function deletePortalAnnouncement(schoolId, commIdx) {
+    const s = appData.schools.find(x => x.id === schoolId);
+    if(!s) return;
+    const code = prompt("Entrez le code secret de l'école \"" + s.name + "\" pour supprimer cette publication :");
+    if(code && code.trim().toUpperCase() === s.secretCode.toUpperCase()) {
+        s.communications.splice(commIdx, 1);
+        saveData();
+        renderPortalAnnouncements();
+        if(activeSchoolId === schoolId) renderCommTable();
+        alert("Publication supprimée avec succès.");
+    } else if(code !== null) {
+        alert("Code secret incorrect.");
+    }
 }
 
 function promptLoginCode(id) {
@@ -1000,27 +1018,115 @@ function deleteDirection(i) {
     renderDirectionTable();
 }
 
-// 2. CLASSES
+// 2. CLASSES (MIS À JOUR : CHAQUE CLASSE A SON PROPRE FORMULAIRE ET SES ÉLÈVES / ENSEIGNANT)
 function handleSaveClass(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const name = document.getElementById('className').value.trim();
+    if(!name) return;
     if(!s.classes) s.classes = [];
+    if(s.classes.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        alert("Cette classe existe déjà !");
+        return;
+    }
     s.classes.push({ name });
     saveData();
     document.getElementById('formClass').reset();
     renderClassesTable();
 }
+
 function renderClassesTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
-    document.getElementById('classesTableBody').innerHTML = (s.classes || []).map(c => `<tr><td><b>${c.name}</b></td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteClass('${c.name}')"><i class="fa fa-trash"></i> Supprimer</button></td></tr>`).join('') || '<tr><td colspan="2" class="text-center text-muted">Aucune classe</td></tr>';
+    const container = document.getElementById('classesContainerList');
+    if(!container) return;
+
+    if(!s.classes || s.classes.length === 0) {
+        container.innerHTML = '<div class="alert alert-secondary text-center">Aucune classe enregistrée.</div>';
+        return;
+    }
+
+    container.innerHTML = s.classes.map(c => {
+        const classStudents = (s.students || []).filter(st => st.classe === c.name);
+        const classTeacher = (s.teachers || []).find(t => t.titulaireClass === c.name);
+
+        return `
+            <div class="card shadow-sm border-0 mb-4 border-start border-4 border-primary">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 text-primary fw-bold"><i class="fa fa-door-open me-2"></i>Classe : ${esc(c.name)}</h5>
+                    <button class="btn btn-sm btn-outline-danger no-print" onclick="deleteClass('${esc(c.name)}')"><i class="fa fa-trash"></i> Supprimer la classe</button>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 p-2 bg-light rounded small">
+                        <b>Enseignant Titulaire :</b> <span class="text-success fw-bold">${classTeacher ? esc(classTeacher.name) + ' (Code: ' + classTeacher.secretCode + ')' : 'Aucun enseignant titulaire assigné'}</span>
+                    </div>
+
+                    <!-- Formulaire d'inscription d'élève spécifique à cette classe -->
+                    <form onsubmit="handleSaveStudentInClass(event, '${esc(c.name)}')" class="row g-2 mb-3 no-print">
+                        <div class="col-md-6"><input type="text" id="studentName_${esc(c.name)}" class="form-control form-control-sm" placeholder="Nom et Prénom de l'élève" required></div>
+                        <div class="col-md-3"><select id="studentSexe_${esc(c.name)}" class="form-select form-select-sm"><option value="M">M</option><option value="F">F</option></select></div>
+                        <div class="col-md-3"><button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-plus me-1"></i> Inscrire</button></div>
+                    </form>
+
+                    <!-- Liste des élèves de cette classe -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm align-middle mb-0">
+                            <thead>
+                                <tr class="table-secondary"><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th class="no-print">Action</th></tr>
+                            </thead>
+                            <tbody>
+                                ${
+                                    classStudents.length > 0 ? classStudents.map((st, idx) => `
+                                        <tr>
+                                            <td><b>${st.mat}</b></td>
+                                            <td>${esc(st.name)}</td>
+                                            <td>${esc(st.sexe)}</td>
+                                            <td class="no-print">
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteStudentFromClass('${st.id}')"><i class="fa fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    `).join('') : '<tr><td colspan="4" class="text-center text-muted small">Aucun élève inscrit dans cette classe</td></tr>'
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
-function deleteClass(name) {
+
+function handleSaveStudentInClass(e, className) {
+    e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    s.classes = s.classes.filter(c => c.name !== name);
+    const nameInput = document.getElementById(`studentName_${className}`);
+    const sexeInput = document.getElementById(`studentSexe_${className}`);
+    const name = nameInput.value.trim();
+    const sexe = sexeInput.value;
+    const mat = 'ELV-' + Math.floor(1000 + Math.random() * 9000);
+
+    if(!s.students) s.students = [];
+    s.students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe: className, photo: '', cardData: {} });
     saveData();
     renderClassesTable();
+}
+
+function deleteStudentFromClass(studentId) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(s && s.students) {
+        s.students = s.students.filter(st => st.id !== studentId);
+        saveData();
+        renderClassesTable();
+    }
+}
+
+function deleteClass(name) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(confirm("Voulez-vous vraiment supprimer cette classe ?")) {
+        s.classes = s.classes.filter(c => c.name !== name);
+        saveData();
+        renderClassesTable();
+    }
 }
 
 // 3. ENSEIGNANTS (RESTRICTION PAR CLASSE TITULAIRE)
@@ -1061,9 +1167,7 @@ function loginAsTeacher(code, classe) {
     const entered = prompt("Entrez votre code secret enseignant ("+code+") :");
     if(entered && entered.trim().toUpperCase() === code.toUpperCase()) {
         alert("Accès autorisé uniquement à votre classe titulaire : " + classe);
-        const studentClassSel = document.getElementById('studentClass');
-        if(studentClassSel) { studentClassSel.value = classe; studentClassSel.disabled = true; }
-        switchTab('tab-eleves-reg');
+        switchTab('tab-classes');
     } else {
         const req = confirm("Code incorrect ! Souhaitez-vous envoyer une demande de rappel de code à l'Admin Central pour la classe " + classe + " ?");
         if(req) {
@@ -1084,35 +1188,20 @@ function loginAsTeacher(code, classe) {
     }
 }
 
-// 4. ELEVES (MIS À JOUR : CHARGEMENT DES CLASSES ENREGISTRÉES DE L'ÉCOLE ACTIVE)
+// 4. ELEVES
 function refreshStudentOptions() {
-    const s = appData.schools.find(x => x.id === activeSchoolId);
-    const sel = document.getElementById('studentClass');
-    if(sel) {
-        if(s && s.classes && s.classes.length > 0) {
-            sel.innerHTML = s.classes.map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
-        } else {
-            sel.innerHTML = '<option value="">-- Aucune classe enregistrée --</option>';
-        }
-    }
     renderStudentsTable();
 }
 function handleSaveStudent(e) {
     e.preventDefault();
-    const s = appData.schools.find(x => x.id === activeSchoolId);
-    const name = document.getElementById('studentName').value.trim();
-    const classe = document.getElementById('studentClass').value;
-    const sexe = document.getElementById('studentSexe').value;
-    const mat = 'ELV-' + Math.floor(1000 + Math.random() * 9000);
-    if(!s.students) s.students = [];
-    s.students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe, photo: '', cardData: {} });
-    saveData();
-    document.getElementById('formStudent').reset();
-    renderStudentsTable();
 }
 function renderStudentsTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('studentsTableBody').innerHTML = (s.students || []).map((st, idx) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.students.splice(${idx},1);saveData();renderStudentsTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucun élève</td></tr>';
+    if(!s) return;
+    const tbody = document.getElementById('studentsTableBody');
+    if(tbody) {
+        tbody.innerHTML = (s.students || []).map((st, idx) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.students.splice(${idx},1);saveData();renderStudentsTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucun élève</td></tr>';
+    }
 }
 
 // 5. COURS
@@ -1560,6 +1649,7 @@ function renderDisciplineTable() {
 function handleSaveCommunication() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const message = document.getElementById('announcementText').value;
+    if(!message.trim()) return;
     if(!s.communications) s.communications = [];
     s.communications.push({ date: new Date().toLocaleDateString('fr-FR'), message });
     saveData();
