@@ -516,7 +516,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- NOTES -->
 <div class="tab-pane" id="tab-notes">
-<h5 class="text-primary fw-bold mb-3">Saisie de Notes (1P, 2P, Examen | 3P, 4P, Examen)</h5>
+<h5 class="text-primary fw-bold mb-3">Saisie de Notes (1p, 2p, Examen | 3p, 4p, Examen)</h5>
 <div class="row g-2 mb-3 no-print">
 <div class="col-md-6"><select id="notesClassSelect" class="form-select" onchange="loadStudentsForNotes()"></select></div>
 <div class="col-md-6"><select id="notesStudentSelect" class="form-select" onchange="renderNotesSheet()"></select></div>
@@ -1101,7 +1101,7 @@ function renderCoursesTable() {
     document.getElementById('coursesTableBody').innerHTML = courses.map((c, idx) => `<tr><td>${c.name}</td><td>${c.max}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.courses['${cl}'].splice(${idx},1);saveData();renderCoursesTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucun cours</td></tr>';
 }
 
-// 6. NOTES (MIS À JOUR AVEC 1P, 2P, EXAMEN, 3P, 4P, EXAMEN)
+// 6. NOTES (MIS À JOUR AVEC 1p, 2p, Examen, 3p, 4p, Examen)
 function refreshNotesOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const sel = document.getElementById('notesClassSelect');
@@ -1133,8 +1133,8 @@ function renderNotesSheet() {
                 <th colspan="3">Second Semestre</th>
             </tr>
             <tr class="table-light">
-                <th>1P</th><th>2P</th><th>Examen</th>
-                <th>3P</th><th>4P</th><th>Examen</th>
+                <th>1p</th><th>2p</th><th>Examen</th>
+                <th>3p</th><th>4p</th><th>Examen</th>
             </tr>
         </thead>
         <tbody>` +
@@ -1159,7 +1159,7 @@ function saveNote(stId, crsId, period, val) {
     saveData();
 }
 
-// 7. BULLETIN (MIS À JOUR AVEC GESTION COMPLÈTE 1P, 2P, EXAMEN & 3P, 4P, EXAMEN ET COURS DE LA CLASSE)
+// 7. BULLETIN (MIS À JOUR AVEC CALCULS ET PLACES POUR 1ère, 2ème ET FIN D'ANNÉE / TG)
 function refreshBulletinOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -1193,6 +1193,47 @@ function renderBulletinFromSystem() {
         return;
     }
 
+    const classStudents = (s.students || []).filter(st => st.classe === clName);
+
+    // --- CALCULS POUR TOUS LES ÉLÈVES DE LA CLASSE (POUR DÉTERMINER LES PLACES / RANGS) ---
+    let studentScoresMap = {};
+    classStudents.forEach(st => {
+        let stN = (s.notes && s.notes[st.id]) ? s.notes[st.id] : {};
+        let tS1 = 0, tS2 = 0, tGen = 0;
+        courses.forEach(c => {
+            let cn = stN[c.id] || {};
+            let p1 = parseFloat(cn.p1) || 0;
+            let p2 = parseFloat(cn.p2) || 0;
+            let e1 = parseFloat(cn.e1) || 0;
+            let p3 = parseFloat(cn.p3) || 0;
+            let p4 = parseFloat(cn.p4) || 0;
+            let e2 = parseFloat(cn.e2) || 0;
+
+            let s1Cour = p1 + p2 + e1;
+            let s2Cour = p3 + p4 + e2;
+            tS1 += s1Cour;
+            tS2 += s2Cour;
+            tGen += (s1Cour + s2Cour);
+        });
+        studentScoresMap[st.id] = { s1: tS1, s2: tS2, gen: tGen };
+    });
+
+    // Classement Semestre 1
+    let sortedS1 = [...classStudents].sort((a, b) => studentScoresMap[b.id].s1 - studentScoresMap[a.id].s1);
+    let rankS1Idx = sortedS1.findIndex(st => st.id === student.id);
+    let rankS1 = rankS1Idx !== -1 ? (rankS1Idx + 1) + '/' + classStudents.length : '1/' + classStudents.length;
+
+    // Classement Semestre 2
+    let sortedS2 = [...classStudents].sort((a, b) => studentScoresMap[b.id].s2 - studentScoresMap[a.id].s2);
+    let rankS2Idx = sortedS2.findIndex(st => st.id === student.id);
+    let rankS2 = rankS2Idx !== -1 ? (rankS2Idx + 1) + '/' + classStudents.length : '1/' + classStudents.length;
+
+    // Classement Général / Annuel (TG)
+    let sortedGen = [...classStudents].sort((a, b) => studentScoresMap[b.id].gen - studentScoresMap[a.id].gen);
+    let rankGenIdx = sortedGen.findIndex(st => st.id === student.id);
+    let rankGen = rankGenIdx !== -1 ? (rankGenIdx + 1) + '/' + classStudents.length : '1/' + classStudents.length;
+
+    // --- NOTES DE L'ÉLÈVE SÉLECTIONNÉ ---
     const stNotes = (s.notes && s.notes[student.id]) ? s.notes[student.id] : {};
     
     let totalMaxP1 = 0, totalObtP1 = 0;
@@ -1219,9 +1260,8 @@ function renderBulletinFromSystem() {
 
         const maxCour = parseFloat(c.max) || 20;
         const maxExamCour = maxCour * 2;
-        const maxSemCour = maxCour * 4; // Max P1 + P2 + Examen(Max*2)
+        const maxSemCour = maxCour * 4;
 
-        // Totaux Semestre 1
         totalMaxP1 += maxCour;
         if(p1 !== null) totalObtP1 += p1;
 
@@ -1235,7 +1275,6 @@ function renderBulletinFromSystem() {
         totalMaxS1 += maxSemCour;
         totalObtS1 += totS1Obt;
 
-        // Totaux Semestre 2
         totalMaxP3 += maxCour;
         if(p3 !== null) totalObtP3 += p3;
 
@@ -1249,7 +1288,6 @@ function renderBulletinFromSystem() {
         totalMaxS2 += maxSemCour;
         totalObtS2 += totS2Obt;
 
-        // Total Général Annuel
         const tgMax = maxSemCour * 2;
         const tgObt = totS1Obt + totS2Obt;
         totalMaxGen += tgMax;
@@ -1274,23 +1312,9 @@ function renderBulletinFromSystem() {
         </tr>`;
     }).join('') || '<tr><td colspan="16" class="text-center text-muted">Aucun cours enregistré pour cette classe. Veuillez ajouter des cours dans la section Pondération.</td></tr>';
 
-    // Pourcentages et Rangs
     const pctGen = totalMaxGen > 0 ? ((totalObtGen / totalMaxGen) * 100).toFixed(1) + ' %' : '0 %';
-
-    let classStudents = (s.students || []).filter(st => st.classe === clName);
-    let studentTotals = classStudents.map(st => {
-        let stN = (s.notes && s.notes[st.id]) ? s.notes[st.id] : {};
-        let tObt = 0;
-        courses.forEach(c => {
-            let cn = stN[c.id] || {};
-            tObt += (parseFloat(cn.p1) || 0) + (parseFloat(cn.p2) || 0) + (parseFloat(cn.e1) || 0) + 
-                    (parseFloat(cn.p3) || 0) + (parseFloat(cn.p4) || 0) + (parseFloat(cn.e2) || 0);
-        });
-        return { id: st.id, total: tObt };
-    });
-    studentTotals.sort((a, b) => b.total - a.total);
-    let rankIndex = studentTotals.findIndex(item => item.id === student.id);
-    let studentRank = rankIndex !== -1 ? (rankIndex + 1) + '/' + classStudents.length : '1/' + classStudents.length;
+    const pctS1 = totalMaxS1 > 0 ? ((totalObtS1 / totalMaxS1) * 100).toFixed(1) + ' %' : '0 %';
+    const pctS2 = totalMaxS2 > 0 ? ((totalObtS2 / totalMaxS2) * 100).toFixed(1) + ' %' : '0 %';
 
     page.innerHTML = `
         <div class="hdr">
@@ -1337,9 +1361,9 @@ function renderBulletinFromSystem() {
                     <th rowspan="2">Sign. Prof</th>
                 </tr>
                 <tr>
-                    <th>1ère P</th><th>2ème P</th>
+                    <th>1p</th><th>2p</th>
                     <th colspan="2">1er Ex</th>
-                    <th>3ème P</th><th>4ème P</th>
+                    <th>3p</th><th>4p</th>
                     <th colspan="2">2e Ex</th>
                 </tr>
             </thead>
@@ -1364,15 +1388,15 @@ function renderBulletinFromSystem() {
                 </tr>
                 <tr class="bold">
                     <td class="nm">POURCENTAGE</td>
-                    <td colspan="6"></td>
-                    <td colspan="6"></td>
+                    <td colspan="6"><b>${pctS1}</b></td>
+                    <td colspan="6"><b>${pctS2}</b></td>
                     <td><b>${pctGen}</b></td>
                 </tr>
                 <tr class="bold">
                     <td class="nm">PLACE / NBRE D’ÉLÈVES</td>
-                    <td colspan="6"></td>
-                    <td colspan="6"></td>
-                    <td><b>${studentRank}</b></td>
+                    <td colspan="6"><b>${rankS1}</b></td>
+                    <td colspan="6"><b>${rankS2}</b></td>
+                    <td><b>${rankGen}</b></td>
                 </tr>
                 <tr class="bold">
                     <td class="nm">APPLICATION</td>
