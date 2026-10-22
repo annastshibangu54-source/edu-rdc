@@ -82,7 +82,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <i class="fa fa-user-plus fa-3x text-success mb-3"></i>
 <h4 class="fw-bold">2. Inscription Élèves</h4>
 <p class="text-muted small">Inscrire directement un élève dans une école active.</p>
-<button onclick="openDirectRegistration()" class="btn btn-outline-success btn-sm mt-2 fw-bold">Procéder à l'inscription</button>
+<button onclick="openDirectRegistrationModal()" class="btn btn-outline-success btn-sm mt-2 fw-bold">Procéder à l'inscription</button>
 </div>
 </div>
 <div class="col-md-4">
@@ -511,16 +511,15 @@ const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
 let appData = { schools: [], adminRequests: [], jobApplications: [] };
 let activeSchoolId = null;
 
-// Base de données des sous-divisions par province éducationnelle en RDC
 const subDivisionsData = {
     "KINSHASA-LUKUNGA": ["Bandalungwa", "Gombe", "Kintambo", "Lingwala", "Ngaliema"],
     "KINSHASA-MONT AMBA": ["Kisenso", "Lemba", "Matete", "Ngaba", "Selembao"],
-    "KINSHASA-FUNA": ["Bumbu", "Kalamu", "Kasa-Vubu", "Makala", "Ngiri-Ngiri", "Selembao"],
+    "KINSHASA-FUNA": ["Bumbu", "Kalamu", "Kasa-Vubu", "Makala", "Ngiri-Ngiri"],
     "KINSHASA-TSHANGA": ["Kimbanseke", "Masina", "Nsele"],
     "KINSHASA-EST": ["Ndjili", "Masina", "Kimbanseke"],
     "BAS-UELE": ["Buta", "Aketi", "Bondo", "Ango", "Poko"],
     "EQUATEUR 1": ["Mbandaka 1", "Mbandaka 2", "Wangata", "Lukolela", "Bikoro"],
-    "EQUATEUR 2": ["Basankusu", "Boende", "Koko"],
+    "EQUATEUR 2": ["Basankusu", "Boende"],
     "HAUT-KATANGA 1": ["Lubumbashi 1", "Lubumbashi 2", "Kafubu", "Kipushi", "Kasenga"],
     "HAUT-KATANGA 2": ["Likasi 1", "Likasi 2", "Kambove", "Sakania"],
     "HAUT-LOMAMI 1": ["Kamina", "Bukama", "Kaniama", "Malemba-Nkulu"],
@@ -530,7 +529,7 @@ const subDivisionsData = {
     "KASAI 1": ["Tshikapa 1", "Tshikapa 2", "Kamuesha", "Luebo"],
     "KASAI 2": ["Ilebo", "Mweka", "Dekese"],
     "KASAI CENTRAL 1": ["Kananga 1", "Kananga 2", "Dibaya", "Demba"],
-    "KASAI ORIENTAL 1": ["Mbuji-Mayi 1", "Mbuji-Mayi 2", "Katanda", "Luebo"],
+    "KASAI ORIENTAL 1": ["Mbuji-Mayi 1", "Mbuji-Mayi 2", "Katanda"],
     "KATANGA HAUT-LOMAMI": ["Kamina", "Bukama"],
     "KINSHASA OUEST": ["Ngaliema", "Kintambo"],
     "KONGO CENTRAL 1": ["Matadi", "Boma", "Muanda", "Tshela"],
@@ -540,7 +539,7 @@ const subDivisionsData = {
     "KWILU 2": ["Bandundu", "Masi-Manimba", "Gungu"],
     "LOMAMI 1": ["Kabinda", "Ngandajika", "Lubao", "Kamiji"],
     "LUALABA 1": ["Kolwezi 1", "Kolwezi 2", "Fungurume", "Mutshatsha", "Dilolo"],
-    "MAI-NDOMBE 1": ["Inongo", "Kutu", "Oshwe", "Kilemsi"],
+    "MAI-NDOMBE 1": ["Inongo", "Kutu", "Oshwe"],
     "MANIEMA 1": ["Kindu", "Kasongo", "Pangi", "Lubutu", "Kibombo"],
     "MONGALA 1": ["Lisala", "Bumba", "Bongandanga"],
     "NORD-KIVU 1": ["Goma", "Nyiragongo", "Masisi"],
@@ -574,7 +573,13 @@ function updateSubDivisions() {
 
 window.onload = function() {
     let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V12");
-    if (saved) { try { appData = JSON.parse(saved); } catch(e){} }
+    if (saved) { 
+        try { 
+            appData = JSON.parse(saved); 
+        } catch(e){
+            appData = { schools: [], adminRequests: [], jobApplications: [] };
+        } 
+    }
     if(!appData.schools) appData.schools = [];
     if(!appData.jobApplications) appData.jobApplications = [];
     renderSchoolsList();
@@ -626,21 +631,20 @@ function handleSaveSchool(e) {
     const secretCode = 'SEC-' + Math.floor(1000 + Math.random() * 9000);
     
     const fileInput = document.getElementById('schoolLogoFile');
-    let logoUrl = "https://via.placeholder.com/70";
     
     if (fileInput.files && fileInput.files[0]) {
         const reader = new FileReader();
         reader.onload = function(evt) {
-            logoUrl = evt.target.result;
-            finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl);
+            finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, evt.target.result);
         };
         reader.readAsDataURL(fileInput.files[0]);
     } else {
-        finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl);
+        finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, "https://via.placeholder.com/70");
     }
 }
 
 function finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl) {
+    if(!appData.schools) appData.schools = [];
     appData.schools.push({
         id: 'SCH-' + Date.now(),
         name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl,
@@ -655,7 +659,7 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
 function renderSchoolsList() {
     const container = document.getElementById('schoolsListContainer');
     if(!container) return;
-    if(!appData.schools.length) {
+    if(!appData.schools || !appData.schools.length) {
         container.innerHTML = '<div class="col-12"><div class="alert alert-secondary text-center">Aucun établissement enregistré. Cliquez sur « 1. Créer une École ».</div></div>';
         return;
     }
@@ -1122,6 +1126,14 @@ function populateCardFromSelectedStudent() {
     document.getElementById('cardPostnomVal').innerText = parts[1] || '-';
     document.getElementById('cardPrenomVal').innerText = parts.slice(2).join(' ') || '-';
     document.getElementById('cardClasseVal').innerText = st.classe || '-';
+}
+
+function openDirectRegistrationModal() {
+    if(!appData.schools || appData.schools.length === 0) {
+        alert("Veuillez d'abord créer au moins une école pour inscrire un élève.");
+        return;
+    }
+    promptLoginCode(appData.schools[0].id);
 }
 </script>
 </body>
