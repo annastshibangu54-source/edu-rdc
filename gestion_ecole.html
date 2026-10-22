@@ -155,6 +155,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 
+<!-- ZONE D'AFFICHAGE DES PUBLICATIONS / ANNONCES PUBLIEES PAR LES ÉCOLES -->
+<div class="row mb-4 no-print">
+<div class="col-12">
+<div class="card shadow-sm border-0 bg-white p-3">
+<h5 class="text-primary fw-bold mb-3"><i class="fa fa-bullhorn me-2"></i>Fil d'Actualités & Annonces Officielles des Écoles</h5>
+<div id="portalAnnouncementsContainer">
+<p class="text-muted small mb-0">Aucune annonce publiée pour le moment.</p>
+</div>
+</div>
+</div>
+</div>
+
 <div class="text-center mt-4">
 <h1 class="mb-4">Liste des Établissements Enregistrés</h1>
 </div>
@@ -681,6 +693,7 @@ window.onload = function() {
     if(!appData.adminRequests) appData.adminRequests = [];
     if(!appData.jobApplications) appData.jobApplications = [];
     renderSchoolsList();
+    renderPortalAnnouncements();
 };
 
 function saveData() {
@@ -695,7 +708,10 @@ function showSection(id) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
     const target = document.getElementById(id);
     if(target) target.classList.add('active');
-    if (id === 'view-portal') renderSchoolsList();
+    if (id === 'view-portal') {
+        renderSchoolsList();
+        renderPortalAnnouncements();
+    }
 }
 
 function openSchoolForm() {
@@ -810,6 +826,32 @@ function renderSchoolsList() {
     `).join('');
 }
 
+// RENDU DES ANNONCES SUR LE PORTAIL PRINCIPAL
+function renderPortalAnnouncements() {
+    const container = document.getElementById('portalAnnouncementsContainer');
+    if(!container) return;
+    let allComms = [];
+    if(appData.schools) {
+        appData.schools.forEach(s => {
+            if(s.communications && s.communications.length > 0) {
+                s.communications.forEach(c => {
+                    allComms.push({ schoolName: s.name, date: c.date, message: c.message });
+                });
+            }
+        });
+    }
+    if(allComms.length === 0) {
+        container.innerHTML = '<p class="text-muted small mb-0">Aucune annonce publiée pour le moment.</p>';
+        return;
+    }
+    container.innerHTML = allComms.map(item => `
+        <div class="alert alert-light border-start border-4 border-warning mb-2 py-2">
+            <div class="d-flex justify-content-between"><strong class="text-primary">${esc(item.schoolName)}</strong><small class="text-muted">${item.date}</small></div>
+            <div class="small mt-1">${esc(item.message)}</div>
+        </div>
+    `).join('');
+}
+
 function promptLoginCode(id) {
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
@@ -842,6 +884,7 @@ function promptCentralDeleteSchool(id) {
         appData.schools = appData.schools.filter(x => x.id !== id);
         saveData();
         renderSchoolsList();
+        renderPortalAnnouncements();
         if(document.getElementById('view-admin-central').classList.contains('active')) {
             openAdminCentralPanel();
         }
@@ -1041,11 +1084,17 @@ function loginAsTeacher(code, classe) {
     }
 }
 
-// 4. ELEVES
+// 4. ELEVES (MIS À JOUR : CHARGEMENT DES CLASSES ENREGISTRÉES DE L'ÉCOLE ACTIVE)
 function refreshStudentOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const sel = document.getElementById('studentClass');
-    sel.innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    if(sel) {
+        if(s && s.classes && s.classes.length > 0) {
+            sel.innerHTML = s.classes.map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+        } else {
+            sel.innerHTML = '<option value="">-- Aucune classe enregistrée --</option>';
+        }
+    }
     renderStudentsTable();
 }
 function handleSaveStudent(e) {
@@ -1516,11 +1565,12 @@ function handleSaveCommunication() {
     saveData();
     document.getElementById('announcementText').value = '';
     renderCommTable();
+    renderPortalAnnouncements();
 }
 function renderCommTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
-    document.getElementById('commTableBody').innerHTML = (s.communications || []).map((c, idx) => `<tr><td>${c.date}</td><td>${c.message}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${idx},1);saveData();renderCommTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune annonce</td></tr>';
+    document.getElementById('commTableBody').innerHTML = (s.communications || []).map((c, idx) => `<tr><td>${c.date}</td><td>${c.message}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${idx},1);saveData();renderCommTable();renderPortalAnnouncements();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune annonce</td></tr>';
 }
 
 // 12. EMPLOI
