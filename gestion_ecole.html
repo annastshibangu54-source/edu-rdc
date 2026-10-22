@@ -599,7 +599,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="action-bar mb-3 no-print">
 <button class="btn btn-warning btn-sm fw-bold" onclick="handleSaveCommunication()"><i class="fa fa-bullhorn me-1"></i> Publier</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
-<button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+<button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 <table class="table table-bordered mt-3"><thead><tr><th>Date</th><th>Annonce</th><th class="no-print">Action</th></tr></thead><tbody id="commTableBody"></tbody></table>
 </div>
@@ -625,6 +625,7 @@ const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
 let appData = { schools: [], adminRequests: [], jobApplications: [] };
 let activeSchoolId = null;
 let currentCreatedSecretCode = "";
+let unlockedClasses = {}; // Suivi des classes déverrouillées par session
 
 const subDivisionsData = {
     "KINSHASA-LUKUNGA": ["Bandalungwa", "Gombe", "Kintambo", "Lingwala", "Ngaliema"],
@@ -914,6 +915,7 @@ function promptCentralDeleteSchool(id) {
 
 function openSchoolDashboard(id) {
     activeSchoolId = id;
+    unlockedClasses = {}; // Réinitialiser les accès aux classes à l'ouverture
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
     document.getElementById('dashSchoolTitle').innerText = s.name;
@@ -1018,7 +1020,7 @@ function deleteDirection(i) {
     renderDirectionTable();
 }
 
-// 2. CLASSES (MIS À JOUR : CHAQUE CLASSE A SON PROPRE FORMULAIRE ET SES ÉLÈVES / ENSEIGNANT)
+// 2. CLASSES (MIS À JOUR : BOUTON DE SÉCURISATION ET AFFICHAGE CONDITIONNEL PAR CLASSE)
 function handleSaveClass(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1049,6 +1051,7 @@ function renderClassesTable() {
     container.innerHTML = s.classes.map(c => {
         const classStudents = (s.students || []).filter(st => st.classe === c.name);
         const classTeacher = (s.teachers || []).find(t => t.titulaireClass === c.name);
+        const isUnlocked = unlockedClasses[c.name] === true;
 
         return `
             <div class="card shadow-sm border-0 mb-4 border-start border-4 border-primary">
@@ -1057,43 +1060,78 @@ function renderClassesTable() {
                     <button class="btn btn-sm btn-outline-danger no-print" onclick="deleteClass('${esc(c.name)}')"><i class="fa fa-trash"></i> Supprimer la classe</button>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3 p-2 bg-light rounded small">
-                        <b>Enseignant Titulaire :</b> <span class="text-success fw-bold">${classTeacher ? esc(classTeacher.name) + ' (Code: ' + classTeacher.secretCode + ')' : 'Aucun enseignant titulaire assigné'}</span>
-                    </div>
+                    ${!isUnlocked ? `
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-3"><i class="fa fa-lock fa-2x text-warning mb-2"></i><br>Cette classe est verrouillée. Veuillez saisir le <b>code secret de l'école</b> ou le <b>code de l'enseignant titulaire</b> pour afficher ses informations.</p>
+                            <button class="btn btn-primary btn-sm fw-bold px-4" onclick="promptUnlockClass('${esc(c.name)}')"><i class="fa fa-key me-1"></i> Déverrouiller ${esc(c.name)}</button>
+                        </div>
+                    ` : `
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-success"><i class="fa fa-unlock me-1"></i> Déverrouillé</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="lockClass('${esc(c.name)}')"><i class="fa fa-lock me-1"></i> Verrouiller</button>
+                        </div>
+                        <div class="mb-3 p-2 bg-light rounded small">
+                            <b>Enseignant Titulaire :</b> <span class="text-success fw-bold">${classTeacher ? esc(classTeacher.name) + ' (Code: ' + classTeacher.secretCode + ')' : 'Aucun enseignant titulaire assigné'}</span>
+                        </div>
 
-                    <!-- Formulaire d'inscription d'élève spécifique à cette classe -->
-                    <form onsubmit="handleSaveStudentInClass(event, '${esc(c.name)}')" class="row g-2 mb-3 no-print">
-                        <div class="col-md-6"><input type="text" id="studentName_${esc(c.name)}" class="form-control form-control-sm" placeholder="Nom et Prénom de l'élève" required></div>
-                        <div class="col-md-3"><select id="studentSexe_${esc(c.name)}" class="form-select form-select-sm"><option value="M">M</option><option value="F">F</option></select></div>
-                        <div class="col-md-3"><button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-plus me-1"></i> Inscrire</button></div>
-                    </form>
+                        <!-- Formulaire d'inscription d'élève spécifique à cette classe -->
+                        <form onsubmit="handleSaveStudentInClass(event, '${esc(c.name)}')" class="row g-2 mb-3 no-print">
+                            <div class="col-md-6"><input type="text" id="studentName_${esc(c.name)}" class="form-control form-control-sm" placeholder="Nom et Prénom de l'élève" required></div>
+                            <div class="col-md-3"><select id="studentSexe_${esc(c.name)}" class="form-select form-select-sm"><option value="M">M</option><option value="F">F</option></select></div>
+                            <div class="col-md-3"><button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-plus me-1"></i> Inscrire</button></div>
+                        </form>
 
-                    <!-- Liste des élèves de cette classe -->
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm align-middle mb-0">
-                            <thead>
-                                <tr class="table-secondary"><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th class="no-print">Action</th></tr>
-                            </thead>
-                            <tbody>
-                                ${
-                                    classStudents.length > 0 ? classStudents.map((st, idx) => `
-                                        <tr>
-                                            <td><b>${st.mat}</b></td>
-                                            <td>${esc(st.name)}</td>
-                                            <td>${esc(st.sexe)}</td>
-                                            <td class="no-print">
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteStudentFromClass('${st.id}')"><i class="fa fa-trash"></i></button>
-                                            </td>
-                                        </tr>
-                                    `).join('') : '<tr><td colspan="4" class="text-center text-muted small">Aucun élève inscrit dans cette classe</td></tr>'
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                        <!-- Liste des élèves de cette classe -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle mb-0">
+                               <thead>
+                                    <tr class="table-secondary"><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th class="no-print">Action</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${
+                                        classStudents.length > 0 ? classStudents.map((st, idx) => `
+                                            <tr>
+                                                <td><b>${st.mat}</b></td>
+                                                <td>${esc(st.name)}</td>
+                                                <td>${esc(st.sexe)}</td>
+                                                <td class="no-print">
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteStudentFromClass('${st.id}')"><i class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        `).join('') : '<tr><td colspan="4" class="text-center text-muted small">Aucun élève inscrit dans cette classe</td></tr>'
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    `}
                 </div>
             </div>
         `;
     }).join('');
+}
+
+function promptUnlockClass(className) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const teacher = (s.teachers || []).find(t => t.titulaireClass === className);
+    const teacherCode = teacher ? teacher.secretCode : '';
+
+    const entered = prompt("Entrez le code secret de l'école ou le code secret de l'enseignant titulaire pour la classe " + className + " :");
+    if(entered) {
+        const val = entered.trim().toUpperCase();
+        if(val === s.secretCode.toUpperCase() || (teacherCode && val === teacherCode.toUpperCase())) {
+            unlockedClasses[className] = true;
+            renderClassesTable();
+            alert("Accès autorisé à la classe " + className + " !");
+        } else {
+            alert("Code incorrect !");
+        }
+    }
+}
+
+function lockClass(className) {
+    unlockedClasses[className] = false;
+    renderClassesTable();
 }
 
 function handleSaveStudentInClass(e, className) {
@@ -1124,6 +1162,7 @@ function deleteClass(name) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(confirm("Voulez-vous vraiment supprimer cette classe ?")) {
         s.classes = s.classes.filter(c => c.name !== name);
+        delete unlockedClasses[name];
         saveData();
         renderClassesTable();
     }
