@@ -40,22 +40,26 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .secret-modal-card { background: #fff; padding: 30px; border-radius: 12px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
 .secret-code-badge { font-size: 26px; font-weight: 800; color: #0d6efd; letter-spacing: 2px; background: #e7f1ff; padding: 10px 20px; border-radius: 8px; border: 2px dashed #0d6efd; display: inline-block; margin: 15px 0; }
 
+/* STYLE D'IMPRESSION PROPRE : Masque les menus, barres, boutons et formulaires */
 @media print {
-.no-print, .navbar, .sidebar-menu, .modal-header, .modal-footer { display:none !important; }
+  body * { visibility: hidden; }
+  .tab-pane.active, .tab-pane.active *, .bulletin-container, .bulletin-container * { visibility: visible; }
+  .tab-pane.active { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; padding: 0 !important; }
+  .no-print, .navbar, .sidebar-menu, .action-bar, form, .btn, .card-header { display: none !important; }
 }
 </style>
 </head>
 <body>
 
-<!-- MODALE D'AFFICHAGE DU CODE SECRET -->
+<!-- MODALE D'AFFICHAGE DU CODE SECRET (UNIQUE LORS DE LA CRÉATION) -->
 <div id="secretCodeModal" class="secret-modal-overlay">
   <div class="secret-modal-card">
     <i class="fa fa-check-circle fa-4x text-success mb-3"></i>
-    <h3 class="fw-bold">Établissement Créé !</h3>
-    <p class="text-muted">Voici le **Code Secret d'accès** généré pour votre école. Veuillez le conserver soigneusement pour vous connecter :</p>
+    <h3 class="fw-bold">Établissement Créé avec Succès !</h3>
+    <p class="text-muted small">Voici votre <b>Code Secret</b> unique. Notez-le bien, il ne sera plus affiché publiquement pour des raisons de sécurité :</p>
     <div id="modalSecretCodeDisplay" class="secret-code-badge">SEC-0000</div>
     <div>
-      <button class="btn btn-outline-primary btn-sm me-2" onclick="copySecretCodeModal()"><i class="fa fa-copy me-1"></i> Copier le code</button>
+      <button class="btn btn-outline-primary btn-sm me-2" onclick="copySecretCodeModal()"><i class="fa fa-copy me-1"></i> Copier</button>
       <button class="btn btn-success btn-sm fw-bold px-4" onclick="closeSecretModal()"><i class="fa fa-check me-1"></i> J'ai noté le code</button>
     </div>
   </div>
@@ -76,7 +80,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </nav>
 
 <!-- HEADER -->
-<div class="container-fluid bg-primary py-5 mb-5">
+<div class="container-fluid bg-primary py-5 mb-5 no-print">
 <div class="container py-5 text-center">
 <h1 class="display-3 text-white">Plateforme Intégrée EDU-RDC</h1>
 <p class="fs-4 text-white">Répertoire national et gestion professionnelle des institutions éducationnelles en RDC</p>
@@ -87,7 +91,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- PORTAIL PRINCIPAL -->
 <div id="view-portal" class="view-section active">
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-4 no-print">
 <div class="col-md-4">
 <div class="card h-100 shadow-sm border-0 text-center p-4 bg-light">
 <i class="fa fa-university fa-3x text-primary mb-3"></i>
@@ -122,7 +126,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- FORMULAIRE CRÉATION ÉCOLE -->
 <div id="view-create-school" class="view-section">
-<button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
+<button class="btn btn-secondary btn-sm mb-3 no-print" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
 <div class="card shadow-sm border-0">
 <div class="card-header bg-primary text-white"><h4 class="m-0 text-white" id="schoolFormTitle">Fiche d'Enregistrement Officiel d'un Établissement (RDC)</h4></div>
 <div class="card-body p-4">
@@ -215,7 +219,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="col-md-12"><label class="form-label fw-bold">Arrêté Ministériel d'Agrément :</label><input type="text" id="schoolAgrement" class="form-control" placeholder="Ex: MINEPST/CABMIN/001/2022"></div>
 </div>
 
-<div class="action-bar mt-4">
+<div class="action-bar mt-4 no-print">
 <button type="submit" class="btn btn-success fw-bold px-4"><i class="fa fa-save me-1"></i> Enregistrer l'Établissement</button>
 <button type="button" class="btn btn-secondary fw-bold px-4" onclick="showSection('view-portal')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
@@ -226,7 +230,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- ADMIN CENTRAL -->
 <div id="view-admin-central" class="view-section">
-<button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
+<button class="btn btn-secondary btn-sm mb-3 no-print" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
 <div class="card shadow-sm border-0 border-start border-4 border-danger">
 <div class="card-header bg-dark text-white"><h4 class="m-0 text-white">Espace Administrateur Central</h4></div>
 <div class="card-body p-4">
@@ -241,7 +245,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- DEMANDE EMPLOI -->
 <div id="view-job-application" class="view-section">
-<button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
+<button class="btn btn-secondary btn-sm mb-3 no-print" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
 <div class="card shadow-sm border-0">
 <div class="card-header bg-warning text-dark"><h4 class="m-0 fw-bold">Soumettre une Candidature</h4></div>
 <div class="card-body p-4">
@@ -262,7 +266,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- SUIVI CANDIDAT -->
 <div id="view-check-candidate-reply" class="view-section">
-<button class="btn btn-secondary btn-sm mb-3" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
+<button class="btn btn-secondary btn-sm mb-3 no-print" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
 <div class="card p-4">
 <h4>Suivi de Candidature</h4>
 <input type="text" id="candidateSecretCodeInput" class="form-control mb-2" placeholder="Saisir votre Code Candidat">
@@ -273,7 +277,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- DASHBOARD ÉCOLE -->
 <div id="view-school-dashboard" class="view-section">
-<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
+<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm no-print">
 <div class="d-flex align-items-center gap-3">
 <img id="dashSchoolLogo" class="school-logo-display" src="" alt="Logo">
 <div><h3 id="dashSchoolTitle" class="text-primary m-0 fw-bold"></h3><small id="dashSchoolSub" class="text-muted"></small></div>
@@ -281,7 +285,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <button class="btn btn-secondary btn-sm fw-bold" onclick="showSection('view-portal')"><i class="fa fa-times me-1"></i> Fermer / Retour</button>
 </div>
 <div class="row">
-<div class="col-lg-3 mb-4">
+<div class="col-lg-3 mb-4 no-print">
 <div class="list-group sidebar-menu shadow-sm">
 <a class="list-group-item list-group-item-action bg-dark text-white fw-bold" href="javascript:void(0);" onclick="toggleParamsSubmenu()">Paramètres <i class="fa fa-chevron-down float-end" id="arrowIcon"></i></a>
 <div id="paramsSubmenu" class="params-submenu">
@@ -302,7 +306,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 
-<div class="col-lg-9">
+<div class="col-lg-9 col-12">
 <div class="bg-white p-4 rounded shadow-sm">
 <div id="defaultWelcomeMessage" class="text-center py-5 text-muted">
 <h5>Cliquez sur <b>Paramètres</b> à gauche pour gérer votre école.</h5>
@@ -311,7 +315,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- 1. DIRECTION -->
 <div class="tab-pane" id="tab-direction">
 <h5 class="text-primary fw-bold mb-3">Direction & Membres Administratifs</h5>
-<form onsubmit="handleSaveDirection(event)" class="row g-2 mb-3">
+<form onsubmit="handleSaveDirection(event)" class="row g-2 mb-3 no-print">
 <input type="hidden" id="dirEditIndex">
 <div class="col-md-4"><input type="text" id="dirName" class="form-control" placeholder="Nom et Prénom" required></div>
 <div class="col-md-4">
@@ -333,13 +337,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </form>
-<table class="table table-bordered align-middle"><thead><tr><th>Nom</th><th>Fonction</th><th>Contact</th><th>Action</th></tr></thead><tbody id="directionTableBody"></tbody></table>
+<table class="table table-bordered align-middle"><thead><tr><th>Nom</th><th>Fonction</th><th>Contact</th><th class="no-print">Action</th></tr></thead><tbody id="directionTableBody"></tbody></table>
 </div>
 
 <!-- 2. CLASSES -->
 <div class="tab-pane" id="tab-classes">
 <h5 class="text-primary fw-bold mb-3">Enregistrement des Classes</h5>
-<form onsubmit="handleSaveClass(event)" class="row g-2 mb-3">
+<form onsubmit="handleSaveClass(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-8"><input type="text" id="className" class="form-control" placeholder="Nom de la classe (ex: 1ère Année A)" required></div>
 <div class="col-md-4">
 <div class="action-bar m-0">
@@ -349,13 +353,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 </form>
-<table class="table table-bordered"><thead><tr><th>Classe</th><th>Action</th></tr></thead><tbody id="classesTableBody"></tbody></table>
+<table class="table table-bordered"><thead><tr><th>Classe</th><th class="no-print">Action</th></tr></thead><tbody id="classesTableBody"></tbody></table>
 </div>
 
 <!-- 3. ENSEIGNANTS -->
 <div class="tab-pane" id="tab-profs">
 <h5 class="text-primary fw-bold mb-3">Enseignants & Titulaires</h5>
-<form onsubmit="handleSaveTeacher(event)" class="row g-2 mb-3">
+<form onsubmit="handleSaveTeacher(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-4"><input type="text" id="teacherName" class="form-control" placeholder="Nom de l'enseignant" required></div>
 <div class="col-md-4"><select id="teacherClass" class="form-select"></select></div>
 <div class="col-md-4">
@@ -366,13 +370,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 </form>
-<table class="table table-bordered"><thead><tr><th>Nom</th><th>Classe Titulaire</th><th>Code Agent</th><th>Action</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
+<table class="table table-bordered"><thead><tr><th>Nom</th><th>Classe Titulaire</th><th>Code Agent</th><th class="no-print">Action</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
 </div>
 
 <!-- 4. ELEVES -->
 <div class="tab-pane" id="tab-eleves-reg">
 <h5 class="text-primary fw-bold mb-3">Inscription des Élèves</h5>
-<form onsubmit="handleSaveStudent(event)" class="row g-2 mb-3">
+<form onsubmit="handleSaveStudent(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-4"><select id="studentClass" class="form-select" required></select></div>
 <div class="col-md-4"><input type="text" id="studentName" class="form-control" placeholder="Nom et Prénom" required></div>
 <div class="col-md-2"><select id="studentSexe" class="form-select"><option value="M">M</option><option value="F">F</option></select></div>
@@ -382,13 +386,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </form>
-<table class="table table-bordered"><thead><tr><th>Matricule</th><th>Nom</th><th>Sexe</th><th>Classe</th><th>Action</th></tr></thead><tbody id="studentsTableBody"></tbody></table>
+<table class="table table-bordered"><thead><tr><th>Matricule</th><th>Nom</th><th>Sexe</th><th>Classe</th><th class="no-print">Action</th></tr></thead><tbody id="studentsTableBody"></tbody></table>
 </div>
 
 <!-- CARTE ELEVE -->
 <div class="tab-pane" id="tab-carte-eleve">
 <h5 class="text-primary fw-bold mb-3">Carte d'Élève</h5>
-<div class="row mb-3">
+<div class="row mb-3 no-print">
 <div class="col-md-6"><label>Classe :</label><select id="cardClassSelect" class="form-select" onchange="loadStudentsForCardSelect()"></select></div>
 <div class="col-md-6"><label>Élève :</label><select id="cardStudentSelect" class="form-select" onchange="populateCardFromSelectedStudent()"></select></div>
 </div>
@@ -401,7 +405,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div><b>Prénom :</b> <span id="cardPrenomVal">-</span></div>
 <div><b>Classe :</b> <span id="cardClasseVal">-</span></div>
 </div>
-<div class="action-bar justify-content-center">
+<div class="action-bar justify-content-center no-print">
 <button class="btn btn-success btn-sm fw-bold" onclick="alert('Carte enregistrée')"><i class="fa fa-save me-1"></i> Enregistrer</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
@@ -411,7 +415,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- COURS -->
 <div class="tab-pane" id="tab-cours">
 <h5 class="text-primary fw-bold mb-3">Cours & Pondération</h5>
-<form onsubmit="handleSaveCourse(event)" class="row g-2 mb-3">
+<form onsubmit="handleSaveCourse(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-4"><select id="courseClassSelect" class="form-select" required></select></div>
 <div class="col-md-4"><input type="text" id="courseName" class="form-control" placeholder="Intitulé du cours" required></div>
 <div class="col-md-2"><input type="number" id="courseMax" class="form-control" placeholder="Max" required></div>
@@ -421,18 +425,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </form>
-<table class="table table-bordered"><thead><tr><th>Cours</th><th>Max</th><th>Action</th></tr></thead><tbody id="coursesTableBody"></tbody></table>
+<table class="table table-bordered"><thead><tr><th>Cours</th><th>Max</th><th class="no-print">Action</th></tr></thead><tbody id="coursesTableBody"></tbody></table>
 </div>
 
 <!-- NOTES -->
 <div class="tab-pane" id="tab-notes">
 <h5 class="text-primary fw-bold mb-3">Saisie de Notes</h5>
-<div class="row g-2 mb-3">
+<div class="row g-2 mb-3 no-print">
 <div class="col-md-6"><select id="notesClassSelect" class="form-select" onchange="loadStudentsForNotes()"></select></div>
 <div class="col-md-6"><select id="notesStudentSelect" class="form-select" onchange="renderNotesSheet()"></select></div>
 </div>
 <div id="notesSheetContainer" class="mb-3"></div>
-<div class="action-bar">
+<div class="action-bar no-print">
 <button class="btn btn-success btn-sm fw-bold" onclick="alert('Notes enregistrées')"><i class="fa fa-save me-1"></i> Enregistrer</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
@@ -441,40 +445,41 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- BULLETINS -->
 <div class="tab-pane" id="tab-bulletins">
-<h5 class="text-primary fw-bold mb-3">Bulletin de Cotes</h5>
-<div class="row g-2 mb-3">
+<h5 class="text-primary fw-bold mb-3 no-print">Bulletin de Cotes</h5>
+<div class="row g-2 mb-3 no-print">
 <div class="col-md-5"><select id="bulletinClassSelect" class="form-select" onchange="loadStudentsForBulletin()"></select></div>
 <div class="col-md-5"><select id="bulletinStudentSelect" class="form-select" onchange="renderBulletinFromSystem()"></select></div>
 <div class="col-md-2"><button class="btn btn-primary w-100 btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button></div>
 </div>
 <div class="bulletin-container"><div class="page" id="page"><p class="text-center text-muted">Sélectionnez un élève.</p></div></div>
-<div class="action-bar mt-3">
+<div class="action-bar mt-3 no-print">
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </div>
 
-<!-- FRAIS -->
+<!-- FRAIS & FACTURATION -->
 <div class="tab-pane" id="tab-frais">
-<h5 class="text-primary fw-bold mb-3">Caisse & Paiements</h5>
-<form onsubmit="handleSaveStudentPayment(event)" class="row g-2 mb-3">
-<div class="col-md-4"><select id="payClassSelect" class="form-select" onchange="loadStudentsForPayment(this.value)" required></select></div>
-<div class="col-md-4"><select id="payStudentSelect" class="form-select" required></select></div>
-<div class="col-md-2"><input type="number" id="payMontant" class="form-control" placeholder="Montant payé" required></div>
-<div class="col-md-2"><button type="submit" class="btn btn-success btn-sm w-100 fw-bold"><i class="fa fa-plus me-1"></i> Ajouter</button></div>
+<h5 class="text-primary fw-bold mb-3">Caisse & Facturation</h5>
+<form onsubmit="handleSaveStudentPayment(event)" class="row g-2 mb-3 no-print">
+<div class="col-md-3"><select id="paySection" class="form-select" onchange="updatePayEntityOptions()" required><option value="Élève">Élève</option><option value="Enseignant">Enseignant</option><option value="Administratif">Administratif</option></select></div>
+<div class="col-md-3"><select id="payEntitySelect" class="form-select" required></select></div>
+<div class="col-md-2"><input type="number" id="payMontant" class="form-control" placeholder="Montant ($)" required></div>
+<div class="col-md-2"><input type="text" id="payMotif" class="form-control" placeholder="Motif (ex: Frais scolaires)" required></div>
+<div class="col-md-2"><button type="submit" class="btn btn-success btn-sm w-100 fw-bold"><i class="fa fa-file-invoice-dollar me-1"></i> Facturer</button></div>
 <div class="col-12 action-bar mt-2">
-<button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
+<button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer la liste</button>
 <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </form>
-<table class="table table-bordered"><thead><tr><th>Date</th><th>Élève</th><th>Montant Payé</th><th>Action</th></tr></thead><tbody id="studentPayTableBody"></tbody></table>
+<table class="table table-bordered"><thead><tr><th>Date</th><th>Section</th><th>Bénéficiaire / Payeur</th><th>Motif</th><th>Montant</th><th class="no-print">Action</th></tr></thead><tbody id="studentPayTableBody"></tbody></table>
 </div>
 
 <!-- PRESENCES -->
 <div class="tab-pane" id="tab-presences">
 <h5 class="text-primary fw-bold mb-3">Gestion de Présence</h5>
-<select id="presClassSelect" class="form-select mb-3" onchange="loadStudentsForPresence()"></select>
+<select id="presClassSelect" class="form-select mb-3 no-print" onchange="loadStudentsForPresence()"></select>
 <div id="studentsPresenceContainer" class="mb-3"></div>
-<div class="action-bar">
+<div class="action-bar no-print">
 <button class="btn btn-success btn-sm fw-bold" onclick="alert('Présences enregistrées')"><i class="fa fa-save me-1"></i> Enregistrer</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
@@ -484,7 +489,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- DISCIPLINE -->
 <div class="tab-pane" id="tab-discipline">
 <h5 class="text-primary fw-bold mb-3">Discipline & Sanctions</h5>
-<form onsubmit="handleSaveDiscipline(event)" class="row g-2 mb-3">
+<form onsubmit="handleSaveDiscipline(event)" class="row g-2 mb-3 no-print">
 <div class="col-md-4"><select id="discClassSelect" class="form-select" onchange="loadStudentsForDiscipline()" required></select></div>
 <div class="col-md-4"><select id="discStudentSelect" class="form-select" required></select></div>
 <div class="col-md-4"><input type="text" id="discobs" class="form-control" placeholder="Motif / Sanction" required></div>
@@ -494,26 +499,26 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </form>
-<table class="table table-bordered"><thead><tr><th>Élève</th><th>Sanction</th><th>Action</th></tr></thead><tbody id="disciplineTableBody"></tbody></table>
+<table class="table table-bordered"><thead><tr><th>Élève</th><th>Sanction</th><th class="no-print">Action</th></tr></thead><tbody id="disciplineTableBody"></tbody></table>
 </div>
 
 <!-- COMMUNICATION -->
 <div class="tab-pane" id="tab-communication">
 <h5 class="text-primary fw-bold mb-3">Communication & Annonces</h5>
-<textarea id="announcementText" class="form-control mb-2" rows="3" placeholder="Saisir un événement..."></textarea>
-<div class="action-bar mb-3">
+<textarea id="announcementText" class="form-control mb-2 no-print" rows="3" placeholder="Saisir un événement..."></textarea>
+<div class="action-bar mb-3 no-print">
 <button class="btn btn-warning btn-sm fw-bold" onclick="handleSaveCommunication()"><i class="fa fa-bullhorn me-1"></i> Publier</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
-<table class="table table-bordered mt-3"><thead><tr><th>Date</th><th>Annonce</th><th>Action</th></tr></thead><tbody id="commTableBody"></tbody></table>
+<table class="table table-bordered mt-3"><thead><tr><th>Date</th><th>Annonce</th><th class="no-print">Action</th></tr></thead><tbody id="commTableBody"></tbody></table>
 </div>
 
 <!-- EMPLOI -->
 <div class="tab-pane" id="tab-jobs-received">
 <h5 class="text-primary fw-bold mb-3">Demandes d'Emploi Reçues</h5>
 <table class="table table-bordered"><thead><tr><th>Candidat</th><th>Poste</th><th>Action</th></tr></thead><tbody id="schoolJobsTableBody"></tbody></table>
-<div class="action-bar mt-3">
+<div class="action-bar mt-3 no-print">
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </div>
@@ -578,9 +583,7 @@ function updateSubDivisions() {
     const provinceSelect = document.getElementById('schoolProvince');
     const subDivSelect = document.getElementById('schoolSubDivision');
     const selectedProvince = provinceSelect.value;
-
     subDivSelect.innerHTML = '<option value="">-- Choisir une Sous-Division --</option>';
-
     if (selectedProvince && subDivisionsData[selectedProvince]) {
         subDivisionsData[selectedProvince].forEach(sub => {
             const opt = document.createElement('option');
@@ -594,11 +597,7 @@ function updateSubDivisions() {
 window.onload = function() {
     let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V12");
     if (saved) { 
-        try { 
-            appData = JSON.parse(saved); 
-        } catch(e){
-            appData = { schools: [], adminRequests: [], jobApplications: [] };
-        } 
+        try { appData = JSON.parse(saved); } catch(e){ appData = { schools: [], adminRequests: [], jobApplications: [] }; } 
     }
     if(!appData.schools) appData.schools = [];
     if(!appData.jobApplications) appData.jobApplications = [];
@@ -651,7 +650,6 @@ function handleSaveSchool(e) {
     const secretCode = 'SEC-' + Math.floor(1000 + Math.random() * 9000);
     
     const fileInput = document.getElementById('schoolLogoFile');
-    
     if (fileInput.files && fileInput.files[0]) {
         const reader = new FileReader();
         reader.onload = function(evt) {
@@ -672,8 +670,6 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
         caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: []
     });
     saveData();
-    
-    // Affichage de la fenêtre surgissante modale avec le Code Secret
     currentCreatedSecretCode = secretCode;
     document.getElementById('modalSecretCodeDisplay').innerText = secretCode;
     document.getElementById('secretCodeModal').style.display = 'flex';
@@ -703,7 +699,7 @@ function renderSchoolsList() {
                 <div class="flex-grow-1">
                     <h5 class="fw-bold text-primary mb-1">${s.name}</h5>
                     <div class="small text-muted mb-1"><b>Prov :</b> ${s.province} | <b>Sous-Div :</b> ${s.subDivision || '-'}</div>
-                    <div class="small text-muted"><b>Code Secret :</b> <span class="badge bg-success">${s.secretCode}</span></div>
+                    <div class="small text-muted"><b>NIF :</b> ${s.nif || '-'} | <b>Commune :</b> ${s.commune}</div>
                     <div class="mt-2 d-flex gap-2">
                         <button class="btn btn-primary btn-sm fw-bold" onclick="promptLoginCode('${s.id}')"><i class="fa fa-folder-open me-1"></i> Ouvrir</button>
                         <button class="btn btn-danger btn-sm fw-bold" onclick="promptCentralDeleteSchool('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer</button>
@@ -812,7 +808,7 @@ function renderDirectionTable() {
     if(!s) return;
     document.getElementById('directionTableBody').innerHTML = (s.direction || []).map((d, i) => `
         <tr><td>${d.name}</td><td><b>${d.role}</b></td><td>${d.phone || '-'}</td>
-        <td>
+        <td class="no-print">
             <button class="btn btn-sm btn-outline-warning" onclick="editDirection(${i})"><i class="fa fa-edit"></i></button>
             <button class="btn btn-sm btn-outline-danger" onclick="deleteDirection(${i})"><i class="fa fa-trash"></i></button>
         </td></tr>
@@ -861,7 +857,7 @@ function handleSaveClass(e) {
 function renderClassesTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
-    document.getElementById('classesTableBody').innerHTML = (s.classes || []).map(c => `<tr><td><b>${c.name}</b></td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteClass('${c.name}')"><i class="fa fa-trash"></i> Supprimer</button></td></tr>`).join('') || '<tr><td colspan="2" class="text-center text-muted">Aucune classe</td></tr>';
+    document.getElementById('classesTableBody').innerHTML = (s.classes || []).map(c => `<tr><td><b>${c.name}</b></td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteClass('${c.name}')"><i class="fa fa-trash"></i> Supprimer</button></td></tr>`).join('') || '<tr><td colspan="2" class="text-center text-muted">Aucune classe</td></tr>';
 }
 function deleteClass(name) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -890,7 +886,7 @@ function handleSaveTeacher(e) {
 }
 function renderTeachersTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('teachersTableBody').innerHTML = (s.teachers || []).map((t, idx) => `<tr><td>${t.name}</td><td>${t.titulaireClass}</td><td><b>${t.secretCode}</b></td><td><button class="btn btn-sm btn-outline-danger" onclick="s.teachers.splice(${idx},1);saveData();renderTeachersTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun enseignant</td></tr>';
+    document.getElementById('teachersTableBody').innerHTML = (s.teachers || []).map((t, idx) => `<tr><td>${t.name}</td><td>${t.titulaireClass}</td><td><b>${t.secretCode}</b></td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.teachers.splice(${idx},1);saveData();renderTeachersTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun enseignant</td></tr>';
 }
 
 // 4. ELEVES
@@ -914,7 +910,7 @@ function handleSaveStudent(e) {
 }
 function renderStudentsTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('studentsTableBody').innerHTML = (s.students || []).map((st, idx) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.students.splice(${idx},1);saveData();renderStudentsTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucun élève</td></tr>';
+    document.getElementById('studentsTableBody').innerHTML = (s.students || []).map((st, idx) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.students.splice(${idx},1);saveData();renderStudentsTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucun élève</td></tr>';
 }
 
 // 5. COURS
@@ -940,7 +936,7 @@ function renderCoursesTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const cl = document.getElementById('courseClassSelect') ? document.getElementById('courseClassSelect').value : '';
     const courses = (s && s.courses) ? (s.courses[cl] || []) : [];
-    document.getElementById('coursesTableBody').innerHTML = courses.map((c, idx) => `<tr><td>${c.name}</td><td>${c.max}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.courses['${cl}'].splice(${idx},1);saveData();renderCoursesTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucun cours</td></tr>';
+    document.getElementById('coursesTableBody').innerHTML = courses.map((c, idx) => `<tr><td>${c.name}</td><td>${c.max}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.courses['${cl}'].splice(${idx},1);saveData();renderCoursesTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucun cours</td></tr>';
 }
 
 // 6. NOTES
@@ -1008,31 +1004,49 @@ function renderBulletinFromSystem() {
     `;
 }
 
-// 8. FRAIS
+// 8. FRAIS & FACTURATION
 function refreshPaymentOptions() {
-    const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('payClassSelect').innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-    loadStudentsForPayment(document.getElementById('payClassSelect').value);
+    updatePayEntityOptions();
     renderStudentPayTable();
 }
-function loadStudentsForPayment(cl) {
+function updatePayEntityOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('payStudentSelect').innerHTML = (s.students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+    const section = document.getElementById('paySection').value;
+    const sel = document.getElementById('payEntitySelect');
+    if(section === 'Élève') {
+        sel.innerHTML = (s.students || []).map(st => `<option value="${st.name}">Élève : ${st.name} (${st.classe})</option>`).join('');
+    } else if(section === 'Enseignant') {
+        sel.innerHTML = (s.teachers || []).map(t => `<option value="${t.name}">Enseignant : ${t.name}</option>`).join('');
+    } else {
+        sel.innerHTML = (s.direction || []).map(d => `<option value="${d.name}">Admin : ${d.name} (${d.role})</option>`).join('');
+    }
 }
 function handleSaveStudentPayment(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    const studentId = document.getElementById('payStudentSelect').value;
-    const studentObj = s.students.find(x => x.id === studentId);
-    const paye = parseFloat(document.getElementById('payMontant').value) || 0;
+    const section = document.getElementById('paySection').value;
+    const entityName = document.getElementById('payEntitySelect').value;
+    const montant = parseFloat(document.getElementById('payMontant').value) || 0;
+    const motif = document.getElementById('payMotif').value;
+    
     if(!s.studentPayments) s.studentPayments = [];
-    s.studentPayments.push({ date: new Date().toLocaleDateString('fr-FR'), studentName: studentObj ? studentObj.name : 'Inconnu', paye });
+    s.studentPayments.push({ date: new Date().toLocaleDateString('fr-FR'), section, entityName, motif, montant });
     saveData();
     renderStudentPayTable();
+    alert("Facture / Reçu enregistré avec succès !");
 }
 function renderStudentPayTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('studentPayTableBody').innerHTML = (s.studentPayments || []).map((p, idx) => `<tr><td>${p.date}</td><td>${p.studentName}</td><td class="text-success fw-bold">${p.paye} $</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.studentPayments.splice(${idx},1);saveData();renderStudentPayTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun paiement</td></tr>';
+    document.getElementById('studentPayTableBody').innerHTML = (s.studentPayments || []).map((p, idx) => `
+        <tr>
+            <td>${p.date}</td>
+            <td><b>${p.section}</b></td>
+            <td>${p.entityName}</td>
+            <td>${p.motif}</td>
+            <td class="text-success fw-bold">${p.montant} $</td>
+            <td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.studentPayments.splice(${idx},1);saveData();renderStudentPayTable();"><i class="fa fa-trash"></i></button></td>
+        </tr>
+    `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucune facture enregistrée</td></tr>';
 }
 
 // 9. PRESENCES
@@ -1073,7 +1087,7 @@ function handleSaveDiscipline(e) {
 }
 function renderDisciplineTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('disciplineTableBody').innerHTML = (s.discipline || []).map((d, idx) => `<tr><td>${d.studentName}</td><td>${d.obs}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.discipline.splice(${idx},1);saveData();renderDisciplineTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune sanction</td></tr>';
+    document.getElementById('disciplineTableBody').innerHTML = (s.discipline || []).map((d, idx) => `<tr><td>${d.studentName}</td><td>${d.obs}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.discipline.splice(${idx},1);saveData();renderDisciplineTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune sanction</td></tr>';
 }
 
 // 11. COMMUNICATION
@@ -1088,7 +1102,7 @@ function handleSaveCommunication() {
 function renderCommTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
-    document.getElementById('commTableBody').innerHTML = (s.communications || []).map((c, idx) => `<tr><td>${c.date}</td><td>${c.message}</td><td><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${idx},1);saveData();renderCommTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune annonce</td></tr>';
+    document.getElementById('commTableBody').innerHTML = (s.communications || []).map((c, idx) => `<tr><td>${c.date}</td><td>${c.message}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${idx},1);saveData();renderCommTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune annonce</td></tr>';
 }
 
 // 12. EMPLOI
@@ -1107,10 +1121,6 @@ function handleSendJobApplication(e) {
     saveData();
     alert("Candidature envoyée ! Votre code candidat est : " + candidateCode);
     showSection('view-portal');
-}
-function renderSchoolJobApplications() {
-    const apps = (appData.jobApplications || []).filter(a => a.schoolId === activeSchoolId);
-    document.getElementById('schoolJobsTableBody').innerHTML = apps.map(a => `<tr><td>${a.applicantName}</td><td>${a.role}</td><td>En attente</td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune candidature</td></tr>';
 }
 function verifyCandidateCodeAndDisplayReply() {
     const code = document.getElementById('candidateSecretCodeInput').value.trim();
