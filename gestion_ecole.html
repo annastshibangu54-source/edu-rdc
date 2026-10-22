@@ -35,12 +35,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .bulletin-container .logo img { max-width: 100%; max-height:100%; }
 .bulletin-container .ht { text-align:center; font-weight:bold; font-size:11.5px; line-height:1.3; flex:1; padding:0 6px; }
 
-/* POPUP CODE SECRET */
-.secret-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; }
-.secret-modal-card { background: #fff; padding: 30px; border-radius: 12px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-.secret-code-badge { font-size: 26px; font-weight: 800; color: #0d6efd; letter-spacing: 2px; background: #e7f1ff; padding: 10px 20px; border-radius: 8px; border: 2px dashed #0d6efd; display: inline-block; margin: 15px 0; }
-
-/* STYLE D'IMPRESSION PROPRE : Masque les menus, barres, boutons et formulaires */
+/* STYLE D'IMPRESSION PROPRE */
 @media print {
   body * { visibility: hidden; }
   .tab-pane.active, .tab-pane.active *, .bulletin-container, .bulletin-container * { visibility: visible; }
@@ -50,20 +45,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </style>
 </head>
 <body>
-
-<!-- MODALE D'AFFICHAGE DU CODE SECRET -->
-<div id="secretCodeModal" class="secret-modal-overlay">
-  <div class="secret-modal-card">
-    <i class="fa fa-check-circle fa-4x text-success mb-3"></i>
-    <h3 class="fw-bold">Établissement Créé avec Succès !</h3>
-    <p class="text-muted small">Voici votre <b>Code Secret</b> unique. Notez-le bien, il ne sera plus affiché sur l'accueil pour des raisons de sécurité :</p>
-    <div id="modalSecretCodeDisplay" class="secret-code-badge">SEC-0000</div>
-    <div>
-      <button class="btn btn-outline-primary btn-sm me-2" onclick="copySecretCodeModal()"><i class="fa fa-copy me-1"></i> Copier</button>
-      <button class="btn btn-success btn-sm fw-bold px-4" onclick="closeSecretModal()"><i class="fa fa-check me-1"></i> J'ai noté le code</button>
-    </div>
-  </div>
-</div>
 
 <!-- NAVIGATION -->
 <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0 no-print">
@@ -130,7 +111,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="card shadow-sm border-0">
 <div class="card-header bg-primary text-white"><h4 class="m-0 text-white" id="schoolFormTitle">Fiche d'Enregistrement Officiel d'un Établissement (RDC)</h4></div>
 <div class="card-body p-4">
-<form onsubmit="handleSaveSchool(event)">
+<form id="formCreateSchool" onsubmit="handleSaveSchool(event)">
 <input type="hidden" id="editSchoolId">
 
 <h5 class="text-primary fw-bold mb-3"><i class="fa fa-school me-2"></i>1. Identité de l'Établissement</h5>
@@ -534,7 +515,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
 let appData = { schools: [], adminRequests: [], jobApplications: [] };
 let activeSchoolId = null;
-let currentCreatedSecretCode = "";
 
 const subDivisionsData = {
     "KINSHASA-LUKUNGA": ["Bandalungwa", "Gombe", "Kintambo", "Lingwala", "Ngaliema"],
@@ -616,19 +596,9 @@ function showSection(id) {
 }
 
 function openSchoolForm() {
+    document.getElementById('formCreateSchool').reset();
     document.getElementById('editSchoolId').value = "";
-    document.getElementById('schoolName').value = "";
-    document.getElementById('schoolProvince').value = "";
-    document.getElementById('schoolDivision').value = "";
     document.getElementById('schoolSubDivision').innerHTML = '<option value="">-- D\'abord choisir la Province --</option>';
-    document.getElementById('schoolCommune').value = "";
-    document.getElementById('schoolAddress').value = "";
-    document.getElementById('schoolNif').value = "";
-    document.getElementById('schoolRccm').value = "";
-    document.getElementById('schoolIdNat').value = "";
-    document.getElementById('schoolSecope').value = "";
-    document.getElementById('schoolPhone').value = "";
-    document.getElementById('schoolAgrement').value = "";
     showSection('view-create-school');
 }
 
@@ -670,19 +640,12 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
         caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: []
     });
     saveData();
-    currentCreatedSecretCode = secretCode;
-    document.getElementById('modalSecretCodeDisplay').innerText = secretCode;
-    document.getElementById('secretCodeModal').style.display = 'flex';
-}
-
-function closeSecretModal() {
-    document.getElementById('secretCodeModal').style.display = 'none';
+    
+    // Alerte bloquante directe pour garantir l'obtention du code
+    alert("ÉTABLISSEMENT CRÉÉ AVEC SUCCÈS !\n\nVoici votre Code Secret d'accès : " + secretCode + "\n\nVeuillez le noter précieusement pour pouvoir ouvrir votre école.");
+    
+    document.getElementById('formCreateSchool').reset();
     showSection('view-portal');
-}
-
-function copySecretCodeModal() {
-    navigator.clipboard.writeText(currentCreatedSecretCode);
-    alert("Code Secret copié dans le presse-papier !");
 }
 
 function renderSchoolsList() {
@@ -692,7 +655,7 @@ function renderSchoolsList() {
         container.innerHTML = '<div class="col-12"><div class="alert alert-secondary text-center">Aucun établissement enregistré. Cliquez sur « 1. Créer une École ».</div></div>';
         return;
     }
-    // Code secret retiré de l'affichage de la carte
+    // Masquage strict du code secret sur les cartes
     container.innerHTML = appData.schools.map(s => `
         <div class="col-md-6">
             <div class="card shadow-sm border-start border-4 border-primary p-3 bg-light d-flex flex-row align-items-center gap-3">
