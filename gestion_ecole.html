@@ -420,7 +420,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 
 <!-- CARTE D'ÉLÈVE REVISÉE -->
-<div class="student-card-container" id="studentCardPrintArea">
+<div class="student-card-container mb-3" id="studentCardPrintArea">
     <img id="cardBgLogo" src="" class="student-card-bg-logo" alt="Logo Filigrane">
     <div class="student-card-content">
         <div class="d-flex align-items-center justify-content-between mb-2 border-bottom pb-2">
@@ -452,6 +452,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <button class="btn btn-success btn-sm fw-bold" onclick="saveStudentCardData()"><i class="fa fa-save me-1"></i> Enregistrer la Carte</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="printStudentCard()"><i class="fa fa-print me-1"></i> Imprimer / Télécharger</button>
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+</div>
+
+<!-- SECTION DES CARTES ENREGISTRÉES -->
+<hr class="my-4 no-print">
+<h5 class="text-secondary fw-bold mb-3 no-print"><i class="fa fa-id-card-alt me-2"></i>Cartes d'Élèves Enregistrées / Archivées</h5>
+<div class="table-responsive no-print">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Date</th><th>Matricule</th><th>Nom & Prénom</th><th>Classe</th><th>Action</th></tr></thead>
+<tbody id="savedCardsTableBody"></tbody>
+</table>
 </div>
 </div>
 
@@ -729,7 +739,7 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
         id: 'SCH-' + Date.now(),
         name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl,
         direction: [], staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {},
-        caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: []
+        caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: [], savedCards: []
     });
     
     saveData();
@@ -984,7 +994,6 @@ function loginAsTeacher(code, classe) {
     const entered = prompt("Entrez votre code secret enseignant ("+code+") :");
     if(entered && entered.trim().toUpperCase() === code.toUpperCase()) {
         alert("Accès autorisé uniquement à votre classe titulaire : " + classe);
-        // Restreindre l'affichage ou filtrer les vues élèves/notes pour cette classe spécifique
         const studentClassSel = document.getElementById('studentClass');
         if(studentClassSel) { studentClassSel.value = classe; studentClassSel.disabled = true; }
         switchTab('tab-eleves-reg');
@@ -1260,7 +1269,6 @@ function openAdminCentralPanel() {
     const pass = prompt("Entrez le code secret Administrateur Central :");
     if(pass && pass.trim() === ADMIN_MASTER_PASSWORD) {
         showSection('view-admin-central');
-        // Rendu tableau écoles
         document.getElementById('adminSchoolsTableBody').innerHTML = appData.schools.map(s => `
             <tr>
                 <td><img src="${s.logoUrl || ''}" class="school-logo-display" alt="Logo"></td>
@@ -1275,7 +1283,6 @@ function openAdminCentralPanel() {
             </tr>
         `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucune école enregistrée</td></tr>';
 
-        // Rendu tableau demandes d'assistance / motifs
         document.getElementById('adminRequestsTableBody').innerHTML = (appData.adminRequests || []).map((req, rIdx) => `
             <tr>
                 <td>${req.date}</td>
@@ -1320,6 +1327,7 @@ function refreshCardOptions() {
     document.getElementById('cardSchoolLogo').src = s.logoUrl || 'https://via.placeholder.com/40';
     document.getElementById('cardBgLogo').src = s.logoUrl || 'https://via.placeholder.com/180';
     loadStudentsForCardSelect();
+    renderSavedCardsTable();
 }
 function loadStudentsForCardSelect() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1363,8 +1371,80 @@ function previewStudentCardPhoto(e) {
 }
 
 function saveStudentCardData() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const mat = document.getElementById('cardMatVal').innerText;
+    const name = document.getElementById('cardNomVal').innerText;
+    const sexe = document.getElementById('cardSexeVal').innerText;
+    const classe = document.getElementById('cardClasseVal').innerText;
+    const photo = document.getElementById('cardPhotoPreview').src;
+
+    if(mat === '-' || name === '-') {
+        alert("Veuillez sélectionner un élève valide avant d'enregistrer la carte.");
+        return;
+    }
+
+    if(!s.savedCards) s.savedCards = [];
+    s.savedCards.push({
+        id: 'CARD-' + Date.now(),
+        date: new Date().toLocaleDateString('fr-FR'),
+        mat, name, sexe, classe, photo, schoolName: s.name, logoUrl: s.logoUrl
+    });
     saveData();
-    alert("Carte d'élève enregistrée avec succès ! Elle est prête pour le téléchargement ou l'impression.");
+    renderSavedCardsTable();
+
+    // Vider la zone active de la carte pour laisser la place à une nouvelle carte
+    document.getElementById('cardMatVal').innerText = '-';
+    document.getElementById('cardNomVal').innerText = '-';
+    document.getElementById('cardSexeVal').innerText = '-';
+    document.getElementById('cardClasseVal').innerText = '-';
+    document.getElementById('cardPhotoPreview').src = "https://via.placeholder.com/80";
+    if(document.getElementById('cardStudentSelect')) document.getElementById('cardStudentSelect').value = '';
+
+    alert("Carte enregistrée avec succès et ajoutée à la liste des cartes ! La zone active a été vidée pour une nouvelle carte.");
+}
+
+function renderSavedCardsTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const tbody = document.getElementById('savedCardsTableBody');
+    if(!tbody) return;
+    tbody.innerHTML = (s.savedCards || []).map((card, idx) => `
+        <tr>
+            <td>${card.date}</td>
+            <td><b>${card.mat}</b></td>
+            <td>${card.name}</td>
+            <td>${card.classe}</td>
+            <td>
+                <button class="btn btn-sm btn-primary fw-bold" onclick="printSpecificSavedCard('${card.mat}','${card.name}','${card.sexe}','${card.classe}','${card.photo}','${card.schoolName}','${card.logoUrl}')"><i class="fa fa-print me-1"></i> Imprimer</button>
+                <button class="btn btn-sm btn-danger fw-bold" onclick="deleteSavedCard(${idx})"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucune carte enregistrée pour le moment</td></tr>';
+}
+
+function printSpecificSavedCard(mat, name, sexe, classe, photo, schoolName, logoUrl) {
+    // Remplir temporairement la zone d'affichage pour impression
+    document.getElementById('cardMatVal').innerText = mat;
+    document.getElementById('cardNomVal').innerText = name;
+    document.getElementById('cardSexeVal').innerText = sexe;
+    document.getElementById('cardClasseVal').innerText = classe;
+    document.getElementById('cardPhotoPreview').src = photo;
+    document.getElementById('cardSchoolName').innerText = schoolName.toUpperCase();
+    if(logoUrl) {
+        document.getElementById('cardSchoolLogo').src = logoUrl;
+        document.getElementById('cardBgLogo').src = logoUrl;
+    }
+    window.print();
+}
+
+function deleteSavedCard(idx) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(s && s.savedCards) {
+        s.savedCards.splice(idx, 1);
+        saveData();
+        renderSavedCardsTable();
+    }
 }
 
 function printStudentCard() {
