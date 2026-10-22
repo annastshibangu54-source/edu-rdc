@@ -822,15 +822,37 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 
-<!-- JAVASCRIPT GLOBAL -->
+<!-- SDK FIREBASE (Compat v10) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+<!-- JAVASCRIPT GLOBAL ADAPTÉ À FIREBASE -->
 <script>
+// --- CONFIGURATION FIREBASE (À remplacer par vos clés de la console Firebase) ---
+const firebaseConfig = {
+    apiKey: "VOTRE_API_KEY",
+    authDomain: "VOTRE_AUTH_DOMAIN",
+    projectId: "VOTRE_PROJECT_ID",
+    storageBucket: "VOTRE_STORAGE_BUCKET",
+    messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+    appId: "VOTRE_APP_ID"
+};
+
+// Initialisation de Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+const storage = firebase.storage();
+
 const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
 let appData = { schools: [], adminRequests: [], jobApplications: [] };
 let activeSchoolId = null;
 let currentCreatedSecretCode = "";
-let unlockedClasses = {}; // Suivi des classes déverrouillées par session
-let teachersUnlocked = false; // Suivi du déverrouillage de la section enseignants
-let unlockedStudentClasses = {}; // Suivi des classes déverrouillées pour la section élèves
+let unlockedClasses = {}; 
+let teachersUnlocked = false; 
+let unlockedStudentClasses = {}; 
 
 const subDivisionsData = {
     "KINSHASA-LUKUNGA": ["Bandalungwa", "Gombe", "Kintambo", "Lingwala", "Ngaliema"],
@@ -890,44 +912,57 @@ function updateSubDivisions() {
     }
 }
 
+// --- CHARGEMENT INITIAL DEPUIS FIRESTORE ---
 window.onload = function() {
-    let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V12");
-    if (saved) { 
-        try { appData = JSON.parse(saved); } catch(e){ appData = { schools: [], adminRequests: [], jobApplications: [] }; } 
-    }
-    if(!appData.schools) appData.schools = [];
-    if(!appData.adminRequests) appData.adminRequests = [];
-    if(!appData.jobApplications) appData.jobApplications = [];
-    
-    // Migration de rétrocompatibilité pour s'assurer que chaque école gère ses années
-    appData.schools.forEach(s => {
-        if(!s.activeYear) s.activeYear = "2025-2026";
-        if(!s.yearsData) {
-            s.yearsData = {
-                "2025-2026": {
-                    classes: s.classes || [],
-                    teachers: s.teachers || [],
-                    students: s.students || [],
-                    courses: s.courses || {},
-                    notes: s.notes || {},
-                    caisse: s.caisse || [],
-                    studentPayments: s.studentPayments || [],
-                    discipline: s.discipline || []
-                }
-            };
-        }
-    });
-
-    renderSchoolsList();
-    renderPortalAnnouncements();
+    loadDataFromFirebase();
 };
 
+function loadDataFromFirebase() {
+    db.collection("platformData").doc("mainConfig").get().then((doc) => {
+        if (doc.exists) {
+            appData = doc.data();
+        } else {
+            appData = { schools: [], adminRequests: [], jobApplications: [] };
+        }
+        if(!appData.schools) appData.schools = [];
+        if(!appData.adminRequests) appData.adminRequests = [];
+        if(!appData.jobApplications) appData.jobApplications = [];
+
+        appData.schools.forEach(s => {
+            if(!s.activeYear) s.activeYear = "2025-2026";
+            if(!s.yearsData) {
+                s.yearsData = {
+                    "2025-2026": {
+                        classes: s.classes || [],
+                        teachers: s.teachers || [],
+                        students: s.students || [],
+                        courses: s.courses || {},
+                        notes: s.notes || {},
+                        caisse: s.caisse || [],
+                        studentPayments: s.studentPayments || [],
+                        discipline: []
+                    }
+                };
+            }
+        });
+
+        renderSchoolsList();
+        renderPortalAnnouncements();
+    }).catch((error) => {
+        console.error("Erreur de chargement Firebase: ", error);
+    });
+}
+
+// --- SAUVEGARDE DANS FIRESTORE ---
 function saveData() {
-    try {
-        localStorage.setItem("EDURDC_FULL_PLATFORM_V12", JSON.stringify(appData));
-    } catch(err) {
-        alert("Attention : Mémoire saturée. L'image a été ignorée pour préserver l'enregistrement.");
-    }
+    db.collection("platformData").doc("mainConfig").set(appData)
+    .then(() => {
+        console.log("Données synchronisées avec succès sur Firebase !");
+    })
+    .catch((error) => {
+        console.error("Erreur lors de la sauvegarde Firebase : ", error);
+        alert("Erreur de synchronisation avec la base de données en ligne.");
+    });
 }
 
 function showSection(id) {
@@ -1060,7 +1095,6 @@ function renderSchoolsList() {
     `).join('');
 }
 
-// RENDU DES ANNONCES SUR LE PORTAIL PRINCIPAL AVEC SUPPRESSION PROPRIÉTAIRE
 function renderPortalAnnouncements() {
     const container = document.getElementById('portalAnnouncementsContainer');
     if(!container) return;
@@ -1157,7 +1191,6 @@ function openSchoolDashboard(id) {
     document.getElementById('dashSchoolSub').innerText = s.province + ' | ' + s.commune + ' (' + s.address + ')';
     document.getElementById('dashSchoolLogo').src = s.logoUrl || 'https://via.placeholder.com/70';
     
-    // Réinitialiser l'état verrouillé des années scolaires à l'ouverture du tableau de bord
     document.getElementById('schoolYearsSectionsContainer').setAttribute('style', 'display: none !important;');
     document.getElementById('btnUnlockSchoolYears').style.display = 'inline-block';
 
@@ -1166,7 +1199,6 @@ function openSchoolDashboard(id) {
     showSection('view-school-dashboard');
 }
 
-// DÉVERROUILLAGE SÉCURISÉ DE LA GESTION DES ANNÉES SCOLAIRES AVEC LE CODE SECRET
 function promptUnlockSchoolYears() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -1185,7 +1217,6 @@ function lockSchoolYears() {
     document.getElementById('btnUnlockSchoolYears').style.display = 'inline-block';
 }
 
-// FONCTIONNALITÉ MULTI-ANNÉES : GESTION DES SÉLECTEURS ET TRANSITION D'ANNÉE
 function refreshSchoolYearSelector() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -1225,7 +1256,6 @@ function openNewSchoolYearWizard() {
         return;
     }
 
-    // Copie de transition intelligente : Conserve la structure des classes et cours, et monte les élèves si souhaité
     const currentData = s.yearsData[currentYear] || {};
     const existingClasses = currentData.classes || [];
     const existingCourses = currentData.courses || {};
@@ -1356,7 +1386,7 @@ function deleteDirection(i) {
     renderDirectionTable();
 }
 
-// 2. CLASSES (Rattachées à l'année active)
+// 2. CLASSES
 function handleSaveClass(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1414,14 +1444,12 @@ function renderClassesTable() {
                             <b>Enseignant Titulaire :</b> <span class="text-success fw-bold">${classTeacher ? esc(classTeacher.name) + ' (Code: ' + classTeacher.secretCode + ')' : 'Aucun enseignant titulaire assigné'}</span>
                         </div>
 
-                        <!-- Formulaire d'inscription d'élève spécifique à cette classe -->
                         <form onsubmit="handleSaveStudentInClass(event, '${esc(c.name)}')" class="row g-2 mb-3 no-print">
                             <div class="col-md-6"><input type="text" id="studentName_${esc(c.name)}" class="form-control form-control-sm" placeholder="Nom et Prénom de l'élève" required></div>
                             <div class="col-md-3"><select id="studentSexe_${esc(c.name)}" class="form-select form-select-sm"><option value="M">M</option><option value="F">F</option></select></div>
                             <div class="col-md-3"><button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-plus me-1"></i> Inscrire</button></div>
                         </form>
 
-                        <!-- Liste des élèves de cette classe -->
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm align-middle mb-0">
                                <thead>
@@ -1657,14 +1685,12 @@ function renderStudentsSection() {
                             <b>Enseignant Titulaire :</b> <span class="text-success fw-bold">${classTeacher ? esc(classTeacher.name) + ' (Code: ' + classTeacher.secretCode + ')' : 'Aucun enseignant titulaire assigné'}</span>
                         </div>
 
-                        <!-- Formulaire d'inscription d'élève spécifique à cette classe -->
                         <form onsubmit="handleSaveStudentInRegTab(event, '${esc(c.name)}')" class="row g-2 mb-3 no-print">
                             <div class="col-md-6"><input type="text" id="regStudentName_${esc(c.name)}" class="form-control form-control-sm" placeholder="Nom et Prénom de l'élève" required></div>
                             <div class="col-md-3"><select id="regStudentSexe_${esc(c.name)}" class="form-select form-select-sm"><option value="M">M</option><option value="F">F</option></select></div>
                             <div class="col-md-3"><button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-plus me-1"></i> Inscrire</button></div>
                         </form>
 
-                        <!-- Liste des élèves de cette classe -->
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm align-middle mb-0">
                                <thead>
@@ -1875,7 +1901,6 @@ function renderBulletinFromSystem() {
 
     const classStudents = (s.yearsData[year].students || []).filter(st => st.classe === clName);
 
-    // --- CALCULS DES SCORES POUR LES RANGS (PLACES) ---
     let studentScoresMap = {};
     classStudents.forEach(st => {
         let stN = (s.yearsData[year].notes && s.yearsData[year].notes[st.id]) ? s.yearsData[year].notes[st.id] : {};
@@ -1910,7 +1935,6 @@ function renderBulletinFromSystem() {
     let rankGenIdx = sortedGen.findIndex(st => st.id === student.id);
     let rankGen = rankGenIdx !== -1 ? (rankGenIdx + 1) + '/' + classStudents.length : '1/' + classStudents.length;
 
-    // --- NOTES DE L'ÉLÈVE ---
     const stNotes = (s.yearsData[year].notes && s.yearsData[year].notes[student.id]) ? s.yearsData[year].notes[student.id] : {};
     
     let totalMaxP1 = 0, totalObtP1 = 0;
