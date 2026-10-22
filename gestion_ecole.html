@@ -1150,7 +1150,7 @@ function openSchoolDashboard(id) {
     document.getElementById('dashSchoolSub').innerText = s.province + ' | ' + s.commune + ' (' + s.address + ')';
     document.getElementById('dashSchoolLogo').src = s.logoUrl || 'https://via.placeholder.com/70';
     
-    // Masquer les sélecteurs d'années à l'ouverture du dashboard (nécessite le code secret)
+    // MASQUER LES ANNÉES SCOLAIRES PAR DÉFAUT (NÉCESSITE LE DÉVERROUILLAGE)
     document.getElementById('schoolYearsSectionsContainer').style.display = 'none';
     document.getElementById('btnUnlockSchoolYears').style.display = 'inline-block';
 
