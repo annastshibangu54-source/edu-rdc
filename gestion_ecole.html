@@ -341,13 +341,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div><h3 id="dashSchoolTitle" class="text-primary m-0 fw-bold"></h3><small id="dashSchoolSub" class="text-muted"></small></div>
 </div>
 
-<!-- SÉLECTEUR D'ANNÉE SCOLAIRE ET GESTION MULTI-ANNÉES (INTÉGRÉ SANS ALTERER LE RESTE) -->
+<!-- GESTION SÉCURISÉE DES ANNÉES SCOLAIRES -->
 <div class="d-flex align-items-center gap-2 bg-light p-2 rounded border">
-    <div style="font-size: 13px; font-weight: bold;"><i class="fa fa-calendar-alt text-primary me-1"></i> Année :</div>
-    <select id="globalSchoolYearSelect" class="form-select form-select-sm" style="width: 140px;" onchange="switchSchoolYear(this.value)">
-        <!-- Options injectées dynamiquement -->
-    </select>
-    <button class="btn btn-outline-success btn-sm fw-bold text-nowrap" onclick="openNewSchoolYearWizard()" title="Ouvrir une nouvelle année scolaire et archiver la précédente"><i class="fa fa-plus-circle me-1"></i> Nouvelle Année</button>
+    <button id="btnUnlockSchoolYears" class="btn btn-primary btn-sm fw-bold text-nowrap" onclick="promptUnlockSchoolYears()"><i class="fa fa-key me-1"></i> Années Scolaires</button>
+    <div id="schoolYearsSectionsContainer" class="d-flex align-items-center gap-2" style="display: none;">
+        <div style="font-size: 13px; font-weight: bold;"><i class="fa fa-calendar-alt text-primary me-1"></i> Année :</div>
+        <select id="globalSchoolYearSelect" class="form-select form-select-sm" style="width: 140px;" onchange="switchSchoolYear(this.value)">
+            <!-- Options injectées dynamiquement -->
+        </select>
+        <button class="btn btn-outline-success btn-sm fw-bold text-nowrap" onclick="openNewSchoolYearWizard()" title="Ouvrir une nouvelle année scolaire et archiver la précédente"><i class="fa fa-plus-circle me-1"></i> Nouvelle Année</button>
+    </div>
 </div>
 
 <button class="btn btn-secondary btn-sm fw-bold" onclick="showSection('view-portal')"><i class="fa fa-times me-1"></i> Fermer / Retour</button>
@@ -1147,9 +1150,27 @@ function openSchoolDashboard(id) {
     document.getElementById('dashSchoolSub').innerText = s.province + ' | ' + s.commune + ' (' + s.address + ')';
     document.getElementById('dashSchoolLogo').src = s.logoUrl || 'https://via.placeholder.com/70';
     
+    // Masquer les sélecteurs d'années à l'ouverture du dashboard (nécessite le code secret)
+    document.getElementById('schoolYearsSectionsContainer').style.display = 'none';
+    document.getElementById('btnUnlockSchoolYears').style.display = 'inline-block';
+
     refreshSchoolYearSelector();
     refreshDashboardViews();
     showSection('view-school-dashboard');
+}
+
+// DÉVERROUILLAGE SÉCURISÉ DE LA GESTION DES ANNÉES SCOLAIRES AVEC LE CODE SECRET
+function promptUnlockSchoolYears() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const entered = prompt("Entrez le code secret de l'école \"" + s.name + "\" pour accéder à la gestion des années scolaires :");
+    if(entered && entered.trim().toUpperCase() === s.secretCode.toUpperCase()) {
+        document.getElementById('btnUnlockSchoolYears').style.display = 'none';
+        document.getElementById('schoolYearsSectionsContainer').style.display = 'flex';
+        alert("Accès autorisé à la gestion des années scolaires !");
+    } else if(entered !== null) {
+        alert("Code secret incorrect.");
+    }
 }
 
 // FONCTIONNALITÉ MULTI-ANNÉES : GESTION DES SÉLECTEURS ET TRANSITION D'ANNÉE
