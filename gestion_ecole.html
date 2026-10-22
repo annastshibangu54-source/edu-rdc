@@ -608,7 +608,7 @@ function saveData() {
     try {
         localStorage.setItem("EDURDC_FULL_PLATFORM_V12", JSON.stringify(appData));
     } catch(err) {
-        alert("Erreur de stockage : Espace insuffisant. Essayez de réinitialiser ou d'utiliser un logo plus petit.");
+        alert("Attention : Mémoire saturée. L'image a été ignorée pour préserver l'enregistrement.");
     }
 }
 
@@ -624,6 +624,34 @@ function openSchoolForm() {
     document.getElementById('editSchoolId').value = "";
     document.getElementById('schoolSubDivision').innerHTML = '<option value="">-- D\'abord choisir la Province --</option>';
     showSection('view-create-school');
+}
+
+// REDIMENSIONNEMENT / COMPRESSION AUTOMATIQUE DE L'IMAGE
+function compressAndResizeImage(file, callback) {
+    if (!file) {
+        callback("https://via.placeholder.com/70");
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 150;
+            canvas.height = 150;
+            ctx.drawImage(img, 0, 0, 150, 150);
+            callback(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        img.onerror = function() {
+            callback("https://via.placeholder.com/70");
+        };
+        img.src = e.target.result;
+    };
+    reader.onerror = function() {
+        callback("https://via.placeholder.com/70");
+    };
+    reader.readAsDataURL(file);
 }
 
 function handleSaveSchool(e) {
@@ -644,18 +672,11 @@ function handleSaveSchool(e) {
     const secretCode = 'SEC-' + Math.floor(1000 + Math.random() * 9000);
     
     const fileInput = document.getElementById('schoolLogoFile');
-    if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, evt.target.result);
-        };
-        reader.onerror = function() {
-            finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, "https://via.placeholder.com/70");
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-    } else {
-        finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, "https://via.placeholder.com/70");
-    }
+    const file = (fileInput.files && fileInput.files[0]) ? fileInput.files[0] : null;
+
+    compressAndResizeImage(file, function(compressedLogo) {
+        finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, compressedLogo);
+    });
 }
 
 function finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl) {
@@ -669,7 +690,7 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
     
     saveData();
     
-    // Affichage garanti de la boîte de dialogue du code secret
+    // Affichage de la modale du code secret
     currentCreatedSecretCode = secretCode;
     document.getElementById('modalSecretCodeDisplay').innerText = secretCode;
     document.getElementById('secretCodeModal').style.display = 'flex';
