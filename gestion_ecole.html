@@ -28,6 +28,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .tab-pane.active { display: block; }
 .action-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
 
+/* POPUP CODE SECRET DESIGN */
+.secret-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; }
+.secret-modal-card { background: #fff; padding: 30px; border-radius: 12px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+.secret-code-badge { font-size: 26px; font-weight: 800; color: #0d6efd; letter-spacing: 2px; background: #e7f1ff; padding: 10px 20px; border-radius: 8px; border: 2px dashed #0d6efd; display: inline-block; margin: 15px 0; }
+
 /* STYLES BULLETIN INTEGRE */
 .bulletin-container .page { width:210mm; min-height:297mm; margin:0 auto; background:#fff; padding:7mm 8mm; font-size: 8px; box-shadow:0 2px 10px rgba(0,0,0,.25); color:#000; font-family: Arial, Helvetica, sans-serif; }
 .bulletin-container .hdr { display: flex; align-items:center; justify-content: space-between; margin-bottom:2px; }
@@ -45,6 +50,20 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </style>
 </head>
 <body>
+
+<!-- MODALE D'AFFICHAGE DU CODE SECRET -->
+<div id="secretCodeModal" class="secret-modal-overlay">
+  <div class="secret-modal-card">
+    <i class="fa fa-check-circle fa-4x text-success mb-3"></i>
+    <h3 class="fw-bold">Établissement Créé avec Succès !</h3>
+    <p class="text-muted small">Voici votre <b>Code Secret</b> unique. Notez-le bien, il vous sera demandé pour ouvrir votre école :</p>
+    <div id="modalSecretCodeDisplay" class="secret-code-badge">SEC-0000</div>
+    <div>
+      <button class="btn btn-outline-primary btn-sm me-2" onclick="copySecretCodeModal()"><i class="fa fa-copy me-1"></i> Copier</button>
+      <button class="btn btn-success btn-sm fw-bold px-4" onclick="closeSecretModal()"><i class="fa fa-check me-1"></i> J'ai noté le code</button>
+    </div>
+  </div>
+</div>
 
 <!-- NAVIGATION -->
 <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0 no-print">
@@ -515,6 +534,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 const ADMIN_MASTER_PASSWORD = "ADMIN-2026";
 let appData = { schools: [], adminRequests: [], jobApplications: [] };
 let activeSchoolId = null;
+let currentCreatedSecretCode = "";
 
 const subDivisionsData = {
     "KINSHASA-LUKUNGA": ["Bandalungwa", "Gombe", "Kintambo", "Lingwala", "Ngaliema"],
@@ -588,7 +608,7 @@ function saveData() {
     try {
         localStorage.setItem("EDURDC_FULL_PLATFORM_V12", JSON.stringify(appData));
     } catch(err) {
-        alert("Attention : L'espace de stockage de votre appareil est plein (souvent à cause de photos trop lourdes). Essayez sans logo ou avec une image plus légère.");
+        alert("Erreur de stockage : Espace insuffisant. Essayez de réinitialiser ou d'utiliser un logo plus petit.");
     }
 }
 
@@ -649,11 +669,21 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
     
     saveData();
     
-    // Alerte bloquante directe garantie
-    window.alert("ÉTABLISSEMENT ENREGISTRÉ AVEC SUCCÈS !\n\nCODE SECRET : " + secretCode + "\n\nNotez bien ce code, il vous sera demandé pour ouvrir votre école.");
-    
+    // Affichage garanti de la boîte de dialogue du code secret
+    currentCreatedSecretCode = secretCode;
+    document.getElementById('modalSecretCodeDisplay').innerText = secretCode;
+    document.getElementById('secretCodeModal').style.display = 'flex';
     document.getElementById('formCreateSchool').reset();
+}
+
+function closeSecretModal() {
+    document.getElementById('secretCodeModal').style.display = 'none';
     showSection('view-portal');
+}
+
+function copySecretCodeModal() {
+    navigator.clipboard.writeText(currentCreatedSecretCode);
+    alert("Code Secret copié dans le presse-papier !");
 }
 
 function renderSchoolsList() {
@@ -1108,7 +1138,7 @@ function verifyCandidateCodeAndDisplayReply() {
 }
 function openAdminCentralPanel() {
     const pass = prompt("Code Admin Central :");
-    if(pass === ADMIN_MASTER_PASSWORD) {
+    if(pass && pass.trim() === ADMIN_MASTER_PASSWORD) {
         showSection('view-admin-central');
         document.getElementById('adminSchoolsTableBody').innerHTML = appData.schools.map(s => `
             <tr>
@@ -1120,7 +1150,7 @@ function openAdminCentralPanel() {
                 <td><button class="btn btn-danger btn-sm fw-bold" onclick="promptCentralDeleteSchool('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer</button></td>
             </tr>
         `).join('');
-    } else {
+    } else if (pass !== null) {
         alert("Mot de passe incorrect.");
     }
 }
