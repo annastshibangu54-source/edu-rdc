@@ -335,11 +335,21 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- DASHBOARD ÉCOLE -->
 <div id="view-school-dashboard" class="view-section">
-<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm no-print">
+<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm no-print flex-wrap gap-2">
 <div class="d-flex align-items-center gap-3">
 <img id="dashSchoolLogo" class="school-logo-display" src="" alt="Logo">
 <div><h3 id="dashSchoolTitle" class="text-primary m-0 fw-bold"></h3><small id="dashSchoolSub" class="text-muted"></small></div>
 </div>
+
+<!-- SÉLECTEUR D'ANNÉE SCOLAIRE ET GESTION MULTI-ANNÉES (INTÉGRÉ SANS ALTERER LE RESTE) -->
+<div class="d-flex align-items-center gap-2 bg-light p-2 rounded border">
+    <div style="font-size: 13px; font-weight: bold;"><i class="fa fa-calendar-alt text-primary me-1"></i> Année :</div>
+    <select id="globalSchoolYearSelect" class="form-select form-select-sm" style="width: 140px;" onchange="switchSchoolYear(this.value)">
+        <!-- Options injectées dynamiquement -->
+    </select>
+    <button class="btn btn-outline-success btn-sm fw-bold text-nowrap" onclick="openNewSchoolYearWizard()" title="Ouvrir une nouvelle année scolaire et archiver la précédente"><i class="fa fa-plus-circle me-1"></i> Nouvelle Année</button>
+</div>
+
 <button class="btn btn-secondary btn-sm fw-bold" onclick="showSection('view-portal')"><i class="fa fa-times me-1"></i> Fermer / Retour</button>
 </div>
 <div class="row">
@@ -576,7 +586,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="action-bar no-print">
 <button class="btn btn-success btn-sm fw-bold" onclick="alert('Présences enregistrées')"><i class="fa fa-save me-1"></i> Enregistrer</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
-<button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+<button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </div>
 
@@ -878,6 +888,26 @@ window.onload = function() {
     if(!appData.schools) appData.schools = [];
     if(!appData.adminRequests) appData.adminRequests = [];
     if(!appData.jobApplications) appData.jobApplications = [];
+    
+    // Migration de rétrocompatibilité pour s'assurer que chaque école gère ses années
+    appData.schools.forEach(s => {
+        if(!s.activeYear) s.activeYear = "2025-2026";
+        if(!s.yearsData) {
+            s.yearsData = {
+                "2025-2026": {
+                    classes: s.classes || [],
+                    teachers: s.teachers || [],
+                    students: s.students || [],
+                    courses: s.courses || {},
+                    notes: s.notes || {},
+                    caisse: s.caisse || [],
+                    studentPayments: s.studentPayments || [],
+                    discipline: s.discipline || []
+                }
+            };
+        }
+    });
+
     renderSchoolsList();
     renderPortalAnnouncements();
 };
@@ -962,11 +992,19 @@ function handleSaveSchool(e) {
 
 function finishSavingSchool(name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl) {
     if(!appData.schools) appData.schools = [];
+    
+    const defaultYear = "2025-2026";
     appData.schools.push({
         id: 'SCH-' + Date.now(),
         name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl,
-        direction: [], staff: [], classes: [], teachers: [], students: [], courses: {}, notes: {},
-        caisse: [], presenceStudents: {}, studentPayments: [], discipline: [], communications: [], savedCards: [], armoiries: '', devise: '', courriers: [], dossiersArchive: []
+        activeYear: defaultYear,
+        yearsData: {
+            "2025-2026": {
+                classes: [], teachers: [], students: [], courses: {}, notes: {},
+                caisse: [], presenceStudents: {}, studentPayments: [], discipline: []
+            }
+        },
+        direction: [], staff: [], communications: [], savedCards: [], armoiries: '', devise: '', courriers: [], dossiersArchive: []
     });
     
     saveData();
@@ -1000,7 +1038,7 @@ function renderSchoolsList() {
                 <img src="${s.logoUrl || 'https://via.placeholder.com/70'}" class="school-logo-display" alt="Logo">
                 <div class="flex-grow-1">
                     <h5 class="fw-bold text-primary mb-1">${s.name}</h5>
-                    <div class="small text-muted mb-1"><b>Prov :</b> ${s.province} | <b>Sous-Div :</b> ${s.subDivision || '-'}</div>
+                    <div class="small text-muted mb-1"><b>Prov :</b> ${s.province} | <b>Année :</b> ${s.activeYear || '2025-2026'}</div>
                     <div class="small text-muted"><b>NIF :</b> ${s.nif || '-'} | <b>Commune :</b> ${s.commune}</div>
                     <div class="mt-2 d-flex gap-2">
                         <button class="btn btn-primary btn-sm fw-bold" onclick="promptLoginCode('${s.id}')"><i class="fa fa-folder-open me-1"></i> Ouvrir</button>
@@ -1100,16 +1138,90 @@ function promptCentralDeleteSchool(id) {
 
 function openSchoolDashboard(id) {
     activeSchoolId = id;
-    unlockedClasses = {}; // Réinitialiser les accès aux classes à l'ouverture
-    teachersUnlocked = false; // Réinitialiser l'accès enseignants à l'ouverture
-    unlockedStudentClasses = {}; // Réinitialiser l'accès élèves à l'ouverture
+    unlockedClasses = {}; 
+    teachersUnlocked = false; 
+    unlockedStudentClasses = {}; 
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
     document.getElementById('dashSchoolTitle').innerText = s.name;
     document.getElementById('dashSchoolSub').innerText = s.province + ' | ' + s.commune + ' (' + s.address + ')';
     document.getElementById('dashSchoolLogo').src = s.logoUrl || 'https://via.placeholder.com/70';
+    
+    refreshSchoolYearSelector();
     refreshDashboardViews();
     showSection('view-school-dashboard');
+}
+
+// FONCTIONNALITÉ MULTI-ANNÉES : GESTION DES SÉLECTEURS ET TRANSITION D'ANNÉE
+function refreshSchoolYearSelector() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    if(!s.yearsData) s.yearsData = { "2025-2026": { classes: s.classes || [], teachers: s.teachers || [], students: s.students || [], courses: s.courses || {}, notes: s.notes || {}, caisse: s.caisse || [], studentPayments: s.studentPayments || [], discipline: s.discipline || [] } };
+    if(!s.activeYear) s.activeYear = "2025-2026";
+
+    const select = document.getElementById('globalSchoolYearSelect');
+    if(!select) return;
+
+    const years = Object.keys(s.yearsData).sort();
+    select.innerHTML = years.map(y => `<option value="${y}" ${y === s.activeYear ? 'selected' : ''}>${y} ${y === s.activeYear ? '(En cours)' : '(Archive)'}</option>`).join('');
+}
+
+function switchSchoolYear(year) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s || !s.yearsData[year]) return;
+    s.activeYear = year;
+    saveData();
+    refreshDashboardViews();
+    switchTab('defaultWelcomeMessage');
+    alert("Basculement effectué vers l'année scolaire : " + year + (year === s.activeYear ? " (Mode Actif)" : " (Mode Archive en lecture/consultation)"));
+}
+
+function openNewSchoolYearWizard() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+
+    const currentYear = s.activeYear || "2025-2026";
+    const nextYearDefault = "2026-2027";
+    const newYearInput = prompt("Clôture de l'année " + currentYear + " et ouverture d'une nouvelle année.\nVeuillez saisir la nouvelle Année Scolaire (ex: 2026-2027) :", nextYearDefault);
+    
+    if(!newYearInput || !newYearInput.trim()) return;
+    const newYear = newYearInput.trim();
+
+    if(s.yearsData[newYear]) {
+        alert("Cette année scolaire existe déjà !");
+        return;
+    }
+
+    // Copie de transition intelligente : Conserve la structure des classes et cours, et monte les élèves si souhaité
+    const currentData = s.yearsData[currentYear] || {};
+    const existingClasses = currentData.classes || [];
+    const existingCourses = currentData.courses || {};
+
+    let transferredStudents = [];
+    if(confirm("Voulez-vous reporter automatiquement la liste des élèves dans la nouvelle année ? (Les élèves seront maintenus dans leurs classes pour la rentrée)")) {
+        transferredStudents = (currentData.students || []).map(st => ({
+            ...st,
+            id: 'STU-' + Date.now() + '-' + Math.floor(Math.random() * 1000)
+        }));
+    }
+
+    s.yearsData[newYear] = {
+        classes: JSON.parse(JSON.stringify(existingClasses)),
+        teachers: [],
+        students: transferredStudents,
+        courses: JSON.parse(JSON.stringify(existingCourses)),
+        notes: {},
+        caisse: [],
+        studentPayments: [],
+        discipline: []
+    };
+
+    s.activeYear = newYear;
+    saveData();
+    refreshSchoolYearSelector();
+    refreshDashboardViews();
+    switchTab('defaultWelcomeMessage');
+    alert("Félicitations ! L'année scolaire " + newYear + " est ouverte avec succès. L'année " + currentYear + " a été archivée en toute sécurité.");
 }
 
 function toggleParamsSubmenu() {
@@ -1211,18 +1323,20 @@ function deleteDirection(i) {
     renderDirectionTable();
 }
 
-// 2. CLASSES
+// 2. CLASSES (Rattachées à l'année active)
 function handleSaveClass(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
+    if(!s.yearsData[year]) s.yearsData[year] = { classes: [], teachers: [], students: [], courses: {}, notes: {}, caisse: [], studentPayments: [], discipline: [] };
+    
     const name = document.getElementById('className').value.trim();
     if(!name) return;
-    if(!s.classes) s.classes = [];
-    if(s.classes.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-        alert("Cette classe existe déjà !");
+    if(s.yearsData[year].classes.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        alert("Cette classe existe déjà pour l'année " + year + " !");
         return;
     }
-    s.classes.push({ name });
+    s.yearsData[year].classes.push({ name });
     saveData();
     document.getElementById('formClass').reset();
     renderClassesTable();
@@ -1231,23 +1345,25 @@ function handleSaveClass(e) {
 function renderClassesTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const currentYearData = s.yearsData[year] || { classes: [], teachers: [], students: [] };
     const container = document.getElementById('classesContainerList');
     if(!container) return;
 
-    if(!s.classes || s.classes.length === 0) {
-        container.innerHTML = '<div class="alert alert-secondary text-center">Aucune classe enregistrée.</div>';
+    if(!currentYearData.classes || currentYearData.classes.length === 0) {
+        container.innerHTML = `<div class="alert alert-secondary text-center">Aucune classe enregistrée pour l'année scolaire <b>${year}</b>.</div>`;
         return;
     }
 
-    container.innerHTML = s.classes.map(c => {
-        const classStudents = (s.students || []).filter(st => st.classe === c.name);
-        const classTeacher = (s.teachers || []).find(t => t.titulaireClass === c.name);
+    container.innerHTML = currentYearData.classes.map(c => {
+        const classStudents = (currentYearData.students || []).filter(st => st.classe === c.name);
+        const classTeacher = (currentYearData.teachers || []).find(t => t.titulaireClass === c.name);
         const isUnlocked = unlockedClasses[c.name] === true;
 
         return `
             <div class="card shadow-sm border-0 mb-4 border-start border-4 border-primary">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 text-primary fw-bold"><i class="fa fa-door-open me-2"></i>Classe : ${esc(c.name)}</h5>
+                    <h5 class="m-0 text-primary fw-bold"><i class="fa fa-door-open me-2"></i>Classe : ${esc(c.name)} (${year})</h5>
                     <button class="btn btn-sm btn-outline-danger no-print" onclick="deleteClass('${esc(c.name)}')"><i class="fa fa-trash"></i> Supprimer la classe</button>
                 </div>
                 <div class="card-body">
@@ -1289,7 +1405,7 @@ function renderClassesTable() {
                                                     <button class="btn btn-sm btn-outline-danger" onclick="deleteStudentFromClass('${st.id}')"><i class="fa fa-trash"></i></button>
                                                 </td>
                                             </tr>
-                                        `).join('') : '<tr><td colspan="4" class="text-center text-muted small">Aucun élève inscrit dans cette classe</td></tr>'
+                                        `).join('') : '<tr><td colspan="4" class="text-center text-muted small">Aucun élève inscrit dans cette classe pour cette année</td></tr>'
                                     }
                                 </tbody>
                             </table>
@@ -1304,7 +1420,8 @@ function renderClassesTable() {
 function promptUnlockClass(className) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
-    const teacher = (s.teachers || []).find(t => t.titulaireClass === className);
+    const year = s.activeYear || "2025-2026";
+    const teacher = (s.yearsData[year].teachers || []).find(t => t.titulaireClass === className);
     const teacherCode = teacher ? teacher.secretCode : '';
 
     const entered = prompt("Entrez le code secret de l'école ou le code secret de l'enseignant titulaire pour la classe " + className + " :");
@@ -1328,22 +1445,24 @@ function lockClass(className) {
 function handleSaveStudentInClass(e, className) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const nameInput = document.getElementById(`studentName_${className}`);
     const sexeInput = document.getElementById(`studentSexe_${className}`);
     const name = nameInput.value.trim();
     const sexe = sexeInput.value;
     const mat = 'ELV-' + Math.floor(1000 + Math.random() * 9000);
 
-    if(!s.students) s.students = [];
-    s.students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe: className, photo: '', cardData: {} });
+    if(!s.yearsData[year].students) s.yearsData[year].students = [];
+    s.yearsData[year].students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe: className, photo: '', cardData: {} });
     saveData();
     renderClassesTable();
 }
 
 function deleteStudentFromClass(studentId) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    if(s && s.students) {
-        s.students = s.students.filter(st => st.id !== studentId);
+    const year = s.activeYear || "2025-2026";
+    if(s && s.yearsData[year].students) {
+        s.yearsData[year].students = s.yearsData[year].students.filter(st => st.id !== studentId);
         saveData();
         renderClassesTable();
     }
@@ -1351,15 +1470,16 @@ function deleteStudentFromClass(studentId) {
 
 function deleteClass(name) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    if(confirm("Voulez-vous vraiment supprimer cette classe ?")) {
-        s.classes = s.classes.filter(c => c.name !== name);
+    const year = s.activeYear || "2025-2026";
+    if(confirm("Voulez-vous vraiment supprimer cette classe pour l'année " + year + " ?")) {
+        s.yearsData[year].classes = s.yearsData[year].classes.filter(c => c.name !== name);
         delete unlockedClasses[name];
         saveData();
         renderClassesTable();
     }
 }
 
-// 3. ENSEIGNANTS (SÉCURISÉ PAR CODE PROPRIÉTAIRE ÉCOLE)
+// 3. ENSEIGNANTS
 function renderTeachersSection() {
     const lockedCont = document.getElementById('teachersLockedContainer');
     const unlockedCont = document.getElementById('teachersUnlockedContainer');
@@ -1393,39 +1513,43 @@ function lockTeachers() {
 
 function refreshTeacherOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const sel = document.getElementById('teacherClass');
-    if(sel && s && s.classes) {
-        sel.innerHTML = s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    if(sel && s && s.yearsData[year].classes) {
+        sel.innerHTML = s.yearsData[year].classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     }
     renderTeachersTable();
 }
 function handleSaveTeacher(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const name = document.getElementById('teacherName').value.trim();
     const titulaireClass = document.getElementById('teacherClass').value;
     const secretCode = 'AGT-' + Math.floor(1000 + Math.random() * 9000);
-    if(!s.teachers) s.teachers = [];
-    s.teachers.push({ name, titulaireClass, secretCode });
+    if(!s.yearsData[year].teachers) s.yearsData[year].teachers = [];
+    s.yearsData[year].teachers.push({ name, titulaireClass, secretCode });
     saveData();
     document.getElementById('formTeacher').reset();
     renderTeachersTable();
 }
 function renderTeachersTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const tbody = document.getElementById('teachersTableBody');
     if(tbody && s) {
-        tbody.innerHTML = (s.teachers || []).map((t, idx) => `
+        const teachers = s.yearsData[year].teachers || [];
+        tbody.innerHTML = teachers.map((t, idx) => `
             <tr>
                 <td>${t.name}</td>
                 <td><span class="badge bg-info text-dark">${t.titulaireClass}</span></td>
                 <td><b>${t.secretCode}</b></td>
                 <td class="no-print">
                     <button class="btn btn-sm btn-outline-primary" onclick="loginAsTeacher('${t.secretCode}','${t.titulaireClass}')"><i class="fa fa-sign-in-alt me-1"></i> Accéder</button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="s.teachers.splice(${idx},1);saveData();renderTeachersTable();"><i class="fa fa-trash"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="s.yearsData['${year}'].teachers.splice(${idx},1);saveData();renderTeachersTable();"><i class="fa fa-trash"></i></button>
                 </td>
             </tr>
-        `).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun enseignant</td></tr>';
+        `).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun enseignant pour cette année</td></tr>';
     }
 }
 
@@ -1454,7 +1578,7 @@ function loginAsTeacher(code, classe) {
     }
 }
 
-// 4. ELEVES (SÉCURISÉ PAR CLASSE / CODE ÉCOLE OU CODE ENSEIGNANT)
+// 4. ELEVES
 function refreshStudentOptions() {
     renderStudentsSection();
 }
@@ -1465,23 +1589,25 @@ function handleSaveStudent(e) {
 function renderStudentsSection() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const currentYearData = s.yearsData[year] || { classes: [], students: [] };
     const container = document.getElementById('studentsContainerList');
     if(!container) return;
 
-    if(!s.classes || s.classes.length === 0) {
-        container.innerHTML = '<div class="alert alert-secondary text-center">Aucune classe enregistrée. Veuillez d\'abord créer des classes.</div>';
+    if(!currentYearData.classes || currentYearData.classes.length === 0) {
+        container.innerHTML = `<div class="alert alert-secondary text-center">Aucune classe enregistrée pour l'année ${year}. Veuillez d'abord créer des classes.</div>`;
         return;
     }
 
-    container.innerHTML = s.classes.map(c => {
-        const classStudents = (s.students || []).filter(st => st.classe === c.name);
-        const classTeacher = (s.teachers || []).find(t => t.titulaireClass === c.name);
+    container.innerHTML = currentYearData.classes.map(c => {
+        const classStudents = (currentYearData.students || []).filter(st => st.classe === c.name);
+        const classTeacher = (currentYearData.teachers || []).find(t => t.titulaireClass === c.name);
         const isUnlocked = unlockedStudentClasses[c.name] === true;
 
         return `
             <div class="card shadow-sm border-0 mb-4 border-start border-4 border-success">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 text-success fw-bold"><i class="fa fa-user-graduate me-2"></i>Classe : ${esc(c.name)}</h5>
+                    <h5 class="m-0 text-success fw-bold"><i class="fa fa-user-graduate me-2"></i>Classe : ${esc(c.name)} (${year})</h5>
                 </div>
                 <div class="card-body">
                     ${!isUnlocked ? `
@@ -1537,7 +1663,8 @@ function renderStudentsSection() {
 function promptUnlockStudentClass(className) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
-    const teacher = (s.teachers || []).find(t => t.titulaireClass === className);
+    const year = s.activeYear || "2025-2026";
+    const teacher = (s.yearsData[year].teachers || []).find(t => t.titulaireClass === className);
     const teacherCode = teacher ? teacher.secretCode : '';
 
     const entered = prompt("Entrez le code secret de l'école ou le code secret de l'enseignant titulaire pour la classe " + className + " :");
@@ -1561,22 +1688,24 @@ function lockStudentClass(className) {
 function handleSaveStudentInRegTab(e, className) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const nameInput = document.getElementById(`regStudentName_${className}`);
     const sexeInput = document.getElementById(`regStudentSexe_${className}`);
     const name = nameInput.value.trim();
     const sexe = sexeInput.value;
     const mat = 'ELV-' + Math.floor(1000 + Math.random() * 9000);
 
-    if(!s.students) s.students = [];
-    s.students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe: className, photo: '', cardData: {} });
+    if(!s.yearsData[year].students) s.yearsData[year].students = [];
+    s.yearsData[year].students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe: className, photo: '', cardData: {} });
     saveData();
     renderStudentsSection();
 }
 
 function deleteStudentFromRegTab(studentId) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    if(s && s.students) {
-        s.students = s.students.filter(st => st.id !== studentId);
+    const year = s.activeYear || "2025-2026";
+    if(s && s.yearsData[year].students) {
+        s.yearsData[year].students = s.yearsData[year].students.filter(st => st.id !== studentId);
         saveData();
         renderStudentsSection();
     }
@@ -1585,53 +1714,59 @@ function deleteStudentFromRegTab(studentId) {
 // 5. COURS
 function refreshCourseOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const sel = document.getElementById('courseClassSelect');
-    sel.innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    sel.innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     renderCoursesTable();
 }
 function handleSaveCourse(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const cl = document.getElementById('courseClassSelect').value;
     const name = document.getElementById('courseName').value.trim();
     const max = parseFloat(document.getElementById('courseMax').value) || 20;
-    if(!s.courses) s.courses = {};
-    if(!s.courses[cl]) s.courses[cl] = [];
-    s.courses[cl].push({ id: 'CRS-' + Date.now(), name, max });
+    if(!s.yearsData[year].courses) s.yearsData[year].courses = {};
+    if(!s.yearsData[year].courses[cl]) s.yearsData[year].courses[cl] = [];
+    s.yearsData[year].courses[cl].push({ id: 'CRS-' + Date.now(), name, max });
     saveData();
     document.getElementById('formCourse').reset();
     renderCoursesTable();
 }
 function renderCoursesTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const cl = document.getElementById('courseClassSelect') ? document.getElementById('courseClassSelect').value : '';
-    const courses = (s && s.courses) ? (s.courses[cl] || []) : [];
-    document.getElementById('coursesTableBody').innerHTML = courses.map((c, idx) => `<tr><td>${c.name}</td><td>${c.max}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.courses['${cl}'].splice(${idx},1);saveData();renderCoursesTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucun cours</td></tr>';
+    const courses = (s && s.yearsData[year].courses) ? (s.yearsData[year].courses[cl] || []) : [];
+    document.getElementById('coursesTableBody').innerHTML = courses.map((c, idx) => `<tr><td>${c.name}</td><td>${c.max}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.yearsData['${year}'].courses['${cl}'].splice(${idx},1);saveData();renderCoursesTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucun cours</td></tr>';
 }
 
-// 6. NOTES (MIS À JOUR AVEC 1p, 2p, Examen, 3p, 4p, Examen)
+// 6. NOTES
 function refreshNotesOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const sel = document.getElementById('notesClassSelect');
-    sel.innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    sel.innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     loadStudentsForNotes();
 }
 function loadStudentsForNotes() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const cl = document.getElementById('notesClassSelect').value;
     const sel = document.getElementById('notesStudentSelect');
-    sel.innerHTML = (s.students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+    sel.innerHTML = (s.yearsData[year].students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
     renderNotesSheet();
 }
 function renderNotesSheet() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const cl = document.getElementById('notesClassSelect').value;
     const stId = document.getElementById('notesStudentSelect').value;
-    const courses = (s.courses && s.courses[cl]) ? s.courses[cl] : [];
+    const courses = (s.yearsData[year].courses && s.yearsData[year].courses[cl]) ? s.yearsData[year].courses[cl] : [];
     const container = document.getElementById('notesSheetContainer');
     if(!stId || !courses.length) { container.innerHTML = '<p class="text-muted">Sélectionnez une classe et un élève.</p>'; return; }
-    if(!s.notes) s.notes = {};
-    if(!s.notes[stId]) s.notes[stId] = {};
+    if(!s.yearsData[year].notes) s.yearsData[year].notes = {};
+    if(!s.yearsData[year].notes[stId]) s.yearsData[year].notes[stId] = {};
     
     container.innerHTML = `<div class="table-responsive"><table class="table table-sm table-bordered align-middle text-center">
         <thead>
@@ -1647,7 +1782,7 @@ function renderNotesSheet() {
         </thead>
         <tbody>` +
         courses.map(c => {
-            const n = s.notes[stId][c.id] || {};
+            const n = s.yearsData[year].notes[stId][c.id] || {};
             return `<tr>
                 <td class="text-start"><b>${esc(c.name)}</b> <span class="text-muted small">(Max: ${c.max})</span></td>
                 <td><input type="number" class="form-control form-control-sm text-center" value="${n.p1 !== undefined ? n.p1 : ''}" onchange="saveNote('${stId}','${c.id}','p1',this.value)"></td>
@@ -1661,27 +1796,30 @@ function renderNotesSheet() {
 }
 function saveNote(stId, crsId, period, val) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    if(!s.notes[stId]) s.notes[stId] = {};
-    if(!s.notes[stId][crsId]) s.notes[stId][crsId] = {};
-    s.notes[stId][crsId][period] = val !== '' ? parseFloat(val) : '';
+    const year = s.activeYear || "2025-2026";
+    if(!s.yearsData[year].notes[stId]) s.yearsData[year].notes[stId] = {};
+    if(!s.yearsData[year].notes[stId][crsId]) s.yearsData[year].notes[stId][crsId] = {};
+    s.yearsData[year].notes[stId][crsId][period] = val !== '' ? parseFloat(val) : '';
     saveData();
 }
 
-// 7. BULLETIN OFFICIEL (MIS À JOUR AVEC RANGS/PLACES ET DESIGN MINEPST)
+// 7. BULLETIN OFFICIEL
 function refreshBulletinOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
+    const year = s.activeYear || "2025-2026";
     const clsSelect = document.getElementById('bulletinClassSelect');
-    clsSelect.innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    clsSelect.innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     loadStudentsForBulletin();
 }
 
 function loadStudentsForBulletin() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
+    const year = s.activeYear || "2025-2026";
     const cl = document.getElementById('bulletinClassSelect').value;
     const studentSelect = document.getElementById('bulletinStudentSelect');
-    const filteredStudents = (s.students || []).filter(st => st.classe === cl);
+    const filteredStudents = (s.yearsData[year].students || []).filter(st => st.classe === cl);
     studentSelect.innerHTML = filteredStudents.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
     renderBulletinFromSystem();
 }
@@ -1691,22 +1829,23 @@ function renderBulletinFromSystem() {
     const page = document.getElementById('page');
     if(!s) { page.innerHTML = '<p class="text-center text-muted">Aucune école active.</p>'; return; }
     
+    const year = s.activeYear || "2025-2026";
     const clName = document.getElementById('bulletinClassSelect').value;
     const stId = document.getElementById('bulletinStudentSelect').value;
-    const student = (s.students || []).find(x => x.id === stId);
-    const courses = (s.courses && s.courses[clName]) ? s.courses[clName] : [];
+    const student = (s.yearsData[year].students || []).find(x => x.id === stId);
+    const courses = (s.yearsData[year].courses && s.yearsData[year].courses[clName]) ? s.yearsData[year].courses[clName] : [];
 
     if(!student) {
         page.innerHTML = '<p class="text-center text-muted">Veuillez sélectionner un élève valide.</p>';
         return;
     }
 
-    const classStudents = (s.students || []).filter(st => st.classe === clName);
+    const classStudents = (s.yearsData[year].students || []).filter(st => st.classe === clName);
 
     // --- CALCULS DES SCORES POUR LES RANGS (PLACES) ---
     let studentScoresMap = {};
     classStudents.forEach(st => {
-        let stN = (s.notes && s.notes[st.id]) ? s.notes[st.id] : {};
+        let stN = (s.yearsData[year].notes && s.yearsData[year].notes[st.id]) ? s.yearsData[year].notes[st.id] : {};
         let tS1 = 0, tS2 = 0, tGen = 0;
         courses.forEach(c => {
             let cn = stN[c.id] || {};
@@ -1739,7 +1878,7 @@ function renderBulletinFromSystem() {
     let rankGen = rankGenIdx !== -1 ? (rankGenIdx + 1) + '/' + classStudents.length : '1/' + classStudents.length;
 
     // --- NOTES DE L'ÉLÈVE ---
-    const stNotes = (s.notes && s.notes[student.id]) ? s.notes[student.id] : {};
+    const stNotes = (s.yearsData[year].notes && s.yearsData[year].notes[student.id]) ? s.yearsData[year].notes[student.id] : {};
     
     let totalMaxP1 = 0, totalObtP1 = 0;
     let totalMaxP2 = 0, totalObtP2 = 0;
@@ -1829,7 +1968,7 @@ function renderBulletinFromSystem() {
             <tr><td><b>CODE :</b> <input value="${esc(s.secretCode)}"></td>
                 <td><b>N° PERM. :</b> <input value="${student.mat}"></td></tr>
         </table>
-        <div class="title">BULLETIN DE LA 7ème ANNEE CYCLE TERMINAL DE L'EDUCATION DE BASE (CTBE) ANNEE SCOLAIRE 2025 - 2026</div>
+        <div class="title">BULLETIN DE LA 7ème ANNEE CYCLE TERMINAL DE L'EDUCATION DE BASE (CTBE) ANNEE SCOLAIRE ${year}</div>
 
         <table class="b">
             <colgroup>
@@ -1940,12 +2079,13 @@ function refreshPaymentOptions() {
 }
 function updatePayEntityOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const section = document.getElementById('paySection').value;
     const sel = document.getElementById('payEntitySelect');
     if(section === 'Élève') {
-        sel.innerHTML = (s.students || []).map(st => `<option value="${st.name}">Élève : ${st.name} (${st.classe})</option>`).join('');
+        sel.innerHTML = (s.yearsData[year].students || []).map(st => `<option value="${st.name}">Élève : ${st.name} (${st.classe})</option>`).join('');
     } else if(section === 'Enseignant') {
-        sel.innerHTML = (s.teachers || []).map(t => `<option value="${t.name}">Enseignant : ${t.name}</option>`).join('');
+        sel.innerHTML = (s.yearsData[year].teachers || []).map(t => `<option value="${t.name}">Enseignant : ${t.name}</option>`).join('');
     } else {
         sel.innerHTML = (s.direction || []).map(d => `<option value="${d.name}">Admin : ${d.name} (${d.role})</option>`).join('');
     }
@@ -1953,13 +2093,14 @@ function updatePayEntityOptions() {
 function handleSaveStudentPayment(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const section = document.getElementById('paySection').value;
     const entityName = document.getElementById('payEntitySelect').value;
     const montant = parseFloat(document.getElementById('payMontant').value) || 0;
     const motif = document.getElementById('payMotif').value;
     
-    if(!s.studentPayments) s.studentPayments = [];
-    s.studentPayments.push({ date: new Date().toLocaleDateString('fr-FR'), section, entityName, motif, montant });
+    if(!s.yearsData[year].studentPayments) s.yearsData[year].studentPayments = [];
+    s.yearsData[year].studentPayments.push({ date: new Date().toLocaleDateString('fr-FR'), section, entityName, motif, montant });
     saveData();
     document.getElementById('formPayment').reset();
     updatePayEntityOptions();
@@ -1968,51 +2109,57 @@ function handleSaveStudentPayment(e) {
 }
 function renderStudentPayTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('studentPayTableBody').innerHTML = (s.studentPayments || []).map((p, idx) => `
+    const year = s.activeYear || "2025-2026";
+    document.getElementById('studentPayTableBody').innerHTML = (s.yearsData[year].studentPayments || []).map((p, idx) => `
         <tr>
             <td>${p.date}</td>
             <td><b>${p.section}</b></td>
             <td>${p.entityName}</td>
             <td>${p.motif}</td>
             <td class="text-success fw-bold">${p.montant} $</td>
-            <td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.studentPayments.splice(${idx},1);saveData();renderStudentPayTable();"><i class="fa fa-trash"></i></button></td>
+            <td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.yearsData['${year}'].studentPayments.splice(${idx},1);saveData();renderStudentPayTable();"><i class="fa fa-trash"></i></button></td>
         </tr>
-    `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucune facture enregistrée</td></tr>';
+    `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucune facture enregistrée pour cette année</td></tr>';
 }
 
 // 9. PRESENCES
 function refreshPresenceOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('presClassSelect').innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    const year = s.activeYear || "2025-2026";
+    document.getElementById('presClassSelect').innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     loadStudentsForPresence();
 }
 function loadStudentsForPresence() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const cl = document.getElementById('presClassSelect').value;
-    const students = (s.students || []).filter(st => st.classe === cl);
+    const students = (s.yearsData[year].students || []).filter(st => st.classe === cl);
     document.getElementById('studentsPresenceContainer').innerHTML = students.map(st => `<div>${st.name} - Présent</div>`).join('') || 'Aucun élève';
 }
 
 // 9.1 DISCIPLINE
 function refreshDisciplineOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('discClassSelect').innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    const year = s.activeYear || "2025-2026";
+    document.getElementById('discClassSelect').innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     loadStudentsForDiscipline();
     renderDisciplineTable();
 }
 function loadStudentsForDiscipline() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const cl = document.getElementById('discClassSelect').value;
-    document.getElementById('discStudentSelect').innerHTML = (s.students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+    document.getElementById('discStudentSelect').innerHTML = (s.yearsData[year].students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
 }
 function handleSaveDiscipline(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const stId = document.getElementById('discStudentSelect').value;
-    const stObj = s.students.find(x => x.id === stId);
+    const stObj = s.yearsData[year].students.find(x => x.id === stId);
     const obs = document.getElementById('discobs').value;
-    if(!s.discipline) s.discipline = [];
-    s.discipline.push({ studentName: stObj ? stObj.name : '', obs });
+    if(!s.yearsData[year].discipline) s.yearsData[year].discipline = [];
+    s.yearsData[year].discipline.push({ studentName: stObj ? stObj.name : '', obs });
     saveData();
     document.getElementById('formDiscipline').reset();
     loadStudentsForDiscipline();
@@ -2020,7 +2167,8 @@ function handleSaveDiscipline(e) {
 }
 function renderDisciplineTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('disciplineTableBody').innerHTML = (s.discipline || []).map((d, idx) => `<tr><td>${d.studentName}</td><td>${d.obs}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.discipline.splice(${idx},1);saveData();renderDisciplineTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune sanction</td></tr>';
+    const year = s.activeYear || "2025-2026";
+    document.getElementById('disciplineTableBody').innerHTML = (s.yearsData[year].discipline || []).map((d, idx) => `<tr><td>${d.studentName}</td><td>${d.obs}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.yearsData['${year}'].discipline.splice(${idx},1);saveData();renderDisciplineTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune sanction</td></tr>';
 }
 
 // 11. COMMUNICATION
@@ -2123,7 +2271,8 @@ function regenerateSchoolCode(id) {
 // CARTE D'ÉLÈVE
 function refreshCardOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('cardClassSelect').innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    const year = s.activeYear || "2025-2026";
+    document.getElementById('cardClassSelect').innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     document.getElementById('cardSchoolName').innerText = s.name.toUpperCase();
     document.getElementById('cardSchoolLogo').src = s.logoUrl || 'https://via.placeholder.com/40';
     document.getElementById('cardBgLogo').src = s.logoUrl || 'https://via.placeholder.com/180';
@@ -2132,14 +2281,16 @@ function refreshCardOptions() {
 }
 function loadStudentsForCardSelect() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const cl = document.getElementById('cardClassSelect').value;
-    document.getElementById('cardStudentSelect').innerHTML = (s.students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+    document.getElementById('cardStudentSelect').innerHTML = (s.yearsData[year].students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
     populateCardFromSelectedStudent();
 }
 function populateCardFromSelectedStudent() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
     const stId = document.getElementById('cardStudentSelect').value;
-    const st = (s.students || []).find(x => x.id === stId);
+    const st = (s.yearsData[year].students || []).find(x => x.id === stId);
     if(!st) {
         document.getElementById('cardMatVal').innerText = '-';
         document.getElementById('cardNomVal').innerText = '-';
@@ -2161,8 +2312,9 @@ function previewStudentCardPhoto(e) {
         compressAndResizeImage(file, function(compressedUrl) {
             document.getElementById('cardPhotoPreview').src = compressedUrl;
             const s = appData.schools.find(x => x.id === activeSchoolId);
+            const year = s.activeYear || "2025-2026";
             const stId = document.getElementById('cardStudentSelect').value;
-            const st = (s.students || []).find(x => x.id === stId);
+            const st = (s.yearsData[year].students || []).find(x => x.id === stId);
             if(st) {
                 st.photo = compressedUrl;
                 saveData();
@@ -2258,10 +2410,6 @@ function openDirectRegistrationModal() {
     promptLoginCode(appData.schools[0].id);
 }
 
-// ====================================================
-// NOUVELLES FONCTIONS : ARMOIRIES, PALMARÈS, COURRIER, DOSSIERS
-// ====================================================
-
 // 1. Armoiries & Devise
 function refreshArmoiriesOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2302,27 +2450,28 @@ function handleSaveArmoiries(e) {
 function refreshPalmaresOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
+    const year = s.activeYear || "2025-2026";
     const select = document.getElementById('palmaresClassSelect');
-    select.innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    select.innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     renderPalmaresTable();
 }
 
 function renderPalmaresTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
+    const year = s.activeYear || "2025-2026";
     const clName = document.getElementById('palmaresClassSelect').value;
     const container = document.getElementById('palmaresTableContainer');
-    const students = (s.students || []).filter(st => st.classe === clName);
-    const courses = (s.courses && s.courses[clName]) ? s.courses[clName] : [];
+    const students = (s.yearsData[year].students || []).filter(st => st.classe === clName);
+    const courses = (s.yearsData[year].courses && s.yearsData[year].courses[clName]) ? s.yearsData[year].courses[clName] : [];
 
     if(!students.length || !courses.length) {
         container.innerHTML = '<div class="alert alert-secondary text-center">Aucun élève ou aucun cours enregistré dans cette classe pour générer le palmarès.</div>';
         return;
     }
 
-    // Calcul des totaux et pourcentages pour chaque élève
     let studentResults = students.map(st => {
-        let stNotes = (s.notes && s.notes[st.id]) ? s.notes[st.id] : {};
+        let stNotes = (s.yearsData[year].notes && s.yearsData[year].notes[st.id]) ? s.yearsData[year].notes[st.id] : {};
         let totalObtGen = 0;
         let totalMaxGen = 0;
 
@@ -2340,14 +2489,13 @@ function renderPalmaresTable() {
             totalObtGen += (s1Cour + s2Cour);
 
             let maxCour = parseFloat(c.max) || 20;
-            totalMaxGen += (maxCour * 4 * 2); // Max annuel total (S1 + S2)
+            totalMaxGen += (maxCour * 4 * 2);
         });
 
         let pct = totalMaxGen > 0 ? ((totalObtGen / totalMaxGen) * 100).toFixed(1) : 0;
         return { student: st, totalObtGen, totalMaxGen, pct: parseFloat(pct) };
     });
 
-    // Tri par ordre de mérite (pourcentage décroissant)
     studentResults.sort((a, b) => b.pct - a.pct);
 
     container.innerHTML = `
@@ -2384,7 +2532,7 @@ function renderPalmaresTable() {
     `;
 }
 
-// 3. Courriers Entrants / Sortants (avec support optionnel de fichier joint)
+// 3. Courriers Entrants / Sortants
 function refreshCourrierOptions() {
     renderCourriersTable();
     const today = new Date().toISOString().split('T')[0];
@@ -2466,13 +2614,14 @@ function refreshDossiersStorageOptions() {
 function updateDossierPersonOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
+    const year = s.activeYear || "2025-2026";
     const cat = document.getElementById('dossierCategory').value;
     const targetSel = document.getElementById('dossierTargetPerson');
 
     if (cat === 'Eleve') {
-        targetSel.innerHTML = (s.students || []).map(st => `<option value="${st.id}">${st.name} (${st.classe})</option>`).join('');
+        targetSel.innerHTML = (s.yearsData[year].students || []).map(st => `<option value="${st.id}">${st.name} (${st.classe})</option>`).join('');
     } else if (cat === 'Enseignant') {
-        targetSel.innerHTML = (s.teachers || []).map(t => `<option value="${t.name}">${t.name} (Titulaire: ${t.titulaireClass})</option>`).join('');
+        targetSel.innerHTML = (s.yearsData[year].teachers || []).map(t => `<option value="${t.name}">${t.name} (Titulaire: ${t.titulaireClass})</option>`).join('');
     } else if (cat === 'Administratif') {
         targetSel.innerHTML = (s.direction || []).map(d => `<option value="${d.name}">${d.name} (${d.role})</option>`).join('');
     }
