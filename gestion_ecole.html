@@ -64,6 +64,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 <a href="index.html" class="nav-item nav-link">Accueil</a>
                 <a href="gestion_ecole.html" class="nav-item nav-link active">Gestion École</a>
                 <a href="contact.html" class="nav-item nav-link">Contact</a>
+                <a href="javascript:void(0);" class="nav-item nav-link text-danger fw-bold" onclick="openAdminCentralPanel()"><i class="fa fa-user-shield me-1"></i> Admin Central</a>
             </div>
             <!-- Bouton pour quitter ou revenir rapidement au portail principal -->
             <a href="index.html" class="btn btn-danger py-4 px-lg-5 d-none d-lg-block text-white">Quitter la Gestion<i class="fa fa-sign-out-alt ms-3"></i></a>
@@ -399,16 +400,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="tab-pane" id="tab-carte-eleve">
 <h5 class="text-primary fw-bold mb-3">Carte d'Élève</h5>
 <div class="row mb-3 no-print">
-<div class="col-md-6"><label>Classe :</label><select id="cardClassSelect" class="form-select" onchange="loadStudentsForCardSelect()"></select></div>
-<div class="col-md-6"><label>Élève :</label><select id="cardStudentSelect" class="form-select" onchange="populateCardFromSelectedStudent()"></select></div>
+<div class="col-md-4"><label>Classe :</label><select id="cardClassSelect" class="form-select" onchange="loadStudentsForCardSelect()"></select></div>
+<div class="col-md-4"><label>Élève :</label><select id="cardStudentSelect" class="form-select" onchange="populateCardFromSelectedStudent()"></select></div>
+<div class="col-md-4"><label>Photo de l'élève :</label><input type="file" id="cardPhotoInput" class="form-control" accept="image/*" onchange="previewStudentCardPhoto(event)"></div>
 </div>
 <div class="carte border p-3 bg-light mb-3 text-center" id="recto" style="max-width:350px; margin:0 auto; border-radius:8px;">
+<div class="mb-2"><img id="cardPhotoPreview" src="https://via.placeholder.com/80" alt="Photo Élève" style="width:80px; height:80px; object-fit:cover; border-radius:50%; border:2px solid #0d6efd;"></div>
 <h6 class="fw-bold">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</h6>
 <h5 class="text-primary fw-bold">CARTE D'ÉLÈVE</h5>
 <div id="cardSchoolName" class="fw-bold small text-muted mb-2"></div>
-<div><b>Nom :</b> <span id="cardNomVal">-</span></div>
-<div><b>Postnom :</b> <span id="cardPostnomVal">-</span></div>
-<div><b>Prénom :</b> <span id="cardPrenomVal">-</span></div>
+<div><b>Matricule :</b> <span id="cardMatVal">-</span></div>
+<div><b>Nom & Prénom :</b> <span id="cardNomVal">-</span></div>
+<div><b>Sexe :</b> <span id="cardSexeVal">-</span></div>
 <div><b>Classe :</b> <span id="cardClasseVal">-</span></div>
 </div>
 <div class="action-bar justify-content-center no-print">
@@ -745,7 +748,10 @@ function promptLoginCode(id) {
     if(code && code.trim().toUpperCase() === s.secretCode.toUpperCase()) {
         openSchoolDashboard(id);
     } else {
-        alert("Code incorrect !");
+        const sendReq = confirm("Code incorrect ! Voulez-vous envoyer une demande de rappel/génération de code au Gestionnaire de l'École / Admin Central pour \"" + s.name + "\" ?");
+        if(sendReq) {
+            alert("Demande envoyée pour l'école : " + s.name + ". L'Admin Central pourra vous attribuer ou vous renvoyer votre code.");
+        }
     }
 }
 
@@ -804,6 +810,7 @@ function switchTab(tabId, element) {
     else if(tabId === 'tab-discipline') refreshDisciplineOptions();
     else if(tabId === 'tab-communication') renderCommTable();
     else if(tabId === 'tab-jobs-received') renderSchoolJobApplications();
+    else if(tabId === 'tab-carte-eleve') refreshCardOptions();
 }
 
 function refreshDashboardViews() {
@@ -931,7 +938,7 @@ function handleSaveStudent(e) {
     const sexe = document.getElementById('studentSexe').value;
     const mat = 'ELV-' + Math.floor(1000 + Math.random() * 9000);
     if(!s.students) s.students = [];
-    s.students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe, cardData: {} });
+    s.students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe, photo: '', cardData: {} });
     saveData();
     document.getElementById('formStudent').reset();
     renderStudentsTable();
@@ -1163,8 +1170,9 @@ function verifyCandidateCodeAndDisplayReply() {
     area.style.display = 'block';
     area.innerHTML = app ? `<div class="alert alert-success">Candidature trouvée pour le poste : ${app.role}</div>` : `<div class="alert alert-danger">Code invalide</div>`;
 }
+
 function openAdminCentralPanel() {
-    const pass = prompt("Code Admin Central :");
+    const pass = prompt("Entrez le code secret Administrateur Central :");
     if(pass && pass.trim() === ADMIN_MASTER_PASSWORD) {
         showSection('view-admin-central');
         document.getElementById('adminSchoolsTableBody').innerHTML = appData.schools.map(s => `
@@ -1174,11 +1182,25 @@ function openAdminCentralPanel() {
                 <td>${s.province}<br><small class="text-muted">Sous-Div: ${s.subDivision || '-'}</small></td>
                 <td><small><b>NIF:</b> ${s.nif||'-'}<br><b>RCCM:</b> ${s.rccm||'-'}<br><b>ID Nat:</b> ${s.idNat||'-'}</small></td>
                 <td><b>${s.secretCode}</b></td>
-                <td><button class="btn btn-danger btn-sm fw-bold" onclick="promptCentralDeleteSchool('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer</button></td>
+                <td>
+                    <button class="btn btn-warning btn-sm fw-bold mb-1" onclick="regenerateSchoolCode('${s.id}')"><i class="fa fa-sync me-1"></i> Générer un nouveau code</button>
+                    <button class="btn btn-danger btn-sm fw-bold" onclick="promptCentralDeleteSchool('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer</button>
+                </td>
             </tr>
-        `).join('');
+        `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucune école enregistrée</td></tr>';
     } else if (pass !== null) {
         alert("Mot de passe incorrect.");
+    }
+}
+
+function regenerateSchoolCode(id) {
+    const s = appData.schools.find(x => x.id === id);
+    if(s) {
+        const newCode = 'SEC-' + Math.floor(1000 + Math.random() * 9000);
+        s.secretCode = newCode;
+        saveData();
+        alert("Nouveau code généré avec succès pour " + s.name + " : " + newCode);
+        openAdminCentralPanel();
     }
 }
 
@@ -1193,16 +1215,41 @@ function loadStudentsForCardSelect() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const cl = document.getElementById('cardClassSelect').value;
     document.getElementById('cardStudentSelect').innerHTML = (s.students || []).filter(st => st.classe === cl).map(st => `<option value="${st.id}">${st.name}</option>`).join('');
+    populateCardFromSelectedStudent();
 }
 function populateCardFromSelectedStudent() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    const st = (s.students || []).find(x => x.id === document.getElementById('cardStudentSelect').value);
-    if(!st) return;
-    const parts = st.name.split(' ');
-    document.getElementById('cardNomVal').innerText = parts[0] || '-';
-    document.getElementById('cardPostnomVal').innerText = parts[1] || '-';
-    document.getElementById('cardPrenomVal').innerText = parts.slice(2).join(' ') || '-';
+    const stId = document.getElementById('cardStudentSelect').value;
+    const st = (s.students || []).find(x => x.id === stId);
+    if(!st) {
+        document.getElementById('cardMatVal').innerText = '-';
+        document.getElementById('cardNomVal').innerText = '-';
+        document.getElementById('cardSexeVal').innerText = '-';
+        document.getElementById('cardClasseVal').innerText = '-';
+        document.getElementById('cardPhotoPreview').src = "https://via.placeholder.com/80";
+        return;
+    }
+    document.getElementById('cardMatVal').innerText = st.mat || '-';
+    document.getElementById('cardNomVal').innerText = st.name || '-';
+    document.getElementById('cardSexeVal').innerText = st.sexe || '-';
     document.getElementById('cardClasseVal').innerText = st.classe || '-';
+    document.getElementById('cardPhotoPreview').src = st.photo || "https://via.placeholder.com/80";
+}
+
+function previewStudentCardPhoto(e) {
+    const file = e.target.files[0];
+    if(file) {
+        compressAndResizeImage(file, function(compressedUrl) {
+            document.getElementById('cardPhotoPreview').src = compressedUrl;
+            const s = appData.schools.find(x => x.id === activeSchoolId);
+            const stId = document.getElementById('cardStudentSelect').value;
+            const st = (s.students || []).find(x => x.id === stId);
+            if(st) {
+                st.photo = compressedUrl;
+                saveData();
+            }
+        });
+    }
 }
 
 function openDirectRegistrationModal() {
