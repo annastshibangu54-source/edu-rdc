@@ -417,34 +417,34 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- 3. ENSEIGNANTS -->
 <div class="tab-pane" id="tab-profs">
 <h5 class="text-primary fw-bold mb-3">Enseignants & Titulaires</h5>
-<form id="formTeacher" onsubmit="handleSaveTeacher(event)" class="row g-2 mb-3 no-print">
-<div class="col-md-4"><input type="text" id="teacherName" class="form-control" placeholder="Nom de l'enseignant" required></div>
-<div class="col-md-4"><select id="teacherClass" class="form-select"></select></div>
-<div class="col-md-4">
-<div class="action-bar m-0">
-<button type="submit" class="btn btn-success btn-sm fw-bold flex-fill"><i class="fa fa-plus me-1"></i> Ajouter</button>
-<button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
-<button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+<div id="teachersLockedContainer" class="text-center py-5">
+    <p class="text-muted mb-3"><i class="fa fa-lock fa-3x text-warning mb-2"></i><br>Cette section est sécurisée. Veuillez saisir le <b>code secret de l'école</b> pour afficher la gestion des enseignants.</p>
+    <button class="btn btn-primary btn-sm fw-bold px-4" onclick="promptUnlockTeachers()"><i class="fa fa-key me-1"></i> Déverrouiller la section Enseignants</button>
 </div>
+<div id="teachersUnlockedContainer" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-success"><i class="fa fa-unlock me-1"></i> Déverrouillé</span>
+        <button class="btn btn-sm btn-outline-secondary" onclick="lockTeachers()"><i class="fa fa-lock me-1"></i> Verrouiller</button>
+    </div>
+    <form id="formTeacher" onsubmit="handleSaveTeacher(event)" class="row g-2 mb-3 no-print">
+    <div class="col-md-4"><input type="text" id="teacherName" class="form-control" placeholder="Nom de l'enseignant" required></div>
+    <div class="col-md-4"><select id="teacherClass" class="form-select"></select></div>
+    <div class="col-md-4">
+    <div class="action-bar m-0">
+    <button type="submit" class="btn btn-success btn-sm fw-bold flex-fill"><i class="fa fa-plus me-1"></i> Ajouter</button>
+    <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
+    <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+    </div>
+    </div>
+    </form>
+    <table class="table table-bordered"><thead><tr><th>Nom</th><th>Classe Titulaire</th><th>Code Agent</th><th class="no-print">Action</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
 </div>
-</form>
-<table class="table table-bordered"><thead><tr><th>Nom</th><th>Classe Titulaire</th><th>Code Agent</th><th class="no-print">Action</th></tr></thead><tbody id="teachersTableBody"></tbody></table>
 </div>
 
 <!-- 4. ELEVES -->
 <div class="tab-pane" id="tab-eleves-reg">
 <h5 class="text-primary fw-bold mb-3">Inscription des Élèves</h5>
-<form id="formStudent" onsubmit="handleSaveStudent(event)" class="row g-2 mb-3 no-print">
-<div class="col-md-4"><select id="studentClass" class="form-select" required></select></div>
-<div class="col-md-4"><input type="text" id="studentName" class="form-control" placeholder="Nom et Prénom" required></div>
-<div class="col-md-2"><select id="studentSexe" class="form-select"><option value="M">M</option><option value="F">F</option></select></div>
-<div class="col-md-2"><button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-plus me-1"></i> Inscrire</button></div>
-<div class="col-12 action-bar mt-2">
-<button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
-<button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
-</div>
-</form>
-<table class="table table-bordered"><thead><tr><th>Matricule</th><th>Nom</th><th>Sexe</th><th>Classe</th><th class="no-print">Action</th></tr></thead><tbody id="studentsTableBody"></tbody></table>
+<div id="studentsContainerList"></div>
 </div>
 
 <!-- CARTE ELEVE -->
@@ -529,7 +529,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="action-bar no-print">
 <button class="btn btn-success btn-sm fw-bold" onclick="alert('Notes enregistrées automatiquement à chaque saisie')"><i class="fa fa-save me-1"></i> Enregistrer</button>
 <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
-<button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+<button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
 </div>
 
@@ -626,6 +626,8 @@ let appData = { schools: [], adminRequests: [], jobApplications: [] };
 let activeSchoolId = null;
 let currentCreatedSecretCode = "";
 let unlockedClasses = {}; // Suivi des classes déverrouillées par session
+let teachersUnlocked = false; // Suivi du déverrouillage de la section enseignants
+let unlockedStudentClasses = {}; // Suivi des classes déverrouillées pour la section élèves
 
 const subDivisionsData = {
     "KINSHASA-LUKUNGA": ["Bandalungwa", "Gombe", "Kintambo", "Lingwala", "Ngaliema"],
@@ -916,6 +918,8 @@ function promptCentralDeleteSchool(id) {
 function openSchoolDashboard(id) {
     activeSchoolId = id;
     unlockedClasses = {}; // Réinitialiser les accès aux classes à l'ouverture
+    teachersUnlocked = false; // Réinitialiser l'accès enseignants à l'ouverture
+    unlockedStudentClasses = {}; // Réinitialiser l'accès élèves à l'ouverture
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
     document.getElementById('dashSchoolTitle').innerText = s.name;
@@ -944,8 +948,8 @@ function switchTab(tabId, element) {
     
     if(tabId === 'tab-direction') renderDirectionTable();
     else if(tabId === 'tab-classes') renderClassesTable();
-    else if(tabId === 'tab-profs') refreshTeacherOptions();
-    else if(tabId === 'tab-eleves-reg') refreshStudentOptions();
+    else if(tabId === 'tab-profs') renderTeachersSection();
+    else if(tabId === 'tab-eleves-reg') renderStudentsSection();
     else if(tabId === 'tab-cours') refreshCourseOptions();
     else if(tabId === 'tab-notes') refreshNotesOptions();
     else if(tabId === 'tab-bulletins') refreshBulletinOptions();
@@ -1020,7 +1024,7 @@ function deleteDirection(i) {
     renderDirectionTable();
 }
 
-// 2. CLASSES (MIS À JOUR : BOUTON DE SÉCURISATION ET AFFICHAGE CONDITIONNEL PAR CLASSE)
+// 2. CLASSES
 function handleSaveClass(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -1168,11 +1172,44 @@ function deleteClass(name) {
     }
 }
 
-// 3. ENSEIGNANTS (RESTRICTION PAR CLASSE TITULAIRE)
+// 3. ENSEIGNANTS (SÉCURISÉ PAR CODE PROPRIÉTAIRE ÉCOLE)
+function renderTeachersSection() {
+    const lockedCont = document.getElementById('teachersLockedContainer');
+    const unlockedCont = document.getElementById('teachersUnlockedContainer');
+    if(teachersUnlocked) {
+        lockedCont.style.display = 'none';
+        unlockedCont.style.display = 'block';
+        refreshTeacherOptions();
+    } else {
+        lockedCont.style.display = 'block';
+        unlockedCont.style.display = 'none';
+    }
+}
+
+function promptUnlockTeachers() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const entered = prompt("Entrez le code secret de l'école pour accéder à la gestion des enseignants :");
+    if(entered && entered.trim().toUpperCase() === s.secretCode.toUpperCase()) {
+        teachersUnlocked = true;
+        renderTeachersSection();
+        alert("Accès autorisé à la section Enseignants !");
+    } else if(entered !== null) {
+        alert("Code secret incorrect.");
+    }
+}
+
+function lockTeachers() {
+    teachersUnlocked = false;
+    renderTeachersSection();
+}
+
 function refreshTeacherOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const sel = document.getElementById('teacherClass');
-    sel.innerHTML = (s.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    if(sel && s && s.classes) {
+        sel.innerHTML = s.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    }
     renderTeachersTable();
 }
 function handleSaveTeacher(e) {
@@ -1189,17 +1226,20 @@ function handleSaveTeacher(e) {
 }
 function renderTeachersTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
-    document.getElementById('teachersTableBody').innerHTML = (s.teachers || []).map((t, idx) => `
-        <tr>
-            <td>${t.name}</td>
-            <td><span class="badge bg-info text-dark">${t.titulaireClass}</span></td>
-            <td><b>${t.secretCode}</b></td>
-            <td class="no-print">
-                <button class="btn btn-sm btn-outline-primary" onclick="loginAsTeacher('${t.secretCode}','${t.titulaireClass}')"><i class="fa fa-sign-in-alt me-1"></i> Accéder</button>
-                <button class="btn btn-sm btn-outline-danger" onclick="s.teachers.splice(${idx},1);saveData();renderTeachersTable();"><i class="fa fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun enseignant</td></tr>';
+    const tbody = document.getElementById('teachersTableBody');
+    if(tbody && s) {
+        tbody.innerHTML = (s.teachers || []).map((t, idx) => `
+            <tr>
+                <td>${t.name}</td>
+                <td><span class="badge bg-info text-dark">${t.titulaireClass}</span></td>
+                <td><b>${t.secretCode}</b></td>
+                <td class="no-print">
+                    <button class="btn btn-sm btn-outline-primary" onclick="loginAsTeacher('${t.secretCode}','${t.titulaireClass}')"><i class="fa fa-sign-in-alt me-1"></i> Accéder</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="s.teachers.splice(${idx},1);saveData();renderTeachersTable();"><i class="fa fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun enseignant</td></tr>';
+    }
 }
 
 function loginAsTeacher(code, classe) {
@@ -1227,19 +1267,131 @@ function loginAsTeacher(code, classe) {
     }
 }
 
-// 4. ELEVES
+// 4. ELEVES (SÉCURISÉ PAR CLASSE / CODE ÉCOLE OU CODE ENSEIGNANT)
 function refreshStudentOptions() {
-    renderStudentsTable();
+    renderStudentsSection();
 }
 function handleSaveStudent(e) {
     e.preventDefault();
 }
-function renderStudentsTable() {
+
+function renderStudentsSection() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
-    const tbody = document.getElementById('studentsTableBody');
-    if(tbody) {
-        tbody.innerHTML = (s.students || []).map((st, idx) => `<tr><td><b>${st.mat}</b></td><td>${st.name}</td><td>${st.sexe}</td><td>${st.classe}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.students.splice(${idx},1);saveData();renderStudentsTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucun élève</td></tr>';
+    const container = document.getElementById('studentsContainerList');
+    if(!container) return;
+
+    if(!s.classes || s.classes.length === 0) {
+        container.innerHTML = '<div class="alert alert-secondary text-center">Aucune classe enregistrée. Veuillez d\'abord créer des classes.</div>';
+        return;
+    }
+
+    container.innerHTML = s.classes.map(c => {
+        const classStudents = (s.students || []).filter(st => st.classe === c.name);
+        const classTeacher = (s.teachers || []).find(t => t.titulaireClass === c.name);
+        const isUnlocked = unlockedStudentClasses[c.name] === true;
+
+        return `
+            <div class="card shadow-sm border-0 mb-4 border-start border-4 border-success">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 text-success fw-bold"><i class="fa fa-user-graduate me-2"></i>Classe : ${esc(c.name)}</h5>
+                </div>
+                <div class="card-body">
+                    ${!isUnlocked ? `
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-3"><i class="fa fa-lock fa-2x text-warning mb-2"></i><br>Cette section d'inscription est verrouillée. Veuillez saisir le <b>code secret de l'école</b> ou le <b>code de l'enseignant titulaire</b> pour y accéder.</p>
+                            <button class="btn btn-success btn-sm fw-bold px-4" onclick="promptUnlockStudentClass('${esc(c.name)}')"><i class="fa fa-key me-1"></i> Déverrouiller ${esc(c.name)}</button>
+                        </div>
+                    ` : `
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-success"><i class="fa fa-unlock me-1"></i> Déverrouillé</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="lockStudentClass('${esc(c.name)}')"><i class="fa fa-lock me-1"></i> Verrouiller</button>
+                        </div>
+                        <div class="mb-3 p-2 bg-light rounded small">
+                            <b>Enseignant Titulaire :</b> <span class="text-success fw-bold">${classTeacher ? esc(classTeacher.name) + ' (Code: ' + classTeacher.secretCode + ')' : 'Aucun enseignant titulaire assigné'}</span>
+                        </div>
+
+                        <!-- Formulaire d'inscription d'élève spécifique à cette classe -->
+                        <form onsubmit="handleSaveStudentInRegTab(event, '${esc(c.name)}')" class="row g-2 mb-3 no-print">
+                            <div class="col-md-6"><input type="text" id="regStudentName_${esc(c.name)}" class="form-control form-control-sm" placeholder="Nom et Prénom de l'élève" required></div>
+                            <div class="col-md-3"><select id="regStudentSexe_${esc(c.name)}" class="form-select form-select-sm"><option value="M">M</option><option value="F">F</option></select></div>
+                            <div class="col-md-3"><button type="submit" class="btn btn-success btn-sm fw-bold w-100"><i class="fa fa-plus me-1"></i> Inscrire</button></div>
+                        </form>
+
+                        <!-- Liste des élèves de cette classe -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle mb-0">
+                               <thead>
+                                    <tr class="table-secondary"><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th class="no-print">Action</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${
+                                        classStudents.length > 0 ? classStudents.map((st, idx) => `
+                                            <tr>
+                                                <td><b>${st.mat}</b></td>
+                                                <td>${esc(st.name)}</td>
+                                                <td>${esc(st.sexe)}</td>
+                                                <td class="no-print">
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteStudentFromRegTab('${st.id}')"><i class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        `).join('') : '<tr><td colspan="4" class="text-center text-muted small">Aucun élève inscrit dans cette classe</td></tr>'
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function promptUnlockStudentClass(className) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const teacher = (s.teachers || []).find(t => t.titulaireClass === className);
+    const teacherCode = teacher ? teacher.secretCode : '';
+
+    const entered = prompt("Entrez le code secret de l'école ou le code secret de l'enseignant titulaire pour la classe " + className + " :");
+    if(entered) {
+        const val = entered.trim().toUpperCase();
+        if(val === s.secretCode.toUpperCase() || (teacherCode && val === teacherCode.toUpperCase())) {
+            unlockedStudentClasses[className] = true;
+            renderStudentsSection();
+            alert("Accès autorisé à la classe " + className + " !");
+        } else {
+            alert("Code incorrect !");
+        }
+    }
+}
+
+function lockStudentClass(className) {
+    unlockedStudentClasses[className] = false;
+    renderStudentsSection();
+}
+
+function handleSaveStudentInRegTab(e, className) {
+    e.preventDefault();
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    const nameInput = document.getElementById(`regStudentName_${className}`);
+    const sexeInput = document.getElementById(`regStudentSexe_${className}`);
+    const name = nameInput.value.trim();
+    const sexe = sexeInput.value;
+    const mat = 'ELV-' + Math.floor(1000 + Math.random() * 9000);
+
+    if(!s.students) s.students = [];
+    s.students.push({ id: 'STU-' + Date.now(), mat, name, sexe, classe: className, photo: '', cardData: {} });
+    saveData();
+    renderStudentsSection();
+}
+
+function deleteStudentFromRegTab(studentId) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(s && s.students) {
+        s.students = s.students.filter(st => st.id !== studentId);
+        saveData();
+        renderStudentsSection();
     }
 }
 
