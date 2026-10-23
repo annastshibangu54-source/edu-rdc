@@ -355,8 +355,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-carte-eleve', this)"><i class="fa fa-id-card me-2"></i> Carte d'Élève</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-cours', this)"><i class="fa fa-book-open me-2"></i> Cours</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-notes', this)"><i class="fa fa-edit me-2"></i> Saisie de Notes</a>
-<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-bulletins', this)"><i class="fa fa-file-invoice me-2"></i> Bulletins</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-bulletins', this)"><i class="fa fa-file-invoice me-2"></i> Bulletins Semestriels</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-bulletins-periodiques', this)"><i class="fa fa-file-alt me-2"></i> Bulletins Périodiques</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-frais', this)"><i class="fa fa-wallet me-2"></i> Caisse & Frais</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-mobile-money', this)"><i class="fa fa-mobile-alt me-2"></i> Paiement Mobile Money</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-presences', this)"><i class="fa fa-clipboard-check me-2"></i> Présences</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-discipline', this)"><i class="fa fa-gavel me-2"></i> Discipline</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-communication', this)"><i class="fa fa-bullhorn me-2"></i> Communication</a>
@@ -367,6 +369,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-dossiers-archivage', this)"><i class="fa fa-folder-open me-2"></i> Stockage & Dossiers</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-calendrier-vacances', this)"><i class="fa fa-calendar-check me-2"></i> Congés & Vacances</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-horaires-cours', this)"><i class="fa fa-clock me-2"></i> Horaires des Cours</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-statistiques', this)"><i class="fa fa-chart-pie me-2"></i> Statistiques & Analytique</a>
 </div>
 </div>
 </div>
@@ -561,13 +564,35 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- BULLETINS -->
 <div class="tab-pane" id="tab-bulletins">
-<h5 class="text-primary fw-bold mb-3 no-print">Bulletin de Cotes</h5>
+<h5 class="text-primary fw-bold mb-3 no-print">Bulletin Semestriel de Cotes</h5>
 <div class="row g-2 mb-3 no-print">
 <div class="col-md-5"><select id="bulletinClassSelect" class="form-select" onchange="loadStudentsForBulletin()"></select></div>
 <div class="col-md-5"><select id="bulletinStudentSelect" class="form-select" onchange="renderBulletinFromSystem()"></select></div>
 <div class="col-md-2"><button class="btn btn-primary w-100 btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button></div>
 </div>
 <div class="bulletin-container"><div class="page" id="page"><p class="text-center text-muted">Sélectionnez un élève.</p></div></div>
+<div class="action-bar mt-3 no-print">
+<button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+</div>
+</div>
+
+<!-- NOUVEAU : BULLETINS PÉRIODIQUES (1ère, 2ème, 3ème, 4ème PÉRIODE) -->
+<div class="tab-pane" id="tab-bulletins-periodiques">
+<h5 class="text-primary fw-bold mb-3 no-print">Bulletin Périodique (Par Période)</h5>
+<div class="row g-2 mb-3 no-print">
+<div class="col-md-4"><select id="bulletinPerClassSelect" class="form-select" onchange="loadStudentsForPeriodicBulletin()"></select></div>
+<div class="col-md-4"><select id="bulletinPerStudentSelect" class="form-select" onchange="renderPeriodicBulletin()"></select></div>
+<div class="col-md-2">
+    <select id="bulletinPeriodSelect" class="form-select" onchange="renderPeriodicBulletin()">
+        <option value="p1">1ère Période</option>
+        <option value="p2">2ème Période</option>
+        <option value="p3">3ème Période</option>
+        <option value="p4">4ème Période</option>
+    </select>
+</div>
+<div class="col-md-2"><button class="btn btn-primary w-100 btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button></div>
+</div>
+<div class="bulletin-container"><div class="page" id="periodicBulletinPage"><p class="text-center text-muted">Sélectionnez une classe, un élève et une période.</p></div></div>
 <div class="action-bar mt-3 no-print">
 <button class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
 </div>
@@ -651,6 +676,54 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   </tr>
 </thead>
 <tbody id="caisseCustomTableBody"></tbody>
+</table>
+</div>
+</div>
+
+<!-- NOUVEAU : SIMULATION PAIEMENT MOBILE MONEY (AIRTEL, ORANGE, M-PESA) -->
+<div class="tab-pane" id="tab-mobile-money">
+<h5 class="text-primary fw-bold mb-3"><i class="fa fa-mobile-alt me-2"></i>Simulation de Paiement par Mobile Money (RDC)</h5>
+<div class="card p-4 bg-light border-0 shadow-sm mb-3">
+<form id="formMobileMoney" onsubmit="handleSimulateMobileMoney(event)" class="row g-3">
+<div class="col-md-4">
+  <label class="form-label fw-bold small">Élève concerné :</label>
+  <select id="momoStudentSelect" class="form-select form-select-sm" required></select>
+</div>
+<div class="col-md-3">
+  <label class="form-label fw-bold small">Opérateur Mobile :</label>
+  <select id="momoOperator" class="form-select form-select-sm" required>
+    <option value="M-Pesa (Vodacom)">M-Pesa (Vodacom)</option>
+    <option value="Orange Money">Orange Money</option>
+    <option value="Airtel Money">Airtel Money</option>
+  </select>
+</div>
+<div class="col-md-3">
+  <label class="form-label fw-bold small">Numéro de Téléphone :</label>
+  <input type="text" id="momoPhone" class="form-control form-control-sm" placeholder="Ex: +243 820000000" required>
+</div>
+<div class="col-md-2">
+  <label class="form-label fw-bold small">Montant ($) :</label>
+  <input type="number" id="momoAmount" class="form-control form-control-sm" placeholder="Ex: 50" required>
+</div>
+<div class="col-12 text-end">
+  <button type="submit" class="btn btn-success btn-sm fw-bold px-4"><i class="fa fa-paper-plane me-1"></i> Simuler la Transaction Mobile</button>
+</div>
+</form>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered table-sm align-middle">
+<thead>
+  <tr class="table-primary">
+    <th>Date / Heure</th>
+    <th>Élève</th>
+    <th>Opérateur</th>
+    <th>Téléphone</th>
+    <th>Montant</th>
+    <th>Statut</th>
+    <th class="no-print">Action</th>
+  </tr>
+</thead>
+<tbody id="momoTableBody"></tbody>
 </table>
 </div>
 </div>
@@ -1037,6 +1110,18 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   </div>
 </div>
 
+<!-- NOUVEAU : STATISTIQUES & ANALYTIQUE -->
+<div class="tab-pane" id="tab-statistiques">
+<h5 class="text-primary fw-bold mb-3"><i class="fa fa-chart-pie me-2"></i>Tableau de Bord Analytique & Statistiques</h5>
+<div class="row g-3" id="statsContainer">
+    <!-- Rempli dynamiquement -->
+</div>
+<div class="action-bar mt-4 no-print">
+    <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer les Statistiques</button>
+    <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+</div>
+</div>
+
 </div>
 </div>
 </div>
@@ -1270,7 +1355,7 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
                 caisse: [], presenceStudents: {}, studentPayments: [], discipline: []
             }
         },
-        direction: [], staff: [], communications: [], savedCards: [], armoiries: '', devise: '', courriers: [], dossiersArchive: [], calendrierVacances: [], horairesCours: []
+        direction: [], staff: [], communications: [], savedCards: [], armoiries: '', devise: '', courriers: [], dossiersArchive: [], calendrierVacances: [], horairesCours: [], momoPayments: []
     });
     
     saveData();
@@ -1532,7 +1617,9 @@ function switchTab(tabId, element) {
     else if(tabId === 'tab-cours') refreshCourseOptions();
     else if(tabId === 'tab-notes') refreshNotesOptions();
     else if(tabId === 'tab-bulletins') refreshBulletinOptions();
+    else if(tabId === 'tab-bulletins-periodiques') refreshPeriodicBulletinOptions();
     else if(tabId === 'tab-frais') refreshPaymentOptionsCustom();
+    else if(tabId === 'tab-mobile-money') refreshMobileMoneyOptions();
     else if(tabId === 'tab-presences') refreshPresenceOptionsCustom();
     else if(tabId === 'tab-discipline') refreshDisciplineOptions();
     else if(tabId === 'tab-communication') renderCommTable();
@@ -1544,6 +1631,7 @@ function switchTab(tabId, element) {
     else if(tabId === 'tab-dossiers-archivage') refreshDossiersStorageOptions();
     else if(tabId === 'tab-calendrier-vacances') renderCalendrierTable();
     else if(tabId === 'tab-horaires-cours') refreshHoraireOptions();
+    else if(tabId === 'tab-statistiques') renderStatistiquesDashboard();
 }
 
 function refreshDashboardViews() {
@@ -2085,7 +2173,7 @@ function saveNote(stId, crsId, period, val) {
     saveData();
 }
 
-// 7. BULLETIN OFFICIEL
+// 7. BULLETIN OFFICIEL SEMESTRIEL
 function refreshBulletinOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -2352,6 +2440,105 @@ function renderBulletinFromSystem() {
     `;
 }
 
+// 7.1 NOUVEAU : BULLETINS PÉRIODIQUES SPÉCIFIQUES
+function refreshPeriodicBulletinOptions() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const clsSelect = document.getElementById('bulletinPerClassSelect');
+    clsSelect.innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    loadStudentsForPeriodicBulletin();
+}
+
+function loadStudentsForPeriodicBulletin() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const cl = document.getElementById('bulletinPerClassSelect').value;
+    const studentSelect = document.getElementById('bulletinPerStudentSelect');
+    const filteredStudents = (s.yearsData[year].students || []).filter(st => st.classe === cl);
+    studentSelect.innerHTML = filteredStudents.map(st => `<option value="${st.id}">${st.name} (${st.mat})</option>`).join('');
+    renderPeriodicBulletin();
+}
+
+function renderPeriodicBulletin() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    const container = document.getElementById('periodicBulletinPage');
+    if(!s) { container.innerHTML = '<p class="text-center text-muted">Aucune école active.</p>'; return; }
+    
+    const year = s.activeYear || "2025-2026";
+    const clName = document.getElementById('bulletinPerClassSelect').value;
+    const stId = document.getElementById('bulletinPerStudentSelect').value;
+    const period = document.getElementById('bulletinPeriodSelect').value;
+    const student = (s.yearsData[year].students || []).find(x => x.id === stId);
+    const courses = (s.yearsData[year].courses && s.yearsData[year].courses[clName]) ? s.yearsData[year].courses[clName] : [];
+
+    if(!student) {
+        container.innerHTML = '<p class="text-center text-muted">Veuillez sélectionner un élève valide.</p>';
+        return;
+    }
+
+    const stNotes = (s.yearsData[year].notes && s.yearsData[year].notes[student.id]) ? s.yearsData[year].notes[student.id] : {};
+    let totalMax = 0, totalObt = 0;
+
+    let periodLabel = period === 'p1' ? '1ère Période' : period === 'p2' ? '2ème Période' : period === 'p3' ? '3ème Période' : '4ème Période';
+
+    let rows = courses.map(c => {
+        const n = stNotes[c.id] || {};
+        const val = (n[period] !== undefined && n[period] !== '') ? parseFloat(n[period]) : null;
+        const max = parseFloat(c.max) || 20;
+        totalMax += max;
+        if(val !== null) totalObt += val;
+
+        return `
+            <tr>
+                <td style="text-align:left; padding-left:5px;"><b>${esc(c.name)}</b></td>
+                <td>${max}</td>
+                <td><b>${val !== null ? val : ''}</b></td>
+                <td></td>
+            </tr>
+        `;
+    }).join('') || '<tr><td colspan="4" class="text-center text-muted">Aucun cours disponible.</td></tr>';
+
+    let pct = totalMax > 0 ? ((totalObt / totalMax) * 100).toFixed(1) + ' %' : '0 %';
+
+    container.innerHTML = `
+        <div style="padding:15px; font-family:Arial, sans-serif; color:#000;">
+            <div style="text-align:center; font-weight:bold; font-size:12px; margin-bottom:10px;">
+                RÉPUBLIQUE DÉMOCRATIQUE DU CONGO<br>
+                ${esc(s.name).toUpperCase()} - ${esc(s.province)}<br>
+                <u>BULLETIN PÉRIODIQUE : ${periodLabel.toUpperCase()} (${year})</u>
+            </div>
+            <div style="font-size:10px; margin-bottom:10px; border:1px solid #000; padding:8px;">
+                <b>Nom de l'élève :</b> ${esc(student.name)} &nbsp;|&nbsp; <b>Matricule :</b> ${student.mat} &nbsp;|&nbsp; <b>Classe :</b> ${esc(student.classe)}
+            </div>
+            <table style="width:100%; border-collapse:collapse; font-size:9px; text-align:center;" border="1">
+                <thead>
+                    <tr style="background:#f3f4f6;">
+                        <th style="text-align:left; padding-left:5px;">Cours / Branches</th>
+                        <th>Maximum</th>
+                        <th>Note Obtenue</th>
+                        <th>Observations / Signatures</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                    <tr style="font-weight:bold; background:#e5e7eb;">
+                        <td style="text-align:left; padding-left:5px;">TOTAL GÉNÉRAL</td>
+                        <td>${totalMax}</td>
+                        <td>${totalObt}</td>
+                        <td>Pourcentage : ${pct}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:30px; display:flex; justify-content:space-between; font-size:9px;">
+                <div><b>Signature du Titulaire</b></div>
+                <div><b>Sceau de l'École & Signature du Chef d'Établissement</b></div>
+            </div>
+        </div>
+    `;
+}
+
 // ==========================================
 // FONCTIONS CAISSE & PAIEMENT (SUR MESURE)
 // ==========================================
@@ -2482,6 +2669,66 @@ function deleteCaisseCustomItem(idx) {
         s.yearsData[year].caisseCustom.splice(idx, 1);
         saveData();
         renderCaisseCustomTable();
+    }
+}
+
+// 7.2 NOUVEAU : SIMULATION MOBILE MONEY (Paiements scolaires RDC)
+function refreshMobileMoneyOptions() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const sel = document.getElementById('momoStudentSelect');
+    sel.innerHTML = (s.yearsData[year].students || []).map(st => `<option value="${st.name}">${st.name} (${st.classe})</option>`).join('');
+    renderMobileMoneyTable();
+}
+
+function handleSimulateMobileMoney(e) {
+    e.preventDefault();
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+
+    const studentName = document.getElementById('momoStudentSelect').value;
+    const operator = document.getElementById('momoOperator').value;
+    const phone = document.getElementById('momoPhone').value.trim();
+    const amount = parseFloat(document.getElementById('momoAmount').value) || 0;
+    const dateTime = new Date().toLocaleString('fr-FR');
+
+    if(!s.momoPayments) s.momoPayments = [];
+    s.momoPayments.push({ id: 'MOMO-' + Date.now(), studentName, operator, phone, amount, dateTime, status: 'Confirmé / Payé' });
+    saveData();
+
+    document.getElementById('formMobileMoney').reset();
+    renderMobileMoneyTable();
+    alert(`Transaction de ${amount}$ simulée avec succès via ${operator} pour ${studentName} !`);
+}
+
+function renderMobileMoneyTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const tbody = document.getElementById('momoTableBody');
+    if(!tbody) return;
+
+    tbody.innerHTML = (s.momoPayments || []).map((m, idx) => `
+        <tr>
+            <td><small>${m.dateTime}</small></td>
+            <td><b>${esc(m.studentName)}</b></td>
+            <td><span class="badge bg-info text-dark">${m.operator}</span></td>
+            <td>${m.phone}</td>
+            <td><b>${m.amount} $</b></td>
+            <td><span class="badge bg-success">${m.status}</span></td>
+            <td class="no-print">
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteMomoItem(${idx})"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="7" class="text-center text-muted">Aucun paiement mobile money enregistré.</td></tr>';
+}
+
+function deleteMomoItem(idx) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(s && s.momoPayments) {
+        s.momoPayments.splice(idx, 1);
+        saveData();
+        renderMobileMoneyTable();
     }
 }
 
@@ -3309,6 +3556,50 @@ function deleteHoraireItem(idx) {
         saveData();
         renderHorairesTable();
     }
+}
+
+// 7.3 NOUVEAU : STATISTIQUES & TABLEAU DE BORD ANALYTIQUE
+function renderStatistiquesDashboard() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const yearData = s.yearsData[year] || {};
+    const classes = yearData.classes || [];
+    const students = yearData.students || [];
+    const teachers = yearData.teachers || [];
+
+    let totalGarcons = students.filter(st => st.sexe === 'M' || st.sexe === 'm').length;
+    let totalFilles = students.filter(st => st.sexe === 'F' || st.sexe === 'f').length;
+
+    const container = document.getElementById('statsContainer');
+    if(!container) return;
+
+    container.innerHTML = `
+        <div class="col-md-3">
+            <div class="card p-3 border-0 bg-primary text-white shadow-sm text-center">
+                <h3>${classes.length}</h3>
+                <p class="mb-0">Classes Actives</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 bg-success text-white shadow-sm text-center">
+                <h3>${students.length}</h3>
+                <p class="mb-0">Total Élèves (${totalGarcons} M / ${totalFilles} F)</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 bg-warning text-dark shadow-sm text-center">
+                <h3>${teachers.length}</h3>
+                <p class="mb-0">Enseignants Enregistrés</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 bg-info text-white shadow-sm text-center">
+                <h3>${(s.courriers || []).length}</h3>
+                <p class="mb-0">Courriers & Flux</p>
+            </div>
+        </div>
+    `;
 }
 
 // Fonction d'échappement utilitaire
