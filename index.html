@@ -638,13 +638,13 @@
     <!-- SCRIPT FIREBASE ET GESTION GLOBALE DES ÉCOLES EN LIGNE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC8PVf2sKt-n_8ANjUr7Iiv1PQkGJrjB-E",
             authDomain: "edu-rdc.firebaseapp.com",
-            projectId: "edu-rdc",
-            storageBucket: "edu-rdc.firebasestorage.app",
+            projectId: "edu-rdc-5c858",
+            storageBucket: "edu-rdc-5c858.firebasestorage.app",
             messagingSenderId: "567182543451",
             appId: "1:567182543451:web:0d08c9303bfb18e4200d7e",
             measurementId: "G-3ELD77JK5N"
@@ -657,13 +657,18 @@
         let simulatedCode = "";
         let tempUser = {};
 
-        // Chargement en temps réel depuis le document global partagé sur Firebase
+        // Chargement en temps réel depuis la collection "schools" synchronisée avec gestion_ecole.html
         window.addEventListener('DOMContentLoaded', () => {
-            onSnapshot(doc(db, "edu_rdc_data", "global_state"), (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    cachedSchools = data.schools || [];
-                } else {
+            onSnapshot(collection(db, "schools"), (snapshot) => {
+                cachedSchools = [];
+                snapshot.forEach((docSnap) => {
+                    let schoolData = docSnap.data();
+                    schoolData.id = docSnap.id;
+                    cachedSchools.push(schoolData);
+                });
+
+                // Si aucune école n'est trouvée dans Firestore, charger les données par défaut pour l'affichage
+                if (cachedSchools.length === 0) {
                     cachedSchools = [
                         {
                             id: "SCH-001",
@@ -757,7 +762,7 @@
                 schools.forEach(s => {
                     (s.teachers || []).forEach(t => {
                         count++;
-                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué securisé">••••••••</span></td></tr>`;
+                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province || ''}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué securisé">••••••••</span></td></tr>`;
                     });
                 });
                 if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>`;
@@ -771,7 +776,7 @@
                 schools.forEach(s => {
                     (s.students || []).forEach(st => {
                         count++;
-                        html += `<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province})</td></tr>`;
+                        html += `<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province || ''})</td></tr>`;
                     });
                 });
                 if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>`;
@@ -785,7 +790,7 @@
                 schools.forEach(s => {
                     (s.staff || []).forEach(st => {
                         count++;
-                        html += `<tr><td><span class="badge bg-danger p-2 fs-6">${st.role}</span></td><td><b>${st.name}</b></td><td><b class="text-primary">${s.name}</b></td><td>${s.province} / ${s.commune || st.commune || ''}</td></tr>`;
+                        html += `<tr><td><span class="badge bg-danger p-2 fs-6">${st.role}</span></td><td><b>${st.name}</b></td><td><b class="text-primary">${s.name}</b></td><td>${s.province || ''} / ${s.commune || st.commune || ''}</td></tr>`;
                     });
                 });
                 if(count === 0) html += `<tr><td colspan="4" class="text-center text-muted py-3">Aucun cadre administratif enregistré.</td></tr>`;
