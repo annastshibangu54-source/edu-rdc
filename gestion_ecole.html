@@ -365,6 +365,8 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-palmares', this)"><i class="fa fa-trophy me-2"></i> Palmarès & Mérite</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-courriers', this)"><i class="fa fa-exchange-alt me-2"></i> Courrier (Entrants / Sortants)</a>
 <a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-dossiers-archivage', this)"><i class="fa fa-folder-open me-2"></i> Stockage & Dossiers</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-calendrier-vacances', this)"><i class="fa fa-calendar-check me-2"></i> Congés & Vacances</a>
+<a class="list-group-item rubric-item" href="javascript:void(0);" onclick="switchTab('tab-horaires-cours', this)"><i class="fa fa-clock me-2"></i> Horaires des Cours</a>
 </div>
 </div>
 </div>
@@ -935,6 +937,106 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   </div>
 </div>
 
+<!-- NOUVELLE SECTION : CONGÉS, VACANCES & RENTRÉE SCOLAIRE -->
+<div class="tab-pane" id="tab-calendrier-vacances">
+  <h5 class="text-primary fw-bold mb-3"><i class="fa fa-calendar-check me-2"></i>Gestion des Congés, Vacances & Rentrée Scolaire</h5>
+  <form id="formCalendrierScolaire" onsubmit="handleSaveCalendrierScolaire(event)" class="row g-2 mb-4 no-print bg-light p-3 rounded">
+    <div class="col-md-4">
+      <label class="form-label fw-bold small">Intitulé de l'Événement :</label>
+      <input type="text" id="calTitre" class="form-control form-control-sm" placeholder="Ex: Rentrée scolaire / Congé de détente" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Type :</label>
+      <select id="calType" class="form-select form-select-sm" required>
+        <option value="Rentrée Scolaire">Rentrée Scolaire</option>
+        <option value="Congé de détente">Congé de détente</option>
+        <option value="Vacances">Vacances (Noël / Pâques)</option>
+        <option value="Clôture">Clôture Année Scolaire</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label fw-bold small">Date Début :</label>
+      <input type="date" id="calDebut" class="form-control form-control-sm" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Date Fin :</label>
+      <input type="date" id="calFin" class="form-control form-control-sm" required>
+    </div>
+    <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+      <button type="submit" class="btn btn-success btn-sm fw-bold px-4"><i class="fa fa-save me-1"></i> Enregistrer l'Événement</button>
+      <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+    </div>
+  </form>
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead>
+        <tr class="table-primary">
+          <th>Intitulé</th>
+          <th>Type</th>
+          <th>Date de Début</th>
+          <th>Date de Fin</th>
+          <th class="no-print">Action</th>
+        </tr>
+      </thead>
+      <tbody id="calendrierTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- NOUVELLE SECTION : HORAIRES DES COURS -->
+<div class="tab-pane" id="tab-horaires-cours">
+  <h5 class="text-primary fw-bold mb-3"><i class="fa fa-clock me-2"></i>Horaires & Emploi du Temps des Cours</h5>
+  <form id="formHoraireCours" onsubmit="handleSaveHoraireCours(event)" class="row g-2 mb-4 no-print bg-light p-3 rounded">
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Classe :</label>
+      <select id="horaireClassSelect" class="form-select form-select-sm" required></select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Jour de la Semaine :</label>
+      <select id="horaireJour" class="form-select form-select-sm" required>
+        <option value="Lundi">Lundi</option>
+        <option value="Mardi">Mardi</option>
+        <option value="Mercredi">Mercredi</option>
+        <option value="Jeudi">Jeudi</option>
+        <option value="Vendredi">Vendredi</option>
+        <option value="Samedi">Samedi</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Plage Horaire :</label>
+      <input type="text" id="horairePlage" class="form-control form-control-sm" placeholder="Ex: 08h00 - 08h50" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold small">Intitulé du Cours :</label>
+      <input type="text" id="horaireCoursNom" class="form-control form-control-sm" placeholder="Ex: Mathématiques" required>
+    </div>
+    <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+      <button type="submit" class="btn btn-success btn-sm fw-bold px-4"><i class="fa fa-save me-1"></i> Ajouter à l'Emploi du Temps</button>
+      <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+    </div>
+  </form>
+  <div class="row mb-3 no-print">
+    <div class="col-md-4">
+      <label class="form-label fw-bold small">Filtrer par Classe :</label>
+      <select id="filterHoraireClass" class="form-select form-select-sm" onchange="renderHorairesTable()"></select>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead>
+        <tr class="table-primary">
+          <th>Classe</th>
+          <th>Jour</th>
+          <th>Heure</th>
+          <th>Cours</th>
+          <th class="no-print">Action</th>
+        </tr>
+      </thead>
+      <tbody id="horairesTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
 </div>
 </div>
 </div>
@@ -1168,7 +1270,7 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
                 caisse: [], presenceStudents: {}, studentPayments: [], discipline: []
             }
         },
-        direction: [], staff: [], communications: [], savedCards: [], armoiries: '', devise: '', courriers: [], dossiersArchive: []
+        direction: [], staff: [], communications: [], savedCards: [], armoiries: '', devise: '', courriers: [], dossiersArchive: [], calendrierVacances: [], horairesCours: []
     });
     
     saveData();
@@ -1440,6 +1542,8 @@ function switchTab(tabId, element) {
     else if(tabId === 'tab-palmares') refreshPalmaresOptions();
     else if(tabId === 'tab-courriers') refreshCourrierOptions();
     else if(tabId === 'tab-dossiers-archivage') refreshDossiersStorageOptions();
+    else if(tabId === 'tab-calendrier-vacances') renderCalendrierTable();
+    else if(tabId === 'tab-horaires-cours') refreshHoraireOptions();
 }
 
 function refreshDashboardViews() {
@@ -2558,7 +2662,23 @@ function handleSaveCommunication() {
 function renderCommTable() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
-    document.getElementById('commTableBody').innerHTML = (s.communications || []).map((c, idx) => `<tr><td>${c.date}</td><td>${c.message}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.communications.splice(${idx},1);saveData();renderCommTable();renderPortalAnnouncements();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune annonce</td></tr>';
+    document.getElementById('commTableBody').innerHTML = (s.communications || []).map((c, idx) => `<tr><td>${c.date}</td><td>${c.message}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteSchoolCommunication(${idx})"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune annonce</td></tr>';
+}
+
+// SUPPRESSION SÉCURISÉE PAR LE PROPRIÉTAIRE (CODE SECRET) D'UNE ANNONCE INTERNE
+function deleteSchoolCommunication(idx) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const code = prompt("Entrez le code secret de l'école \"" + s.name + "\" pour supprimer cette annonce :");
+    if(code && code.trim().toUpperCase() === s.secretCode.toUpperCase()) {
+        s.communications.splice(idx, 1);
+        saveData();
+        renderCommTable();
+        renderPortalAnnouncements();
+        alert("Annonce supprimée avec succès.");
+    } else if(code !== null) {
+        alert("Code secret incorrect.");
+    }
 }
 
 // 12. EMPLOI
@@ -3075,6 +3195,119 @@ function deleteDossierDocument(idx) {
             saveData();
             renderDossiersStorageTable();
         }
+    }
+}
+
+// 5. NOUVELLES FONCTIONS : CALENDRIER SCOLAIRE (CONGÉS, VACANCES, RENTRÉE)
+function handleSaveCalendrierScolaire(e) {
+    e.preventDefault();
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const titre = document.getElementById('calTitre').value.trim();
+    const type = document.getElementById('calType').value;
+    const debut = document.getElementById('calDebut').value;
+    const fin = document.getElementById('calFin').value;
+
+    if(!s.calendrierVacances) s.calendrierVacances = [];
+    s.calendrierVacances.push({ id: 'CAL-' + Date.now(), titre, type, debut, fin });
+    saveData();
+    document.getElementById('formCalendrierScolaire').reset();
+    renderCalendrierTable();
+    alert("Événement du calendrier scolaire enregistré avec succès !");
+}
+
+function renderCalendrierTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const tbody = document.getElementById('calendrierTableBody');
+    if(!tbody) return;
+
+    tbody.innerHTML = (s.calendrierVacances || []).map((c, idx) => `
+        <tr>
+            <td><b>${esc(c.titre)}</b></td>
+            <td><span class="badge bg-secondary">${c.type}</span></td>
+            <td>${c.debut}</td>
+            <td>${c.fin}</td>
+            <td class="no-print">
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteCalendrierItem(${idx})"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucun congé ou vacances enregistré.</td></tr>';
+}
+
+function deleteCalendrierItem(idx) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(s && s.calendrierVacances) {
+        s.calendrierVacances.splice(idx, 1);
+        saveData();
+        renderCalendrierTable();
+    }
+}
+
+// 6. NOUVELLES FONCTIONS : HORAIRES DES COURS (EMPLOI DU TEMPS)
+function refreshHoraireOptions() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const classes = s.yearsData[year].classes || [];
+    
+    const classSelect = document.getElementById('horaireClassSelect');
+    classSelect.innerHTML = classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+    const filterSelect = document.getElementById('filterHoraireClass');
+    filterSelect.innerHTML = `<option value="ALL">-- Toutes les classes --</option>` + classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+    renderHorairesTable();
+}
+
+function handleSaveHoraireCours(e) {
+    e.preventDefault();
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const classe = document.getElementById('horaireClassSelect').value;
+    const jour = document.getElementById('horaireJour').value;
+    const plage = document.getElementById('horairePlage').value.trim();
+    const coursNom = document.getElementById('horaireCoursNom').value.trim();
+
+    if(!s.horairesCours) s.horairesCours = [];
+    s.horairesCours.push({ id: 'HOR-' + Date.now(), classe, jour, plage, coursNom });
+    saveData();
+    document.getElementById('formHoraireCours').reset();
+    renderHorairesTable();
+    alert("Horaire de cours ajouté avec succès !");
+}
+
+function renderHorairesTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const tbody = document.getElementById('horairesTableBody');
+    const filterCl = document.getElementById('filterHoraireClass') ? document.getElementById('filterHoraireClass').value : 'ALL';
+    if(!tbody) return;
+
+    let horaires = s.horairesCours || [];
+    if(filterCl !== 'ALL') {
+        horaires = horaires.filter(h => h.classe === filterCl);
+    }
+
+    tbody.innerHTML = horaires.map((h, idx) => `
+        <tr>
+            <td><span class="badge bg-primary">${esc(h.classe)}</span></td>
+            <td><b>${h.jour}</b></td>
+            <td>${esc(h.plage)}</td>
+            <td>${esc(h.coursNom)}</td>
+            <td class="no-print">
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteHoraireItem(${idx})"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucun horaire de cours enregistré.</td></tr>';
+}
+
+function deleteHoraireItem(idx) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(s && s.horairesCours) {
+        s.horairesCours.splice(idx, 1);
+        saveData();
+        renderHorairesTable();
     }
 }
 
