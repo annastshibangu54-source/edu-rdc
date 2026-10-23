@@ -965,7 +965,6 @@
             const secretCode = 'PRO-' + Math.floor(1000 + Math.random() * 9000);
 
             try {
-                // CORRECTION : Cohérence exacte avec la structure attendue par gestion_ecole.html
                 await addDoc(collection(db, "professional_users"), {
                     name: tempUser.name,
                     contact: tempUser.contact,
