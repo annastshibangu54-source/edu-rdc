@@ -517,7 +517,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- SECTION DES CARTES ENREGISTRÉES -->
 <hr class="my-4 no-print">
-<h5 class="text-secondary fw-bold mb-3 no-print"><i class="fa fa-id-card-alt me-2"></i>Cartes d'Élèves Enregistrées / Archivées</h5>
+<h5 class="text-secondary fw-bold mb-3 no-print"><i class="fa fa-id-card-alt me-2"></i>Cartes d'Élèves Enregisitrées / Archivées</h5>
 <div class="table-responsive no-print">
 <table class="table table-bordered align-middle">
 <thead><tr><th>Date</th><th>Matricule</th><th>Nom & Prénom</th><th>Classe</th><th>Action</th></tr></thead>
@@ -571,32 +571,151 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 
-<!-- FRAIS & FACTURATION -->
+<!-- FRAIS & FACTURATION (CAISSE & PAIEMENT MODIFIÉ SELON VOS INSTRUCTIONS) -->
 <div class="tab-pane" id="tab-frais">
-<h5 class="text-primary fw-bold mb-3">Caisse & Facturation</h5>
-<form id="formPayment" onsubmit="handleSaveStudentPayment(event)" class="row g-2 mb-3 no-print">
-<div class="col-md-3"><select id="paySection" class="form-select" onchange="updatePayEntityOptions()" required><option value="Élève">Élève</option><option value="Enseignant">Enseignant</option><option value="Administratif">Administratif</option></select></div>
-<div class="col-md-3"><select id="payEntitySelect" class="form-select" required></select></div>
-<div class="col-md-2"><input type="number" id="payMontant" class="form-control" placeholder="Montant ($)" required></div>
-<div class="col-md-2"><input type="text" id="payMotif" class="form-control" placeholder="Motif (ex: Frais scolaires)" required></div>
-<div class="col-md-2"><button type="submit" class="btn btn-success btn-sm w-100 fw-bold"><i class="fa fa-file-invoice-dollar me-1"></i> Facturer</button></div>
-<div class="col-12 action-bar mt-2">
-<button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer la liste</button>
-<button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
-</div>
-</form>
-<table class="table table-bordered"><thead><tr><th>Date</th><th>Section</th><th>Bénéficiaire / Payeur</th><th>Motif</th><th>Montant</th><th class="no-print">Action</th></tr></thead><tbody id="studentPayTableBody"></tbody></table>
+<h5 class="text-primary fw-bold mb-3">Caisse & Paiement</h5>
+<form id="formPaymentCustom" onsubmit="handleSaveCaissePaymentCustom(event)" class="row g-2 mb-3 no-print bg-light p-3 rounded">
+<div class="col-md-3">
+  <label class="form-label fw-bold small">Catégorie :</label>
+  <select id="caisseCategorie" class="form-select form-select-sm" onchange="updateCaisseFieldsVisibility()" required>
+    <option value="Eleve">1. Élève</option>
+    <option value="Enseignant">2. Enseignant ou Professeur</option>
+    <option value="Administrateur">3. Administrateur</option>
+  </select>
 </div>
 
-<!-- PRESENCES -->
+<div class="col-md-3">
+  <label class="form-label fw-bold small">Bénéficiaire / Personne :</label>
+  <select id="caissePersonSelect" class="form-select form-select-sm" required></select>
+</div>
+
+<div class="col-md-3">
+  <label class="form-label fw-bold small">Jours / Date / Heure :</label>
+  <input type="text" id="caisseDateTime" class="form-control form-control-sm" readonly>
+</div>
+
+<!-- Champs Élève -->
+<div class="col-md-3 caisse-fields-eleve">
+  <label class="form-label fw-bold small">Somme Générale à Payer ($) :</label>
+  <input type="number" id="caisseEleveTotal" class="form-control form-control-sm" placeholder="0">
+</div>
+<div class="col-md-3 caisse-fields-eleve">
+  <label class="form-label fw-bold small">Somme Payée ($) :</label>
+  <input type="number" id="caisseElevePaye" class="form-control form-control-sm" placeholder="0" oninput="calculateEleveReste()">
+</div>
+<div class="col-md-3 caisse-fields-eleve">
+  <label class="form-label fw-bold small">Reste ($) :</label>
+  <input type="number" id="caisseEleveReste" class="form-control form-control-sm" placeholder="0" readonly>
+</div>
+
+<!-- Champs Enseignant / Administrateur -->
+<div class="col-md-3 caisse-fields-staff" style="display:none;">
+  <label class="form-label fw-bold small">Somme Générale à Payer ($) :</label>
+  <input type="number" id="caisseStaffTotal" class="form-control form-control-sm" placeholder="0" oninput="calculateStaffReste()">
+</div>
+<div class="col-md-3 caisse-fields-staff" style="display:none;">
+  <label class="form-label fw-bold small">Prime ($) :</label>
+  <input type="number" id="caisseStaffPrime" class="form-control form-control-sm" placeholder="0" oninput="calculateStaffReste()">
+</div>
+<div class="col-md-3 caisse-fields-staff" style="display:none;">
+  <label class="form-label fw-bold small">Emprunt ($) :</label>
+  <input type="number" id="caisseStaffEmprunt" class="form-control form-control-sm" placeholder="0" oninput="calculateStaffReste()">
+</div>
+<div class="col-md-3 caisse-fields-staff" style="display:none;">
+  <label class="form-label fw-bold small">Remboursement ($) :</label>
+  <input type="number" id="caisseStaffRembourse" class="form-control form-control-sm" placeholder="0" oninput="calculateStaffReste()">
+</div>
+<div class="col-md-3 caisse-fields-staff" style="display:none;">
+  <label class="form-label fw-bold small">Reste à Payer ($) :</label>
+  <input type="number" id="caisseStaffReste" class="form-control form-control-sm" placeholder="0" readonly>
+</div>
+
+<div class="col-12 mt-3 d-flex justify-content-end gap-2">
+  <button type="submit" class="btn btn-success btn-sm fw-bold px-4"><i class="fa fa-save me-1"></i> Enregistrer</button>
+  <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer Plus Tard / Liste</button>
+  <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+</div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-bordered table-sm align-middle">
+<thead>
+  <tr class="table-primary">
+    <th>Catégorie</th>
+    <th>Nom / Bénéficiaire</th>
+    <th>Détails Financiers (Total / Payé / Prime / Emprunt / Reste)</th>
+    <th>Jours, Date & Heure</th>
+    <th class="no-print">Action</th>
+  </tr>
+</thead>
+<tbody id="caisseCustomTableBody"></tbody>
+</table>
+</div>
+</div>
+
+<!-- PRESENCES (MODIFIÉ SELON VOS INSTRUCTIONS) -->
 <div class="tab-pane" id="tab-presences">
 <h5 class="text-primary fw-bold mb-3">Gestion de Présence</h5>
-<select id="presClassSelect" class="form-select mb-3 no-print" onchange="loadStudentsForPresence()"></select>
-<div id="studentsPresenceContainer" class="mb-3"></div>
-<div class="action-bar no-print">
-<button class="btn btn-success btn-sm fw-bold" onclick="alert('Présences enregistrées')"><i class="fa fa-save me-1"></i> Enregistrer</button>
-<button class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
-<button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+
+<form id="formPresenceCustom" onsubmit="handleSavePresenceCustom(event)" class="row g-2 mb-3 no-print bg-light p-3 rounded">
+<div class="col-md-3">
+  <label class="form-label fw-bold small">Catégorie :</label>
+  <select id="presCategorie" class="form-select form-select-sm" onchange="updatePresenceFieldsVisibility()" required>
+    <option value="Eleve">1. Élève</option>
+    <option value="Enseignant">2. Enseignant ou Professeur</option>
+    <option value="Administrateur">3. Administrateur</option>
+  </select>
+</div>
+
+<div class="col-md-4">
+  <label class="form-label fw-bold small">Nom / Personne :</label>
+  <select id="presPersonSelect" class="form-select form-select-sm" required></select>
+</div>
+
+<div class="col-md-3">
+  <label class="form-label fw-bold small">Jours & Date :</label>
+  <input type="text" id="presJourDate" class="form-control form-control-sm" readonly>
+</div>
+
+<!-- Champs Élève : Présent, Absent, Malade -->
+<div class="col-md-2 pres-fields-eleve d-flex align-items-end">
+  <select id="presStatutEleve" class="form-select form-select-sm">
+    <option value="Présent">Présent(e)</option>
+    <option value="Absent">Absent(e)</option>
+    <option value="Malade">Malade</option>
+  </select>
+</div>
+
+<!-- Champs Enseignant / Admin : Heure d'arrivée, Heure de départ -->
+<div class="col-md-2 pres-fields-staff" style="display:none;">
+  <label class="form-label fw-bold small">Arrivée :</label>
+  <input type="time" id="presHeureArrivee" class="form-control form-control-sm">
+</div>
+<div class="col-md-2 pres-fields-staff" style="display:none;">
+  <label class="form-label fw-bold small">Départ :</label>
+  <input type="time" id="presHeureDepart" class="form-control form-control-sm">
+</div>
+
+<div class="col-12 mt-3 d-flex justify-content-end gap-2">
+  <button type="submit" class="btn btn-success btn-sm fw-bold px-4"><i class="fa fa-save me-1"></i> Enregistrer</button>
+  <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer</button>
+  <button type="button" class="btn btn-secondary btn-sm fw-bold" onclick="switchTab('defaultWelcomeMessage')"><i class="fa fa-times me-1"></i> Fermer</button>
+</div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-bordered table-sm align-middle">
+<thead>
+  <tr class="table-primary">
+    <th>Catégorie</th>
+    <th>Nom & Prénom</th>
+    <th>Jours & Date</th>
+    <th>Statut / Horaires (Présent, Absent, Malade / Arrivée, Départ)</th>
+    <th class="no-print">Action</th>
+  </tr>
+</thead>
+<tbody id="presenceCustomTableBody"></tbody>
+</table>
 </div>
 </div>
 
@@ -1311,8 +1430,8 @@ function switchTab(tabId, element) {
     else if(tabId === 'tab-cours') refreshCourseOptions();
     else if(tabId === 'tab-notes') refreshNotesOptions();
     else if(tabId === 'tab-bulletins') refreshBulletinOptions();
-    else if(tabId === 'tab-frais') refreshPaymentOptions();
-    else if(tabId === 'tab-presences') refreshPresenceOptions();
+    else if(tabId === 'tab-frais') refreshPaymentOptionsCustom();
+    else if(tabId === 'tab-presences') refreshPresenceOptionsCustom();
     else if(tabId === 'tab-discipline') refreshDisciplineOptions();
     else if(tabId === 'tab-communication') renderCommTable();
     else if(tabId === 'tab-jobs-received') renderSchoolJobApplications();
@@ -2129,55 +2248,251 @@ function renderBulletinFromSystem() {
     `;
 }
 
-// 8. FRAIS & FACTURATION
-function refreshPaymentOptions() {
-    updatePayEntityOptions();
-    renderStudentPayTable();
+// ==========================================
+// FONCTIONS CAISSE & PAIEMENT (SUR MESURE)
+// ==========================================
+function refreshPaymentOptionsCustom() {
+    updateCaissePersonOptions();
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    document.getElementById('caisseDateTime').value = now.toLocaleDateString('fr-FR', options);
+    updateCaisseFieldsVisibility();
+    renderCaisseCustomTable();
 }
-function updatePayEntityOptions() {
+
+function updateCaissePersonOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
     const year = s.activeYear || "2025-2026";
-    const section = document.getElementById('paySection').value;
-    const sel = document.getElementById('payEntitySelect');
-    if(section === 'Élève') {
-        sel.innerHTML = (s.yearsData[year].students || []).map(st => `<option value="${st.name}">Élève : ${st.name} (${st.classe})</option>`).join('');
-    } else if(section === 'Enseignant') {
-        sel.innerHTML = (s.yearsData[year].teachers || []).map(t => `<option value="${t.name}">Enseignant : ${t.name}</option>`).join('');
+    const cat = document.getElementById('caisseCategorie').value;
+    const sel = document.getElementById('caissePersonSelect');
+    
+    if(cat === 'Eleve') {
+        sel.innerHTML = (s.yearsData[year].students || []).map(st => `<option value="${st.name}">${st.name} (${st.classe})</option>`).join('');
+    } else if(cat === 'Enseignant') {
+        sel.innerHTML = (s.yearsData[year].teachers || []).map(t => `<option value="${t.name}">${t.name}</option>`).join('');
     } else {
-        sel.innerHTML = (s.direction || []).map(d => `<option value="${d.name}">Admin : ${d.name} (${d.role})</option>`).join('');
+        sel.innerHTML = (s.direction || []).map(d => `<option value="${d.name}">${d.name} (${d.role})</option>`).join('');
     }
 }
-function handleSaveStudentPayment(e) {
+
+function updateCaisseFieldsVisibility() {
+    const cat = document.getElementById('caisseCategorie').value;
+    const eleveDivs = document.querySelectorAll('.caisse-fields-eleve');
+    const staffDivs = document.querySelectorAll('.caisse-fields-staff');
+    
+    if(cat === 'Eleve') {
+        eleveDivs.forEach(el => el.style.display = 'block');
+        staffDivs.forEach(el => el.style.display = 'none');
+    } else {
+        eleveDivs.forEach(el => el.style.display = 'none');
+        staffDivs.forEach(el => el.style.display = 'block');
+    }
+    updateCaissePersonOptions();
+}
+
+function calculateEleveReste() {
+    const total = parseFloat(document.getElementById('caisseEleveTotal').value) || 0;
+    const paye = parseFloat(document.getElementById('caisseElevePaye').value) || 0;
+    const reste = total - paye;
+    document.getElementById('caisseEleveReste').value = reste >= 0 ? reste : 0;
+}
+
+function calculateStaffReste() {
+    const total = parseFloat(document.getElementById('caisseStaffTotal').value) || 0;
+    const prime = parseFloat(document.getElementById('caisseStaffPrime').value) || 0;
+    const emprunt = parseFloat(document.getElementById('caisseStaffEmprunt').value) || 0;
+    const rembourser = parseFloat(document.getElementById('caisseStaffRembourse').value) || 0;
+    
+    // Formule : Somme Générale + Prime + Emprunt - Remboursement (ou reste net dû)
+    const reste = (total + prime + emprunt) - rembourser;
+    document.getElementById('caisseStaffReste').value = reste;
+}
+
+function handleSaveCaissePaymentCustom(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
     const year = s.activeYear || "2025-2026";
-    const section = document.getElementById('paySection').value;
-    const entityName = document.getElementById('payEntitySelect').value;
-    const montant = parseFloat(document.getElementById('payMontant').value) || 0;
-    const motif = document.getElementById('payMotif').value;
-    
-    if(!s.yearsData[year].studentPayments) s.yearsData[year].studentPayments = [];
-    s.yearsData[year].studentPayments.push({ date: new Date().toLocaleDateString('fr-FR'), section, entityName, motif, montant });
+    const categorie = document.getElementById('caisseCategorie').value;
+    const personName = document.getElementById('caissePersonSelect').value;
+    const dateTime = document.getElementById('caisseDateTime').value;
+
+    let paymentData = { categorie, personName, dateTime };
+
+    if(categorie === 'Eleve') {
+        paymentData.sommeGenerale = parseFloat(document.getElementById('caisseEleveTotal').value) || 0;
+        paymentData.sommePayee = parseFloat(document.getElementById('caisseElevePaye').value) || 0;
+        paymentData.reste = parseFloat(document.getElementById('caisseEleveReste').value) || 0;
+    } else {
+        paymentData.sommeGenerale = parseFloat(document.getElementById('caisseStaffTotal').value) || 0;
+        paymentData.prime = parseFloat(document.getElementById('caisseStaffPrime').value) || 0;
+        paymentData.emprunt = parseFloat(document.getElementById('caisseStaffEmprunt').value) || 0;
+        paymentData.rembourser = parseFloat(document.getElementById('caisseStaffRembourse').value) || 0;
+        paymentData.reste = parseFloat(document.getElementById('caisseStaffReste').value) || 0;
+    }
+
+    if(!s.yearsData[year].caisseCustom) s.yearsData[year].caisseCustom = [];
+    s.yearsData[year].caisseCustom.push(paymentData);
     saveData();
-    document.getElementById('formPayment').reset();
-    updatePayEntityOptions();
-    renderStudentPayTable();
-    alert("Facture / Reçu enregistré avec succès !");
+
+    document.getElementById('formPaymentCustom').reset();
+    refreshPaymentOptionsCustom();
+    alert("Enregistrement de caisse effectué avec succès ! Prêt pour impression ultérieure.");
 }
-function renderStudentPayTable() {
+
+function renderCaisseCustomTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const tbody = document.getElementById('caisseCustomTableBody');
+    if(!tbody) return;
+
+    const list = s.yearsData[year].caisseCustom || [];
+    tbody.innerHTML = list.map((item, idx) => {
+        let details = "";
+        if(item.categorie === 'Eleve') {
+            details = `Total à payer: <b>${item.sommeGenerale}$</b> | Payé: <span class="text-success fw-bold">${item.sommePayee}$</span> | Reste: <span class="text-danger fw-bold">${item.reste}$</span>`;
+        } else {
+            details = `Total dû: <b>${item.sommeGenerale}$</b> | Prime: ${item.prime}$ | Emprunt: ${item.emprunt}$ | Remboursé: ${item.rembourser}$ | Reste à payer: <span class="text-danger fw-bold">${item.reste}$</span>`;
+        }
+
+        return `
+            <tr>
+                <td><b>${item.categorie}</b></td>
+                <td>${esc(item.personName)}</td>
+                <td>${details}</td>
+                <td><small>${item.dateTime}</small></td>
+                <td class="no-print">
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteCaisseCustomItem(${idx})"><i class="fa fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    }).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucun enregistrement en caisse pour cette année</td></tr>';
+}
+
+function deleteCaisseCustomItem(idx) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const year = s.activeYear || "2025-2026";
-    document.getElementById('studentPayTableBody').innerHTML = (s.yearsData[year].studentPayments || []).map((p, idx) => `
-        <tr>
-            <td>${p.date}</td>
-            <td><b>${p.section}</b></td>
-            <td>${p.entityName}</td>
-            <td>${p.motif}</td>
-            <td class="text-success fw-bold">${p.montant} $</td>
-            <td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.yearsData['${year}'].studentPayments.splice(${idx},1);saveData();renderStudentPayTable();"><i class="fa fa-trash"></i></button></td>
-        </tr>
-    `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucune facture enregistrée pour cette année</td></tr>';
+    if(s && s.yearsData[year].caisseCustom) {
+        s.yearsData[year].caisseCustom.splice(idx, 1);
+        saveData();
+        renderCaisseCustomTable();
+    }
 }
+
+
+// ==========================================
+// FONCTIONS PRÉSENCES (SUR MESURE)
+// ==========================================
+function refreshPresenceOptionsCustom() {
+    updatePresencePersonOptions();
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
+    document.getElementById('presJourDate').value = now.toLocaleDateString('fr-FR', options);
+    updatePresenceFieldsVisibility();
+    renderPresenceCustomTable();
+}
+
+function updatePresencePersonOptions() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const cat = document.getElementById('presCategorie').value;
+    const sel = document.getElementById('presPersonSelect');
+    
+    if(cat === 'Eleve') {
+        sel.innerHTML = (s.yearsData[year].students || []).map(st => `<option value="${st.name}">${st.name} (${st.classe})</option>`).join('');
+    } else if(cat === 'Enseignant') {
+        sel.innerHTML = (s.yearsData[year].teachers || []).map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+    } else {
+        sel.innerHTML = (s.direction || []).map(d => `<option value="${d.name}">${d.name} (${d.role})</option>`).join('');
+    }
+}
+
+function updatePresenceFieldsVisibility() {
+    const cat = document.getElementById('presCategorie').value;
+    const eleveDivs = document.querySelectorAll('.pres-fields-eleve');
+    const staffDivs = document.querySelectorAll('.pres-fields-staff');
+    
+    if(cat === 'Eleve') {
+        eleveDivs.forEach(el => el.style.display = 'block');
+        staffDivs.forEach(el => el.style.display = 'none');
+    } else {
+        eleveDivs.forEach(el => el.style.display = 'none');
+        staffDivs.forEach(el => el.style.display = 'block');
+    }
+    updatePresencePersonOptions();
+}
+
+function handleSavePresenceCustom(e) {
+    e.preventDefault();
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const categorie = document.getElementById('presCategorie').value;
+    const personName = document.getElementById('presPersonSelect').value;
+    const jourDate = document.getElementById('presJourDate').value;
+
+    let presenceObj = { categorie, personName, jourDate };
+
+    if(categorie === 'Eleve') {
+        presenceObj.statut = document.getElementById('presStatutEleve').value;
+    } else {
+        presenceObj.heureArrivee = document.getElementById('presHeureArrivee').value || '--:--';
+        presenceObj.heureDepart = document.getElementById('presHeureDepart').value || '--:--';
+    }
+
+    if(!s.yearsData[year].presenceCustom) s.yearsData[year].presenceCustom = [];
+    s.yearsData[year].presenceCustom.push(presenceObj);
+    saveData();
+
+    document.getElementById('formPresenceCustom').reset();
+    refreshPresenceOptionsCustom();
+    alert("Présence enregistrée avec succès !");
+}
+
+function renderPresenceCustomTable() {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    if(!s) return;
+    const year = s.activeYear || "2025-2026";
+    const tbody = document.getElementById('presenceCustomTableBody');
+    if(!tbody) return;
+
+    const list = s.yearsData[year].presenceCustom || [];
+    tbody.innerHTML = list.map((item, idx) => {
+        let details = "";
+        if(item.categorie === 'Eleve') {
+            let badgeColor = item.statut === 'Présent' ? 'bg-success' : item.statut === 'Malade' ? 'bg-warning text-dark' : 'bg-danger';
+            details = `<span class="badge ${badgeColor}">${item.statut}</span>`;
+        } else {
+            details = `Heure d'arrivée : <b>${item.heureArrivee}</b> | Heure de départ : <b>${item.heureDepart}</b>`;
+        }
+
+        return `
+            <tr>
+                <td><b>${item.categorie}</b></td>
+                <td>${esc(item.personName)}</td>
+                <td>${item.jourDate}</td>
+                <td>${details}</td>
+                <td class="no-print">
+                    <button class="btn btn-sm btn-outline-danger" onclick="deletePresenceCustomItem(${idx})"><i class="fa fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    }).join('') || '<tr><td colspan="5" class="text-center text-muted">Aucune présence enregistrée pour cette année</td></tr>';
+}
+
+function deletePresenceCustomItem(idx) {
+    const s = appData.schools.find(x => x.id === activeSchoolId);
+    const year = s.activeYear || "2025-2026";
+    if(s && s.yearsData[year].presenceCustom) {
+        s.yearsData[year].presenceCustom.splice(idx, 1);
+        saveData();
+        renderPresenceCustomTable();
+    }
+}
+
 
 // 9. PRESENCES
 function refreshPresenceOptions() {
