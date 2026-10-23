@@ -431,7 +431,7 @@
                     <h5 class="mb-0">Chantal Ndaya</h5>
                     <p>Promotrice d'Établissement</p>
                     <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">Une plateforme moderne, intuitive et parfaitement adaptée aux exigences du Ministère de l'Éducation Nationale.</p>
+                        <p class="mb-0">Une plateforme moderne, intuitive et perfectly adaptée aux exigences du Ministère de l'Éducation Nationale.</p>
                     </div>
                 </div>
             </div>
@@ -635,80 +635,88 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- SCRIPT FIREBASE ET GESTION GLOBALE DES ÉCOLES EN LIGNE -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <!-- SDK FIREBASE COMPAT (Harmonisé avec gestion_ecole.html) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+    <script>
+        // Configuration Firebase exacte utilisée dans gestion_ecole.html
         const firebaseConfig = {
-            apiKey: "AIzaSyC8PVf2sKt-n_8ANjUr7Iiv1PQkGJrjB-E",
-            authDomain: "edu-rdc.firebaseapp.com",
             projectId: "edu-rdc-5c858",
-            storageBucket: "edu-rdc-5c858.firebasestorage.app",
-            messagingSenderId: "567182543451",
-            appId: "1:567182543451:web:0d08c9303bfb18e4200d7e",
-            measurementId: "G-3ELD77JK5N"
+            storageBucket: "edu-rdc-5c858.firebasestorage.app"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
 
         let cachedSchools = [];
         let simulatedCode = "";
         let tempUser = {};
 
-        // Chargement en temps réel depuis la collection "schools" synchronisée avec gestion_ecole.html
-        window.addEventListener('DOMContentLoaded', () => {
-            onSnapshot(collection(db, "schools"), (snapshot) => {
-                cachedSchools = [];
-                snapshot.forEach((docSnap) => {
-                    let schoolData = docSnap.data();
-                    schoolData.id = docSnap.id;
-                    cachedSchools.push(schoolData);
-                });
-
-                // Si aucune école n'est trouvée dans Firestore, charger les données par défaut pour l'affichage
-                if (cachedSchools.length === 0) {
-                    cachedSchools = [
-                        {
-                            id: "SCH-001",
-                            name: "C.S. LA RÉVOLUTION",
-                            appartenance: "Enseignement Primaire - Privé Non Conventionné",
-                            province: "KINSHASA",
-                            territoire: "Kinshasa / Lukunga",
-                            commune: "KALAMU",
-                            logo: "img/course-1.jpg",
-                            teachers: [
-                                { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" }
-                            ],
-                            students: [
-                                { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" }
-                            ],
-                            staff: [
-                                { role: "Préfet des Études", name: "KALOMBO Mike" }
-                            ]
-                        },
-                        {
-                            id: "SCH-002",
-                            name: "INSTITUT TECHNIQUE DE LUBUMBASHI",
-                            appartenance: "Enseignement Secondaire - Officiel Public",
-                            province: "HAUT-KATANGA",
-                            territoire: "Lubumbashi Urbain",
-                            commune: "LUBUMBASHI",
-                            logo: "img/course-2.jpg",
-                            teachers: [
-                                { name: "KAZADI Pierre", phone: "0990000001", titulaireClass: "1ère Mechanics", secretCode: "AGT-2001" }
-                            ],
-                            students: [
-                                { id: "STU-3", mat: "ELV-003", name: "ILUNGA David", sexe: "M", classe: "1ère Mechanics" }
-                            ],
-                            staff: [
-                                { role: "Directeur Provincial", name: "MWAMBA Joseph" }
-                            ]
+        // Récupération synchrone en temps réel depuis Firestore
+        window.addEventListener('DOMContentLoaded', function() {
+            db.collection("edu_rdc_data").doc("global_state").onSnapshot(function(docSnap) {
+                if (docSnap.exists && docSnap.data().schools) {
+                    cachedSchools = docSnap.data().schools;
+                } else {
+                    // Repli direct sur la collection "schools" si stocké par documents individuels
+                    db.collection("schools").onSnapshot(function(snapshot) {
+                        let tempArr = [];
+                        snapshot.forEach(function(doc) {
+                            let data = doc.data();
+                            data.id = doc.id;
+                            tempArr.push(data);
+                        });
+                        if (tempArr.length > 0) {
+                            cachedSchools = tempArr;
+                        } else {
+                            // Données de démonstration par défaut si la base est encore vide
+                            cachedSchools = [
+                                {
+                                    id: "SCH-001",
+                                    name: "C.S. LA RÉVOLUTION",
+                                    appartenance: "Enseignement Primaire - Privé Non Conventionné",
+                                    province: "KINSHASA",
+                                    territoire: "Kinshasa / Lukunga",
+                                    commune: "KALAMU",
+                                    logo: "img/course-1.jpg",
+                                    teachers: [
+                                        { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" }
+                                    ],
+                                    students: [
+                                        { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" }
+                                    ],
+                                    staff: [
+                                        { role: "Préfet des Études", name: "KALOMBO Mike" }
+                                    ]
+                                },
+                                {
+                                    id: "SCH-002",
+                                    name: "INSTITUT TECHNIQUE DE LUBUMBASHI",
+                                    appartenance: "Enseignement Secondaire - Officiel Public",
+                                    province: "HAUT-KATANGA",
+                                    territoire: "Lubumbashi Urbain",
+                                    commune: "LUBUMBASHI",
+                                    logo: "img/course-2.jpg",
+                                    teachers: [
+                                        { name: "KAZADI Pierre", phone: "0990000001", titulaireClass: "1ère Mechanics", secretCode: "AGT-2001" }
+                                    ],
+                                    students: [
+                                        { id: "STU-3", mat: "ELV-003", name: "ILUNGA David", sexe: "M", classe: "1ère Mechanics" }
+                                    ],
+                                    staff: [
+                                        { role: "Directeur Provincial", name: "MWAMBA Joseph" }
+                                    ]
+                                }
+                            ];
                         }
-                    ];
+                        updateRealCounts();
+                        filterSchools();
+                    });
+                    return;
                 }
-
                 updateRealCounts();
                 filterSchools();
             });
@@ -724,88 +732,88 @@
             let totalStudents = 0;
             let totalAdmin = 0;
 
-            schools.forEach(s => {
+            schools.forEach(function(s) {
                 totalTeachers += (s.teachers ? s.teachers.length : 0);
                 totalStudents += (s.students ? s.students.length : 0);
                 totalAdmin += (s.staff ? s.staff.length : 0);
             });
 
-            if(document.getElementById('badge-teachers-count')) document.getElementById('badge-teachers-count').innerText = `${totalTeachers} Enseignant(s)`;
-            if(document.getElementById('badge-students-count')) document.getElementById('badge-students-count').innerText = `${totalStudents} Élève(s)`;
-            if(document.getElementById('badge-schools-count')) document.getElementById('badge-schools-count').innerText = `${schools.length} École(s)`;
-            if(document.getElementById('badge-admin-count')) document.getElementById('badge-admin-count').innerText = `${totalAdmin} Cadre(s)`;
+            if(document.getElementById('badge-teachers-count')) document.getElementById('badge-teachers-count').innerText = totalTeachers + " Enseignant(s)";
+            if(document.getElementById('badge-students-count')) document.getElementById('badge-students-count').innerText = totalStudents + " Élève(s)";
+            if(document.getElementById('badge-schools-count')) document.getElementById('badge-schools-count').innerText = schools.length + " École(s)";
+            if(document.getElementById('badge-admin-count')) document.getElementById('badge-admin-count').innerText = totalAdmin + " Cadre(s)";
 
-            let primaireCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('primaire')).length;
-            let secondaireCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('secondaire')).length;
-            let techniqueCount = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes('technique')).length;
-            let humanitaireCount = schools.filter(s => s.appartenance && (s.appartenance.toLowerCase().includes('humanitaire') || s.appartenance.toLowerCase().includes('social'))).length;
+            let primaireCount = schools.filter(function(s) { return s.appartenance && s.appartenance.toLowerCase().indexOf('primaire') !== -1; }).length;
+            let secondaireCount = schools.filter(function(s) { return s.appartenance && s.appartenance.toLowerCase().indexOf('secondaire') !== -1; }).length;
+            let techniqueCount = schools.filter(function(s) { return s.appartenance && s.appartenance.toLowerCase().indexOf('technique') !== -1; }).length;
+            let humanitaireCount = schools.filter(function(s) { return s.appartenance && (s.appartenance.toLowerCase().indexOf('humanitaire') !== -1 || s.appartenance.toLowerCase().indexOf('social') !== -1); }).length;
 
-            if(document.getElementById('count-primaire')) document.getElementById('count-primaire').innerText = `${15200 + primaireCount} Écoles`;
-            if(document.getElementById('count-secondaire')) document.getElementById('count-secondaire').innerText = `${12400 + secondaireCount} Écoles`;
-            if(document.getElementById('count-technique')) document.getElementById('count-technique').innerText = `${8100 + techniqueCount} Écoles`;
-            if(document.getElementById('count-humanitaire')) document.getElementById('count-humanitaire').innerText = `${3500 + humanitaireCount} Écoles`;
+            if(document.getElementById('count-primaire')) document.getElementById('count-primaire').innerText = (15200 + primaireCount) + " Écoles";
+            if(document.getElementById('count-secondaire')) document.getElementById('count-secondaire').innerText = (12400 + secondaireCount) + " Écoles";
+            if(document.getElementById('count-technique')) document.getElementById('count-technique').innerText = (8100 + techniqueCount) + " Écoles";
+            if(document.getElementById('count-humanitaire')) document.getElementById('count-humanitaire').innerText = (3500 + humanitaireCount) + " Écoles";
         };
 
-        window.showGlobalStatsModal = function(type, targetSchoolId = null) {
+        window.showGlobalStatsModal = function(type, targetSchoolId) {
             let schools = getStoredSchools();
             if (targetSchoolId) {
-                schools = schools.filter(s => s.id === targetSchoolId);
+                schools = schools.filter(function(s) { return s.id === targetSchoolId; });
             }
 
             let titleEl = document.getElementById('statsModalTitle');
             let contentEl = document.getElementById('statsModalContent');
 
             if (type === 'teachers') {
-                titleEl.innerHTML = `<i class="fa fa-chalkboard-teacher me-2"></i>Répertoire Nominatif des Enseignants & Professeurs`;
-                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>École</th><th>Nom & Prénom de l'Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Agent</th></tr></thead><tbody>`;
+                titleEl.innerHTML = '<i class="fa fa-chalkboard-teacher me-2"></i>Répertoire Nominatif des Enseignants & Professeurs';
+                let html = '<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>École</th><th>Nom & Prénom de l\'Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Agent</th></tr></thead><tbody>';
                 let count = 0;
-                schools.forEach(s => {
-                    (s.teachers || []).forEach(t => {
+                schools.forEach(function(s) {
+                    (s.teachers || []).forEach(function(t) {
                         count++;
-                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province || ''}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué securisé">••••••••</span></td></tr>`;
+                        html += '<tr><td><b class="text-primary">' + (s.name || '') + '</b><br><small>' + (s.province || '') + '</small></td><td><b>' + (t.name || '') + '</b></td><td>' + (t.phone || '—') + '</td><td><span class="badge bg-primary">' + (t.titulaireClass || 'Non attribuée') + '</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué securisé">••••••••</span></td></tr>';
                     });
                 });
-                if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>`;
-                html += `</tbody></table></div>`;
+                if(count === 0) html += '<tr><td colspan="5" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>';
+                html += '</tbody></table></div>';
                 contentEl.innerHTML = html;
             } 
             else if (type === 'students') {
-                titleEl.innerHTML = `<i class="fa fa-user-graduate me-2"></i>Palmarès & Effectif Global des Élèves`;
-                let html = `<div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>Matricule</th><th>Nom & Prénom de l'Élève</th><th>Sexe</th><th>Classe</th><th>Établissement</th></tr></thead><tbody>`;
+                titleEl.innerHTML = '<i class="fa fa-user-graduate me-2"></i>Palmarès & Effectif Global des Élèves';
+                let html = '<div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>Matricule</th><th>Nom & Prénom de l\'Élève</th><th>Sexe</th><th>Classe</th><th>Établissement</th></tr></thead><tbody>';
                 let count = 0;
-                schools.forEach(s => {
-                    (s.students || []).forEach(st => {
+                schools.forEach(function(s) {
+                    (s.students || []).forEach(function(st) {
                         count++;
-                        html += `<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province || ''})</td></tr>`;
+                        html += '<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>' + (st.name || '') + '</b></td><td>' + (st.sexe || 'M') + '</td><td><span class="badge bg-info text-dark">' + (st.classe || '—') + '</span></td><td><b class="text-primary">' + (s.name || '') + '</b> (' + (s.province || '') + ')</td></tr>';
                     });
                 });
-                if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>`;
-                html += `</tbody></table></div>`;
+                if(count === 0) html += '<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>';
+                html += '</tbody></table></div>';
                 contentEl.innerHTML = html;
             }
             else if (type === 'admin') {
-                titleEl.innerHTML = `<i class="fa fa-sitemap me-2"></i>Répertoire des Cadres de Direction & Administration`;
-                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>Poste / Fonction</th><th>Nom & Prénom</th><th>Établissement</th><th>Province / Localisation</th></tr></thead><tbody>`;
+                titleEl.innerHTML = '<i class="fa fa-sitemap me-2"></i>Répertoire des Cadres de Direction & Administration';
+                let html = '<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>Poste / Fonction</th><th>Nom & Prénom</th><th>Établissement</th><th>Province / Localisation</th></tr></thead><tbody>';
                 let count = 0;
-                schools.forEach(s => {
-                    (s.staff || []).forEach(st => {
+                schools.forEach(function(s) {
+                    (s.staff || []).forEach(function(st) {
                         count++;
-                        html += `<tr><td><span class="badge bg-danger p-2 fs-6">${st.role}</span></td><td><b>${st.name}</b></td><td><b class="text-primary">${s.name}</b></td><td>${s.province || ''} / ${s.commune || st.commune || ''}</td></tr>`;
+                        html += '<tr><td><span class="badge bg-danger p-2 fs-6">' + (st.role || '') + '</span></td><td><b>' + (st.name || '') + '</b></td><td><b class="text-primary">' + (s.name || '') + '</b></td><td>' + (s.province || '') + ' / ' + (s.commune || st.commune || '') + '</td></tr>';
                     });
                 });
-                if(count === 0) html += `<tr><td colspan="4" class="text-center text-muted py-3">Aucun cadre administratif enregistré.</td></tr>`;
-                html += `</tbody></table></div>`;
+                if(count === 0) html += '<tr><td colspan="4" class="text-center text-muted py-3">Aucun cadre administratif enregistré.</td></tr>';
+                html += '</tbody></table></div>';
                 contentEl.innerHTML = html;
             }
             else if (type === 'schools') {
-                titleEl.innerHTML = `<i class="fa fa-school me-2"></i>Registre des Institutions Scolaires Enregistrées`;
-                let html = `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l'École</th><th>Régime / Appartenance</th><th>Province / Territoire / Commune</th><th>Effectifs</th><th>Action</th></tr></thead><tbody>`;
-                schools.forEach(s => {
+                titleEl.innerHTML = '<i class="fa fa-school me-2"></i>Registre des Institutions Scolaires Enregistrées';
+                let html = '<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l\'École</th><th>Régime / Appartenance</th><th>Province / Territoire / Commune</th><th>Effectifs</th><th>Action</th></tr></thead><tbody>';
+                schools.forEach(function(s) {
                     let profCount = (s.teachers || []).length;
                     let elvCount = (s.students || []).length;
-                    html += `<tr><td><b class="text-primary fs-6">${s.name}</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>${s.appartenance || 'Général'}</td><td><b>Prov:</b> ${s.province || 'N/A'}<br><b>Terr:</b> ${s.territoire || 'N/A'}<br><b>Commune:</b> ${s.commune || 'N/A'}</td><td><b>${profCount}</b> Profs | <b>${elvCount}</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>`;
+                    html += '<tr><td><b class="text-primary fs-6">' + (s.name || '') + '</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>' + (s.appartenance || 'Général') + '</td><td><b>Prov:</b> ' + (s.province || 'N/A') + '<br><b>Terr:</b> ' + (s.territoire || 'N/A') + '<br><b>Commune:</b> ' + (s.commune || 'N/A') + '</td><td><b>' + profCount + '</b> Profs | <b>' + elvCount + '</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal(\'students\', \'' + s.id + '\')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>';
                 });
-                html += `</tbody></table></div>`;
+                html += '</tbody></table></div>';
                 contentEl.innerHTML = html;
             }
 
@@ -815,47 +823,23 @@
 
         window.filterCategoryModal = function(category) {
             let schools = getStoredSchools();
-            let matches = schools.filter(s => s.appartenance && s.appartenance.toLowerCase().includes(category.toLowerCase()));
+            let matches = schools.filter(function(s) { return s.appartenance && s.appartenance.toLowerCase().indexOf(category.toLowerCase()) !== -1; });
             let titleEl = document.getElementById('statsModalTitle');
             let contentEl = document.getElementById('statsModalContent');
 
-            titleEl.innerHTML = `<i class="fa fa-list me-2"></i>Écoles du Secteur [ ${category} ] - RDC`;
-            let html = `<div class="alert alert-info fw-bold">Nombre total d'établissements répertoriés dans toute la RDC pour ce secteur : ${matches.length > 0 ? matches.length : '15,200+ (Base Nationale)'}</div>`;
-            html += `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l'Établissement</th><th>Régime Éducatif</th><th>Province</th><th>Territoire</th><th>Commune</th><th>Action</th></tr></thead><tbody>`;
+            titleEl.innerHTML = '<i class="fa fa-list me-2"></i>Écoles du Secteur [ ' + category + ' ] - RDC';
+            let html = '<div class="alert alert-info fw-bold">Nombre total d\'établissements répertoriés dans toute la RDC pour ce secteur : ' + (matches.length > 0 ? matches.length : '15,200+ (Base Nationale)') + '</div>';
+            html += '<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l\'Établissement</th><th>Régime Éducatif</th><th>Province</th><th>Territoire</th><th>Commune</th><th>Action</th></tr></thead><tbody>';
             
             if(matches.length === 0) {
-                html += `
-                    <tr>
-                        <td><b>C.S. LA RÉVOLUTION</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td>
-                        <td>Enseignement ${category} - Privé Non Conventionné</td>
-                        <td>KINSHASA</td>
-                        <td>Kinshasa / Lukunga</td>
-                        <td>KALAMU</td>
-                        <td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('schools')">Détails</button></td>
-                    </tr>
-                    <tr>
-                        <td><b>INSTITUT TECHNIQUE DE LUBUMBASHI</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td>
-                        <td>Enseignement ${category} - Officiel Public</td>
-                        <td>HAUT-KATANGA</td>
-                        <td>Lubumbashi Urbain</td>
-                        <td>LUBUMBASHI</td>
-                        <td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('schools')">Détails</button></td>
-                    </tr>
-                    <tr>
-                        <td><b>LYCÉE MODÈLE DE MATADI</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td>
-                        <td>Enseignement ${category} - Conventionné Catholique</td>
-                        <td>KONGO CENTRAL</td>
-                        <td>Matadi</td>
-                        <td>MATADI</td>
-                        <td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('schools')">Détails</button></td>
-                    </tr>
-                `;
+                html += '<tr><td><b>C.S. LA RÉVOLUTION</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>Enseignement ' + category + ' - Privé Non Conventionné</td><td>KINSHASA</td><td>Kinshasa / Lukunga</td><td>KALAMU</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal(\'schools\')">Détails</button></td></tr>' +
+                        '<tr><td><b>INSTITUT TECHNIQUE DE LUBUMBASHI</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>Enseignement ' + category + ' - Officiel Public</td><td>HAUT-KATANGA</td><td>Lubumbashi Urbain</td><td>LUBUMBASHI</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal(\'schools\')">Détails</button></td></tr>';
             } else {
-                matches.forEach(s => {
-                    html += `<tr><td><b>${s.name}</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>${s.appartenance}</td><td>${s.province || 'RDC'}</td><td>${s.territoire || 'Standard'}</td><td>${s.commune || 'Centre'}</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')">Consulter Effectif</button></td></tr>`;
+                matches.forEach(function(s) {
+                    html += '<tr><td><b>' + s.name + '</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>' + s.appartenance + '</td><td>' + (s.province || 'RDC') + '</td><td>' + (s.territoire || 'Standard') + '</td><td>' + (s.commune || 'Centre') + '</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal(\'students\', \'' + s.id + '\')">Consulter Effectif</button></td></tr>';
                 });
             }
-            html += `</tbody></table></div>`;
+            html += '</tbody></table></div>';
             contentEl.innerHTML = html;
 
             let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
@@ -871,15 +855,15 @@
             const container = document.getElementById('schoolsContainer');
             if (!container) return;
 
-            const filtered = query === "" ? allSchools : allSchools.filter(s => {
-                const nameMatch = s.name ? s.name.toLowerCase().includes(query) : false;
-                const provMatch = s.province ? s.province.toLowerCase().includes(query) : false;
-                const comMatch = s.commune ? s.commune.toLowerCase().includes(query) : false;
+            const filtered = query === "" ? allSchools : allSchools.filter(function(s) {
+                const nameMatch = s.name ? s.name.toLowerCase().indexOf(query) !== -1 : false;
+                const provMatch = s.province ? s.province.toLowerCase().indexOf(query) !== -1 : false;
+                const comMatch = s.commune ? s.commune.toLowerCase().indexOf(query) !== -1 : false;
                 return nameMatch || provMatch || comMatch;
             });
 
             if (filtered.length > 0) {
-                container.innerHTML = filtered.map(s => {
+                container.innerHTML = filtered.map(function(s) {
                     const logoSrc = s.logo || 'img/course-1.jpg';
                     const schoolName = s.name || 'Nom de l\'école';
                     const schoolApp = s.appartenance || 'Établissement Enregistré';
@@ -888,37 +872,25 @@
                     const profCount = (s.teachers || []).length;
                     const studentCount = (s.students || []).length;
 
-                    return `
-                        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                            <div class="course-item bg-light rounded overflow-hidden shadow-sm interactive-card" onclick="showGlobalStatsModal('students', '${s.id}')">
-                                <div class="position-relative overflow-hidden text-center p-3 bg-white" style="height: 200px; display: flex; align-items: center; justify-content: center;">
-                                    <img class="img-fluid rounded" src="${logoSrc}" alt="Photo École" style="max-height: 100%; max-width: 100%; object-fit: cover;">
-                                    <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-3">
-                                        <span class="btn btn-sm btn-primary px-3 shadow" style="border-radius: 30px;"><i class="fa fa-users me-1"></i> ${studentCount} Élève(s) | ${profCount} Prof(s)</span>
-                                    </div>
-                                </div>
-                                <div class="text-center p-4 pb-0">
-                                    <h3 class="mb-0 text-primary">${schoolName}</h3>
-                                    <div class="mb-2 text-muted">
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small>(Enregistré)</small>
-                                    </div>
-                                    <h5 class="mb-3">${schoolApp}</h5>
-                                </div>
-                                <div class="d-flex border-top">
-                                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>${schoolProv}</small>
-                                    <small class="flex-fill text-center py-2"><i class="fa fa-building text-primary me-2"></i>${schoolCom}</small>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    return '<div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">' +
+                           '<div class="course-item bg-light rounded overflow-hidden shadow-sm interactive-card" onclick="showGlobalStatsModal(\'students\', \'' + s.id + '\')">' +
+                           '<div class="position-relative overflow-hidden text-center p-3 bg-white" style="height: 200px; display: flex; align-items: center; justify-content: center;">' +
+                           '<img class="img-fluid rounded" src="' + logoSrc + '" alt="Photo École" style="max-height: 100%; max-width: 100%; object-fit: cover;">' +
+                           '<div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-3">' +
+                           '<span class="btn btn-sm btn-primary px-3 shadow" style="border-radius: 30px;"><i class="fa fa-users me-1"></i> ' + studentCount + ' Élève(s) | ' + profCount + ' Prof(s)</span>' +
+                           '</div></div>' +
+                           '<div class="text-center p-4 pb-0">' +
+                           '<h3 class="mb-0 text-primary">' + schoolName + '</h3>' +
+                           '<div class="mb-2 text-muted"><small class="fa fa-star text-primary"></small><small class="fa fa-star text-primary"></small><small class="fa fa-star text-primary"></small><small class="fa fa-star text-primary"></small><small class="fa fa-star text-primary"></small><small>(Enregistré)</small></div>' +
+                           '<h5 class="mb-3">' + schoolApp + '</h5>' +
+                           '</div>' +
+                           '<div class="d-flex border-top">' +
+                           '<small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>' + schoolProv + '</small>' +
+                           '<small class="flex-fill text-center py-2"><i class="fa fa-building text-primary me-2"></i>' + schoolCom + '</small>' +
+                           '</div></div></div>';
                 }).join('');
             } else {
-                container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Aucun établissement ne correspond à votre recherche "${query}".</div></div>`;
+                container.innerHTML = '<div class="col-12"><div class="alert alert-warning text-center">Aucun établissement ne correspond à votre recherche "' + query + '".</div></div>';
             }
         };
 
@@ -948,17 +920,17 @@
             if(!name || !contact) return alert("Remplissez tous les champs.");
 
             simulatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-            tempUser = { name, contact };
+            tempUser = { name: name, contact: contact };
 
             document.getElementById('modalDisplayContact').innerText = contact;
-            alert(`[SIMULATION SMS/EMAIL]\nCode envoyé à ${contact}\n\nCODE À 6 CHIFFRES : ${simulatedCode}`);
+            alert("[SIMULATION SMS/EMAIL]\nCode envoyé à " + contact + "\n\nCODE À 6 CHIFFRES : " + simulatedCode);
 
             document.getElementById('modal-reg-step-1').style.display = 'none';
             document.getElementById('modal-reg-step-2').style.display = 'block';
             return false;
         };
 
-        window.modalVerifyAndCreate = async function(e) {
+        window.modalVerifyAndCreate = function(e) {
             e.preventDefault();
             const entered = document.getElementById('modalRegCode').value.trim();
 
@@ -969,49 +941,43 @@
 
             const secretCode = 'PRO-' + Math.floor(1000 + Math.random() * 9000);
 
-            try {
-                await addDoc(collection(db, "professional_users"), {
-                    name: tempUser.name,
-                    contact: tempUser.contact,
-                    secretCode: secretCode,
-                    createdAt: new Date().toISOString()
-                });
-
+            db.collection("professional_users").add({
+                name: tempUser.name,
+                contact: tempUser.contact,
+                secretCode: secretCode,
+                createdAt: new Date().toISOString()
+            }).then(function() {
                 document.getElementById('modalGeneratedSecret').innerText = secretCode;
                 document.getElementById('modal-reg-step-2').style.display = 'none';
                 document.getElementById('modal-reg-step-3').style.display = 'block';
-
-            } catch (error) {
+            }).catch(function(error) {
                 console.error(error);
                 alert("Erreur d'enregistrement Firebase.");
-            }
+            });
             return false;
         };
 
-        window.handleModalLogin = async function(e) {
+        window.handleModalLogin = function(e) {
             e.preventDefault();
             const email = document.getElementById('modalLoginEmail').value.trim();
             const password = document.getElementById('modalLoginPassword').value.trim();
 
-            try {
-                const q = query(
-                    collection(db, "professional_users"), 
-                    where("contact", "==", email), 
-                    where("secretCode", "==", password)
-                );
-                const snapshot = await getDocs(q);
-
-                if (!snapshot.empty) {
-                    alert("Connexion réussie ! Bienvenue dans votre espace sécurisé.");
-                    localStorage.setItem("edu_is_logged", "true");
-                    window.location.href = "gestion_ecole.html"; 
-                } else {
-                    alert("Email ou Code Secret incorrect.");
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Erreur de connexion Firebase.");
-            }
+            db.collection("professional_users")
+                .where("contact", "==", email)
+                .where("secretCode", "==", password)
+                .get()
+                .then(function(snapshot) {
+                    if (!snapshot.empty) {
+                        alert("Connexion réussie ! Bienvenue dans votre espace sécurisé.");
+                        localStorage.setItem("edu_is_logged", "true");
+                        window.location.href = "gestion_ecole.html"; 
+                    } else {
+                        alert("Email ou Code Secret incorrect.");
+                    }
+                }).catch(function(error) {
+                    console.error(error);
+                    alert("Erreur de connexion Firebase.");
+                });
             return false;
         };
     </script>
