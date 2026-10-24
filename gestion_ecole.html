@@ -38,6 +38,13 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 .secret-modal-card { background: #fff; padding: 30px; border-radius: 12px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
 .secret-code-badge { font-size: 26px; font-weight: 800; color: #0d6efd; letter-spacing: 2px; background: #e7f1ff; padding: 10px 20px; border-radius: 8px; border: 2px dashed #0d6efd; display: inline-block; margin: 15px 0; }
 
+/* MODALE DE CONSULTATION DE FICHIER SÉCURISÉE */
+.file-viewer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
+.file-viewer-card { background: #fff; width: 100%; max-width: 800px; height: 85vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4); }
+.file-viewer-header { background: #0d6efd; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+.file-viewer-body { flex: 1; padding: 15px; overflow: auto; background: #e5e7eb; display: flex; align-items: center; justify-content: center; }
+.file-viewer-body iframe, .file-viewer-body img { width: 100%; height: 100%; border: 0; object-fit: contain; background: #fff; border-radius: 6px; }
+
 /* STYLES BULLETIN INTEGRE (CONFORME À L'IMAGE MINEPST) */
 .bulletin-container .page { width:210mm; min-height:297mm; margin:0 auto; background:#fff; padding:5mm 7mm; font-size: 8px; box-shadow:0 2px 10px rgba(0,0,0,.25); color:#000; font-family: Arial, Helvetica, sans-serif; }
 .bulletin-container .hdr { display: flex; align-items:center; justify-content: space-between; margin-bottom:2px; }
@@ -112,6 +119,19 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
     <div>
       <button class="btn btn-outline-primary btn-sm me-2" onclick="copySecretCodeModal()"><i class="fa fa-copy me-1"></i> Copier</button>
       <button class="btn btn-success btn-sm fw-bold px-4" onclick="closeSecretModal()"><i class="fa fa-check me-1"></i> J'ai noté le code</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE DE CONSULTATION DE FICHIER / DOCUMENT INTÉGRÉE -->
+<div id="fileViewerModal" class="file-viewer-overlay">
+  <div class="file-viewer-card">
+    <div class="file-viewer-header">
+      <h5 class="m-0 text-white"><i class="fa fa-file-alt me-2"></i>Consultation du Document Scanné</h5>
+      <button class="btn btn-sm btn-light fw-bold" onclick="closeFileViewerModal()"><i class="fa fa-times"></i> Fermer</button>
+    </div>
+    <div class="file-viewer-body" id="fileViewerContentArea">
+      <!-- Rendu dynamique de l'image ou du PDF -->
     </div>
   </div>
 </div>
@@ -1135,7 +1155,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 
 <!-- JAVASCRIPT GLOBAL ADAPTÉ À FIREBASE -->
 <script>
-// --- CONFIGURATION FIREBASE (Mise à jour avec vos vraies clés) ---
+// --- CONFIGURATION FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyAfLQc6uveuaqdKLDLnc5BpNK-yoO_0eCE",
   authDomain: "edu-rdc-5c858.firebaseapp.com",
@@ -1374,6 +1394,27 @@ function closeSecretModal() {
 function copySecretCodeModal() {
     navigator.clipboard.writeText(currentCreatedSecretCode);
     alert("Code Secret copié dans le presse-papier !");
+}
+
+// FONCTIONS DE LA MODALE DE CONSULTATION DE FICHIER SÉCURISÉE
+function openFileViewerModal(fileUrl, fileType) {
+    const contentArea = document.getElementById('fileViewerContentArea');
+    if (!fileUrl) {
+        alert("Aucun fichier attaché à consulter.");
+        return;
+    }
+
+    if (fileType === 'pdf' || fileUrl.includes('data:application/pdf')) {
+        contentArea.innerHTML = `<iframe src="${fileUrl}" type="application/pdf"></iframe>`;
+    } else {
+        contentArea.innerHTML = `<img src="${fileUrl}" alt="Document Scanné">`;
+    }
+    document.getElementById('fileViewerModal').style.display = 'flex';
+}
+
+function closeFileViewerModal() {
+    document.getElementById('fileViewerModal').style.display = 'none';
+    document.getElementById('fileViewerContentArea').innerHTML = '';
 }
 
 function renderSchoolsList() {
@@ -2595,7 +2636,6 @@ function calculateStaffReste() {
     const emprunt = parseFloat(document.getElementById('caisseStaffEmprunt').value) || 0;
     const rembourser = parseFloat(document.getElementById('caisseStaffRembourse').value) || 0;
     
-    // Formule : Somme Générale + Prime + Emprunt - Remboursement (ou reste net dû)
     const reste = (total + prime + emprunt) - rembourser;
     document.getElementById('caisseStaffReste').value = reste;
 }
@@ -2672,7 +2712,7 @@ function deleteCaisseCustomItem(idx) {
     }
 }
 
-// 7.2 NOUVEAU : SIMULATION MOBILE MONEY (Paiements scolaires RDC)
+// 7.2 NOUVEAU : SIMULATION MOBILE MONEY
 function refreshMobileMoneyOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -2844,22 +2884,6 @@ function deletePresenceCustomItem(idx) {
     }
 }
 
-
-// 9. PRESENCES
-function refreshPresenceOptions() {
-    const s = appData.schools.find(x => x.id === activeSchoolId);
-    const year = s.activeYear || "2025-2026";
-    document.getElementById('presClassSelect').innerHTML = (s.yearsData[year].classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-    loadStudentsForPresence();
-}
-function loadStudentsForPresence() {
-    const s = appData.schools.find(x => x.id === activeSchoolId);
-    const year = s.activeYear || "2025-2026";
-    const cl = document.getElementById('presClassSelect').value;
-    const students = (s.yearsData[year].students || []).filter(st => st.classe === cl);
-    document.getElementById('studentsPresenceContainer').innerHTML = students.map(st => `<div>${st.name} - Présent</div>`).join('') || 'Aucun élève';
-}
-
 // 9.1 DISCIPLINE
 function refreshDisciplineOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -2912,7 +2936,6 @@ function renderCommTable() {
     document.getElementById('commTableBody').innerHTML = (s.communications || []).map((c, idx) => `<tr><td>${c.date}</td><td>${c.message}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteSchoolCommunication(${idx})"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune annonce</td></tr>';
 }
 
-// SUPPRESSION SÉCURISÉE PAR LE PROPRIÉTAIRE (CODE SECRET) D'UNE ANNONCE INTERNE
 function deleteSchoolCommunication(idx) {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -3274,7 +3297,7 @@ function renderPalmaresTable() {
     `;
 }
 
-// 3. Courriers Entrants / Sortants (Corrigé avec FileReader local au lieu de Firebase Storage)
+// 3. Courriers Entrants / Sortants
 function refreshCourrierOptions() {
     renderCourriersTable();
     const today = new Date().toISOString().split('T')[0];
@@ -3335,7 +3358,7 @@ function renderCourriersTable() {
             <td>${esc(c.tiers)}</td>
             <td>${esc(c.objet)}</td>
             <td class="text-center">
-                ${c.fileUrl ? `<a href="${c.fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-paperclip me-1"></i> Voir Pièce</a>` : '<span class="text-muted small">Aucun fichier</span>'}
+                ${c.fileUrl ? `<button type="button" class="btn btn-sm btn-outline-primary" onclick="openFileViewerModal('${c.fileUrl}', '${c.fileUrl.includes('application/pdf') ? 'pdf' : 'img'}')"><i class="fa fa-paperclip me-1"></i> Consulter</button>` : '<span class="text-muted small">Aucun fichier</span>'}
             </td>
             <td class="no-print">
                 <button class="btn btn-sm btn-outline-danger" onclick="deleteCourrier(${idx})"><i class="fa fa-trash"></i></button>
@@ -3353,7 +3376,7 @@ function deleteCourrier(idx) {
     }
 }
 
-// 4. Stockage / GED des Dossiers (Corrigé avec FileReader local)
+// 4. Stockage / GED des Dossiers
 function refreshDossiersStorageOptions() {
     updateDossierPersonOptions();
     renderDossiersStorageTable();
@@ -3440,7 +3463,7 @@ function renderDossiersStorageTable() {
             <td><b>${esc(doc.targetPersonName)}</b></td>
             <td>${esc(doc.docType)}</td>
             <td class="text-center">
-                <a href="${doc.fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-eye me-1"></i> Consulter</a>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="openFileViewerModal('${doc.fileUrl}', '${doc.fileUrl.includes('application/pdf') ? 'pdf' : 'img'}')"><i class="fa fa-eye me-1"></i> Consulter</button>
             </td>
             <td class="no-print">
                 <button class="btn btn-sm btn-outline-danger" onclick="deleteDossierDocument(${idx})"><i class="fa fa-trash"></i></button>
@@ -3460,7 +3483,7 @@ function deleteDossierDocument(idx) {
     }
 }
 
-// 5. NOUVELLES FONCTIONS : CALENDRIER SCOLAIRE (CONGÉS, VACANCES, RENTRÉE)
+// 5. CALENDRIER SCOLAIRE
 function handleSaveCalendrierScolaire(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -3506,7 +3529,7 @@ function deleteCalendrierItem(idx) {
     }
 }
 
-// 6. NOUVELLES FONCTIONS : HORAIRES DES COURS (EMPLOI DU TEMPS)
+// 6. HORAIRES DES COURS
 function refreshHoraireOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -3573,7 +3596,7 @@ function deleteHoraireItem(idx) {
     }
 }
 
-// 7.3 NOUVEAU : STATISTIQUES & TABLEAU DE BORD ANALYTIQUE
+// 7.3 STATISTIQUES & TABLEAU DE BORD ANALYTIQUE
 function renderStatistiquesDashboard() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
