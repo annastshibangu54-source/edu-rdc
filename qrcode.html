@@ -92,8 +92,8 @@
         <div class="card shadow p-4 bg-white rounded border-0">
             <h3 class="text-center text-primary mb-4"><i class="fa fa-school me-2"></i>Accès Établissement</h3>
             <div class="mb-3">
-                <label class="form-label fw-bold">Nom Complet ou Code de l'École</label>
-                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION ou Code">
+                <label class="form-label fw-bold">Nom Complet de l'École</label>
+                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION">
             </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Code Secret de Sécurité de l'École</label>
@@ -228,41 +228,46 @@
         let base64SchoolLogo = "";
 
         window.onload = function() {
+            // Charger d'abord depuis localStorage pour avoir une base immédiate
+            let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V10");
+            if (saved) {
+                try {
+                    let parsed = JSON.parse(saved);
+                    if (parsed && parsed.schools) appData = parsed;
+                } catch(e) {}
+            }
+
             try {
                 if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
                     db = firebase.firestore();
                     db.collection("edu_rdc_data").doc("global_state").onSnapshot((doc) => {
-                        if (doc.exists) {
+                        if (doc.exists && doc.data() && doc.data().schools) {
                             appData = doc.data();
                         }
                     });
-                } else {
-                    let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V10");
-                    if (saved) appData = JSON.parse(saved);
                 }
             } catch(e) {
-                let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V10");
-                if (saved) appData = JSON.parse(saved);
+                console.error("Erreur Firebase:", e);
             }
         };
 
         window.ouvrirEspace = function() {
-            const saisie = document.getElementById('authSchoolName').value.trim().toUpperCase();
+            const saisieNom = document.getElementById('authSchoolName').value.trim().toUpperCase();
             const saisieSecret = document.getElementById('authSecretCode').value.trim();
 
-            if(!saisie) { alert("Saisissez le nom ou le code de l'école !"); return; }
+            if(!saisieNom) { alert("Veuillez saisir le nom complet de l'école !"); return; }
             if(!saisieSecret) { alert("Veuillez saisir le code secret de l'école !"); return; }
             
             if(!appData.schools) appData.schools = [];
             
-            // Recherche par nom ou par code secret
-            let ecoleTrouvee = appData.schools.find(s => s.name.toUpperCase() === saisie || s.secretCode.toUpperCase() === saisie || s.id.toUpperCase() === saisie);
+            // Recherche de l'école par nom complet
+            let ecoleTrouvee = appData.schools.find(s => s.name && s.name.toUpperCase() === saisieNom);
             
             if (!ecoleTrouvee) {
-                // Création automatique si non existante avec le code secret fourni
+                // Création automatique de l'école si elle n'existe pas encore
                 ecoleTrouvee = {
                     id: 'SCH-' + Date.now(),
-                    name: saisie,
+                    name: saisieNom,
                     appartenance: 'Non Conventionnée (Privée)',
                     province: 'KINSHASA',
                     district: 'KINTAMBO',
@@ -277,10 +282,15 @@
                 appData.schools.push(ecoleTrouvee);
                 sauvegarderGlobal();
             } else {
-                // Sécurisation : Vérification du code secret de l'école
+                // Vérification du code secret
                 if (ecoleTrouvee.secretCode && ecoleTrouvee.secretCode !== saisieSecret) {
                     alert("Code secret incorrect pour cette école !");
                     return;
+                }
+                // Si l'école existait sans code secret défini
+                if (!ecoleTrouvee.secretCode) {
+                    ecoleTrouvee.secretCode = saisieSecret;
+                    sauvegarderGlobal();
                 }
             }
 
@@ -356,7 +366,6 @@
 
             const ecole = appData.schools.find(s => s.id === currentSchoolId);
             if (ecole) {
-                // Gestion dynamique selon la catégorie choisie pour cohérence avec gestion_ecole.html
                 let targetList = ecole.students;
                 if (typeCarte === "Enseignant") {
                     if(!ecole.teachers) ecole.teachers = [];
