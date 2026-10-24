@@ -61,7 +61,7 @@
         .card-details { font-size: 0.31rem; line-height: 1.15; color: #fff; }
         .qr-container {
             position: absolute;
-            bottom: 12px;
+            bottom: 10px;
             right: 6px;
             background: #ffffff;
             padding: 2px;
@@ -71,7 +71,7 @@
         }
         .qr-container img { width: 100%; height: 100%; object-fit: contain; }
         .assistance-text {
-            font-size: 0.23rem;
+            font-size: 0.22rem;
             text-align: center;
             margin-top: 2px;
             line-height: 1;
@@ -96,7 +96,7 @@
                 <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION">
             </div>
             <div class="mb-3">
-                <label class="form-label fw-bold">Code Secret de Sécurité de l'École</label>
+                <label class="form-label fw-bold">Code Secret de Sécurité</label>
                 <input type="password" id="authSecretCode" class="form-control" placeholder="Entrez le code secret">
             </div>
             <button type="button" onclick="ouvrirEspace()" class="btn btn-primary w-100 py-2 fw-bold">
@@ -176,7 +176,6 @@
                         <!-- En-tête : Drapeau à gauche, Texte RDC au centre, Logo école à droite -->
                         <div class="d-flex justify-content-between align-items-center pb-1 mb-1 border-bottom" style="font-size: 0.3rem;">
                             <div class="d-flex align-items-center">
-                                <!-- Drapeau RDC -->
                                 <span style="background: linear-gradient(to bottom, #007fff 33%, #ffd700 33%, #ffd700 66%, #ce1126 66%); width: 0.5cm; height: 0.35cm; display: inline-block; margin-right: 3px; border: 0.5px solid #fff;"></span>
                                 <span class="fw-bold">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</span>
                             </div>
@@ -187,7 +186,7 @@
                         <div class="text-center fw-bold mb-1" id="viewSchoolNameTitle" style="font-size: 0.35rem; text-transform: uppercase;">C.S. LA RÉVOLUTION</div>
                         <div style="border-bottom: 1px solid rgba(255,255,255,0.5); margin-bottom: 3px;"></div>
 
-                        <!-- Corps de la carte : Détails à gauche, Photo à droite -->
+                        <!-- Corps de la carte -->
                         <div class="d-flex align-items-start justify-content-between">
                             <div class="card-details text-start" style="width: 72%;">
                                 <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
@@ -204,7 +203,7 @@
                             </div>
                         </div>
 
-                        <!-- Mot d'assistance aux autorités militaires et civiles -->
+                        <!-- Mot d'assistance aux autorités -->
                         <div class="assistance-text">
                             Prière aux autorités civiles et militaires de porter assistance au porteur en cas de besoin.
                         </div>
@@ -218,7 +217,7 @@
         </div>
     </div>
 
-    <!-- Script de Gestion Intégré Compatible Firestore Global -->
+    <!-- Script de Gestion Intégré -->
     <script>
         let db = null;
         let appData = { schools: [] };
@@ -239,11 +238,12 @@
             try {
                 if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
                     db = firebase.firestore();
-                    db.collection("edu_rdc_data").doc("global_state").onSnapshot((doc) => {
+                    db.collection("edu_rdc_data").doc("global_state").get().then((doc) => {
                         if (doc.exists && doc.data() && doc.data().schools) {
                             appData = doc.data();
+                            localStorage.setItem("EDURDC_FULL_PLATFORM_V10", JSON.stringify(appData));
                         }
-                    });
+                    }).catch(err => console.log("Firestore init info:", err));
                 }
             } catch(e) {
                 console.error("Erreur Firebase:", e);
@@ -251,7 +251,7 @@
         };
 
         window.ouvrirEspace = function() {
-            const saisieNom = document.getElementById('authSchoolName').value.trim().toUpperCase();
+            const saisieNom = document.getElementById('authSchoolName').value.trim();
             const saisieSecret = document.getElementById('authSecretCode').value.trim();
 
             if(!saisieNom) { alert("Veuillez saisir le nom complet de l'école !"); return; }
@@ -259,14 +259,12 @@
             
             if(!appData.schools) appData.schools = [];
             
-            // Recherche de l'école par nom complet insensible à la casse
-            let ecoleTrouvee = appData.schools.find(s => s.name && s.name.trim().toUpperCase() === saisieNom);
+            let ecoleTrouvee = appData.schools.find(s => s.name && s.name.trim().toLowerCase() === saisieNom.toLowerCase());
             
             if (!ecoleTrouvee) {
-                // Création automatique si l'école n'existe pas encore
                 ecoleTrouvee = {
                     id: 'SCH-' + Date.now(),
-                    name: document.getElementById('authSchoolName').value.trim(),
+                    name: saisieNom,
                     appartenance: 'Non Conventionnée (Privée)',
                     province: 'KINSHASA',
                     district: 'KINTAMBO',
@@ -281,12 +279,10 @@
                 appData.schools.push(ecoleTrouvee);
                 sauvegarderGlobal();
             } else {
-                // Vérification du code secret si l'école existe déjà
                 if (ecoleTrouvee.secretCode && ecoleTrouvee.secretCode !== saisieSecret) {
                     alert("Code secret incorrect pour cette école !");
                     return;
                 }
-                // Si l'école existait sans code secret, on l'enregistre
                 if (!ecoleTrouvee.secretCode) {
                     ecoleTrouvee.secretCode = saisieSecret;
                     sauvegarderGlobal();
