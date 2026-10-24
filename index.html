@@ -713,7 +713,7 @@
 
                     (teachersList || []).forEach(function(t) {
                         count++;
-                        html += '<tr><td><b class="text-primary">' + (s.name || '') + '</b><br><small>' + (s.province || '') + '</small></td><td><b>' + (t.name || '') + '</b></td><td><span class="badge bg-primary">' + (t.titulaireClass || 'Non attribuée') + '</span></td><td><code>' + (t.secretCode || '—') + '</code></td></tr>';
+                        html += '<tr><td><b class="text-primary">' + (s.name || '') + '</b><br><small>' + (s.province || '') + '</small></td><td><b>' + (t.name || '') + '</b></td><td><span class="badge bg-primary">' + (t.titulaireClass || 'Non attribuée') + '</span></td><td><code>••••••</code></td></tr>';
                     });
                 });
                 if(count === 0) html += '<tr><td colspan="4" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>';
@@ -730,7 +730,7 @@
 
                     (studentsList || []).forEach(function(st) {
                         count++;
-                        html += '<tr><td><b>' + (st.mat || '—') + '</b></td><td><b>' + (st.name || '') + '</b></td><td>' + (st.sexe || 'M') + '</td><td><span class="badge bg-info text-dark">' + (st.classe || '—') + '</span></td><td><b class="text-primary">' + (s.name || '') + '</b> (' + (s.province || '') + ')</td></tr>';
+                        html += '<tr><td><b>••••••</b></td><td><b>' + (st.name || '') + '</b></td><td>' + (st.sexe || 'M') + '</td><td><span class="badge bg-info text-dark">' + (st.classe || '—') + '</span></td><td><b class="text-primary">' + (s.name || '') + '</b> (' + (s.province || '') + ')</td></tr>';
                     });
                 });
                 if(count === 0) html += '<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>';
@@ -744,7 +744,7 @@
                 schools.forEach(function(s) {
                     (s.direction || []).forEach(function(st) {
                         count++;
-                        html += '<tr><td><span class="badge bg-danger p-2 fs-6">' + (st.role || '') + '</span></td><td><b>' + (st.name || '') + '</b></td><td>' + (st.phone || '—') + '</td><td><b class="text-primary">' + (s.name || '') + '</b> (' + (s.province || '') + ')</td></tr>';
+                        html += '<tr><td><span class="badge bg-danger p-2 fs-6">' + (st.role || '') + '</span></td><td><b>' + (st.name || '') + '</b></td><td>••••••</td><td><b class="text-primary">' + (s.name || '') + '</b> (' + (s.province || '') + ')</td></tr>';
                     });
                 });
                 if(count === 0) html += '<tr><td colspan="4" class="text-center text-muted py-3">Aucun cadre administratif enregistré.</td></tr>';
@@ -759,7 +759,7 @@
                     let profCount = activeYearData && activeYearData.teachers ? activeYearData.teachers.length : (s.teachers ? s.teachers.length : 0);
                     let elvCount = activeYearData && activeYearData.students ? activeYearData.students.length : (s.students ? s.students.length : 0);
 
-                    html += '<tr><td><b class="text-primary fs-6">' + (s.name || '') + '</b><br><small class="text-muted">Code Secret : <code>' + (s.secretCode || '') + '</code></small></td><td>' + (s.regime || 'Général') + '</td><td><b>Prov:</b> ' + (s.province || 'N/A') + '<br><b>Commune:</b> ' + (s.commune || 'N/A') + '</td><td><b>' + profCount + '</b> Profs | <b>' + elvCount + '</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal(\'students\', \'' + s.id + '\')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>';
+                    html += '<tr><td><b class="text-primary fs-6">' + (s.name || '') + '</b><br><small class="text-muted">Code Secret : <code>••••••</code></small></td><td>' + (s.regime || 'Général') + '</td><td><b>Prov:</b> ' + (s.province || 'N/A') + '<br><b>Commune:</b> ' + (s.commune || 'N/A') + '</td><td><b>' + profCount + '</b> Profs | <b>' + elvCount + '</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal(\'students\', \'' + s.id + '\')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>';
                 });
                 html += '</tbody></table></div>';
                 contentEl.innerHTML = html;
@@ -783,7 +783,7 @@
                 html += '<tr><td colspan="5" class="text-center text-muted py-3">Aucune école enregistrée spécifiquement dans cette catégorie pour le moment.</td></tr>';
             } else {
                 matches.forEach(function(s) {
-                    html += '<tr><td><b>' + s.name + '</b><br><small class="text-muted">Code Secret : <code>' + (s.secretCode || '') + '</code></small></td><td>' + s.regime + '</td><td>' + (s.province || 'RDC') + '</td><td>' + (s.commune || 'Centre') + '</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal(\'students\', \'' + s.id + '\')">Consulter Effectif</button></td></tr>';
+                    html += '<tr><td><b>' + s.name + '</b><br><small class="text-muted">Code Secret : <code>••••••</code></small></td><td>' + s.regime + '</td><td>' + (s.province || 'RDC') + '</td><td>' + (s.commune || 'Centre') + '</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showGlobalStatsModal(\'students\', \'' + s.id + '\')">Consulter Effectif</button></td></tr>';
                 });
             }
             html += '</tbody></table></div>';
