@@ -482,7 +482,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div class="row mb-3 no-print">
 <div class="col-md-4"><label>Classe :</label><select id="cardClassSelect" class="form-select" onchange="loadStudentsForCardSelect()"></select></div>
 <div class="col-md-4"><label>Élève :</label><select id="cardStudentSelect" class="form-select" onchange="populateCardFromSelectedStudent()"></select></div>
-<div class="col-md-4"><label>Photo de l'élève :</label><input type="file" id="cardPhotoInput" class="form-control" accept="image/*" onchange="previewStudentCardPhoto(event)"></div>
+<div class="col-md-4"><label>Photo de l'élève (PC / Téléphone) :</label><input type="file" id="cardPhotoInput" class="form-control" accept="image/*" onchange="previewStudentCardPhoto(event)"></div>
 </div>
 
 <!-- CARTE D'ÉLÈVE REVISÉE -->
@@ -3048,17 +3048,20 @@ function populateCardFromSelectedStudent() {
 function previewStudentCardPhoto(e) {
     const file = e.target.files[0];
     if(file) {
-        compressAndResizeImage(file, function(compressedUrl) {
-            document.getElementById('cardPhotoPreview').src = compressedUrl;
+        const reader = new FileReader();
+        reader.onload = function(uploadEvent) {
+            const localPhotoUrl = uploadEvent.target.result;
+            document.getElementById('cardPhotoPreview').src = localPhotoUrl;
             const s = appData.schools.find(x => x.id === activeSchoolId);
             const year = s.activeYear || "2025-2026";
             const stId = document.getElementById('cardStudentSelect').value;
             const st = (s.yearsData[year].students || []).find(x => x.id === stId);
             if(st) {
-                st.photo = compressedUrl;
+                st.photo = localPhotoUrl;
                 saveData();
             }
-        });
+        };
+        reader.readAsDataURL(file);
     }
 }
 
@@ -3271,7 +3274,7 @@ function renderPalmaresTable() {
     `;
 }
 
-// 3. Courriers Entrants / Sortants
+// 3. Courriers Entrants / Sortants (Corrigé avec Firebase Storage)
 function refreshCourrierOptions() {
     renderCourriersTable();
     const today = new Date().toISOString().split('T')[0];
@@ -3293,8 +3296,14 @@ function handleSaveCourrier(e) {
     const file = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0] : null;
 
     if (file) {
-        compressAndResizeImage(file, function(fileDataUrl) {
-            saveCourrierData(s, type, date, tiers, ref, objet, fileDataUrl);
+        const storageRef = storage.ref(`ecoles/${s.id}/courriers/${Date.now()}_${file.name}`);
+        const uploadTask = storageRef.put(file);
+        uploadTask.on('state_changed', null, (error) => {
+            alert("Erreur lors du téléchargement du fichier : " + error.message);
+        }, () => {
+            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                saveCourrierData(s, type, date, tiers, ref, objet, downloadURL);
+            });
         });
     } else {
         saveCourrierData(s, type, date, tiers, ref, objet, '');
@@ -3344,7 +3353,7 @@ function deleteCourrier(idx) {
     }
 }
 
-// 4. Stockage / GED des Dossiers
+// 4. Stockage / GED des Dossiers (Corrigé avec Firebase Storage)
 function refreshDossiersStorageOptions() {
     updateDossierPersonOptions();
     renderDossiersStorageTable();
@@ -3384,24 +3393,30 @@ function handleSaveDocumentDossier(e) {
         return;
     }
 
-    compressAndResizeImage(file, function(fileDataUrl) {
-        if(!s.dossiersArchive) s.dossiersArchive = [];
+    const storageRef = storage.ref(`ecoles/${s.id}/dossiers/${Date.now()}_${file.name}`);
+    const uploadTask = storageRef.put(file);
+    uploadTask.on('state_changed', null, (error) => {
+        alert("Erreur lors de l'archivage du fichier : " + error.message);
+    }, () => {
+        uploadTask.snapshot.ref.getDownloadURL().then((fileDataUrl) => {
+            if(!s.dossiersArchive) s.dossiersArchive = [];
 
-        s.dossiersArchive.push({
-            id: 'DOC-' + Date.now(),
-            date: new Date().toLocaleDateString('fr-FR'),
-            category,
-            targetPersonId,
-            targetPersonName,
-            docType,
-            fileUrl: fileDataUrl
+            s.dossiersArchive.push({
+                id: 'DOC-' + Date.now(),
+                date: new Date().toLocaleDateString('fr-FR'),
+                category,
+                targetPersonId,
+                targetPersonName,
+                docType,
+                fileUrl: fileDataUrl
+            });
+
+            saveData();
+            document.getElementById('formDossierStorage').reset();
+            updateDossierPersonOptions();
+            renderDossiersStorageTable();
+            alert("Document ajouté au dossier individuel avec succès !");
         });
-
-        saveData();
-        document.getElementById('formDossierStorage').reset();
-        updateDossierPersonOptions();
-        renderDossiersStorageTable();
-        alert("Document ajouté au dossier individuel avec succès !");
     });
 }
 
