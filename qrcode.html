@@ -231,12 +231,12 @@
             </div>
         </div>
 
-        <!-- Espace de Liste / Répertoire des Cartes Enregistrées -->
+        <!-- Espace de Liste / Répertoire des Cartes Enregistrées (Générées ici) -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="bg-white p-3 rounded shadow-sm border">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="text-primary m-0"><i class="fa fa-address-card me-2"></i>Répertoire des Cartes Enregistrées dans l'École</h5>
+                        <h5 class="text-primary m-0"><i class="fa fa-address-card me-2"></i>Mes Cartes Générées et Enregistrées</h5>
                         <button class="btn btn-sm btn-outline-secondary" onclick="chargerRepertoireCartes()"><i class="fa fa-sync-alt me-1"></i> Actualiser</button>
                     </div>
                     <div class="table-responsive">
@@ -392,7 +392,7 @@
             });
         };
 
-        // Fonction pour afficher uniquement les cartes enregistrées explicitement dans cette école
+        // Fonction pour afficher uniquement les cartes spécifiquement enregistrées depuis cet outil (stockées dans savedCards)
         window.chargerRepertoireCartes = function() {
             const ecole = appData.schools.find(s => s.id === currentSchoolId);
             const tbody = document.getElementById('tableRepertoireCartes');
@@ -403,18 +403,8 @@
                 return;
             }
 
-            let allCards = [];
-            const yearData = ecole.yearsData && ecole.yearsData[currentSchoolYear] ? ecole.yearsData[currentSchoolYear] : {};
-            
-            if (yearData.students) {
-                yearData.students.forEach(st => allCards.push({ ...st, type: 'Élève' }));
-            }
-            if (yearData.teachers) {
-                yearData.teachers.forEach(t => allCards.push({ ...t, type: 'Enseignant', mat: t.secretCode || 'N/A' }));
-            }
-            if (ecole.direction) {
-                ecole.direction.forEach(d => allCards.push({ ...d, type: 'Administrateur', mat: d.phone || 'N/A' }));
-            }
+            if(!ecole.savedCards) ecole.savedCards = [];
+            const allCards = ecole.savedCards;
 
             if (allCards.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucune carte enregistrée. Remplissez le formulaire et cliquez sur "Enregistrer".</td></tr>';
@@ -422,16 +412,15 @@
             }
 
             allCards.forEach((card) => {
-                const identifier = card.mat || card.secretCode || card.phone || '';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><span class="badge bg-info text-dark">${card.type || 'Élève'}</span></td>
-                    <td class="fw-bold">${identifier}</td>
+                    <td class="fw-bold">${card.mat || ''}</td>
                     <td>${card.name || (card.nom + ' ' + (card.postnom || ''))}</td>
                     <td>${card.naiss || ''} ${card.adresse ? '/ ' + card.adresse : ''}</td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-primary me-1" onclick='chargerCarteDansFormulaire(${JSON.stringify(card)})' title="Charger dans l'aperçu"><i class="fa fa-eye"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick='supprimerCarte("${identifier}", "${card.type}")' title="Supprimer"><i class="fa fa-trash"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick='supprimerCarte("${card.id}")' title="Supprimer"><i class="fa fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -440,10 +429,10 @@
 
         window.chargerCarteDansFormulaire = function(card) {
             document.getElementById('selectCardType').value = card.type || 'Élève';
-            document.getElementById('inputNom').value = card.nom || (card.name ? card.name.split(' ')[0] : '') || '';
-            document.getElementById('inputPostnom').value = card.postnom || (card.name ? card.name.split(' ')[1] : '') || '';
+            document.getElementById('inputNom').value = card.nom || '';
+            document.getElementById('inputPostnom').value = card.postnom || '';
             document.getElementById('inputPrenom').value = card.prenom || '';
-            document.getElementById('inputMatricule').value = card.mat || card.secretCode || card.phone || '';
+            document.getElementById('inputMatricule').value = card.mat || '';
             document.getElementById('inputNaiss').value = card.naiss || '';
             document.getElementById('inputAdresse').value = card.adresse || '';
             document.getElementById('inputPere').value = card.pere || '';
@@ -456,19 +445,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        window.supprimerCarte = function(identifiant, type) {
+        window.supprimerCarte = function(cardId) {
             if(!confirm("Voulez-vous vraiment supprimer cette carte du registre ?")) return;
             const ecole = appData.schools.find(s => s.id === currentSchoolId);
             if (!ecole) return;
-            const yearData = ecole.yearsData && ecole.yearsData[currentSchoolYear] ? ecole.yearsData[currentSchoolYear] : {};
 
-            if (type === 'Élève' && yearData.students) {
-                yearData.students = yearData.students.filter(st => st.mat !== identifiant);
-            } else if (type === 'Enseignant' && yearData.teachers) {
-                yearData.teachers = yearData.teachers.filter(t => t.secretCode !== identifiant);
-            } else if (type === 'Administrateur' && ecole.direction) {
-                ecole.direction = ecole.direction.filter(d => d.phone !== identifiant);
-            }
+            if(!ecole.savedCards) ecole.savedCards = [];
+            ecole.savedCards = ecole.savedCards.filter(c => c.id !== cardId);
 
             db.collection("platformData").doc("mainConfig").set(appData).then(() => {
                 alert("Carte supprimée avec succès !");
@@ -493,23 +476,7 @@
 
             const ecole = appData.schools.find(s => s.id === currentSchoolId);
             if (ecole) {
-                if(!ecole.yearsData) ecole.yearsData = {};
-                if(!ecole.yearsData[currentSchoolYear]) {
-                    ecole.yearsData[currentSchoolYear] = { students: [], teachers: [], classes: [] };
-                }
-                const yearData = ecole.yearsData[currentSchoolYear];
-
-                let targetList;
-                if (typeCarte === "Enseignant") {
-                    if(!yearData.teachers) yearData.teachers = [];
-                    targetList = yearData.teachers;
-                } else if (typeCarte === "Administrateur") {
-                    if(!ecole.direction) ecole.direction = [];
-                    targetList = ecole.direction;
-                } else {
-                    if(!yearData.students) yearData.students = [];
-                    targetList = yearData.students;
-                }
+                if(!ecole.savedCards) ecole.savedCards = [];
 
                 const fullName = nom + " " + postnom + " " + prenom;
                 const cardPayload = {
@@ -523,32 +490,16 @@
                     pere: document.getElementById('inputPere').value,
                     mere: document.getElementById('inputMere').value,
                     photo: base64Photo || "",
-                    classe: "Générale",
                     schoolLogo: base64SchoolLogo || ""
                 };
 
-                if (typeCarte === "Élève") {
-                    let existing = yearData.students.find(st => st.mat === mat);
-                    if (existing) {
-                        Object.assign(existing, cardPayload);
-                    } else {
-                        yearData.students.push(cardPayload);
-                    }
-                } else if (typeCarte === "Enseignant") {
-                    let existing = yearData.teachers.find(t => t.secretCode === mat || t.name === fullName);
-                    if (existing) {
-                        Object.assign(existing, { name: fullName, secretCode: mat });
-                    } else {
-                        yearData.teachers.push({ name: fullName, titulaireClass: "Générale", secretCode: mat, ...cardPayload });
-                    }
+                // Vérifier si la carte existe déjà par matricule pour la mettre à jour, sinon l'ajouter
+                let existingIndex = ecole.savedCards.findIndex(c => c.mat === mat && c.type === typeCarte);
+                if (existingIndex >= 0) {
+                    cardPayload.id = ecole.savedCards[existingIndex].id; // Conserver l'ID d'origine
+                    ecole.savedCards[existingIndex] = cardPayload;
                 } else {
-                    if(!ecole.direction) ecole.direction = [];
-                    let existing = ecole.direction.find(d => d.phone === mat || d.name === fullName);
-                    if (existing) {
-                        Object.assign(existing, { name: fullName, phone: mat, ...cardPayload });
-                    } else {
-                        ecole.direction.push({ name: fullName, role: "Administrateur", phone: mat, ...cardPayload });
-                    }
+                    ecole.savedCards.push(cardPayload);
                 }
 
                 // Sauvegarde globale sur Firebase
