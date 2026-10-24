@@ -1140,7 +1140,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAfLQc6uveuaqdKLDLnc5BpNK-yoO_0eCE",
   authDomain: "edu-rdc-5c858.firebaseapp.com",
   projectId: "edu-rdc-5c858",
-  storageBucket: "edu-rdc-5c858.firebasestorage.app",
+  storageBucket: "edu-rdc-5c858.appspot.com",
   messagingSenderId: "610052383238",
   appId: "1:610052383238:web:5c69f493d1aa12baca5987"
 };
@@ -3274,7 +3274,7 @@ function renderPalmaresTable() {
     `;
 }
 
-// 3. Courriers Entrants / Sortants (Corrigé avec Firebase Storage)
+// 3. Courriers Entrants / Sortants (Corrigé avec FileReader local au lieu de Firebase Storage)
 function refreshCourrierOptions() {
     renderCourriersTable();
     const today = new Date().toISOString().split('T')[0];
@@ -3296,15 +3296,15 @@ function handleSaveCourrier(e) {
     const file = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0] : null;
 
     if (file) {
-        const storageRef = storage.ref(`ecoles/${s.id}/courriers/${Date.now()}_${file.name}`);
-        const uploadTask = storageRef.put(file);
-        uploadTask.on('state_changed', null, (error) => {
-            alert("Erreur lors du téléchargement du fichier : " + error.message);
-        }, () => {
-            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                saveCourrierData(s, type, date, tiers, ref, objet, downloadURL);
-            });
-        });
+        const reader = new FileReader();
+        reader.onload = function(uploadEvent) {
+            const fileDataUrl = uploadEvent.target.result;
+            saveCourrierData(s, type, date, tiers, ref, objet, fileDataUrl);
+        };
+        reader.onerror = function() {
+            alert("Erreur lors de la lecture du fichier.");
+        };
+        reader.readAsDataURL(file);
     } else {
         saveCourrierData(s, type, date, tiers, ref, objet, '');
     }
@@ -3353,7 +3353,7 @@ function deleteCourrier(idx) {
     }
 }
 
-// 4. Stockage / GED des Dossiers (Corrigé avec Firebase Storage)
+// 4. Stockage / GED des Dossiers (Corrigé avec FileReader local)
 function refreshDossiersStorageOptions() {
     updateDossierPersonOptions();
     renderDossiersStorageTable();
@@ -3393,31 +3393,31 @@ function handleSaveDocumentDossier(e) {
         return;
     }
 
-    const storageRef = storage.ref(`ecoles/${s.id}/dossiers/${Date.now()}_${file.name}`);
-    const uploadTask = storageRef.put(file);
-    uploadTask.on('state_changed', null, (error) => {
-        alert("Erreur lors de l'archivage du fichier : " + error.message);
-    }, () => {
-        uploadTask.snapshot.ref.getDownloadURL().then((fileDataUrl) => {
-            if(!s.dossiersArchive) s.dossiersArchive = [];
+    const reader = new FileReader();
+    reader.onload = function(uploadEvent) {
+        const fileDataUrl = uploadEvent.target.result;
+        if(!s.dossiersArchive) s.dossiersArchive = [];
 
-            s.dossiersArchive.push({
-                id: 'DOC-' + Date.now(),
-                date: new Date().toLocaleDateString('fr-FR'),
-                category,
-                targetPersonId,
-                targetPersonName,
-                docType,
-                fileUrl: fileDataUrl
-            });
-
-            saveData();
-            document.getElementById('formDossierStorage').reset();
-            updateDossierPersonOptions();
-            renderDossiersStorageTable();
-            alert("Document ajouté au dossier individuel avec succès !");
+        s.dossiersArchive.push({
+            id: 'DOC-' + Date.now(),
+            date: new Date().toLocaleDateString('fr-FR'),
+            category,
+            targetPersonId,
+            targetPersonName,
+            docType,
+            fileUrl: fileDataUrl
         });
-    });
+
+        saveData();
+        document.getElementById('formDossierStorage').reset();
+        updateDossierPersonOptions();
+        renderDossiersStorageTable();
+        alert("Document ajouté au dossier individuel avec succès !");
+    };
+    reader.onerror = function() {
+        alert("Erreur lors de la lecture du fichier.");
+    };
+    reader.readAsDataURL(file);
 }
 
 function renderDossiersStorageTable() {
