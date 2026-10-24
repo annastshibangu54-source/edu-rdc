@@ -252,7 +252,7 @@
                             </thead>
                             <tbody id="tableRepertoireCartes">
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Aucune carte chargée. Veuillez ouvrir l'espace école.</td>
+                                    <td colspan="5" class="text-center text-muted">Aucune carte enregistrée.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -392,7 +392,7 @@
             });
         };
 
-        // Fonction pour afficher et charger le répertoire des cartes dans le tableau
+        // Fonction pour afficher uniquement les cartes enregistrées explicitement dans cette école
         window.chargerRepertoireCartes = function() {
             const ecole = appData.schools.find(s => s.id === currentSchoolId);
             const tbody = document.getElementById('tableRepertoireCartes');
@@ -417,20 +417,21 @@
             }
 
             if (allCards.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucune carte enregistrée pour le moment. Remplissez le formulaire ci-dessus et cliquez sur "Enregistrer".</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucune carte enregistrée. Remplissez le formulaire et cliquez sur "Enregistrer".</td></tr>';
                 return;
             }
 
-            allCards.forEach((card, index) => {
+            allCards.forEach((card) => {
+                const identifier = card.mat || card.secretCode || card.phone || '';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><span class="badge bg-info text-dark">${card.type || 'Élève'}</span></td>
-                    <td class="fw-bold">${card.mat || card.secretCode || '---'}</td>
+                    <td class="fw-bold">${identifier}</td>
                     <td>${card.name || (card.nom + ' ' + (card.postnom || ''))}</td>
-                    <td>${card.naiss || ''} / ${card.adresse || ''}</td>
+                    <td>${card.naiss || ''} ${card.adresse ? '/ ' + card.adresse : ''}</td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-primary me-1" onclick='chargerCarteDansFormulaire(${JSON.stringify(card)})' title="Charger dans l'aperçu"><i class="fa fa-eye"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick='supprimerCarte('${card.mat || card.name}', '${card.type}')' title="Supprimer"><i class="fa fa-trash"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick='supprimerCarte("${identifier}", "${card.type}")' title="Supprimer"><i class="fa fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -439,10 +440,10 @@
 
         window.chargerCarteDansFormulaire = function(card) {
             document.getElementById('selectCardType').value = card.type || 'Élève';
-            document.getElementById('inputNom').value = card.nom || card.name.split(' ')[0] || '';
-            document.getElementById('inputPostnom').value = card.postnom || card.name.split(' ')[1] || '';
+            document.getElementById('inputNom').value = card.nom || (card.name ? card.name.split(' ')[0] : '') || '';
+            document.getElementById('inputPostnom').value = card.postnom || (card.name ? card.name.split(' ')[1] : '') || '';
             document.getElementById('inputPrenom').value = card.prenom || '';
-            document.getElementById('inputMatricule').value = card.mat || card.secretCode || '';
+            document.getElementById('inputMatricule').value = card.mat || card.secretCode || card.phone || '';
             document.getElementById('inputNaiss').value = card.naiss || '';
             document.getElementById('inputAdresse').value = card.adresse || '';
             document.getElementById('inputPere').value = card.pere || '';
@@ -462,11 +463,11 @@
             const yearData = ecole.yearsData && ecole.yearsData[currentSchoolYear] ? ecole.yearsData[currentSchoolYear] : {};
 
             if (type === 'Élève' && yearData.students) {
-                yearData.students = yearData.students.filter(st => st.mat !== identifiant && st.name !== identifiant);
+                yearData.students = yearData.students.filter(st => st.mat !== identifiant);
             } else if (type === 'Enseignant' && yearData.teachers) {
-                yearData.teachers = yearData.teachers.filter(t => t.secretCode !== identifiant && t.name !== identifiant);
+                yearData.teachers = yearData.teachers.filter(t => t.secretCode !== identifiant);
             } else if (type === 'Administrateur' && ecole.direction) {
-                ecole.direction = ecole.direction.filter(d => d.phone !== identifiant && d.name !== identifiant);
+                ecole.direction = ecole.direction.filter(d => d.phone !== identifiant);
             }
 
             db.collection("platformData").doc("mainConfig").set(appData).then(() => {
@@ -538,11 +539,16 @@
                     if (existing) {
                         Object.assign(existing, { name: fullName, secretCode: mat });
                     } else {
-                        yearData.teachers.push({ name: fullName, titulaireClass: "Générale", secretCode: mat });
+                        yearData.teachers.push({ name: fullName, titulaireClass: "Générale", secretCode: mat, ...cardPayload });
                     }
                 } else {
                     if(!ecole.direction) ecole.direction = [];
-                    ecole.direction.push({ name: fullName, role: "Administrateur", phone: mat });
+                    let existing = ecole.direction.find(d => d.phone === mat || d.name === fullName);
+                    if (existing) {
+                        Object.assign(existing, { name: fullName, phone: mat, ...cardPayload });
+                    } else {
+                        ecole.direction.push({ name: fullName, role: "Administrateur", phone: mat, ...cardPayload });
+                    }
                 }
 
                 // Sauvegarde globale sur Firebase
