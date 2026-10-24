@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>EDU-RDC - Politique de Confidentialité</title>
+    <title>EDU-RDC - À Propos de la Plateforme</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -30,10 +30,21 @@
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
     
-    <!-- Firebase SDK (Compat v10) pour la cohérence globale -->
+    <!-- Firebase SDK (Compat v10) pour une parfaite synchronisation globale -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+    <style>
+        .interactive-card {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -57,7 +68,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="index.html" class="nav-item nav-link">Accueil</a>
-                <a href="about.html" class="nav-item nav-link">À propos</a>
+                <a href="about.html" class="nav-item nav-link active">À propos</a>
                 <a href="courses.html" class="nav-item nav-link">Établissements</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
@@ -79,8 +90,8 @@
         <div class="container py-5">
             <div class="row justify-content-center">
                 <div class="col-lg-10 text-center">
-                    <h1 class="display-3 text-white animated slideInDown">Politique de Confidentialité</h1>
-                    <p class="fs-4 text-white animated slideInDown">Protection des données et respect de la vie privée sur la plateforme EDU-RDC</p>
+                    <h1 class="display-3 text-white animated slideInDown">À Propos de Nous</h1>
+                    <p class="fs-4 text-white animated slideInDown">Système National Intégré de Gestion des Institutions Éducationnelles en RDC</p>
                 </div>
             </div>
         </div>
@@ -88,40 +99,183 @@
     <!-- Header End -->
 
 
-    <!-- Content Start -->
+    <!-- Service Start -->
     <div class="container-xxl py-5">
         <div class="container">
-            <div class="row g-5">
-                <div class="col-lg-12 wow fadeInUp" data-wow-delay="0.1s">
-                    <h6 class="section-title bg-white text-start text-primary pe-3">Engagements officiels</h6>
-                    <h1 class="mb-4">Protection des Données Éducationnelles</h1>
-                    <p class="mb-4">La plateforme <strong>EDU-RDC</strong>, placée sous la tutelle du Ministère de l'Éducation Nationale et Nouvelle Citoyenneté en République Démocratique du Congo, s'engage à protéger la vie privée et la sécurité des données de l'ensemble des acteurs du système éducatif (élèves, enseignants, administrateurs et établissements scolaires).</p>
-
-                    <h3 class="text-primary mt-4 mb-3">1. Collecte des Informations</h3>
-                    <p class="mb-3">Dans le cadre de la gestion administrative et de la scolarité, nous collectons uniquement les informations nécessaires au bon fonctionnement des institutions éducationnelles :</p>
-                    <ul class="mb-4">
-                        <li>Informations d'identification des établissements (nom, code, province, territoire, commune).</li>
-                        <li>Données administratives du personnel enseignant et de direction (noms, postnoms, prénoms, contacts, codes d'agent).</li>
-                        <li>Dossiers académiques et d'identification des élèves (matricules, dates et lieux de naissance, filières, classes).</li>
-                        <li>Photographies d'identité et logos officiels pour la génération sécurisée des cartes d'identification QR.</li>
-                    </ul>
-
-                    <h3 class="text-primary mt-4 mb-3">2. Utilisation et Sécurisation des Données</h3>
-                    <p class="mb-4">Toutes les données collectées sont stockées et sécurisées via notre infrastructure Cloud (Firebase Firestore). Elles sont exclusivement utilisées pour la centralisation des statistiques nationales, le suivi des cursus scolaires et la délivrance de documents officiels. Aucun partage commercial ou non autorisé des informations personnelles n'est effectué.</p>
-
-                    <h3 class="text-primary mt-4 mb-3">3. Confidentialité des Cartes QR et Accès Sécurisés</h3>
-                    <p class="mb-4">Les espaces de gestion d'établissements sont protégés par des codes secrets définis par les autorités scolaires. Les cartes d'identification générées comportent des codes QR cryptés permettant de vérifier l'authenticité du porteur au sein du système national.</p>
-
-                    <h3 class="text-primary mt-4 mb-3">4. Droits d'Accès et de Rectification</h3>
-                    <p class="mb-4">Conformément aux réglementations en vigueur en RDC concernant la protection des données à caractère personnel, chaque utilisateur ou chef d'établissement dispose d'un droit de regard, de modification et de mise à jour des informations le concernant via les interfaces sécurisées de la plateforme.</p>
-
-                    <h3 class="text-primary mt-4 mb-3">5. Contact</h3>
-                    <p class="mb-4">Pour toute question relative à cette politique de confidentialité ou pour exercer vos droits de rectification, vous pouvez contacter les services techniques du Ministère via notre page <a href="contact.html" class="text-primary fw-bold">Contact</a>.</p>
+            <div class="row g-4">
+                <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="service-item text-center pt-3 interactive-card" onclick="showGlobalStatsModal('teachers')">
+                        <div class="p-4">
+                            <i class="fa fa-3x fa-graduation-cap text-primary mb-4"></i>
+                            <h5 class="mb-3">Personnel Enseignant</h5>
+                            <p>Gestion des carrières, affectations et suivi professionnel du corps professoral</p>
+                            <span class="badge bg-primary px-3 py-2 mt-2" id="badge-teachers-count">0 Enseignant(s)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="service-item text-center pt-3 interactive-card" onclick="showGlobalStatsModal('schools')">
+                        <div class="p-4">
+                            <i class="fa fa-3x fa-globe text-primary mb-4"></i>
+                            <h5 class="mb-3">Couverture Nationale</h5>
+                            <p>Supervision centralisée des 26 provinces éducationnelles de la RDC</p>
+                            <span class="badge bg-warning text-dark px-3 py-2 mt-2" id="badge-schools-count">0 École(s)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.5s">
+                    <div class="service-item text-center pt-3 interactive-card" onclick="showGlobalStatsModal('schools')">
+                        <div class="p-4">
+                            <i class="fa fa-3x fa-home text-primary mb-4"></i>
+                            <h5 class="mb-3">Gestion des Écoles</h5>
+                            <p>Suivi administratif, infrastructures et dossiers complets des établissements</p>
+                            <span class="badge bg-success px-3 py-2 mt-2" id="badge-students-count">0 Élève(s)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.7s">
+                    <div class="service-item text-center pt-3 interactive-card" onclick="showGlobalStatsModal('admin')">
+                        <div class="p-4">
+                            <i class="fa fa-3x fa-book-open text-primary mb-4"></i>
+                            <h5 class="mb-3">Système d'Évaluation</h5>
+                            <p>Suivi académique rigoureux, gestion des notes et bulletins scolaires</p>
+                            <span class="badge bg-info text-dark px-3 py-2 mt-2" id="badge-admin-count">0 Cadre(s)</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Content End -->
+    <!-- Service End -->
+
+
+    <!-- About Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s" style="min-height: 400px;">
+                    <div class="position-relative h-100">
+                        <img class="img-fluid position-absolute w-100 h-100" src="img/about.jpg" alt="" style="object-fit: cover;">
+                    </div>
+                </div>
+                <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <h6 class="section-title bg-white text-start text-primary pe-3">À propos de nous</h6>
+                    <h1 class="mb-4">Bienvenue sur EDU-RDC</h1>
+                    <p class="mb-4"><strong>EDU-RDC</strong> est une solution logicielle indépendante conçue pour moderniser et optimiser la gestion administrative des institutions éducationnelles en République Démocratique du Congo.</p>
+                    <p class="mb-4">Développé pour répondre aux besoins concrets des établissements scolaires, notre outil s'aligne rigoureusement sur les standards du Ministère de l'Éducation Nationale et Nouvelle Citoyenneté (EDU-NC) afin de faciliter le suivi des élèves, des enseignants et des structures scolaires à travers le pays.</p>
+                    <div class="row gy-2 gx-4 mb-4">
+                        <div class="col-sm-6">
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('admin')"><i class="fa fa-arrow-right text-primary me-2"></i>Personnel Qualifié</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('schools')"><i class="fa fa-arrow-right text-primary me-2"></i>Classes et Écoles</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-0 interactive-card" onclick="window.location.href='qrcode.html'"><i class="fa fa-arrow-right text-primary me-2"></i>Cartes d'Identification QR</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('teachers')"><i class="fa fa-arrow-right text-primary me-2"></i>Personnel Enseignant</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('students')"><i class="fa fa-arrow-right text-primary me-2"></i>Suivi des Élèves</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-0 interactive-card" onclick="showGlobalStatsModal('schools')"><i class="fa fa-arrow-right text-primary me-2"></i>Certifications Officielles</p>
+                        </div>
+                    </div>
+                    <a class="btn btn-primary py-3 px-5 mt-2" href="javascript:void(0);" onclick="window.location.href='index.html'">En savoir plus</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- About End -->
+
+
+    <!-- Team Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="section-title bg-white text-center text-primary px-3">Conception & Équipe</h6>
+                <h1 class="mb-5">Pilotage du Projet</h1>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="team-item bg-light interactive-card" onclick="showGlobalStatsModal('admin')">
+                        <div class="overflow-hidden">
+                            <img class="img-fluid" src="img/team-1.jpg" alt="">
+                        </div>
+                        <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
+                            <div class="bg-light d-flex justify-content-center pt-2 px-1">
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                        <div class="text-center p-4">
+                            <h5 class="mb-0">Direction Technique</h5>
+                            <small>Ingénieur Concepteur</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="team-item bg-light interactive-card" onclick="showGlobalStatsModal('teachers')">
+                        <div class="overflow-hidden">
+                            <img class="img-fluid" src="img/team-2.jpg" alt="">
+                        </div>
+                        <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
+                            <div class="bg-light d-flex justify-content-center pt-2 px-1">
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                        <div class="text-center p-4">
+                            <h5 class="mb-0">Support Pédagogique</h5>
+                            <small>Conseiller Éducationnel</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                    <div class="team-item bg-light interactive-card" onclick="showGlobalStatsModal('schools')">
+                        <div class="overflow-hidden">
+                            <img class="img-fluid" src="img/team-3.jpg" alt="">
+                        </div>
+                        <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
+                            <div class="bg-light d-flex justify-content-center pt-2 px-1">
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                        <div class="text-center p-4">
+                            <h5 class="mb-0">Coordination</h5>
+                            <small>Coordonnateur Technique</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
+                    <div class="team-item bg-light interactive-card" onclick="showGlobalStatsModal('admin')">
+                        <div class="overflow-hidden">
+                            <img class="img-fluid" src="img/team-4.jpg" alt="">
+                        </div>
+                        <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
+                            <div class="bg-light d-flex justify-content-center pt-2 px-1">
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-sm-square btn-primary mx-1" href=""><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                        <div class="text-center p-4">
+                            <h5 class="mb-0">Administration</h5>
+                            <small>Administrateur Système</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Team End -->
 
 
     <!-- Footer Start -->
@@ -130,9 +284,9 @@
             <div class="row g-5">
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-white mb-3">Liens Rapides</h4>
-                    <a class="btn btn-link" href="about.html">À propos de nous</a>
-                    <a class="btn btn-link" href="contact.html">Contactez-nous</a>
-                    <a class="btn btn-link" href="privacy.html">Politique de Confidentialité</a>
+                    <a class="btn btn-link" href="">À propos de nous</a>
+                    <a class="btn btn-link" href="">Contactez-nous</a>
+                    <a class="btn btn-link" href="politique.html">Politique de Confidentialité</a>
                     <a class="btn btn-link" href="">Termes & Conditions</a>
                     <a class="btn btn-link" href="">Aide & FAQ</a>
                 </div>
@@ -173,7 +327,7 @@
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-white mb-3">Bulletin d'Information</h4>
-                    <p>Restez informés des communiqués officiels du Ministère de l'Éducation Nationale.</p>
+                    <p>Restez informés des solutions de gestion numérique pour les écoles.</p>
                     <div class="position-relative mx-auto" style="max-width: 400px;">
                         <input class="form-control border-0 w-100 py-3 ps-4 pe-5" type="text" placeholder="Votre email">
                         <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">S'inscrire</button>
@@ -186,11 +340,11 @@
                 <div class="row">
                     <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                         &copy; <a class="border-bottom" href="#">EDU-RDC</a>, Tous Droits Réservés.
-                        Conçu pour la Gestion des Institutions Éducationnelles en RDC
+                        Solution Indépendante de Gestion des Institutions Éducationnelles en RDC
                     </div>
                     <div class="col-md-6 text-center text-md-end">
                         <div class="footer-menu">
-                            <a href="index.html">Accueil</a>
+                            <a href="">Accueil</a>
                             <a href="">Cookies</a>
                             <a href="">Aide</a>
                             <a href="">FAQ</a>
@@ -203,6 +357,26 @@
     <!-- Footer End -->
 
 
+    <!-- MODAL DE DÉTAILS ET INSPECTION DES DONNÉES -->
+    <div class="modal fade" id="statsDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title text-white fw-bold" id="statsModalTitle"><i class="fa fa-info-circle me-2"></i>Détails des Données</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="statsModalContent">
+                    <!-- Généré dynamiquement -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="fa fa-print me-1"></i> Imprimer le Rapport</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 
@@ -210,13 +384,152 @@
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/wave/wow.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
     <script src="lib/easing/easing.min.js"></script>
     <script src="lib/waypoints/waypoints.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+
+    <!-- SCRIPT DYNAMIQUE ET SÉCURISÉ POUR LES DONNÉES LOCALES -->
+    <script>
+        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+
+        window.onload = function() {
+            updateRealCounts();
+        };
+
+        function getStoredSchools() {
+            let allSchools = [];
+            let keysToTry = [STORAGE_KEY, "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
+            
+            keysToTry.forEach(key => {
+                let savedItem = localStorage.getItem(key);
+                if (savedItem) {
+                    try {
+                        let parsed = JSON.parse(savedItem);
+                        let list = Array.isArray(parsed) ? parsed : (parsed.schools || []);
+                        list.forEach(s => {
+                            if (s && s.id && !allSchools.some(existing => existing.id === s.id)) {
+                                allSchools.push(s);
+                            }
+                        });
+                    } catch(e) {}
+                }
+            });
+
+            if (allSchools.length === 0) {
+                allSchools = [
+                    {
+                        id: "SCH-001",
+                        name: "C.S. LA RÉVOLUTION",
+                        appartenance: "Enseignement Primaire - Privé Non Conventionné",
+                        province: "KINSHASA",
+                        territoire: "Kinshasa / Lukunga",
+                        commune: "KALAMU",
+                        logo: "img/course-1.jpg",
+                        teachers: [
+                            { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" }
+                        ],
+                        students: [
+                            { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" }
+                        ],
+                        staff: [
+                            { role: "Préfet des Études", name: "KALOMBO Mike" }
+                        ]
+                    }
+                ];
+            }
+
+            return allSchools;
+        }
+
+        function updateRealCounts() {
+            let schools = getStoredSchools();
+            let totalTeachers = 0;
+            let totalStudents = 0;
+            let totalAdmin = 0;
+
+            schools.forEach(s => {
+                totalTeachers += (s.teachers ? s.teachers.length : 0);
+                totalStudents += (s.students ? s.students.length : 0);
+                totalAdmin += (s.staff ? s.staff.length : 0);
+            });
+
+            if(document.getElementById('badge-teachers-count')) document.getElementById('badge-teachers-count').innerText = `${totalTeachers} Enseignant(s)`;
+            if(document.getElementById('badge-students-count')) document.getElementById('badge-students-count').innerText = `${totalStudents} Élève(s)`;
+            if(document.getElementById('badge-schools-count')) document.getElementById('badge-schools-count').innerText = `${schools.length} École(s)`;
+            if(document.getElementById('badge-admin-count')) document.getElementById('badge-admin-count').innerText = `${totalAdmin} Cadre(s)`;
+        }
+
+        function showGlobalStatsModal(type, targetSchoolId = null) {
+            let schools = getStoredSchools();
+            if (targetSchoolId) {
+                schools = schools.filter(s => s.id === targetSchoolId);
+            }
+
+            let titleEl = document.getElementById('statsModalTitle');
+            let contentEl = document.getElementById('statsModalContent');
+
+            if (type === 'teachers') {
+                titleEl.innerHTML = `<i class="fa fa-chalkboard-teacher me-2"></i>Répertoire Nominatif des Enseignants & Professeurs`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>École</th><th>Nom & Prénom de l'Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Agent</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.teachers || []).forEach(t => {
+                        count++;
+                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué sécurisé">••••••••</span></td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            } 
+            else if (type === 'students') {
+                titleEl.innerHTML = `<i class="fa fa-user-graduate me-2"></i>Palmarès & Effectif Global des Élèves`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>Matricule</th><th>Nom & Prénom de l'Élève</th><th>Sexe</th><th>Classe</th><th>Établissement</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.students || []).forEach(st => {
+                        count++;
+                        html += `<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province})</td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+            else if (type === 'admin') {
+                titleEl.innerHTML = `<i class="fa fa-sitemap me-2"></i>Répertoire des Cadres de Direction & Administration`;
+                let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>Poste / Fonction</th><th>Nom & Prénom</th><th>Établissement</th><th>Province / Localisation</th></tr></thead><tbody>`;
+                let count = 0;
+                schools.forEach(s => {
+                    (s.staff || []).forEach(st => {
+                        count++;
+                        html += `<tr><td><span class="badge bg-danger p-2 fs-6">${st.role}</span></td><td><b>${st.name}</b></td><td><b class="text-primary">${s.name}</b></td><td>${s.province} / ${s.commune || ''}</td></tr>`;
+                    });
+                });
+                if(count === 0) html += `<tr><td colspan="4" class="text-center text-muted py-3">Aucun cadre administratif enregistré.</td></tr>`;
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+            else if (type === 'schools') {
+                titleEl.innerHTML = `<i class="fa fa-school me-2"></i>Registre des Institutions Scolaires Enregistrées`;
+                let html = `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l'École</th><th>Régime / Appartenance</th><th>Province / Territoire / Commune</th><th>Effectifs</th><th>Action</th></tr></thead><tbody>`;
+                schools.forEach(s => {
+                    let profCount = (s.teachers || []).length;
+                    let elvCount = (s.students || []).length;
+                    html += `<tr><td><b class="text-primary fs-6">${s.name}</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>${s.appartenance || 'Général'}</td><td><b>Prov:</b> ${s.province || 'N/A'}<br><b>Terr:</b> ${s.territoire || 'N/A'}<br><b>Commune:</b> ${s.commune || 'N/A'}</td><td><b>${profCount}</b> Profs | <b>${elvCount}</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+                contentEl.innerHTML = html;
+            }
+
+            let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
+            modal.show();
+        }
+    </script>
 </body>
 
 </html>
