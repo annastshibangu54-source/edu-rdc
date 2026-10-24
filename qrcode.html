@@ -20,7 +20,7 @@
             background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%) !important;
             border-radius: 8px;
             color: #ffffff !important;
-            padding: 8px 10px;
+            padding: 6px 8px;
             position: relative;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             margin: 0 auto;
@@ -29,27 +29,55 @@
             box-sizing: border-box;
             -webkit-print-color-adjust: exact !important;
         }
-        .card-photo {
-            width: 1.4cm;
-            height: 1.7cm;
-            object-fit: cover;
-            border: 1.5px solid #ffffff;
-            border-radius: 4px;
-            background-color: #ffffff;
-            cursor: pointer;
+        /* Logo d'école transparent en fond au centre */
+        .id-card::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3.5cm;
+            height: 3.5cm;
+            background-image: var(--bg-school-logo, url('img/team-1.jpg'));
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.12;
+            z-index: 0;
+            pointer-events: none;
         }
-        .card-details { font-size: 0.35rem; line-height: 1.2; margin-left: 4px; color: #fff; }
+        .id-card > * {
+            position: relative;
+            z-index: 1;
+        }
+        .card-photo {
+            width: 1.3cm;
+            height: 1.6cm;
+            object-fit: cover;
+            border: 1px solid #ffffff;
+            border-radius: 3px;
+            background-color: #ffffff;
+        }
+        .card-details { font-size: 0.31rem; line-height: 1.15; color: #fff; }
         .qr-container {
             position: absolute;
-            bottom: 10px;
-            right: 8px;
+            bottom: 12px;
+            right: 6px;
             background: #ffffff;
             padding: 2px;
             border-radius: 3px;
-            width: 1.05cm;
-            height: 1.05cm;
+            width: 0.95cm;
+            height: 0.95cm;
         }
         .qr-container img { width: 100%; height: 100%; object-fit: contain; }
+        .assistance-text {
+            font-size: 0.23rem;
+            text-align: center;
+            margin-top: 2px;
+            line-height: 1;
+            color: #ffeb3b;
+            font-weight: bold;
+        }
         @media print {
             body * { visibility: hidden; }
             #cardPreviewContainer, #cardPreviewContainer * { visibility: visible; }
@@ -66,6 +94,10 @@
             <div class="mb-3">
                 <label class="form-label fw-bold">Nom Complet ou Code de l'École</label>
                 <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION ou Code">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Code Secret de Sécurité de l'École</label>
+                <input type="password" id="authSecretCode" class="form-control" placeholder="Entrez le code secret">
             </div>
             <button type="button" onclick="ouvrirEspace()" class="btn btn-primary w-100 py-2 fw-bold">
                 <i class="fa fa-key me-2"></i>Ouvrir l'Espace École
@@ -90,15 +122,47 @@
             <div class="col-lg-6">
                 <div class="bg-white p-3 rounded shadow-sm border">
                     <h5 class="text-primary mb-3">Formulaire Carte & QR</h5>
+                    
+                    <!-- Sélection du type de carte -->
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold mb-1">Type de Carte :</label>
+                        <select class="form-select form-select-sm mb-2" id="selectCardType" onchange="mettreAJour()">
+                            <option value="Élève">Élève</option>
+                            <option value="Enseignant">Enseignant</option>
+                            <option value="Administrateur">Administrateur</option>
+                        </select>
+                    </div>
+
                     <div class="mb-2">
                         <label class="form-label small fw-bold mb-1">Nom :</label>
-                        <input type="text" class="form-control form-control-sm mb-2" id="inputNom" placeholder="Nom" value="KALOMBO" oninput="mettreAJour()">
+                        <input type="text" class="form-control form-control-sm mb-1" id="inputNom" placeholder="Nom" value="KALOMBO" oninput="mettreAJour()">
+                        
+                        <label class="form-label small fw-bold mb-1">Postnom :</label>
+                        <input type="text" class="form-control form-control-sm mb-1" id="inputPostnom" placeholder="Postnom" value="TSHIBANGU" oninput="mettreAJour()">
+                        
                         <label class="form-label small fw-bold mb-1">Prénom :</label>
-                        <input type="text" class="form-control form-control-sm mb-2" id="inputPrenom" placeholder="Prénom" value="Mike" oninput="mettreAJour()">
-                        <label class="form-label small fw-bold mb-1">Matricule :</label>
-                        <input type="text" class="form-control form-control-sm mb-2" id="inputMatricule" placeholder="Matricule" value="MAT-001" oninput="mettreAJour()">
+                        <input type="text" class="form-control form-control-sm mb-1" id="inputPrenom" placeholder="Prénom" value="Mike" oninput="mettreAJour()">
+                        
+                        <label class="form-label small fw-bold mb-1">Matricule ou Code Secret :</label>
+                        <input type="text" class="form-control form-control-sm mb-1" id="inputMatricule" placeholder="Matricule" value="MAT-001" oninput="mettreAJour()">
+                        
+                        <label class="form-label small fw-bold mb-1">Date et Lieu de Naissance :</label>
+                        <input type="text" class="form-control form-control-sm mb-1" id="inputNaiss" placeholder="Ex: 23/03/1993 à Mbuji-Mayi" value="23/03/1993 à Mbuji-Mayi" oninput="mettreAJour()">
+                        
+                        <label class="form-label small fw-bold mb-1">Adresse Physique :</label>
+                        <input type="text" class="form-control form-control-sm mb-1" id="inputAdresse" placeholder="Adresse Physique" value="Kinshasa, RDC" oninput="mettreAJour()">
+                        
+                        <label class="form-label small fw-bold mb-1">Nom du Père :</label>
+                        <input type="text" class="form-control form-control-sm mb-1" id="inputPere" placeholder="Nom du père" value="KALOMBO Père" oninput="mettreAJour()">
+                        
+                        <label class="form-label small fw-bold mb-1">Nom de la Mère :</label>
+                        <input type="text" class="form-control form-control-sm mb-1" id="inputMere" placeholder="Nom de la mère" value="MUKADI Mère" oninput="mettreAJour()">
+                        
                         <label class="form-label small fw-bold mb-1">Photo (Fichier) :</label>
                         <input type="file" class="form-control form-control-sm mb-2" id="inputPhotoFile" accept="image/*" onchange="chargerPhoto(event)">
+
+                        <label class="form-label small fw-bold mb-1">Logo École (Optionnel pour le fond) :</label>
+                        <input type="file" class="form-control form-control-sm mb-2" id="inputSchoolLogoFile" accept="image/*" onchange="chargerLogoEcole(event)">
                     </div>
                     <button type="button" onclick="enregistrerSurFirebase()" class="btn btn-outline-primary w-100 py-2 fw-bold">
                         <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans l'École Active
@@ -109,15 +173,43 @@
             <div class="col-lg-6 text-center">
                 <div id="cardPreviewContainer">
                     <div class="id-card" id="cardPreview">
-                        <div class="fw-bold small text-center border-bottom pb-1 mb-1">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</div>
-                        <div class="d-flex align-items-start mt-1">
-                            <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
-                            <div class="card-details text-start">
+                        <!-- En-tête : Drapeau à gauche, Texte RDC au centre, Logo école à droite -->
+                        <div class="d-flex justify-content-between align-items-center pb-1 mb-1 border-bottom" style="font-size: 0.3rem;">
+                            <div class="d-flex align-items-center">
+                                <!-- Drapeau RDC simplifié / icône -->
+                                <span style="background: linear-gradient(to bottom, #007fff 33%, #ffd700 33%, #ffd700 66%, #ce1126 66%); width: 0.5cm; height: 0.35cm; display: inline-block; margin-right: 3px; border: 0.5px solid #fff;"></span>
+                                <span class="fw-bold">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</span>
+                            </div>
+                            <img id="viewSchoolLogoHeader" src="img/team-1.jpg" style="width: 0.45cm; height: 0.45cm; object-fit: cover; border-radius: 50%; border: 1px solid #fff;" alt="Logo">
+                        </div>
+
+                        <!-- Nom complet de l'école -->
+                        <div class="text-center fw-bold mb-1" id="viewSchoolNameTitle" style="font-size: 0.35rem; text-transform: uppercase;">C.S. LA RÉVOLUTION</div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.5); margin-bottom: 3px;"></div>
+
+                        <!-- Corps de la carte : Détails à gauche, Photo à droite -->
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div class="card-details text-start" style="width: 72%;">
                                 <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
+                                <div><strong>Postnom :</strong> <span id="viewPostnom">TSHIBANGU</span></div>
                                 <div><strong>Prénom :</strong> <span id="viewPrenom">Mike</span></div>
-                                <div><strong>Matricule :</strong> <span id="viewMatricule">MAT-001</span></div>
+                                <div><strong>Matricule/Code :</strong> <span id="viewMatricule">MAT-001</span></div>
+                                <div><strong>Né(e) à :</strong> <span id="viewNaiss">23/03/1993 à Mbuji-Mayi</span></div>
+                                <div><strong>Adresse :</strong> <span id="viewAdresse">Kinshasa, RDC</span></div>
+                                <div><strong>Père :</strong> <span id="viewPere">KALOMBO Père</span></div>
+                                <div><strong>Mère :</strong> <span id="viewMere">MUKADI Mère</span></div>
+                            </div>
+                            <div class="text-end" style="width: 26%;">
+                                <img id="cardUserPhoto" src="img/team-1.jpg" class="card-photo" alt="Photo">
                             </div>
                         </div>
+
+                        <!-- Mot d'assistance aux autorités militaires et civiles -->
+                        <div class="assistance-text">
+                            Prière aux autorités civiles et militaires de porter assistance au porteur en cas de besoin.
+                        </div>
+
+                        <!-- QR Code -->
                         <div class="qr-container" id="qrcodePreview"></div>
                     </div>
                 </div>
@@ -133,6 +225,7 @@
         let currentSchoolId = null;
         let currentSchoolName = "";
         let base64Photo = "";
+        let base64SchoolLogo = "";
 
         window.onload = function() {
             try {
@@ -155,15 +248,18 @@
 
         window.ouvrirEspace = function() {
             const saisie = document.getElementById('authSchoolName').value.trim().toUpperCase();
+            const saisieSecret = document.getElementById('authSecretCode').value.trim();
+
             if(!saisie) { alert("Saisissez le nom ou le code de l'école !"); return; }
+            if(!saisieSecret) { alert("Veuillez saisir le code secret de l'école !"); return; }
             
             if(!appData.schools) appData.schools = [];
             
             // Recherche par nom ou par code secret
-            let ecole Trouvee = appData.schools.find(s => s.name.toUpperCase() === saisie || s.secretCode.toUpperCase() === saisie || s.id.toUpperCase() === saisie);
+            let ecoleTrouvee = appData.schools.find(s => s.name.toUpperCase() === saisie || s.secretCode.toUpperCase() === saisie || s.id.toUpperCase() === saisie);
             
             if (!ecoleTrouvee) {
-                // Si l'école n'existe pas encore dans le répertoire global, on la crée automatiquement pour fluidifier l'expérience
+                // Création automatique si non existante avec le code secret fourni
                 ecoleTrouvee = {
                     id: 'SCH-' + Date.now(),
                     name: saisie,
@@ -171,7 +267,7 @@
                     province: 'KINSHASA',
                     district: 'KINTAMBO',
                     commune: 'KINSHASA',
-                    secretCode: 'SEC-' + Math.floor(1000 + Math.random() * 9000),
+                    secretCode: saisieSecret,
                     students: [],
                     staff: [],
                     teachers: [],
@@ -180,6 +276,12 @@
                 };
                 appData.schools.push(ecoleTrouvee);
                 sauvegarderGlobal();
+            } else {
+                // Sécurisation : Vérification du code secret de l'école
+                if (ecoleTrouvee.secretCode && ecoleTrouvee.secretCode !== saisieSecret) {
+                    alert("Code secret incorrect pour cette école !");
+                    return;
+                }
             }
 
             currentSchoolId = ecoleTrouvee.id;
@@ -188,6 +290,7 @@
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('cardGeneratorSection').style.display = 'block';
             document.getElementById('lockedSchoolTitle').innerText = currentSchoolName;
+            document.getElementById('viewSchoolNameTitle').innerText = currentSchoolName;
             window.mettreAJour();
         };
 
@@ -202,21 +305,47 @@
             reader.readAsDataURL(file);
         };
 
+        window.chargerLogoEcole = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                base64SchoolLogo = e.target.result;
+                document.getElementById('viewSchoolLogoHeader').src = base64SchoolLogo;
+                document.getElementById('cardPreview').style.setProperty('--bg-school-logo', `url('${base64SchoolLogo}')`);
+            };
+            reader.readAsDataURL(file);
+        };
+
         window.mettreAJour = function() {
+            const typeCarte = document.getElementById('selectCardType').value;
             const nom = document.getElementById('inputNom').value || '---';
+            const postnom = document.getElementById('inputPostnom').value || '---';
             const prenom = document.getElementById('inputPrenom').value || '---';
             const mat = document.getElementById('inputMatricule').value || '---';
+            const naiss = document.getElementById('inputNaiss').value || '---';
+            const adresse = document.getElementById('inputAdresse').value || '---';
+            const pere = document.getElementById('inputPere').value || '---';
+            const mere = document.getElementById('inputMere').value || '---';
 
             document.getElementById('viewNom').innerText = nom;
+            document.getElementById('viewPostnom').innerText = postnom;
             document.getElementById('viewPrenom').innerText = prenom;
             document.getElementById('viewMatricule').innerText = mat;
+            document.getElementById('viewNaiss').innerText = naiss;
+            document.getElementById('viewAdresse').innerText = adresse;
+            document.getElementById('viewPere').innerText = pere;
+            document.getElementById('viewMere').innerText = mere;
+            document.getElementById('viewSchoolNameTitle').innerText = currentSchoolName;
 
-            const qrText = "EDU-RDC:" + currentSchoolName + ":" + mat + ":" + nom + " " + prenom;
+            const qrText = "EDU-RDC:" + typeCarte.toUpperCase() + ":" + currentSchoolName + ":" + mat + ":" + nom + " " + postnom + " " + prenom;
             document.getElementById('qrcodePreview').innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(qrText) + '">';
         };
 
         window.enregistrerSurFirebase = async function() {
+            const typeCarte = document.getElementById('selectCardType').value;
             const nom = document.getElementById('inputNom').value.trim();
+            const postnom = document.getElementById('inputPostnom').value.trim();
             const prenom = document.getElementById('inputPrenom').value.trim();
             const mat = document.getElementById('inputMatricule').value.trim();
 
@@ -227,26 +356,42 @@
 
             const ecole = appData.schools.find(s => s.id === currentSchoolId);
             if (ecole) {
-                if(!ecole.students) ecole.students = [];
-                // Vérifier si l'élève existe déjà pour le mettre à jour ou l'ajouter
-                let existing = ecole.students.find(st => st.mat === mat);
-                if (existing) {
-                    existing.name = nom + " " + prenom;
-                    existing.sexe = "M";
-                    if(base64Photo) existing.photo = base64Photo;
+                // Gestion dynamique selon la catégorie choisie pour cohérence avec gestion_ecole.html
+                let targetList = ecole.students;
+                if (typeCarte === "Enseignant") {
+                    if(!ecole.teachers) ecole.teachers = [];
+                    targetList = ecole.teachers;
+                } else if (typeCarte === "Administrateur") {
+                    if(!ecole.staff) ecole.staff = [];
+                    targetList = ecole.staff;
                 } else {
-                    ecole.students.push({
-                        id: 'STU-' + Date.now(),
-                        mat: mat,
-                        name: nom + " " + prenom,
-                        sexe: "M",
-                        classe: "Générale",
-                        photo: base64Photo || "",
-                        cardData: { nom, prenom, matricule: mat }
-                    });
+                    if(!ecole.students) ecole.students = [];
+                    targetList = ecole.students;
                 }
+
+                let existing = targetList.find(st => st.mat === mat || st.matricule === mat);
+                const cardPayload = {
+                    id: 'CARD-' + Date.now(),
+                    type: typeCarte,
+                    mat: mat,
+                    name: nom + " " + postnom + " " + prenom,
+                    nom, postnom, prenom,
+                    naiss: document.getElementById('inputNaiss').value,
+                    adresse: document.getElementById('inputAdresse').value,
+                    pere: document.getElementById('inputPere').value,
+                    mere: document.getElementById('inputMere').value,
+                    photo: base64Photo || "",
+                    schoolLogo: base64SchoolLogo || ""
+                };
+
+                if (existing) {
+                    Object.assign(existing, cardPayload);
+                } else {
+                    targetList.push(cardPayload);
+                }
+
                 await sauvegarderGlobal();
-                alert("Carte enregistrée avec succès dans l'école " + currentSchoolName + " et synchronisée avec la base globale !");
+                alert(`Carte (${typeCarte}) enregistrée avec succès dans l'école ${currentSchoolName} et synchronisée avec Firebase !`);
             } else {
                 alert("Erreur : École active introuvable.");
             }
