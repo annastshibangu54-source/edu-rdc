@@ -176,7 +176,7 @@
                         <!-- En-tête : Drapeau à gauche, Texte RDC au centre, Logo école à droite -->
                         <div class="d-flex justify-content-between align-items-center pb-1 mb-1 border-bottom" style="font-size: 0.3rem;">
                             <div class="d-flex align-items-center">
-                                <!-- Drapeau RDC simplifié / icône -->
+                                <!-- Drapeau RDC -->
                                 <span style="background: linear-gradient(to bottom, #007fff 33%, #ffd700 33%, #ffd700 66%, #ce1126 66%); width: 0.5cm; height: 0.35cm; display: inline-block; margin-right: 3px; border: 0.5px solid #fff;"></span>
                                 <span class="fw-bold">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</span>
                             </div>
@@ -228,7 +228,6 @@
         let base64SchoolLogo = "";
 
         window.onload = function() {
-            // Charger d'abord depuis localStorage pour avoir une base immédiate
             let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V10");
             if (saved) {
                 try {
@@ -260,14 +259,14 @@
             
             if(!appData.schools) appData.schools = [];
             
-            // Recherche de l'école par nom complet
-            let ecoleTrouvee = appData.schools.find(s => s.name && s.name.toUpperCase() === saisieNom);
+            // Recherche de l'école par nom complet insensible à la casse
+            let ecoleTrouvee = appData.schools.find(s => s.name && s.name.trim().toUpperCase() === saisieNom);
             
             if (!ecoleTrouvee) {
-                // Création automatique de l'école si elle n'existe pas encore
+                // Création automatique si l'école n'existe pas encore
                 ecoleTrouvee = {
                     id: 'SCH-' + Date.now(),
-                    name: saisieNom,
+                    name: document.getElementById('authSchoolName').value.trim(),
                     appartenance: 'Non Conventionnée (Privée)',
                     province: 'KINSHASA',
                     district: 'KINTAMBO',
@@ -282,12 +281,12 @@
                 appData.schools.push(ecoleTrouvee);
                 sauvegarderGlobal();
             } else {
-                // Vérification du code secret
+                // Vérification du code secret si l'école existe déjà
                 if (ecoleTrouvee.secretCode && ecoleTrouvee.secretCode !== saisieSecret) {
                     alert("Code secret incorrect pour cette école !");
                     return;
                 }
-                // Si l'école existait sans code secret défini
+                // Si l'école existait sans code secret, on l'enregistre
                 if (!ecoleTrouvee.secretCode) {
                     ecoleTrouvee.secretCode = saisieSecret;
                     sauvegarderGlobal();
