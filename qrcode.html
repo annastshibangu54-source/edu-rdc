@@ -230,6 +230,36 @@
                 </div>
             </div>
         </div>
+
+        <!-- Espace de Liste / Répertoire des Cartes Enregistrées -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="bg-white p-3 rounded shadow-sm border">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-primary m-0"><i class="fa fa-address-card me-2"></i>Répertoire des Cartes Enregistrées dans l'École</h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="chargerRepertoireCartes()"><i class="fa fa-sync-alt me-1"></i> Actualiser</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle small">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Matricule / Code</th>
+                                    <th>Nom Complet</th>
+                                    <th>Date Naiss. & Adresse</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableRepertoireCartes">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">Aucune carte chargée. Veuillez ouvrir l'espace école.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Script de Synchronisation Firebase Identique à gestion_ecole.html -->
@@ -303,6 +333,7 @@
             }
 
             window.mettreAJour();
+            chargerRepertoireCartes();
         };
 
         window.chargerPhoto = function(event) {
@@ -358,6 +389,92 @@
                 link.download = 'Carte_' + (document.getElementById('inputNom').value || 'Identite') + '.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+            });
+        };
+
+        // Fonction pour afficher et charger le répertoire des cartes dans le tableau
+        window.chargerRepertoireCartes = function() {
+            const ecole = appData.schools.find(s => s.id === currentSchoolId);
+            const tbody = document.getElementById('tableRepertoireCartes');
+            tbody.innerHTML = "";
+
+            if (!ecole) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">École introuvable.</td></tr>';
+                return;
+            }
+
+            let allCards = [];
+            const yearData = ecole.yearsData && ecole.yearsData[currentSchoolYear] ? ecole.yearsData[currentSchoolYear] : {};
+            
+            if (yearData.students) {
+                yearData.students.forEach(st => allCards.push({ ...st, type: 'Élève' }));
+            }
+            if (yearData.teachers) {
+                yearData.teachers.forEach(t => allCards.push({ ...t, type: 'Enseignant', mat: t.secretCode || 'N/A' }));
+            }
+            if (ecole.direction) {
+                ecole.direction.forEach(d => allCards.push({ ...d, type: 'Administrateur', mat: d.phone || 'N/A' }));
+            }
+
+            if (allCards.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucune carte enregistrée pour le moment. Remplissez le formulaire ci-dessus et cliquez sur "Enregistrer".</td></tr>';
+                return;
+            }
+
+            allCards.forEach((card, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge bg-info text-dark">${card.type || 'Élève'}</span></td>
+                    <td class="fw-bold">${card.mat || card.secretCode || '---'}</td>
+                    <td>${card.name || (card.nom + ' ' + (card.postnom || ''))}</td>
+                    <td>${card.naiss || ''} / ${card.adresse || ''}</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick='chargerCarteDansFormulaire(${JSON.stringify(card)})' title="Charger dans l'aperçu"><i class="fa fa-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick='supprimerCarte('${card.mat || card.name}', '${card.type}')' title="Supprimer"><i class="fa fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.chargerCarteDansFormulaire = function(card) {
+            document.getElementById('selectCardType').value = card.type || 'Élève';
+            document.getElementById('inputNom').value = card.nom || card.name.split(' ')[0] || '';
+            document.getElementById('inputPostnom').value = card.postnom || card.name.split(' ')[1] || '';
+            document.getElementById('inputPrenom').value = card.prenom || '';
+            document.getElementById('inputMatricule').value = card.mat || card.secretCode || '';
+            document.getElementById('inputNaiss').value = card.naiss || '';
+            document.getElementById('inputAdresse').value = card.adresse || '';
+            document.getElementById('inputPere').value = card.pere || '';
+            document.getElementById('inputMere').value = card.mere || '';
+            if (card.photo) {
+                base64Photo = card.photo;
+                document.getElementById('cardUserPhoto').src = base64Photo;
+            }
+            window.mettreAJour();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.supprimerCarte = function(identifiant, type) {
+            if(!confirm("Voulez-vous vraiment supprimer cette carte du registre ?")) return;
+            const ecole = appData.schools.find(s => s.id === currentSchoolId);
+            if (!ecole) return;
+            const yearData = ecole.yearsData && ecole.yearsData[currentSchoolYear] ? ecole.yearsData[currentSchoolYear] : {};
+
+            if (type === 'Élève' && yearData.students) {
+                yearData.students = yearData.students.filter(st => st.mat !== identifiant && st.name !== identifiant);
+            } else if (type === 'Enseignant' && yearData.teachers) {
+                yearData.teachers = yearData.teachers.filter(t => t.secretCode !== identifiant && t.name !== identifiant);
+            } else if (type === 'Administrateur' && ecole.direction) {
+                ecole.direction = ecole.direction.filter(d => d.phone !== identifiant && d.name !== identifiant);
+            }
+
+            db.collection("platformData").doc("mainConfig").set(appData).then(() => {
+                alert("Carte supprimée avec succès !");
+                chargerRepertoireCartes();
+            }).catch(err => {
+                console.error("Erreur suppression :", err);
+                alert("Erreur lors de la suppression en ligne.");
             });
         };
 
@@ -431,6 +548,7 @@
                 // Sauvegarde globale sur Firebase
                 db.collection("platformData").doc("mainConfig").set(appData).then(() => {
                     alert(`Carte (${typeCarte}) enregistrée avec succès dans l'école ${currentSchoolName} et synchronisée sur Firebase !`);
+                    chargerRepertoireCartes();
                 }).catch(err => {
                     console.error("Erreur sync Firebase :", err);
                     alert("Erreur lors de l'enregistrement en ligne.");
