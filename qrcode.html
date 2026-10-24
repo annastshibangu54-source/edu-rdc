@@ -8,10 +8,10 @@
     <link href="css/style.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Firebase SDK (Compat) pour une parfaite synchronisation globale -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
+    <!-- Firebase SDK (Compat v10) pour une parfaite synchronisation globale -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
     <style>
         .id-card {
@@ -61,7 +61,7 @@
         .card-details { font-size: 0.31rem; line-height: 1.15; color: #fff; }
         .qr-container {
             position: absolute;
-            bottom: 10px;
+            bottom: 8px;
             right: 6px;
             background: #ffffff;
             padding: 2px;
@@ -71,7 +71,7 @@
         }
         .qr-container img { width: 100%; height: 100%; object-fit: contain; }
         .assistance-text {
-            font-size: 0.22rem;
+            font-size: 0.21rem;
             text-align: center;
             margin-top: 2px;
             line-height: 1;
@@ -93,11 +93,11 @@
             <h3 class="text-center text-primary mb-4"><i class="fa fa-school me-2"></i>Accès Établissement</h3>
             <div class="mb-3">
                 <label class="form-label fw-bold">Nom Complet de l'École</label>
-                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA RÉVOLUTION">
+                <input type="text" id="authSchoolName" class="form-control" placeholder="ex: C.S. LA REVOLUTION">
             </div>
             <div class="mb-3">
-                <label class="form-label fw-bold">Code Secret de Sécurité</label>
-                <input type="password" id="authSecretCode" class="form-control" placeholder="Entrez le code secret">
+                <label class="form-label fw-bold">Code Secret de l'École</label>
+                <input type="password" id="authSecretCode" class="form-control" placeholder="Entrez le code secret (ex: SEC-1234)">
             </div>
             <button type="button" onclick="ouvrirEspace()" class="btn btn-primary w-100 py-2 fw-bold">
                 <i class="fa fa-key me-2"></i>Ouvrir l'Espace École
@@ -158,14 +158,11 @@
                         <label class="form-label small fw-bold mb-1">Nom de la Mère :</label>
                         <input type="text" class="form-control form-control-sm mb-1" id="inputMere" placeholder="Nom de la mère" value="MUKADI Mère" oninput="mettreAJour()">
                         
-                        <label class="form-label small fw-bold mb-1">Photo (Fichier) :</label>
+                        <label class="form-label small fw-bold mb-1">Photo (PC / Téléphone) :</label>
                         <input type="file" class="form-control form-control-sm mb-2" id="inputPhotoFile" accept="image/*" onchange="chargerPhoto(event)">
-
-                        <label class="form-label small fw-bold mb-1">Logo École (Optionnel pour le fond) :</label>
-                        <input type="file" class="form-control form-control-sm mb-2" id="inputSchoolLogoFile" accept="image/*" onchange="chargerLogoEcole(event)">
                     </div>
                     <button type="button" onclick="enregistrerSurFirebase()" class="btn btn-outline-primary w-100 py-2 fw-bold">
-                        <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans l'École Active
+                        <i class="fa fa-cloud-upload-alt me-2"></i>Enregistrer dans l'École Active (Firebase)
                     </button>
                 </div>
             </div>
@@ -183,16 +180,16 @@
                         </div>
 
                         <!-- Nom complet de l'école -->
-                        <div class="text-center fw-bold mb-1" id="viewSchoolNameTitle" style="font-size: 0.35rem; text-transform: uppercase;">C.S. LA RÉVOLUTION</div>
+                        <div class="text-center fw-bold mb-1" id="viewSchoolNameTitle" style="font-size: 0.35rem; text-transform: uppercase;">C.S. LA REVOLUTION</div>
                         <div style="border-bottom: 1px solid rgba(255,255,255,0.5); margin-bottom: 3px;"></div>
 
-                        <!-- Corps de la carte -->
+                        <!-- Corps de la carte : Détails à gauche, Photo à droite -->
                         <div class="d-flex align-items-start justify-content-between">
                             <div class="card-details text-start" style="width: 72%;">
                                 <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
                                 <div><strong>Postnom :</strong> <span id="viewPostnom">TSHIBANGU</span></div>
                                 <div><strong>Prénom :</strong> <span id="viewPrenom">Mike</span></div>
-                                <div><strong>Matricule/Code :</strong> <span id="viewMatricule">MAT-001</span></div>
+                                <div><strong>Matricule :</strong> <span id="viewMatricule">MAT-001</span></div>
                                 <div><strong>Né(e) à :</strong> <span id="viewNaiss">23/03/1993 à Mbuji-Mayi</span></div>
                                 <div><strong>Adresse :</strong> <span id="viewAdresse">Kinshasa, RDC</span></div>
                                 <div><strong>Père :</strong> <span id="viewPere">KALOMBO Père</span></div>
@@ -203,7 +200,7 @@
                             </div>
                         </div>
 
-                        <!-- Mot d'assistance aux autorités -->
+                        <!-- Mot d'assistance aux autorités militaires et civiles -->
                         <div class="assistance-text">
                             Prière aux autorités civiles et militaires de porter assistance au porteur en cas de besoin.
                         </div>
@@ -217,85 +214,76 @@
         </div>
     </div>
 
-    <!-- Script de Gestion Intégré -->
+    <!-- Script de Synchronisation Firebase Identique à gestion_ecole.html -->
     <script>
-        let db = null;
+        const firebaseConfig = {
+          apiKey: "AIzaSyAfLQc6uveuaqdKLDLnc5BpNK-yoO_0eCE",
+          authDomain: "edu-rdc-5c858.firebaseapp.com",
+          projectId: "edu-rdc-5c858",
+          storageBucket: "edu-rdc-5c858.appspot.com",
+          messagingSenderId: "610052383238",
+          appId: "1:610052383238:web:5c69f493d1aa12baca5987"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
         let appData = { schools: [] };
         let currentSchoolId = null;
         let currentSchoolName = "";
+        let currentSchoolYear = "2025-2026";
         let base64Photo = "";
         let base64SchoolLogo = "";
 
         window.onload = function() {
-            let saved = localStorage.getItem("EDURDC_FULL_PLATFORM_V10");
-            if (saved) {
-                try {
-                    let parsed = JSON.parse(saved);
-                    if (parsed && parsed.schools) appData = parsed;
-                } catch(e) {}
-            }
-
-            try {
-                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                    db = firebase.firestore();
-                    db.collection("edu_rdc_data").doc("global_state").get().then((doc) => {
-                        if (doc.exists && doc.data() && doc.data().schools) {
-                            appData = doc.data();
-                            localStorage.setItem("EDURDC_FULL_PLATFORM_V10", JSON.stringify(appData));
-                        }
-                    }).catch(err => console.log("Firestore init info:", err));
+            db.collection("platformData").doc("mainConfig").get().then((doc) => {
+                if (doc.exists) {
+                    appData = doc.data();
                 }
-            } catch(e) {
-                console.error("Erreur Firebase:", e);
-            }
+                if(!appData.schools) appData.schools = [];
+            }).catch((error) => {
+                console.error("Erreur de chargement Firebase:", error);
+            });
         };
 
         window.ouvrirEspace = function() {
-            const saisieNom = document.getElementById('authSchoolName').value.trim();
+            const saisieNom = document.getElementById('authSchoolName').value.trim().toUpperCase();
             const saisieSecret = document.getElementById('authSecretCode').value.trim();
 
             if(!saisieNom) { alert("Veuillez saisir le nom complet de l'école !"); return; }
-            if(!saisieSecret) { alert("Veuillez saisir le code secret de l'école !"); return; }
+            if(!saisieSecret) { alert("Veuillez saisir le code secret !"); return; }
             
             if(!appData.schools) appData.schools = [];
             
-            let ecoleTrouvee = appData.schools.find(s => s.name && s.name.trim().toLowerCase() === saisieNom.toLowerCase());
+            let ecoleTrouvee = appData.schools.find(s => s.name && s.name.trim().toUpperCase() === saisieNom);
             
             if (!ecoleTrouvee) {
-                ecoleTrouvee = {
-                    id: 'SCH-' + Date.now(),
-                    name: saisieNom,
-                    appartenance: 'Non Conventionnée (Privée)',
-                    province: 'KINSHASA',
-                    district: 'KINTAMBO',
-                    commune: 'KINSHASA',
-                    secretCode: saisieSecret,
-                    students: [],
-                    staff: [],
-                    teachers: [],
-                    caisse: [],
-                    studentPayments: []
-                };
-                appData.schools.push(ecoleTrouvee);
-                sauvegarderGlobal();
+                alert("École introuvable dans le registre national de gestion ! Veuillez d'abord créer l'école dans la page principale \"gestion_ecole.html\".");
+                return;
             } else {
-                if (ecoleTrouvee.secretCode && ecoleTrouvee.secretCode !== saisieSecret) {
+                if (ecoleTrouvee.secretCode && ecoleTrouvee.secretCode.toUpperCase() !== saisieSecret.toUpperCase()) {
                     alert("Code secret incorrect pour cette école !");
                     return;
-                }
-                if (!ecoleTrouvee.secretCode) {
-                    ecoleTrouvee.secretCode = saisieSecret;
-                    sauvegarderGlobal();
                 }
             }
 
             currentSchoolId = ecoleTrouvee.id;
             currentSchoolName = ecoleTrouvee.name;
+            currentSchoolYear = ecoleTrouvee.activeYear || "2025-2026";
+            base64SchoolLogo = ecoleTrouvee.logoUrl || "";
 
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('cardGeneratorSection').style.display = 'block';
-            document.getElementById('lockedSchoolTitle').innerText = currentSchoolName;
+            document.getElementById('lockedSchoolTitle').innerText = currentSchoolName + " (" + currentSchoolYear + ")";
             document.getElementById('viewSchoolNameTitle').innerText = currentSchoolName;
+            
+            if(base64SchoolLogo) {
+                document.getElementById('viewSchoolLogoHeader').src = base64SchoolLogo;
+                document.getElementById('cardPreview').style.setProperty('--bg-school-logo', `url('${base64SchoolLogo}')`);
+            }
+
             window.mettreAJour();
         };
 
@@ -304,20 +292,17 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                base64Photo = e.target.result;
-                document.getElementById('cardUserPhoto').src = base64Photo;
-            };
-            reader.readAsDataURL(file);
-        };
-
-        window.chargerLogoEcole = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                base64SchoolLogo = e.target.result;
-                document.getElementById('viewSchoolLogoHeader').src = base64SchoolLogo;
-                document.getElementById('cardPreview').style.setProperty('--bg-school-logo', `url('${base64SchoolLogo}')`);
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 150;
+                    canvas.height = 180;
+                    ctx.drawImage(img, 0, 0, 150, 180);
+                    base64Photo = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('cardUserPhoto').src = base64Photo;
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         };
@@ -361,56 +346,70 @@
 
             const ecole = appData.schools.find(s => s.id === currentSchoolId);
             if (ecole) {
-                let targetList = ecole.students;
+                if(!ecole.yearsData) ecole.yearsData = {};
+                if(!ecole.yearsData[currentSchoolYear]) {
+                    ecole.yearsData[currentSchoolYear] = { students: [], teachers: [], classes: [] };
+                }
+                const yearData = ecole.yearsData[currentSchoolYear];
+
+                let targetList;
                 if (typeCarte === "Enseignant") {
-                    if(!ecole.teachers) ecole.teachers = [];
-                    targetList = ecole.teachers;
+                    if(!yearData.teachers) yearData.teachers = [];
+                    targetList = yearData.teachers;
                 } else if (typeCarte === "Administrateur") {
-                    if(!ecole.staff) ecole.staff = [];
-                    targetList = ecole.staff;
+                    if(!ecole.direction) ecole.direction = [];
+                    targetList = ecold.direction;
                 } else {
-                    if(!ecole.students) ecole.students = [];
-                    targetList = ecole.students;
+                    if(!yearData.students) yearData.students = [];
+                    targetList = yearData.students;
                 }
 
-                let existing = targetList.find(st => st.mat === mat || st.matricule === mat);
+                const fullName = nom + " " + postnom + " " + prenom;
                 const cardPayload = {
                     id: 'CARD-' + Date.now(),
                     type: typeCarte,
                     mat: mat,
-                    name: nom + " " + postnom + " " + prenom,
+                    name: fullName,
                     nom, postnom, prenom,
                     naiss: document.getElementById('inputNaiss').value,
                     adresse: document.getElementById('inputAdresse').value,
                     pere: document.getElementById('inputPere').value,
                     mere: document.getElementById('inputMere').value,
                     photo: base64Photo || "",
+                    classe: "Générale",
                     schoolLogo: base64SchoolLogo || ""
                 };
 
-                if (existing) {
-                    Object.assign(existing, cardPayload);
+                if (typeCarte === "Élève") {
+                    let existing = yearData.students.find(st => st.mat === mat);
+                    if (existing) {
+                        Object.assign(existing, cardPayload);
+                    } else {
+                        yearData.students.push(cardPayload);
+                    }
+                } else if (typeCarte === "Enseignant") {
+                    let existing = yearData.teachers.find(t => t.secretCode === mat || t.name === fullName);
+                    if (existing) {
+                        Object.assign(existing, { name: fullName, secretCode: mat });
+                    } else {
+                        yearData.teachers.push({ name: fullName, titulaireClass: "Générale", secretCode: mat });
+                    }
                 } else {
-                    targetList.push(cardPayload);
+                    if(!ecole.direction) ecole.direction = [];
+                    ecole.direction.push({ name: fullName, role: "Administrateur", phone: mat });
                 }
 
-                await sauvegarderGlobal();
-                alert(`Carte (${typeCarte}) enregistrée avec succès dans l'école ${currentSchoolName} et synchronisée avec Firebase !`);
+                // Sauvegarde globale sur Firebase
+                db.collection("platformData").doc("mainConfig").set(appData).then(() => {
+                    alert(`Carte (${typeCarte}) enregistrée avec succès dans l'école ${currentSchoolName} et synchronisée sur Firebase !`);
+                }).catch(err => {
+                    console.error("Erreur sync Firebase :", err);
+                    alert("Erreur lors de l'enregistrement en ligne.");
+                });
             } else {
                 alert("Erreur : École active introuvable.");
             }
         };
-
-        async function sauvegarderGlobal() {
-            localStorage.setItem("EDURDC_FULL_PLATFORM_V10", JSON.stringify(appData));
-            if (db) {
-                try {
-                    await db.collection("edu_rdc_data").doc("global_state").set(appData);
-                } catch (e) {
-                    console.error("Erreur de synchronisation Firestore :", e);
-                }
-            }
-        }
     </script>
 </body>
 </html>
