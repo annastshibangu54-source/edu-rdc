@@ -20,13 +20,16 @@
             background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%) !important;
             border-radius: 8px;
             color: #ffffff !important;
-            padding: 6px 8px;
+            padding: 5px 8px;
             position: relative;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             margin: 0 auto;
             font-family: Arial, sans-serif;
             overflow: hidden;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             -webkit-print-color-adjust: exact !important;
         }
         /* Logo d'école transparent en fond au centre */
@@ -58,25 +61,28 @@
             border-radius: 3px;
             background-color: #ffffff;
         }
-        .card-details { font-size: 0.31rem; line-height: 1.15; color: #fff; }
+        /* Rubrique d'identité en taille de police 12 (environ 0.34rem) */
+        .card-details { font-size: 0.34rem; line-height: 1.15; color: #fff; }
         .qr-container {
             position: absolute;
-            bottom: 8px;
+            bottom: 4px;
             right: 6px;
             background: #ffffff;
-            padding: 2px;
+            padding: 1px;
             border-radius: 3px;
-            width: 0.95cm;
-            height: 0.95cm;
+            width: 0.9cm;
+            height: 0.9cm;
         }
         .qr-container img { width: 100%; height: 100%; object-fit: contain; }
+        /* Mot d'assistance positionné tout en bas de la carte */
         .assistance-text {
-            font-size: 0.21rem;
+            font-size: 0.20rem;
             text-align: center;
-            margin-top: 2px;
-            line-height: 1;
+            line-height: 1.05;
             color: #ffeb3b;
             font-weight: bold;
+            margin-bottom: 2px;
+            padding-right: 1rem;
         }
         @media print {
             body * { visibility: hidden; }
@@ -170,21 +176,23 @@
             <div class="col-lg-6 text-center">
                 <div id="cardPreviewContainer">
                     <div class="id-card" id="cardPreview">
-                        <!-- En-tête : Drapeau à gauche, Texte RDC au centre, Logo école à droite -->
-                        <div class="d-flex justify-content-between align-items-center pb-1 mb-1 border-bottom" style="font-size: 0.3rem;">
-                            <div class="d-flex align-items-center">
-                                <span style="background: linear-gradient(to bottom, #007fff 33%, #ffd700 33%, #ffd700 66%, #ce1126 66%); width: 0.5cm; height: 0.35cm; display: inline-block; margin-right: 3px; border: 0.5px solid #fff;"></span>
-                                <span class="fw-bold">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</span>
+                        <!-- Partie Haute : En-tête (Taille de police 13 / style mis en place) -->
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center pb-1 border-bottom" style="font-size: 0.36rem;">
+                                <div class="d-flex align-items-center">
+                                    <span style="background: linear-gradient(to bottom, #007fff 33%, #ffd700 33%, #ffd700 66%, #ce1126 66%); width: 0.45cm; height: 0.3cm; display: inline-block; margin-right: 3px; border: 0.5px solid #fff;"></span>
+                                    <span class="fw-bold">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</span>
+                                </div>
+                                <img id="viewSchoolLogoHeader" src="img/team-1.jpg" style="width: 0.42cm; height: 0.42cm; object-fit: cover; border-radius: 50%; border: 1px solid #fff;" alt="Logo">
                             </div>
-                            <img id="viewSchoolLogoHeader" src="img/team-1.jpg" style="width: 0.45cm; height: 0.45cm; object-fit: cover; border-radius: 50%; border: 1px solid #fff;" alt="Logo">
+
+                            <!-- Nom complet de l'école -->
+                            <div class="text-center fw-bold my-1" id="viewSchoolNameTitle" style="font-size: 0.4rem; text-transform: uppercase;">C.S. LA REVOLUTION</div>
+                            <div style="border-bottom: 1px solid rgba(255,255,255,0.5); margin-bottom: 3px;"></div>
                         </div>
 
-                        <!-- Nom complet de l'école -->
-                        <div class="text-center fw-bold mb-1" id="viewSchoolNameTitle" style="font-size: 0.35rem; text-transform: uppercase;">C.S. LA REVOLUTION</div>
-                        <div style="border-bottom: 1px solid rgba(255,255,255,0.5); margin-bottom: 3px;"></div>
-
-                        <!-- Corps de la carte : Détails à gauche, Photo à droite -->
-                        <div class="d-flex align-items-start justify-content-between">
+                        <!-- Corps de la carte : Détails à gauche (taille 12), Photo à droite -->
+                        <div class="d-flex align-items-start justify-content-between my-auto">
                             <div class="card-details text-start" style="width: 72%;">
                                 <div><strong>Nom :</strong> <span id="viewNom">KALOMBO</span></div>
                                 <div><strong>Postnom :</strong> <span id="viewPostnom">TSHIBANGU</span></div>
@@ -200,9 +208,11 @@
                             </div>
                         </div>
 
-                        <!-- Mot d'assistance aux autorités militaires et civiles -->
-                        <div class="assistance-text">
-                            Prière aux autorités civiles et militaires de porter assistance au porteur en cas de besoin.
+                        <!-- Partie Basse : Mot d'assistance strictement tout en bas -->
+                        <div>
+                            <div class="assistance-text">
+                                Prière aux autorités civiles et militaires de porter assistance au porteur en cas de besoin.
+                            </div>
                         </div>
 
                         <!-- QR Code -->
@@ -358,7 +368,7 @@
                     targetList = yearData.teachers;
                 } else if (typeCarte === "Administrateur") {
                     if(!ecole.direction) ecole.direction = [];
-                    targetList = ecold.direction;
+                    targetList = ecole.direction;
                 } else {
                     if(!yearData.students) yearData.students = [];
                     targetList = yearData.students;
