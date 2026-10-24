@@ -30,6 +30,11 @@
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
     
+    <!-- Firebase SDK (Compat v10) pour une parfaite synchronisation globale -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
     <style>
         .interactive-card {
             cursor: pointer;
@@ -387,75 +392,42 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- SCRIPT DYNAMIQUE ET SÉCURISÉ POUR LES DONNÉES LOCALES -->
+    <!-- SCRIPT DYNAMIQUE ET SÉCURISÉ FIREBASE IDENTIQUE À gestion_ecole.html -->
     <script>
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+        const firebaseConfig = {
+          apiKey: "AIzaSyAfLQc6uveuaqdKLDLnc5BpNK-yoO_0eCE",
+          authDomain: "edu-rdc-5c858.firebaseapp.com",
+          projectId: "edu-rdc-5c858",
+          storageBucket: "edu-rdc-5c858.appspot.com",
+          messagingSenderId: "610052383238",
+          appId: "1:610052383238:web:5c69f493d1aa12baca5987"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        let appData = { schools: [] };
 
         window.onload = function() {
-            updateRealCounts();
+            db.collection("platformData").doc("mainConfig").get().then((doc) => {
+                if (doc.exists) {
+                    appData = doc.data();
+                }
+                if(!appData.schools) appData.schools = [];
+                updateRealCounts();
+            }).catch((error) => {
+                console.error("Erreur de chargement Firebase:", error);
+                updateRealCounts();
+            });
         };
 
         function getStoredSchools() {
-            let allSchools = [];
-            let keysToTry = [STORAGE_KEY, "EDURDC_FULL_PLATFORM_V11", "EDURDC_FULL_PLATFORM_V12", "EDURDC_SCHOOLS_DATA"];
-            
-            keysToTry.forEach(key => {
-                let savedItem = localStorage.getItem(key);
-                if (savedItem) {
-                    try {
-                        let parsed = JSON.parse(savedItem);
-                        let list = Array.isArray(parsed) ? parsed : (parsed.schools || []);
-                        list.forEach(s => {
-                            if (s && s.id && !allSchools.some(existing => existing.id === s.id)) {
-                                allSchools.push(s);
-                            }
-                        });
-                    } catch(e) {}
-                }
-            });
-
-            if (allSchools.length === 0) {
-                allSchools = [
-                    {
-                        id: "SCH-001",
-                        name: "C.S. LA RÉVOLUTION",
-                        appartenance: "Enseignement Primaire - Privé Non Conventionné",
-                        province: "KINSHASA",
-                        territoire: "Kinshasa / Lukunga",
-                        commune: "KALAMU",
-                        logo: "img/course-1.jpg",
-                        teachers: [
-                            { name: "KABONGO Jean", phone: "0810000001", titulaireClass: "7ème EB A", secretCode: "AGT-1001" }
-                        ],
-                        students: [
-                            { id: "STU-1", mat: "ELV-001", name: "TSHIBANGU Paul", sexe: "M", classe: "7ème EB A" }
-                        ],
-                        staff: [
-                            { role: "Préfet des Études", name: "KALOMBO Mike" }
-                        ]
-                    },
-                    {
-                        id: "SCH-002",
-                        name: "INSTITUT TECHNIQUE DE LUBUMBASHI",
-                        appartenance: "Enseignement Secondaire - Officiel Public",
-                        province: "HAUT-KATANGA",
-                        territoire: "Lubumbashi Urbain",
-                        commune: "LUBUMBASHI",
-                        logo: "img/course-2.jpg",
-                        teachers: [
-                            { name: "KAZADI Pierre", phone: "0990000001", titulaireClass: "1ère Mechanics", secretCode: "AGT-2001" }
-                        ],
-                        students: [
-                            { id: "STU-3", mat: "ELV-003", name: "ILUNGA David", sexe: "M", classe: "1ère Mechanics" }
-                        ],
-                        staff: [
-                            { role: "Directeur Provincial", name: "MWAMBA Joseph" }
-                        ]
-                    }
-                ];
+            if (appData && appData.schools && appData.schools.length > 0) {
+                return appData.schools;
             }
-
-            return allSchools;
+            return [];
         }
 
         function updateRealCounts() {
@@ -465,9 +437,12 @@
             let totalAdmin = 0;
 
             schools.forEach(s => {
-                totalTeachers += (s.teachers ? s.teachers.length : 0);
-                totalStudents += (s.students ? s.students.length : 0);
-                totalAdmin += (s.staff ? s.staff.length : 0);
+                let activeYear = s.activeYear || "2025-2026";
+                let yearData = (s.yearsData && s.yearsData[activeYear]) ? s.yearsData[activeYear] : s;
+                
+                totalTeachers += (yearData.teachers ? yearData.teachers.length : 0);
+                totalStudents += (yearData.students ? yearData.students.length : 0);
+                totalAdmin += (s.direction ? s.direction.length : (s.staff ? s.staff.length : 0));
             });
 
             if(document.getElementById('badge-teachers-count')) document.getElementById('badge-teachers-count').innerText = `${totalTeachers} Enseignant(s)`;
@@ -490,9 +465,11 @@
                 let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>École</th><th>Nom & Prénom de l'Enseignant</th><th>Téléphone</th><th>Classe Titulaire</th><th>Code Agent</th></tr></thead><tbody>`;
                 let count = 0;
                 schools.forEach(s => {
-                    (s.teachers || []).forEach(t => {
+                    let activeYear = s.activeYear || "2025-2026";
+                    let yearData = (s.yearsData && s.yearsData[activeYear]) ? s.yearsData[activeYear] : s;
+                    (yearData.teachers || []).forEach(t => {
                         count++;
-                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province}</small></td><td><b>${t.name}</b></td><td>${t.phone || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué sécurisé">••••••••</span></td></tr>`;
+                        html += `<tr><td><b class="text-primary">${s.name}</b><br><small>${s.province || ''}</small></td><td><b>${t.name}</b></td><td>${t.phone || t.secretCode || '—'}</td><td><span class="badge bg-primary">${t.titulaireClass || 'Non attribuée'}</span></td><td><span class="badge bg-secondary text-muted" title="Code masqué sécurisé">••••••••</span></td></tr>`;
                     });
                 });
                 if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun enseignant enregistré pour le moment.</td></tr>`;
@@ -504,9 +481,11 @@
                 let html = `<div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>Matricule</th><th>Nom & Prénom de l'Élève</th><th>Sexe</th><th>Classe</th><th>Établissement</th></tr></thead><tbody>`;
                 let count = 0;
                 schools.forEach(s => {
-                    (s.students || []).forEach(st => {
+                    let activeYear = s.activeYear || "2025-2026";
+                    let yearData = (s.yearsData && s.yearsData[activeYear]) ? s.yearsData[activeYear] : s;
+                    (yearData.students || []).forEach(st => {
                         count++;
-                        html += `<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>${st.name}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || '—'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province})</td></tr>`;
+                        html += `<tr><td><span class="badge bg-secondary text-muted" title="Matricule masqué sécurisé">••••••••</span></td><td><b>${st.name || (st.nom + ' ' + (st.postnom || ''))}</b></td><td>${st.sexe || 'M'}</td><td><span class="badge bg-info text-dark">${st.classe || 'Générale'}</span></td><td><b class="text-primary">${s.name}</b> (${s.province || ''})</td></tr>`;
                     });
                 });
                 if(count === 0) html += `<tr><td colspan="5" class="text-center text-muted py-3">Aucun élève inscrit dans les registres actuels.</td></tr>`;
@@ -518,9 +497,10 @@
                 let html = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th>Poste / Fonction</th><th>Nom & Prénom</th><th>Établissement</th><th>Province / Localisation</th></tr></thead><tbody>`;
                 let count = 0;
                 schools.forEach(s => {
-                    (s.staff || []).forEach(st => {
+                    let staffList = s.direction || s.staff || [];
+                    staffList.forEach(st => {
                         count++;
-                        html += `<tr><td><span class="badge bg-danger p-2 fs-6">${st.role}</span></td><td><b>${st.name}</b></td><td><b class="text-primary">${s.name}</b></td><td>${s.province} / ${s.commune || ''}</td></tr>`;
+                        html += `<tr><td><span class="badge bg-danger p-2 fs-6">${st.role || 'Administrateur'}</span></td><td><b>${st.name}</b></td><td><b class="text-primary">${s.name}</b></td><td>${s.province || ''} / ${s.commune || ''}</td></tr>`;
                     });
                 });
                 if(count === 0) html += `<tr><td colspan="4" class="text-center text-muted py-3">Aucun cadre administratif enregistré.</td></tr>`;
@@ -531,8 +511,10 @@
                 titleEl.innerHTML = `<i class="fa fa-school me-2"></i>Registre des Institutions Scolaires Enregistrées`;
                 let html = `<div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Nom de l'École</th><th>Régime / Appartenance</th><th>Province / Territoire / Commune</th><th>Effectifs</th><th>Action</th></tr></thead><tbody>`;
                 schools.forEach(s => {
-                    let profCount = (s.teachers || []).length;
-                    let elvCount = (s.students || []).length;
+                    let activeYear = s.activeYear || "2025-2026";
+                    let yearData = (s.yearsData && s.yearsData[activeYear]) ? s.yearsData[activeYear] : s;
+                    let profCount = (yearData.teachers || []).length;
+                    let elvCount = (yearData.students || []).length;
                     html += `<tr><td><b class="text-primary fs-6">${s.name}</b><br><small class="text-muted">Code Propriétaire : ••••••••</small></td><td>${s.appartenance || 'Général'}</td><td><b>Prov:</b> ${s.province || 'N/A'}<br><b>Terr:</b> ${s.territoire || 'N/A'}<br><b>Commune:</b> ${s.commune || 'N/A'}</td><td><b>${profCount}</b> Profs | <b>${elvCount}</b> Élèves</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showGlobalStatsModal('students', '${s.id}')"><i class="fa fa-eye me-1"></i> Inspecter Élèves</button></td></tr>`;
                 });
                 html += `</tbody></table></div>`;
