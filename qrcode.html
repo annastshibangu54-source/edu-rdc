@@ -8,6 +8,9 @@
     <link href="css/style.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     
+    <!-- html2canvas pour permettre le téléchargement direct de la carte en image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <!-- Firebase SDK (Compat v10) pour une parfaite synchronisation globale -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -219,7 +222,12 @@
                         <div class="qr-container" id="qrcodePreview"></div>
                     </div>
                 </div>
-                <button onclick="window.print()" class="btn btn-success mt-3 py-2 px-4 fw-bold"><i class="fa fa-print me-1"></i> Imprimer la Carte</button>
+                
+                <!-- Espace d'actions : Télécharger et Imprimer -->
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <button onclick="telechargerCarte()" class="btn btn-primary py-2 px-3 fw-bold"><i class="fa fa-download me-1"></i> Télécharger la Carte</button>
+                    <button onclick="window.print()" class="btn btn-success py-2 px-3 fw-bold"><i class="fa fa-print me-1"></i> Imprimer la Carte</button>
+                </div>
             </div>
         </div>
     </div>
@@ -340,6 +348,17 @@
 
             const qrText = "EDU-RDC:" + typeCarte.toUpperCase() + ":" + currentSchoolName + ":" + mat + ":" + nom + " " + postnom + " " + prenom;
             document.getElementById('qrcodePreview').innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(qrText) + '">';
+        };
+
+        // Fonction pour télécharger la carte sous format image (PNG)
+        window.telechargerCarte = function() {
+            const cardElement = document.getElementById('cardPreview');
+            html2canvas(cardElement, { scale: 3, useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Carte_' + (document.getElementById('inputNom').value || 'Identite') + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
         };
 
         window.enregistrerSurFirebase = async function() {
