@@ -1275,7 +1275,7 @@ function loadDataFromFirebase() {
         renderSchoolsList();
         renderPortalAnnouncements();
     }).catch((error) => {
-        console.error("Erreur de chargement Firebase: ", error);
+        console.error("Erreur de chargement des données: ", error);
     });
 }
 
@@ -1283,10 +1283,10 @@ function loadDataFromFirebase() {
 function saveData() {
     db.collection("platformData").doc("mainConfig").set(appData)
     .then(() => {
-        console.log("Données synchronisées avec succès sur Firebase !");
+        console.log("Données synchronisées avec succès !");
     })
     .catch((error) => {
-        console.error("Erreur lors de la sauvegarde Firebase : ", error);
+        console.error("Erreur lors de la sauvegarde : ", error);
         alert("Erreur de synchronisation avec la base de données en ligne.");
     });
 }
@@ -2669,7 +2669,7 @@ function handleSaveCaissePaymentCustom(e) {
 
     document.getElementById('formPaymentCustom').reset();
     refreshPaymentOptionsCustom();
-    alert("Enregistrement de caisse effectué avec succès ! Prêt pour impression ultérieure.");
+    alert("Enregistrement de caisse effectué avec succès !");
 }
 
 function renderCaisseCustomTable() {
