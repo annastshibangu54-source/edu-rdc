@@ -260,7 +260,7 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- Script de gestion dynamique des témoignages (72h expiry, Firebase & Local Storage fallback) -->
+    <!-- Script de gestion dynamique des témoignages corrigé -->
     <!-- SDK FIREBASE (Compat v10) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -321,14 +321,14 @@
         function renderTestimonialsCarousel(dynamicList) {
             const carouselEl = $('#testimonialCarouselContainer');
             
-            // Si le carrousel est déjà initialisé par Owl Carousel, on le détruit proprement pour le recréer
+            // Destruction propre de l'instance Owl Carousel existante
             if (carouselEl.hasClass('owl-loaded')) {
                 carouselEl.trigger('destroy.owl.carousel');
                 carouselEl.removeClass('owl-loaded');
                 carouselEl.find('.owl-stage-outer').children().unwrap();
             }
 
-            // Génération des témoignages (dynamiques + statiques) respectant strictement l'architecture d'origine
+            // Génération des témoignages dynamiques soumis
             let dynamicHtml = dynamicList.map(item => {
                 const photoSrc = item.photo || 'img/testimonial-1.jpg';
                 return `
@@ -343,6 +343,7 @@
                 `;
             }).join('');
 
+            // Témoignages statiques d'origine
             const staticTestimonials = `
                 <div class="testimonial-item text-center">
                     <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-1.jpg" style="width: 80px; height: 80px;">
@@ -380,7 +381,7 @@
 
             carouselEl.html(dynamicHtml + staticTestimonials);
 
-            // Réinitialisation du plugin Owl Carousel avec la configuration d'origine du template
+            // Réinitialisation du carrousel avec les mêmes paramètres
             carouselEl.owlCarousel({
                 autoplay: true,
                 smartSpeed: 1000,
@@ -430,7 +431,7 @@
                     db.collection("platformData").doc("testimonialsConfig").set({ testimonials: list }, { merge: true }).then(() => {
                         localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
                         
-                        // Vider complètement les zones de saisie
+                        // Vidage garanti des champs du formulaire
                         document.getElementById('testimonialForm').reset();
 
                         alert("Votre témoignage a été publié avec succès ! Il s'affichera pendant 72 heures.");
@@ -438,7 +439,7 @@
                     }).catch((err) => {
                         localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
                         
-                        // Vider complètement les zones de saisie
+                        // Vidage garanti des champs du formulaire
                         document.getElementById('testimonialForm').reset();
 
                         alert("Votre témoignage a été publié (mode local) !");
@@ -451,7 +452,7 @@
                     list.unshift(newTestimonial);
                     localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
                     
-                    // Vider complètement les zones de saisie
+                    // Vidage garanti des champs du formulaire
                     document.getElementById('testimonialForm').reset();
 
                     alert("Votre témoignage a été publié avec succès !");
