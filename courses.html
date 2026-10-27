@@ -62,7 +62,7 @@
                 </div>
                 <a href="contact.html" class="nav-item nav-link">Contact</a>
             </div>
-            <a href="" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
+            <a href="gestion_ecole.html" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
     </nav>
     <!-- Navbar End -->
@@ -148,7 +148,7 @@
     <!-- Categories End -->
 
 
-    <!-- Courses / Schools List Start (Affichage Code 1 dynamique avec les vraies données enregistrées) -->
+    <!-- Courses / Schools List Start (Affichage dynamique connecté à Firebase) -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
@@ -156,7 +156,7 @@
                 <h1 class="mb-5">Liste des Écoles Enregistrées</h1>
             </div>
             <div class="row g-4 justify-content-center" id="schoolsContainer">
-                <!-- Rempli dynamiquement par JavaScript en respectant le design Code 1 -->
+                <!-- Rempli dynamiquement par JavaScript depuis Firebase -->
             </div>
         </div>
     </div>
@@ -245,6 +245,11 @@
     <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 
 
+    <!-- SDK FIREBASE (Compat v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -256,38 +261,68 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <!-- Script de liaison dynamique pour afficher les écoles enregistrées via la barre de recherche -->
+    <!-- Script de liaison dynamique Firebase pour afficher les écoles enregistrées et gérer la recherche -->
     <script>
-        const STORAGE_KEY = "EDURDC_FULL_PLATFORM_V10";
+        // --- CONFIGURATION FIREBASE ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAfLQc6uveuaqdKLDLnc5BpNK-yoO_0eCE",
+          authDomain: "edu-rdc-5c858.firebaseapp.com",
+          projectId: "edu-rdc-5c858",
+          storageBucket: "edu-rdc-5c858.appspot.com",
+          messagingSenderId: "610052383238",
+          appId: "1:610052383238:web:5c69f493d1aa12baca5987"
+        };
+
+        // Initialisation de Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        let globalSchoolsList = [];
 
         window.onload = function() {
-            loadAndDisplaySchools("");
+            // Masquer le spinner au chargement
+            const spinner = document.getElementById('spinner');
+            if(spinner) {
+                setTimeout(() => { spinner.classList.remove('show'); }, 500);
+            }
+            fetchSchoolsFromFirebase("");
         };
 
         function filterSchools() {
             const query = document.getElementById('searchSchoolInput').value.toLowerCase().trim();
-            loadAndDisplaySchools(query);
+            renderSchools(query);
         }
 
-        function loadAndDisplaySchools(filterQuery) {
-            let allSchools = [];
-            let savedItem = localStorage.getItem(STORAGE_KEY);
-            if (savedItem) {
-                try {
-                    let parsed = JSON.parse(savedItem);
-                    allSchools = Array.isArray(parsed) ? parsed : (parsed.schools || []);
-                } catch(e) {}
-            }
+        function fetchSchoolsFromFirebase(filterQuery) {
+            db.collection("platformData").doc("mainConfig").get().then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    globalSchoolsList = data.schools || [];
+                } else {
+                    globalSchoolsList = [];
+                }
+                renderSchools(filterQuery);
+            }).catch((error) => {
+                console.error("Erreur lors de la récupération des écoles depuis Firebase : ", error);
+                const container = document.getElementById('schoolsContainer');
+                if(container) {
+                    container.innerHTML = `<div class="col-12 text-center text-danger py-4">Erreur de chargement des données depuis la base en ligne.</div>`;
+                }
+            });
+        }
 
+        function renderSchools(filterQuery) {
             const container = document.getElementById('schoolsContainer');
             if (!container) return;
 
-            if (!allSchools.length) {
+            if (!globalSchoolsList.length) {
                 container.innerHTML = `<div class="col-12 text-center text-muted py-4">Aucune école enregistrée pour le moment.</div>`;
                 return;
             }
 
-            const filtered = allSchools.filter(s => {
+            const filtered = globalSchoolsList.filter(s => {
                 const nameMatch = s.name ? s.name.toLowerCase().includes(filterQuery) : false;
                 const provMatch = s.province ? s.province.toLowerCase().includes(filterQuery) : false;
                 const comMatch = s.commune ? s.commune.toLowerCase().includes(filterQuery) : false;
@@ -300,7 +335,8 @@
             }
 
             container.innerHTML = filtered.map(s => {
-                const logoSrc = s.logo || 'img/course-1.jpg';
+                const logoSrc = s.logoUrl || s.logo || 'img/course-1.jpg';
+                const regimeText = s.regime || s.appartenance || 'Officiel';
                 return `
                     <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="course-item bg-light rounded overflow-hidden shadow-sm">
@@ -315,9 +351,9 @@
                                     <small class="fa fa-star text-primary"></small>
                                     <small class="fa fa-star text-primary"></small>
                                     <small class="fa fa-star text-primary"></small>
-                                    <small>(Offriciel)</small>
+                                    <small>(Officiel)</small>
                                 </div>
-                                <h5 class="mb-4">${s.appartenance}</h5>
+                                <h5 class="mb-4">${regimeText}</h5>
                             </div>
                             <div class="d-flex border-top">
                                 <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>${s.province}</small>
