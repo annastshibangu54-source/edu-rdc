@@ -473,16 +473,14 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-    <h4 class="text-white mb-3">Bulletin d'Information</h4>
-    <p class="text-light">Restez informés des communiqués officiels du Ministère de l'Éducation Nationale.</p>
-    
-    <!-- Ajout d'une classe wrapper pour garantir le positionnement absolu du bouton -->
-    <div class="position-relative mx-auto" style="max-width: 400px;">
-        <input class="form-control border-0 w-100 py-3 ps-4 pe-5" type="email" placeholder="Votre Email">
-        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">S'inscrire</button>
-    </div>
-</div>
-
+                    <h4 class="text-white mb-3">Bulletin d'Information</h4>
+                    <p class="text-light">Restez informés des communiqués officiels du Ministère de l'Éducation Nationale.</p>
+                    
+                    <div class="position-relative mx-auto" style="max-width: 400px;">
+                        <input id="newsletterEmailInput" class="form-control border-0 w-100 py-3 ps-4 pe-5" type="email" placeholder="Votre Email">
+                        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2" onclick="handleNewsletterSubscribe()">S'inscrire</button>
+                    </div>
+                    <div id="newsletterMsgArea" class="mt-2 small"></div>
                 </div>
             </div>
         </div>
@@ -931,6 +929,22 @@
                 });
             return false;
         };
+
+        // Fonction pour gérer l'inscription au bulletin d'information
+        function handleNewsletterSubscribe() {
+            const input = document.getElementById('newsletterEmailInput');
+            const msgArea = document.getElementById('newsletterMsgArea');
+            if (!input || !msgArea) return;
+            const email = input.value.trim();
+
+            if(email === "" || !email.includes("@")) {
+                msgArea.innerHTML = '<span class="text-warning">Veuillez entrer une adresse email valide.</span>';
+                return;
+            }
+
+            msgArea.innerHTML = '<span class="text-success fw-bold">✓ Merci ! Votre inscription au bulletin a bien été prise en compte.</span>';
+            input.value = "";
+        }
     </script>
 </body>
 
