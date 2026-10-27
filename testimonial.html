@@ -328,7 +328,21 @@
                 carouselEl.find('.owl-stage-outer').children().unwrap();
             }
 
-            // Témoignages par défaut de la maquette d'origine
+            // Génération des témoignages (dynamiques + statiques) respectant strictement l'architecture d'origine
+            let dynamicHtml = dynamicList.map(item => {
+                const photoSrc = item.photo || 'img/testimonial-1.jpg';
+                return `
+                    <div class="testimonial-item text-center">
+                        <img class="border rounded-circle p-2 mx-auto mb-3" src="${photoSrc}" style="width: 80px; height: 80px; object-fit: cover;">
+                        <h5 class="mb-0">${item.name}</h5>
+                        <p>${item.role}</p>
+                        <div class="testimonial-text bg-light text-center p-4">
+                            <p class="mb-0">${item.message}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
             const staticTestimonials = `
                 <div class="testimonial-item text-center">
                     <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-1.jpg" style="width: 80px; height: 80px;">
@@ -363,21 +377,6 @@
                     </div>
                 </div>
             `;
-
-            // Génération des témoignages dynamiques soumis
-            let dynamicHtml = dynamicList.map(item => {
-                const photoSrc = item.photo || 'img/testimonial-1.jpg';
-                return `
-                    <div class="testimonial-item text-center">
-                        <img class="border rounded-circle p-2 mx-auto mb-3" src="${photoSrc}" style="width: 80px; height: 80px; object-fit: cover;">
-                        <h5 class="mb-0">${item.name}</h5>
-                        <p>${item.role}</p>
-                        <div class="testimonial-text bg-light text-center p-4">
-                            <p class="mb-0">${item.message}</p>
-                        </div>
-                    </div>
-                `;
-            }).join('');
 
             carouselEl.html(dynamicHtml + staticTestimonials);
 
@@ -430,23 +429,32 @@
 
                     db.collection("platformData").doc("testimonialsConfig").set({ testimonials: list }, { merge: true }).then(() => {
                         localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
-                        alert("Votre témoignage a été publié avec succès ! Il s'affichera pendant 72 heures.");
+                        
+                        // Vider complètement les zones de saisie
                         document.getElementById('testimonialForm').reset();
+
+                        alert("Votre témoignage a été publié avec succès ! Il s'affichera pendant 72 heures.");
                         loadTestimonials();
                     }).catch((err) => {
                         localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
-                        alert("Votre témoignage a été publié (mode local) !");
+                        
+                        // Vider complètement les zones de saisie
                         document.getElementById('testimonialForm').reset();
+
+                        alert("Votre témoignage a été publié (mode local) !");
                         loadTestimonials();
                     });
                 }).catch(() => {
-                    let localData = localStorage.getItem(STORAGE_KAY_TESTIMONIALS);
+                    let localData = localStorage.getItem(STORAGE_KEY_TESTIMONIALS);
                     let list = localData ? JSON.parse(localData) : [];
                     list = cleanExpiredTestimonials(list);
                     list.unshift(newTestimonial);
                     localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
-                    alert("Votre témoignage a été publié avec succès !");
+                    
+                    // Vider complètement les zones de saisie
                     document.getElementById('testimonialForm').reset();
+
+                    alert("Votre témoignage a été publié avec succès !");
                     loadTestimonials();
                 });
             };
