@@ -85,6 +85,41 @@
     <!-- Header End -->
 
 
+    <!-- Formulaire de Saisie de Témoignage Start -->
+    <div class="container-xxl py-3">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="bg-light rounded p-4 p-md-5 shadow-sm">
+                        <h3 class="text-primary text-center mb-4">Laisser votre témoignage (Validité 72h)</h3>
+                        <form id="testimonialForm" onsubmit="submitTestimonial(event)">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" id="authorName" class="form-control border-0 py-3" placeholder="Nom et Post-nom" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" id="authorRole" class="form-control border-0 py-3" placeholder="Rôle et Province (ex: Préfet - Kinshasa)" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small ms-1 mb-1">Photo de profil (optionnel)</label>
+                                    <input type="file" id="authorPhoto" class="form-control border-0 py-2 bg-white" accept="image/*">
+                                </div>
+                                <div class="col-12">
+                                    <textarea id="authorMessage" class="form-control border-0 py-3" rows="4" placeholder="Votre témoignage..." required></textarea>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button class="btn btn-primary py-3 px-5 w-100" type="submit">Publier mon témoignage</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Formulaire de Saisie de Témoignage End -->
+
+
     <!-- Testimonial Start -->
     <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container">
@@ -92,7 +127,7 @@
                 <h6 class="section-title bg-white text-center text-primary px-3">Témoignages</h6>
                 <h1 class="mb-5">Ce que disent nos Directeurs et Préfets !</h1>
             </div>
-            <div class="owl-carousel testimonial-carousel position-relative">
+            <div class="owl-carousel testimonial-carousel position-relative" id="testimonialCarouselContainer">
                 <div class="testimonial-item text-center">
                     <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-1.jpg" style="width: 80px; height: 80px;">
                     <h5 class="mb-0">Jean-Paul Mukendi</h5>
@@ -224,7 +259,209 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+
+    <!-- Script de gestion dynamique des témoignages (72h expiry, Firebase & Local Storage fallback) -->
+    <!-- SDK FIREBASE (Compat v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAfLQc6uveuaqdKLDLnc5BpNK-yoO_0eCE",
+          authDomain: "edu-rdc-5c858.firebaseapp.com",
+          projectId: "edu-rdc-5c858",
+          storageBucket: "edu-rdc-5c858.appspot.com",
+          messagingSenderId: "610052383238",
+          appId: "1:610052383238:web:5c69f493d1aa12baca5987"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        const STORAGE_KEY_TESTIMONIALS = "EDURDC_DYNAMIC_TESTIMONIALS_V1";
+        const EXPIRY_HOURS = 72;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadTestimonials();
+        });
+
+        function cleanExpiredTestimonials(list) {
+            const now = new Date().getTime();
+            const expiryTime = EXPIRY_HOURS * 3600 * 1000;
+            return list.filter(item => {
+                return (now - item.timestamp) < expiryTime;
+            });
+        }
+
+        function loadTestimonials() {
+            db.collection("platformData").doc("testimonialsConfig").get().then((doc) => {
+                let dynamicList = [];
+                if (doc.exists && doc.data().testimonials) {
+                    dynamicList = doc.data().testimonials;
+                } else {
+                    let localData = localStorage.getItem(STORAGE_KEY_TESTIMONIALS);
+                    if (localData) {
+                        try { dynamicList = JSON.parse(localData); } catch(e) {}
+                    }
+                }
+
+                dynamicList = cleanExpiredTestimonials(dynamicList);
+                renderTestimonialsCarousel(dynamicList);
+            }).catch((err) => {
+                let localData = localStorage.getItem(STORAGE_KEY_TESTIMONIALS);
+                let dynamicList = localData ? JSON.parse(localData) : [];
+                dynamicList = cleanExpiredTestimonials(dynamicList);
+                renderTestimonialsCarousel(dynamicList);
+            });
+        }
+
+        function renderTestimonialsCarousel(dynamicList) {
+            const carouselEl = $('#testimonialCarouselContainer');
+            
+            // Si le carrousel est déjà initialisé par Owl Carousel, on le détruit proprement pour le recréer
+            if (carouselEl.hasClass('owl-loaded')) {
+                carouselEl.trigger('destroy.owl.carousel');
+                carouselEl.removeClass('owl-loaded');
+                carouselEl.find('.owl-stage-outer').children().unwrap();
+            }
+
+            // Témoignages par défaut de la maquette d'origine
+            const staticTestimonials = `
+                <div class="testimonial-item text-center">
+                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-1.jpg" style="width: 80px; height: 80px;">
+                    <h5 class="mb-0">Jean-Paul Mukendi</h5>
+                    <p>Préfet d'Institut - Kinshasa</p>
+                    <div class="testimonial-text bg-light text-center p-4">
+                        <p class="mb-0">La gestion informatisée des dossiers d'élèves et des notes nous a permis de gagner un temps précieux dans notre établissement.</p>
+                    </div>
+                </div>
+                <div class="testimonial-item text-center">
+                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-2.jpg" style="width: 80px; height: 80px;">
+                    <h5 class="mb-0">Marie Kabamba</h5>
+                    <p>Directrice d'École - Haut-Katanga</p>
+                    <div class="testimonial-text bg-light text-center p-4">
+                        <p class="mb-0">Un outil indispensable pour le suivi des enseignants et la fluidité des rapports statistiques transmis à la province éducationnelle.</p>
+                    </div>
+                </div>
+                <div class="testimonial-item text-center">
+                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-3.jpg" style="width: 80px; height: 80px;">
+                    <h5 class="mb-0">Alain Tshimanga</h5>
+                    <p>Secrétaire Administratif - Kongo Central</p>
+                    <div class="testimonial-text bg-light text-center p-4">
+                        <p class="mb-0">Le système de cartes d'identification sécurisées par QR Code simplifie grandement l'authentification et le contrôle des élèves.</p>
+                    </div>
+                </div>
+                <div class="testimonial-item text-center">
+                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-4.jpg" style="width: 80px; height: 80px;">
+                    <h5 class="mb-0">Chantal Ndaya</h5>
+                    <p>Promotrice d'Établissement - Kasaï Oriental</p>
+                    <div class="testimonial-text bg-light text-center p-4">
+                        <p class="mb-0">Une plateforme moderne, intuitive et parfaitement adaptée aux exigences du Ministère de l'Éducation Nationale.</p>
+                    </div>
+                </div>
+            `;
+
+            // Génération des témoignages dynamiques soumis
+            let dynamicHtml = dynamicList.map(item => {
+                const photoSrc = item.photo || 'img/testimonial-1.jpg';
+                return `
+                    <div class="testimonial-item text-center">
+                        <img class="border rounded-circle p-2 mx-auto mb-3" src="${photoSrc}" style="width: 80px; height: 80px; object-fit: cover;">
+                        <h5 class="mb-0">${item.name}</h5>
+                        <p>${item.role}</p>
+                        <div class="testimonial-text bg-light text-center p-4">
+                            <p class="mb-0">${item.message}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            carouselEl.html(dynamicHtml + staticTestimonials);
+
+            // Réinitialisation du plugin Owl Carousel avec la configuration d'origine du template
+            carouselEl.owlCarousel({
+                autoplay: true,
+                smartSpeed: 1000,
+                center: true,
+                dots: true,
+                loop: true,
+                margin: 24,
+                responsive: {
+                    0:{ items:1 },
+                    768:{ items:2 },
+                    992:{ items:3 }
+                }
+            });
+        }
+
+        function submitTestimonial(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('authorName').value.trim();
+            const role = document.getElementById('authorRole').value.trim();
+            const message = document.getElementById('authorMessage').value.trim();
+            const photoInput = document.getElementById('authorPhoto');
+
+            const processSave = (photoBase64) => {
+                const newTestimonial = {
+                    name: name,
+                    role: role,
+                    message: message,
+                    photo: photoBase64 || 'img/testimonial-1.jpg',
+                    timestamp: new Date().getTime()
+                };
+
+                db.collection("platformData").doc("testimonialsConfig").get().then((doc) => {
+                    let list = [];
+                    if (doc.exists && doc.data().testimonials) {
+                        list = doc.data().testimonials;
+                    } else {
+                        let localData = localStorage.getItem(STORAGE_KEY_TESTIMONIALS);
+                        if (localData) {
+                            try { list = JSON.parse(localData); } catch(e) {}
+                        }
+                    }
+
+                    list = cleanExpiredTestimonials(list);
+                    list.unshift(newTestimonial);
+
+                    db.collection("platformData").doc("testimonialsConfig").set({ testimonials: list }, { merge: true }).then(() => {
+                        localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
+                        alert("Votre témoignage a été publié avec succès ! Il s'affichera pendant 72 heures.");
+                        document.getElementById('testimonialForm').reset();
+                        loadTestimonials();
+                    }).catch((err) => {
+                        localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
+                        alert("Votre témoignage a été publié (mode local) !");
+                        document.getElementById('testimonialForm').reset();
+                        loadTestimonials();
+                    });
+                }).catch(() => {
+                    let localData = localStorage.getItem(STORAGE_KAY_TESTIMONIALS);
+                    let list = localData ? JSON.parse(localData) : [];
+                    list = cleanExpiredTestimonials(list);
+                    list.unshift(newTestimonial);
+                    localStorage.setItem(STORAGE_KEY_TESTIMONIALS, JSON.stringify(list));
+                    alert("Votre témoignage a été publié avec succès !");
+                    document.getElementById('testimonialForm').reset();
+                    loadTestimonials();
+                });
+            };
+
+            if (photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    processSave(e.target.result);
+                };
+                reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                processSave(null);
+            }
+        }
+    </script>
 </body>
 
 </html>
-
