@@ -381,51 +381,55 @@
     </div>
     <!-- Team End -->
 
-
-    <!-- Testimonial Start (Témoignages des Directeurs d'Écoles) -->
-    <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
+<!-- Formulaire de Saisie de Témoignage Start -->
+    <div class="container-xxl py-3">
         <div class="container">
-            <div class="text-center">
-                <h6 class="section-title bg-white text-center text-primary px-3">Témoignages</h6>
-                <h1 class="mb-5">Ce que disent les Directeurs d'Écoles !</h1>
-            </div>
-            <div class="owl-carousel testimonial-carousel position-relative">
-                <div class="testimonial-item text-center">
-                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-1.jpg" style="width: 80px; height: 80px;">
-                    <h5 class="mb-0">Jean-Paul Mukendi</h5>
-                    <p>Préfet d'Institut</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">La gestion informatisée des dossiers d'élèves et des notes nous a permis de gagner un temps précieux dans notre établissement.</p>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center">
-                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-2.jpg" style="width: 80px; height: 80px;">
-                    <h5 class="mb-0">Marie Kabamba</h5>
-                    <p>Directrice d'École Primaire</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">Un outil indispensable pour le suivi des enseignants et la fluidité des rapports statistiques transmis au niveau provincial.</p>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center">
-                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-3.jpg" style="width: 80px; height: 80px;">
-                    <h5 class="mb-0">Alain Tshimanga</h5>
-                    <p>Secrétaire Administratif</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">Le système de cartes d'identification sécurisées simplifie grandement l'authentification des élèves.</p>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center">
-                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-4.jpg" style="width: 80px; height: 80px;">
-                    <h5 class="mb-0">Chantal Ndaya</h5>
-                    <p>Promotrice d'Établissement</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">Une plateforme moderne, intuitive et parfaitement adaptée aux exigences du Ministère de l'Éducation Nationale.</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="bg-light rounded p-4 p-md-5 shadow-sm">
+                        <h3 class="text-primary text-center mb-4">Laisser votre témoignage (Validité 72h)</h3>
+                        <form id="testimonialForm" onsubmit="submitTestimonial(event)">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" id="authorName" class="form-control border-0 py-3" placeholder="Nom et Post-nom" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" id="authorRole" class="form-control border-0 py-3" placeholder="Rôle et Province (ex: Préfet - Kinshasa)" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small ms-1 mb-1">Photo de profil (optionnel)</label>
+                                    <input type="file" id="authorPhoto" class="form-control border-0 py-2 bg-white" accept="image/*">
+                                </div>
+                                <div class="col-12">
+                                    <textarea id="authorMessage" class="form-control border-0 py-3" rows="4" placeholder="Votre témoignage..." required></textarea>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button class="btn btn-primary py-3 px-5 w-100" type="submit">Publier mon témoignage</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Formulaire de Saisie de Témoignage End -->
+
+
+    <!-- Testimonial Start -->
+    <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
+        <div class="container">
+            <div class="text-center">
+                <h6 class="section-title bg-white text-center text-primary px-3">Témoignages</h6>
+                <h1 class="mb-5">Ce que disent nos Directeurs et Préfets !</h1>
+            </div>
+            <div class="owl-carousel testimonial-carousel position-relative" id="testimonialCarouselContainer">
+                <!-- Rempli dynamiquement (témoignages en ligne validité 72h + statiques d'origine) -->
+            </div>
+        </div>
+    </div>
     <!-- Testimonial End -->
+    
         
 
     <!-- Footer Start (Pied de Page d'origine complet) -->
