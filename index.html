@@ -779,7 +779,7 @@
                 let contentEl = document.getElementById('statsModalContent');
 
                 titleEl.innerHTML = '<i class="fa fa-user-shield me-2"></i>Admin Central - Registre Sécurisé des Inscriptions (Newsletter)';
-                contentEl.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Chargement des abonnés depuis Firebase...</p></div>';
+                contentEl.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Chargement des abonnés...</p></div>';
 
                 let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
                 modal.show();
@@ -802,7 +802,7 @@
                     contentEl.innerHTML = html;
                 }).catch(function(error) {
                     console.error(error);
-                    contentEl.innerHTML = '<div class="alert alert-danger">Erreur de chargement depuis Firebase.</div>';
+                    contentEl.innerHTML = '<div class="alert alert-danger">Erreur de chargement.</div>';
                 });
             } else if(pass !== null) {
                 alert("Code Administrateur Central incorrect.");
@@ -960,7 +960,7 @@
                 document.getElementById('modal-reg-step-3').style.display = 'block';
             }).catch(function(error) {
                 console.error(error);
-                alert("Erreur d'enregistrement Firebase.");
+                alert("Erreur d'enregistrement.");
             });
             return false;
         };
@@ -984,12 +984,12 @@
                     }
                 }).catch(function(error) {
                     console.error(error);
-                    alert("Erreur de connexion Firebase.");
+                    alert("Erreur de connexion.");
                 });
             return false;
         };
 
-        // Fonction pour enregistrer l'email dans Firebase et notifier l'utilisateur
+        // Fonction pour enregistrer l'email dans la base de données et notifier l'utilisateur
         function handleNewsletterSubscribe() {
             const input = document.getElementById('newsletterEmailInput');
             const msgArea = document.getElementById('newsletterMsgArea');
@@ -1001,16 +1001,16 @@
                 return;
             }
 
-            // Enregistrement dans Firebase (Collection "newsletters")
+            // Enregistrement dans la base de données (Collection "newsletters")
             db.collection("newsletters").add({
                 email: email,
                 createdAt: new Date().toISOString()
             }).then(function() {
-                msgArea.innerHTML = '<span class="text-success fw-bold">✓ Merci ! Enregistré avec succès dans Firebase.</span>';
+                msgArea.innerHTML = '<span class="text-success fw-bold">✓ Merci ! Votre inscription a bien été prise en compte.</span>';
                 input.value = "";
             }).catch(function(error) {
                 console.error(error);
-                msgArea.innerHTML = '<span class="text-danger">Erreur d\'enregistrement de l\'email.</span>';
+                msgArea.innerHTML = '<span class="text-danger">Erreur lors de l\'inscription.</span>';
             });
         }
     </script>
