@@ -70,6 +70,7 @@
                 <a href="index.html" class="nav-item nav-link active">Accueil</a>
                 <a href="gestion_ecole.html" class="nav-item nav-link">Gestion École</a>
                 <a href="contact.html" class="nav-item nav-link">Contact</a>
+                <a href="javascript:void(0);" class="nav-item nav-link text-danger fw-bold" onclick="showAdminCentralSubscribers()"><i class="fa fa-user-shield me-1"></i> Admin Central (Emails)</a>
             </div>
             <!-- Bouton Espace Sécurisé lié à la modale -->
             <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#authModal" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Espace Sécurisé<i class="fa fa-arrow-right ms-3"></i></a>
@@ -770,6 +771,64 @@
             modal.show();
         };
 
+        // Panneau Admin Central pour gérer et sélectionner les abonnés inscrits par email
+        window.showAdminCentralSubscribers = function() {
+            const pass = prompt("Entrez le code secret Administrateur Central :");
+            if(pass && pass.trim() === "ADMIN-2026") {
+                let titleEl = document.getElementById('statsModalTitle');
+                let contentEl = document.getElementById('statsModalContent');
+
+                titleEl.innerHTML = '<i class="fa fa-user-shield me-2"></i>Admin Central - Registre Sécurisé des Inscriptions (Newsletter)';
+                contentEl.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Chargement des abonnés depuis Firebase...</p></div>';
+
+                let modal = new bootstrap.Modal(document.getElementById('statsDetailModal'));
+                modal.show();
+
+                db.collection("newsletters").orderBy("createdAt", "desc").get().then(function(snapshot) {
+                    let html = '<div class="alert alert-info"><b>Sélection d\'abonnés :</b> Cochez les adresses e-mail souhaitées puis cliquez sur l\'action de votre choix.</div>';
+                    html += '<div class="mb-3"><button class="btn btn-success btn-sm fw-bold me-2" onclick="processSelectedSubscribers(\'export\')"><i class="fa fa-check-square me-1"></i> Traiter la sélection</button></div>';
+                    html += '<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th style="width: 50px;" class="text-center"><input type="checkbox" id="selectAllSubscribers" onclick="toggleSelectAllSubscribers(this)"></th><th>Date d\'inscription</th><th>Adresse E-mail Enregistrée</th><th>Statut</th></tr></thead><tbody>';
+                    
+                    if(snapshot.empty) {
+                        html += '<tr><td colspan="4" class="text-center text-muted py-3">Aucune inscription pour le moment.</td></tr>';
+                    } else {
+                        snapshot.forEach(function(doc) {
+                            let data = doc.data();
+                            let dateStr = data.createdAt ? new Date(data.createdAt).toLocaleString('fr-FR') : 'N/A';
+                            html += '<tr><td class="text-center"><input type="checkbox" class="subscriber-checkbox" value="' + data.email + '"></td><td>' + dateStr + '</td><td><b>' + data.email + '</b></td><td><span class="badge bg-success">Actif / Enregistré</span></td></tr>';
+                        });
+                    }
+                    html += '</tbody></table></div>';
+                    contentEl.innerHTML = html;
+                }).catch(function(error) {
+                    console.error(error);
+                    contentEl.innerHTML = '<div class="alert alert-danger">Erreur de chargement depuis Firebase.</div>';
+                });
+            } else if(pass !== null) {
+                alert("Code Administrateur Central incorrect.");
+            }
+        };
+
+        window.toggleSelectAllSubscribers = function(masterCheckbox) {
+            let checkboxes = document.querySelectorAll('.subscriber-checkbox');
+            checkboxes.forEach(function(cb) {
+                cb.checked = masterCheckbox.checked;
+            });
+        };
+
+        window.processSelectedSubscribers = function(action) {
+            let checkboxes = document.querySelectorAll('.subscriber-checkbox:checked');
+            if(checkboxes.length === 0) {
+                alert("Veuillez sélectionner au moins un abonné dans la liste.");
+                return;
+            }
+            let selectedEmails = [];
+            checkboxes.forEach(function(cb) {
+                selectedEmails.push(cb.value);
+            });
+            alert("Adresses sélectionnées (" + selectedEmails.length + ") :\n\n- " + selectedEmails.join("\n- "));
+        };
+
         window.filterCategoryModal = function(category) {
             let schools = getStoredSchools();
             let matches = schools.filter(function(s) { return s.regime && s.regime.toLowerCase().indexOf(category.toLowerCase()) !== -1; });
@@ -930,7 +989,7 @@
             return false;
         };
 
-        // Fonction pour gérer l'inscription au bulletin d'information
+        // Fonction pour enregistrer l'email dans Firebase et notifier l'utilisateur
         function handleNewsletterSubscribe() {
             const input = document.getElementById('newsletterEmailInput');
             const msgArea = document.getElementById('newsletterMsgArea');
@@ -942,8 +1001,17 @@
                 return;
             }
 
-            msgArea.innerHTML = '<span class="text-success fw-bold">✓ Merci ! Votre inscription au bulletin a bien été prise en compte.</span>';
-            input.value = "";
+            // Enregistrement dans Firebase (Collection "newsletters")
+            db.collection("newsletters").add({
+                email: email,
+                createdAt: new Date().toISOString()
+            }).then(function() {
+                msgArea.innerHTML = '<span class="text-success fw-bold">✓ Merci ! Enregistré avec succès dans Firebase.</span>';
+                input.value = "";
+            }).catch(function(error) {
+                console.error(error);
+                msgArea.innerHTML = '<span class="text-danger">Erreur d\'enregistrement de l\'email.</span>';
+            });
         }
     </script>
 </body>
