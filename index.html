@@ -786,7 +786,10 @@
 
                 db.collection("newsletters").orderBy("createdAt", "desc").get().then(function(snapshot) {
                     let html = '<div class="alert alert-info"><b>Sélection d\'abonnés :</b> Cochez les adresses e-mail souhaitées puis cliquez sur l\'action de votre choix.</div>';
-                    html += '<div class="mb-3"><button class="btn btn-success btn-sm fw-bold me-2" onclick="processSelectedSubscribers(\'export\')"><i class="fa fa-check-square me-1"></i> Traiter la sélection</button></div>';
+                    html += '<div class="mb-3">';
+                    html += '<button class="btn btn-success btn-sm fw-bold me-2" onclick="processSelectedSubscribers(\'export\')"><i class="fa fa-check-square me-1"></i> Traiter la sélection</button>';
+                    html += '<button class="btn btn-danger btn-sm fw-bold" onclick="deleteSelectedSubscribers()"><i class="fa fa-trash-alt me-1"></i> Supprimer la sélection</button>';
+                    html += '</div>';
                     html += '<div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th style="width: 50px;" class="text-center"><input type="checkbox" id="selectAllSubscribers" onclick="toggleSelectAllSubscribers(this)"></th><th>Date d\'inscription</th><th>Adresse E-mail Enregistrée</th><th>Statut</th></tr></thead><tbody>';
                     
                     if(snapshot.empty) {
@@ -795,7 +798,7 @@
                         snapshot.forEach(function(doc) {
                             let data = doc.data();
                             let dateStr = data.createdAt ? new Date(data.createdAt).toLocaleString('fr-FR') : 'N/A';
-                            html += '<tr><td class="text-center"><input type="checkbox" class="subscriber-checkbox" value="' + data.email + '"></td><td>' + dateStr + '</td><td><b>' + data.email + '</b></td><td><span class="badge bg-success">Actif / Enregistré</span></td></tr>';
+                            html += '<tr><td class="text-center"><input type="checkbox" class="subscriber-checkbox" value="' + doc.id + '"></td><td>' + dateStr + '</td><td><b>' + data.email + '</b></td><td><span class="badge bg-success">Actif / Enregistré</span></td></tr>';
                         });
                     }
                     html += '</tbody></table></div>';
@@ -822,11 +825,36 @@
                 alert("Veuillez sélectionner au moins un abonné dans la liste.");
                 return;
             }
-            let selectedEmails = [];
+            let selectedIds = [];
             checkboxes.forEach(function(cb) {
-                selectedEmails.push(cb.value);
+                selectedIds.push(cb.value);
             });
-            alert("Adresses sélectionnées (" + selectedEmails.length + ") :\n\n- " + selectedEmails.join("\n- "));
+            alert("Abonnés sélectionnés (" + selectedIds.length + ") pris en compte avec succès.");
+        };
+
+        // Fonction pour supprimer les abonnés cochés
+        window.deleteSelectedSubscribers = function() {
+            let checkboxes = document.querySelectorAll('.subscriber-checkbox:checked');
+            if(checkboxes.length === 0) {
+                alert("Veuillez sélectionner au moins un abonné à supprimer.");
+                return;
+            }
+
+            if(confirm("Êtes-vous sûr de vouloir supprimer les abonnés sélectionnés de la base de données ?")) {
+                let deletePromises = [];
+                checkboxes.forEach(function(cb) {
+                    let docId = cb.value;
+                    deletePromises.push(db.collection("newsletters").doc(docId).delete());
+                });
+
+                Promise.all(deletePromises).then(function() {
+                    alert("Suppression effectuée avec succès !");
+                    showAdminCentralSubscribers(); // Rafraîchir la liste
+                }).catch(function(error) {
+                    console.error(error);
+                    alert("Erreur lors de la suppression.");
+                });
+            }
         };
 
         window.filterCategoryModal = function(category) {
