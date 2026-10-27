@@ -1047,6 +1047,192 @@
                 msgArea.innerHTML = '<span class="text-danger">Erreur lors de l\'inscription.</span>';
             });
         }
+
+        // --- CONFIGURATION FIREBASE IDENTIQUE ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAfLQc6uveuaqdKLDLnc5BpNK-yoO_0eCE",
+          authDomain: "edu-rdc-5c858.firebaseapp.com",
+          projectId: "edu-rdc-5c858",
+          storageBucket: "edu-rdc-5c858.appspot.com",
+          messagingSenderId: "610052383238",
+          appId: "1:610052383238:web:5c69f493d1aa12baca5987"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        const EXPIRY_HOURS = 72;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadTestimonialsFromFirebase();
+        });
+
+        // Filtrage des témoignages datant de moins de 72h
+        function cleanExpiredTestimonials(list) {
+            const now = new Date().getTime();
+            const expiryTime = EXPIRY_HOURS * 3600 * 1000;
+            return list.filter(item => (now - item.timestamp) < expiryTime);
+        }
+
+        // Chargement depuis Firestore (chemin plateforme / document centralisé)
+        function loadTestimonialsFromFirebase() {
+            db.collection("platformData").doc("testimonialsConfig").get().then((doc) => {
+                let dynamicList = [];
+                if (doc.exists && doc.data().testimonials) {
+                    dynamicList = doc.data().testimonials;
+                }
+                
+                dynamicList = cleanExpiredTestimonials(dynamicList);
+                renderTestimonialsCarousel(dynamicList);
+            }).catch((err) => {
+                console.error("Erreur de chargement des témoignages:", err);
+                renderTestimonialsCarousel([]);
+            });
+        }
+
+        // Rendu du carrousel avec l'architecture d'origine
+        function renderTestimonialsCarousel(dynamicList) {
+            const carouselEl = $('#testimonialCarouselContainer');
+            
+            if (carouselEl.hasClass('owl-loaded')) {
+                carouselEl.trigger('destroy.owl.carousel');
+                carouselEl.removeClass('owl-loaded');
+                carouselEl.find('.owl-stage-outer').children().unwrap();
+            }
+
+            // Génération des témoignages dynamiques soumis en ligne
+            let dynamicHtml = dynamicList.map(item => {
+                const photoSrc = item.photo || 'img/testimonial-1.jpg';
+                return `
+                    <div class="testimonial-item text-center">
+                        <img class="border rounded-circle p-2 mx-auto mb-3" src="${photoSrc}" style="width: 80px; height: 80px; object-fit: cover;">
+                        <h5 class="mb-0">${item.name}</h5>
+                        <p>${item.role}</p>
+                        <div class="testimonial-text bg-light text-center p-4">
+                            <p class="mb-0">${item.message}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Témoignages statiques d'origine de la page
+            const staticTestimonials = `
+                <div class="testimonial-item text-center">
+                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-1.jpg" style="width: 80px; height: 80px;">
+                    <h5 class="mb-0">Jean-Paul Mukendi</h5>
+                    <p>Préfet d'Institut - Kinshasa</p>
+                    <div class="testimonial-text bg-light text-center p-4">
+                        <p class="mb-0">La gestion informatisée des dossiers d'élèves et des notes nous a permis de gagner un temps précieux dans notre établissement.</p>
+                    </div>
+                </div>
+                <div class="testimonial-item text-center">
+                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-2.jpg" style="width: 80px; height: 80px;">
+                    <h5 class="mb-0">Marie Kabamba</h5>
+                    <p>Directrice d'École - Haut-Katanga</p>
+                    <div class="testimonial-text bg-light text-center p-4">
+                        <p class="mb-0">Un outil indispensable pour le suivi des enseignants et la fluidité des rapports statistiques transmis à la province éducationnelle.</p>
+                    </div>
+                </div>
+                <div class="testimonial-item text-center">
+                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-3.jpg" style="width: 80px; height: 80px;">
+                    <h5 class="mb-0">Alain Tshimanga</h5>
+                    <p>Secrétaire Administratif - Kongo Central</p>
+                    <div class="testimonial-text bg-light text-center p-4">
+                        <p class="mb-0">Le système de cartes d'identification sécurisées par QR Code simplifie grandement l'authentification et le contrôle des élèves.</p>
+                    </div>
+                </div>
+                <div class="testimonial-item text-center">
+                    <img class="border rounded-circle p-2 mx-auto mb-3" src="img/testimonial-4.jpg" style="width: 80px; height: 80px;">
+                    <h5 class="mb-0">Chantal Ndaya</h5>
+                    <p>Promotrice d'Établissement - Kasaï Oriental</p>
+                    <div class="testimonial-text bg-light text-center p-4">
+                        <p class="mb-0">Une plateforme moderne, intuitive et parfaitement adaptée aux exigences du Ministère de l'Éducation Nationale.</p>
+                    </div>
+                </div>
+            `;
+
+            carouselEl.html(dynamicHtml + staticTestimonials);
+
+            // Initialisation Owl Carousel identique au template
+            carouselEl.owlCarousel({
+                autoplay: true,
+                smartSpeed: 1000,
+                center: true,
+                dots: true,
+                loop: true,
+                margin: 24,
+                responsive: {
+                    0:{ items:1 },
+                    768:{ items:2 },
+                    992:{ items:3 }
+                }
+            });
+        }
+
+        // Soumission et enregistrement en ligne sur Firebase
+        function submitTestimonial(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('authorName').value.trim();
+            const role = document.getElementById('authorRole').value.trim();
+            const message = document.getElementById('authorMessage').value.trim();
+            const photoInput = document.getElementById('authorPhoto');
+
+            const saveToFirestore = (photoBase64) => {
+                const newTestimonial = {
+                    name: name,
+                    role: role,
+                    message: message,
+                    photo: photoBase64 || 'img/testimonial-1.jpg',
+                    timestamp: new Date().getTime()
+                };
+
+                db.collection("platformData").doc("testimonialsConfig").get().then((doc) => {
+                    let list = [];
+                    if (doc.exists && doc.data().testimonials) {
+                        list = doc.data().testimonials;
+                    }
+
+                    list = cleanExpiredTestimonials(list);
+                    list.unshift(newTestimonial);
+
+                    db.collection("platformData").doc("testimonialsConfig").set({ testimonials: list }, { merge: true }).then(() => {
+                        // Vidage complet des zones de saisie après publication réussie
+                        document.getElementById('testimonialForm').reset();
+
+                        alert("Votre témoignage a été publié en ligne avec succès ! Il s'affichera pendant 72 heures.");
+                        loadTestimonialsFromFirebase();
+                    }).catch((err) => {
+                        console.error("Erreur d'enregistrement Firebase:", err);
+                        alert("Erreur lors de la publication en ligne. Vérifiez vos règles Firestore.");
+                    });
+                }).catch((err) => {
+                    console.error("Erreur de connexion:", err);
+                });
+            };
+
+            // Compression / Traitement de la photo si elle est ajoutée
+            if (photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = 150;
+                        canvas.height = 150;
+                        ctx.drawImage(img, 0, 0, 150, 150);
+                        saveToFirestore(canvas.toDataURL('image/jpeg', 0.6));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                saveToFirestore(null);
+            }
+        }
     </script>
 </body>
 
