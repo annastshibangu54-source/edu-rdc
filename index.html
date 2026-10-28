@@ -663,6 +663,9 @@
         let simulatedCode = "";
         let tempUser = {};
 
+        // Constante pour la durée des témoignages (72 heures)
+        const EXPIRY_HOURS = 72;
+
         // Récupération synchrone en temps réel depuis Firestore (platformData/mainConfig)
         window.addEventListener('DOMContentLoaded', function() {
             db.collection("platformData").doc("mainConfig").onSnapshot(function(docSnap) {
@@ -677,6 +680,9 @@
                     document.getElementById('spinner').style.display = 'none';
                 }
             });
+
+            // Chargement initial des témoignages
+            loadTestimonialsFromFirebase();
         });
 
         function getStoredSchools() {
@@ -1062,26 +1068,7 @@
         }
 
 
-        // --- CONFIGURATION FIREBASE IDENTIQUE ---
-        const firebaseConfig = {
-          apiKey: "AIzaSyAfLQc6uveuaqdKLDLnc5BpNK-yoO_0eCE",
-          authDomain: "edu-rdc-5c858.firebaseapp.com",
-          projectId: "edu-rdc-5c858",
-          storageBucket: "edu-rdc-5c858.appspot.com",
-          messagingSenderId: "610052383238",
-          appId: "1:610052383238:web:5c69f493d1aa12baca5987"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
-
-        const EXPIRY_HOURS = 72;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadTestimonialsFromFirebase();
-        });
+        // --- LOGIQUE DES TÉMOIGNAGES (Identique à testimonial.html) ---
 
         // Filtrage des témoignages datant de moins de 72h
         function cleanExpiredTestimonials(list) {
