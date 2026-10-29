@@ -1,17 +1,23 @@
-// Fichier sw.js optimisé pour ne pas bloquer Firebase
+// Auto-destruction et contournement pour éviter le blocage de Firebase
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          return caches.delete(cacheName); // Supprime tous les anciens caches bloquants
+        })
+      );
+    }).then(() => {
+      return self.clients.claim();
+    })
+  );
 });
 
 self.addEventListener('fetch', (event) => {
-  // On laisse passer toutes les requêtes (notamment Firebase) sans bloquer
-  event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
-  );
+  // Transmet toutes les requêtes (surtout Firebase) directement vers Internet sans bloquer
+  event.respondWith(fetch(event.request));
 });
