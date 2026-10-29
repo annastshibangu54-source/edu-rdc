@@ -304,10 +304,10 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <div id="view-admin-central" class="view-section">
 <button class="btn btn-secondary btn-sm mb-3 no-print" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
 <div class="card shadow-sm border-0 border-start border-4 border-danger mb-4">
-<div class="card-header bg-dark text-white"><h4 class="m-0 text-white">Espace Administrateur Central - Registre des Écoles</h4></div>
+<div class="card-header bg-dark text-white"><h4 class="m-0 text-white">Espace Administrateur Central - Registre des Écoles & Gestion Centrale</h4></div>
 <div class="card-body p-4">
 <table class="table table-bordered align-middle">
-<thead><tr><th>Logo</th><th>Établissement</th><th>Province / Sous-Div</th><th>Identifiants (NIF/RCCM/ID)</th><th>Code Secret</th><th>Action</th></tr></thead>
+<thead><tr><th>Logo</th><th>Établissement</th><th>Province / Sous-Div</th><th>Statut Paiement / Échéance</th><th>Code Secret</th><th>Actions Administration Centrale</th></tr></thead>
 <tbody id="adminSchoolsTableBody"></tbody>
 </table>
 </div>
@@ -1341,6 +1341,7 @@ function loadDataFromFirebase() {
 
         appData.schools.forEach(s => {
             if(!s.activeYear) s.activeYear = "2025-2026";
+            if(s.paiementStatut === undefined) s.paiementStatut = "A jour";
             if(!s.yearsData) {
                 s.yearsData = {
                     "2025-2026": {
@@ -1450,10 +1451,15 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
     if(!appData.schools) appData.schools = [];
     
     const defaultYear = "2025-2026";
+    // Date d'échéance par défaut fixée à 30 jours dans le futur
+    const defaultEcheance = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+
     appData.schools.push({
         id: 'SCH-' + Date.now(),
         name, province, division, subDivision, commune, address, regime, nif, rccm, idNat, secope, phone, agrement, secretCode, logoUrl,
         activeYear: defaultYear,
+        paiementStatut: "A jour",
+        dateEcheancePaiement: defaultEcheance,
         yearsData: {
             "2025-2026": {
                 classes: [], teachers: [], students: [], courses: {}, notes: {},
@@ -1515,7 +1521,7 @@ function renderSchoolsList() {
                 <img src="${s.logoUrl || 'https://via.placeholder.com/70'}" class="school-logo-display" alt="Logo">
                 <div class="flex-grow-1">
                     <h5 class="fw-bold text-primary mb-1">${s.name}</h5>
-                    <div class="small text-muted mb-1"><b>Prov :</b> ${s.province} | <b>Année :</b> ${s.activeYear || '2025-2026'}</div>
+                    <div class="small text-muted mb-1"><b>Prov :</b> ${s.province} | <b>Statut :</b> <span class="badge ${s.paiementStatut === 'A jour' ? 'bg-success' : 'bg-danger'}">${s.paiementStatut || 'A jour'}</span></div>
                     <div class="small text-muted"><b>NIF :</b> ${s.nif || '-'} | <b>Commune :</b> ${s.commune}</div>
                     <div class="mt-2 d-flex gap-2">
                         <button class="btn btn-primary btn-sm fw-bold" onclick="promptLoginCode('${s.id}')"><i class="fa fa-folder-open me-1"></i> Ouvrir</button>
@@ -1573,6 +1579,14 @@ function deletePortalAnnouncement(schoolId, commIdx) {
 function promptLoginCode(id) {
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
+    
+    // VÉRIFICATION AUTOMATIQUE DU BLOCAGE POUR NON-PAIEMENT À L'ADMIN CENTRAL
+    const aujourdHui = new Date().toISOString().split('T')[0];
+    if (s.dateEcheancePaiement && aujourdHui > s.dateEcheancePaiement && s.paiementStatut !== "A jour") {
+        alert(`ACCÈS BLOQUÉ PAR L'ADMINISTRATION CENTRALE !\n\nL'établissement "${s.name}" a dépassé la date limite de paiement fixée au ${s.dateEcheancePaiement} sans s'acquitter de sa contribution.\n\nVeuillez contacter l'Administrateur Central pour régulariser votre situation et débloquer immédiatement votre accès.`);
+        return;
+    }
+
     const code = prompt("Entrez le code secret de l'école \"" + s.name + "\" :");
     if(code && code.trim().toUpperCase() === s.secretCode.toUpperCase()) {
         openSchoolDashboard(id);
@@ -3070,11 +3084,16 @@ function openAdminCentralPanel() {
                 <td><img src="${s.logoUrl || ''}" class="school-logo-display" alt="Logo"></td>
                 <td><b>${s.name}</b><br><small class="text-muted">${s.regime || ''}</small></td>
                 <td>${s.province}<br><small class="text-muted">Sous-Div: ${s.subDivision || '-'}</small></td>
-                <td><small><b>NIF:</b> ${s.nif||'-'}<br><b>RCCM:</b> ${s.rccm||'-'}<br><b>ID Nat:</b> ${s.idNat||'-'}</small></td>
+                <td>
+                    Statut : <span class="badge ${s.paiementStatut === 'A jour' ? 'bg-success' : 'bg-danger'}">${s.paiementStatut || 'A jour'}</span><br>
+                    <small>Échéance : <b>${s.dateEcheancePaiement || 'Non définie'}</b></small>
+                </td>
                 <td><b>${s.secretCode}</b></td>
                 <td>
-                    <button class="btn btn-warning btn-sm fw-bold mb-1" onclick="regenerateSchoolCode('${s.id}')"><i class="fa fa-sync me-1"></i> Générer un autre code</button>
-                    <button class="btn btn-danger btn-sm fw-bold" onclick="promptCentralDeleteSchool('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer</button>
+                    <button class="btn btn-outline-primary btn-sm fw-bold mb-1 w-100" onclick="toggleSchoolPaymentStatus('${s.id}')"><i class="fa fa-wallet me-1"></i> Basculer Paiement (A jour / Bloqué)</button>
+                    <button class="btn btn-outline-warning btn-sm fw-bold mb-1 w-100" onclick="updateSchoolEcheanceDate('${s.id}')"><i class="fa fa-calendar-alt me-1"></i> Modifier Date Limite</button>
+                    <button class="btn btn-warning btn-sm fw-bold mb-1 w-100" onclick="regenerateSchoolCode('${s.id}')"><i class="fa fa-sync me-1"></i> Générer autre code</button>
+                    <button class="btn btn-danger btn-sm fw-bold w-100" onclick="promptCentralDeleteSchool('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer</button>
                 </td>
             </tr>
         `).join('') || '<tr><td colspan="6" class="text-center text-muted">Aucune école enregistrée</td></tr>';
@@ -3093,6 +3112,29 @@ function openAdminCentralPanel() {
 
     } else if (pass !== null) {
         alert("Mot de passe incorrect.");
+    }
+}
+
+// FONCTION AJOUTÉE : BASCULER LE STATUT DE PAIEMENT DE L'ÉCOLE
+function toggleSchoolPaymentStatus(id) {
+    const s = appData.schools.find(x => x.id === id);
+    if(!s) return;
+    s.paiementStatut = (s.paiementStatut === 'A jour') ? 'Impayé / Bloqué' : 'A jour';
+    saveData();
+    openAdminCentralPanel();
+    alert(`Le statut de paiement pour ${s.name} est maintenant : ${s.paiementStatut}`);
+}
+
+// FONCTION AJOUTÉE : METTRE À JOUR LA DATE LIMITE DE PAIEMENT
+function updateSchoolEcheanceDate(id) {
+    const s = appData.schools.find(x => x.id === id);
+    if(!s) return;
+    const newDate = prompt("Entrez la nouvelle date limite de paiement (Format AAAA-MM-JJ) :", s.dateEcheancePaiement || "2026-12-31");
+    if(newDate && newDate.trim()) {
+        s.dateEcheancePaiement = newDate.trim();
+        saveData();
+        openAdminCentralPanel();
+        alert("Date limite de paiement mise à jour avec succès !");
     }
 }
 
