@@ -204,9 +204,11 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <button class="btn btn-primary" type="button" onclick="sendSchoolChatMessage('écrit')"><i class="fa fa-paper-plane"></i> Envoyer</button>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-secondary btn-sm flex-fill" type="button" onclick="sendSchoolChatMessage('audio')"><i class="fa fa-microphone me-1"></i> Envoyer Audio</button>
+                    <button class="btn btn-outline-secondary btn-sm flex-fill" type="button" id="btnStartSchoolRecord" onclick="demarrerEnregistrementAudioEcole()"><i class="fa fa-microphone me-1"></i> Enregistrer Voix</button>
+                    <button class="btn btn-secondary btn-sm flex-fill" type="button" id="btnStopSchoolRecord" onclick="arreterEnregistrementAudioEcole()" disabled><i class="fa fa-stop me-1"></i> Stop & Envoyer Voix</button>
                     <button class="btn btn-outline-success btn-sm flex-fill" type="button" onclick="sendSchoolChatMessage('appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
                 </div>
+                <audio id="schoolAudioPlayback" controls class="w-100 mt-2" style="display:none;"></audio>
             </div>
         </div>
     </div>
@@ -1537,8 +1539,11 @@ function copySecretCodeModal() {
     alert("Code Secret copié dans le presse-papier !");
 }
 
-// LOGIQUE AJOUTÉE : CHAT ÉCOLE BLOQUÉE AVEC ADMIN CENTRAL
+// LOGIQUE AJOUTÉE : CHAT ÉCOLE BLOQUÉE AVEC AUDIO & APPEL DIRECT
 let currentChatSchool = null;
+let schoolMediaRecorder;
+let schoolAudioChunks = [];
+let schoolAudioBlobUrl = null;
 
 function openBlockedSchoolChat() {
     const code = document.getElementById('blockedSchoolSecretCodeInput').value.trim();
@@ -1562,15 +1567,61 @@ function closeBlockedSchoolChat() {
     currentChatSchool = null;
 }
 
+function demarrerEnregistrementAudioEcole() {
+    schoolAudioChunks = [];
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        schoolMediaRecorder = new MediaRecorder(stream);
+        schoolMediaRecorder.ondataavailable = event => {
+            schoolAudioChunks.push(event.data);
+        };
+        schoolMediaRecorder.onstop = () => {
+            const audioBlob = new Blob(schoolAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
+            schoolAudioBlobUrl = URL.createObjectURL(audioBlob);
+            
+            const audioElement = document.getElementById('schoolAudioPlayback');
+            audioElement.src = schoolAudioBlobUrl;
+            audioElement.style.display = 'block';
+
+            // Envoi automatique de l'audio enregistré vers l'Admin
+            if(currentChatSchool) {
+                if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
+                currentChatSchool.chatMessages.push({
+                    sender: 'ecole',
+                    text: schoolAudioBlobUrl,
+                    type: 'audio',
+                    date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                });
+                saveData();
+                renderSchoolChatMessages();
+                alert("Message vocal enregistré et transmis à l'Admin Central avec succès !");
+            }
+        };
+        schoolMediaRecorder.start();
+        document.getElementById('btnStartSchoolRecord').classList.add('disabled');
+        document.getElementById('btnStopSchoolRecord').removeAttribute('disabled');
+        alert("Enregistrement vocal de l'école en cours...");
+    }).catch(err => {
+        alert("Erreur d'accès au microphone : " + err);
+    });
+}
+
+function arreterEnregistrementAudioEcole() {
+    if(schoolMediaRecorder) {
+        schoolMediaRecorder.stop();
+        document.getElementById('btnStartSchoolRecord').classList.remove('disabled');
+        document.getElementById('btnStopSchoolRecord').setAttribute('disabled', 'true');
+    }
+}
+
 function sendSchoolChatMessage(type) {
     if(!currentChatSchool) return;
     const input = document.getElementById('schoolChatMessageInput');
     let text = input.value.trim();
     
-    if(type === 'audio') {
-        text = "[Message Audio enregistré]";
-    } else if(type === 'appel') {
-        text = "[Demande d'Appel Direct en cours...]";
+    if(type === 'appel') {
+        text = "[📞 APPEL DIRECT ENTRANT DE L'ÉCOLE - Téléphone en sonnerie...]";
+        playRingTone();
+        alert("Appel direct lancé ! Le téléphone de l'Admin Central sonne...");
     }
 
     if(!text && type === 'écrit') return;
@@ -1586,7 +1637,7 @@ function sendSchoolChatMessage(type) {
     saveData();
     input.value = '';
     renderSchoolChatMessages();
-    alert("Message transmis avec succès à l'Admin Central !");
+    if(type !== 'appel') alert("Message transmis avec succès à l'Admin Central !");
 }
 
 function renderSchoolChatMessages() {
@@ -1597,12 +1648,21 @@ function renderSchoolChatMessages() {
         container.innerHTML = '<p class="text-muted small text-center my-2">Aucun message. Envoyez votre préoccupation à l\'Admin Central.</p>';
         return;
     }
-    container.innerHTML = msgs.map(m => `
-        <div class="mb-2 p-2 rounded ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
-            <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
-            <div class="small mt-1">${m.text}</div>
-        </div>
-    `).join('');
+    container.innerHTML = msgs.map(m => {
+        let contentHtml = '';
+        if(m.type === 'audio') {
+            contentHtml = `<audio controls src="${m.text}" style="max-width:220px; height:35px;"></audio>`;
+        } else {
+            contentHtml = `<div class="small mt-1">${m.text}</div>`;
+        }
+
+        return `
+            <div class="mb-2 p-2 rounded ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
+                <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
+                ${contentHtml}
+            </div>
+        `;
+    }).join('');
     container.scrollTop = container.scrollHeight;
 }
 
@@ -1630,14 +1690,23 @@ function renderAdminLitigiousSchoolsNotifications() {
         <div class="card mb-3 border-danger">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h6 class="m-0 text-danger fw-bold"><i class="fa fa-school me-2"></i>${s.name} (Code: ${s.secretCode}) - Statut : ${s.paiementStatut}</h6>
+                <div id="adminCallAlert_${s.id}" class="badge bg-danger p-2" style="display:none;"><i class="fa fa-phone-volume fa-shake me-1"></i> APPEL EN COURS (Sonnerie) <button class="btn btn-sm btn-light py-0 ms-2 fw-bold text-dark" onclick="adminDecrocherAppel('${s.id}')">Décrocher</button></div>
             </div>
-            <div class="card-body bg-white" style="max-height: 200px; overflow-y: auto;">
-                ${s.chatMessages.map(m => `
-                    <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : 'bg-light me-4 border'}">
-                        <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
-                        <div class="small">${m.text}</div>
-                    </div>
-                `).join('')}
+            <div class="card-body bg-white" style="max-height: 200px; overflow-y: auto;" id="adminMsgBox_${s.id}">
+                ${s.chatMessages.map(m => {
+                    let contentHtml = '';
+                    if(m.type === 'audio') {
+                        contentHtml = `<audio controls src="${m.text}" style="max-width:220px; height:35px;"></audio>`;
+                    } else {
+                        contentHtml = `<div class="small">${m.text}</div>`;
+                    }
+                    return `
+                        <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : 'bg-light me-4 border'}">
+                            <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
+                            ${contentHtml}
+                        </div>
+                    `;
+                }).join('')}
             </div>
             <div class="card-footer bg-light p-2">
                 <div class="input-group input-group-sm mb-2">
@@ -1645,12 +1714,64 @@ function renderAdminLitigiousSchoolsNotifications() {
                     <button class="btn btn-success" type="button" onclick="sendAdminReply('${s.id}', 'écrit')"><i class="fa fa-paper-plane me-1"></i> Répondre (Écrit)</button>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary btn-sm flex-fill" type="button" onclick="sendAdminReply('${s.id}', 'audio')"><i class="fa fa-microphone me-1"></i> Audio Direct</button>
+                    <button class="btn btn-outline-primary btn-sm flex-fill" type="button" id="btnAdminRecord_${s.id}" onclick="demarrerEnregistrementAudioAdmin('${s.id}')"><i class="fa fa-microphone me-1"></i> Enregistrer Voix</button>
+                    <button class="btn btn-secondary btn-sm flex-fill" type="button" id="btnAdminStopRecord_${s.id}" onclick="arreterEnregistrementAudioAdmin('${s.id}')" disabled><i class="fa fa-stop me-1"></i> Stop & Envoyer Voix</button>
                     <button class="btn btn-outline-success btn-sm flex-fill" type="button" onclick="sendAdminReply('${s.id}', 'appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
                 </div>
+                <audio id="adminAudioPlayback_${s.id}" controls class="w-100 mt-2" style="display:none;"></audio>
             </div>
         </div>
     `).join('');
+}
+
+let adminMediaRecorder;
+let adminAudioChunks = [];
+let adminAudioBlobUrl = null;
+
+function demarrerEnregistrementAudioAdmin(schoolId) {
+    adminAudioChunks = [];
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        adminMediaRecorder = new MediaRecorder(stream);
+        adminMediaRecorder.ondataavailable = event => {
+            adminAudioChunks.push(event.data);
+        };
+        adminMediaRecorder.onstop = () => {
+            const audioBlob = new Blob(adminAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
+            adminAudioBlobUrl = URL.createObjectURL(audioBlob);
+            
+            const audioElement = document.getElementById(`adminAudioPlayback_${schoolId}`);
+            audioElement.src = adminAudioBlobUrl;
+            audioElement.style.display = 'block';
+
+            const s = (appData.schools || []).find(x => x.id === schoolId);
+            if(s) {
+                if(!s.chatMessages) s.chatMessages = [];
+                s.chatMessages.push({
+                    sender: 'admin',
+                    text: adminAudioBlobUrl,
+                    type: 'audio',
+                    date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                });
+                saveData();
+                renderAdminLitigiousSchoolsNotifications();
+                alert("Message vocal de l'Admin Central envoyé à l'école !");
+            }
+        };
+        adminMediaRecorder.start();
+        document.getElementById(`btnAdminRecord_${schoolId}`).classList.add('disabled');
+        document.getElementById(`btnAdminStopRecord_${schoolId}`).removeAttribute('disabled');
+        alert("Enregistrement vocal de l'Admin en cours...");
+    }).catch(err => {
+        alert("Erreur d'accès au micro : " + err);
+    });
+}
+
+function arreterEnregistrementAudioAdmin(schoolId) {
+    if(adminMediaRecorder) {
+        adminMediaRecorder.stop();
+        document.getElementById(`btnAdminRecord_${schoolId}`).classList.remove('disabled');
+        document.getElementById(`btnAdminStopRecord_${schoolId}`).setAttribute('disabled', 'true');
+    }
 }
 
 function sendAdminReply(schoolId, type) {
@@ -1659,10 +1780,10 @@ function sendAdminReply(schoolId, type) {
     const input = document.getElementById(`adminReplyInput_${s.id}`);
     let text = input.value.trim();
 
-    if(type === 'audio') {
-        text = "[Réponse Audio Admin Central]";
-    } else if(type === 'appel') {
-        text = "[Appel Direct Admin Central en cours...]";
+    if(type === 'appel') {
+        text = "[📞 APPEL DIRECT DE L'ADMIN CENTRAL - En communication...]";
+        stopRingTone();
+        alert("Appel décroché ! En communication directe avec l'école.");
     }
 
     if(!text && type === 'écrit') return;
@@ -1678,7 +1799,37 @@ function sendAdminReply(schoolId, type) {
     saveData();
     input.value = '';
     renderAdminLitigiousSchoolsNotifications();
-    alert("Réponse transmise à l'école avec succès !");
+    if(type !== 'appel') alert("Réponse transmise à l'école avec succès !");
+}
+
+function adminDecrocherAppel(schoolId) {
+    stopRingTone();
+    document.getElementById(`adminCallAlert_${schoolId}`).style.display = 'none';
+    alert("Appel décroché avec succès ! L'Admin Central est en ligne avec l'école.");
+}
+
+// Simulation de sonnerie audio simple
+let ringAudioContext;
+function playRingTone() {
+    try {
+        ringAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ringAudioContext.createOscillator();
+        const gain = ringAudioContext.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 440;
+        gain.gain.value = 0.15;
+        osc.connect(gain);
+        gain.connect(ringAudioContext.destination);
+        osc.start();
+        window.activeOscillator = osc;
+    } catch(e) {}
+}
+
+function stopRingTone() {
+    if(window.activeOscillator) {
+        window.activeOscillator.stop();
+        window.activeOscillator = null;
+    }
 }
 // FIN DE LA LOGIQUE AJOUTÉE
 
