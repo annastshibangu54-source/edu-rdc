@@ -182,6 +182,37 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <h5 class="text-primary fw-bold mb-3"><i class="fa fa-bullhorn me-2"></i>Fil d'Actualités & Annonces Officielles des Écoles</h5>
 <div class="mb-3">
 <a href="dashboard.html" class="btn btn-primary btn-sm fw-bold"><i class="fa fa-chart-line me-1"></i> Afficher le Dashboard</a>
+
+<!-- ZONE AJOUTÉE : BOUTON ÉCOLE BLOQUÉE & DISCUSSION DIRECTE AVEC ADMIN CENTRAL -->
+<div class="mt-2 p-3 bg-light border rounded">
+    <div class="input-group input-group-sm" style="max-width: 450px;">
+        <input type="text" id="blockedSchoolSecretCodeInput" class="form-control" placeholder="Entrez votre code secret école bloquée...">
+        <button class="btn btn-outline-danger fw-bold" type="button" onclick="openBlockedSchoolChat()"><i class="fa fa-headset me-1"></i> Discuter avec Admin Central</button>
+    </div>
+    <div id="blockedSchoolChatArea" class="mt-3" style="display: none;">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-2">
+                <span><i class="fa fa-comments me-2"></i>Canal de Discussion Direct - <span id="chatSchoolNameDisplay">École</span> & Admin Central</span>
+                <button class="btn btn-sm btn-light text-danger fw-bold py-0" onclick="closeBlockedSchoolChat()"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="card-body bg-white" style="max-height: 250px; overflow-y: auto;" id="blockedSchoolMessagesContainer">
+                <!-- Messages injectés -->
+            </div>
+            <div class="card-footer bg-light p-2">
+                <div class="input-group input-group-sm mb-2">
+                    <input type="text" id="schoolChatMessageInput" class="form-control" placeholder="Écrire un message à l'Admin Central...">
+                    <button class="btn btn-primary" type="button" onclick="sendSchoolChatMessage('écrit')"><i class="fa fa-paper-plane"></i> Envoyer</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary btn-sm flex-fill" type="button" onclick="sendSchoolChatMessage('audio')"><i class="fa fa-microphone me-1"></i> Envoyer Audio</button>
+                    <button class="btn btn-outline-success btn-sm flex-fill" type="button" onclick="sendSchoolChatMessage('appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- FIN DE LA ZONE AJOUTÉE -->
+
 </div>
 <div id="portalAnnouncementsContainer">
 <p class="text-muted small mb-0">Aucune annonce publiée pour le moment.</p>
@@ -303,6 +334,24 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 <!-- ADMIN CENTRAL -->
 <div id="view-admin-central" class="view-section">
 <button class="btn btn-secondary btn-sm mb-3 no-print" onclick="showSection('view-portal')"><i class="fa fa-arrow-left me-1"></i> Retour</button>
+
+<!-- ZONE AJOUTÉE : NOTIFICATIONS DES ÉCOLES LITIGIEUSES / MESSAGES -->
+<div class="card shadow-sm border-0 border-start border-4 border-danger mb-4">
+<div class="card-header bg-danger text-white"><h4 class="m-0 text-white"><i class="fa fa-bell me-2"></i>Centre de Notifications - Messages des Écoles Litigieuses</h4></div>
+<div class="card-body p-4">
+    <div class="input-group mb-3" style="max-width: 400px;">
+        <input type="password" id="adminCentralNotificationCodeInput" class="form-control form-control-sm" placeholder="Entrez le code Admin Central...">
+        <button class="btn btn-dark btn-sm fw-bold" type="button" onclick="openAdminNotificationsPanel()">Ouvrir Notifications</button>
+    </div>
+    <div id="adminNotificationsListArea" style="display: none;">
+        <div id="adminLitigiousSchoolsMessagesContainer">
+            <!-- Rendu dynamique des messages par école litigieuse -->
+        </div>
+    </div>
+</div>
+</div>
+<!-- FIN DE LA ZONE AJOUTÉE -->
+
 <div class="card shadow-sm border-0 border-start border-4 border-danger mb-4">
 <div class="card-header bg-dark text-white"><h4 class="m-0 text-white">Espace Administrateur Central - Registre des Écoles & Gestion Centrale</h4></div>
 <div class="card-body p-4">
@@ -1342,6 +1391,7 @@ function loadDataFromFirebase() {
         appData.schools.forEach(s => {
             if(!s.activeYear) s.activeYear = "2025-2026";
             if(s.paiementStatut === undefined) s.paiementStatut = "A jour";
+            if(!s.chatMessages) s.chatMessages = [];
             if(!s.yearsData) {
                 s.yearsData = {
                     "2025-2026": {
@@ -1451,7 +1501,6 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
     if(!appData.schools) appData.schools = [];
     
     const defaultYear = "2025-2026";
-    // Date d'échéance par défaut fixée à 30 jours dans le futur
     const defaultEcheance = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
 
     appData.schools.push({
@@ -1460,6 +1509,7 @@ function finishSavingSchool(name, province, division, subDivision, commune, addr
         activeYear: defaultYear,
         paiementStatut: "A jour",
         dateEcheancePaiement: defaultEcheance,
+        chatMessages: [],
         yearsData: {
             "2025-2026": {
                 classes: [], teachers: [], students: [], courses: {}, notes: {},
@@ -1486,6 +1536,151 @@ function copySecretCodeModal() {
     navigator.clipboard.writeText(currentCreatedSecretCode);
     alert("Code Secret copié dans le presse-papier !");
 }
+
+// LOGIQUE AJOUTÉE : CHAT ÉCOLE BLOQUÉE AVEC ADMIN CENTRAL
+let currentChatSchool = null;
+
+function openBlockedSchoolChat() {
+    const code = document.getElementById('blockedSchoolSecretCodeInput').value.trim();
+    if(!code) {
+        alert("Veuillez saisir votre code secret.");
+        return;
+    }
+    const school = (appData.schools || []).find(s => s.secretCode.toUpperCase() === code.toUpperCase());
+    if(!school) {
+        alert("Code secret d'école incorrect.");
+        return;
+    }
+    currentChatSchool = school;
+    document.getElementById('chatSchoolNameDisplay').innerText = school.name;
+    document.getElementById('blockedSchoolChatArea').style.display = 'block';
+    renderSchoolChatMessages();
+}
+
+function closeBlockedSchoolChat() {
+    document.getElementById('blockedSchoolChatArea').style.display = 'none';
+    currentChatSchool = null;
+}
+
+function sendSchoolChatMessage(type) {
+    if(!currentChatSchool) return;
+    const input = document.getElementById('schoolChatMessageInput');
+    let text = input.value.trim();
+    
+    if(type === 'audio') {
+        text = "[Message Audio enregistré]";
+    } else if(type === 'appel') {
+        text = "[Demande d'Appel Direct en cours...]";
+    }
+
+    if(!text && type === 'écrit') return;
+
+    if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
+    currentChatSchool.chatMessages.push({
+        sender: 'ecole',
+        text: text,
+        type: type,
+        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    });
+
+    saveData();
+    input.value = '';
+    renderSchoolChatMessages();
+    alert("Message transmis avec succès à l'Admin Central !");
+}
+
+function renderSchoolChatMessages() {
+    if(!currentChatSchool) return;
+    const container = document.getElementById('blockedSchoolMessagesContainer');
+    const msgs = currentChatSchool.chatMessages || [];
+    if(msgs.length === 0) {
+        container.innerHTML = '<p class="text-muted small text-center my-2">Aucun message. Envoyez votre préoccupation à l\'Admin Central.</p>';
+        return;
+    }
+    container.innerHTML = msgs.map(m => `
+        <div class="mb-2 p-2 rounded ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
+            <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
+            <div class="small mt-1">${m.text}</div>
+        </div>
+    `).join('');
+    container.scrollTop = container.scrollHeight;
+}
+
+// LOGIQUE AJOUTÉE : PANEL NOTIFICATIONS & RÉPONSES ADMIN CENTRAL POUR ÉCOLES LITIGIEUSES
+function openAdminNotificationsPanel() {
+    const pass = document.getElementById('adminCentralNotificationCodeInput').value.trim();
+    if(pass !== ADMIN_MASTER_PASSWORD) {
+        alert("Code Admin Central incorrect.");
+        return;
+    }
+    document.getElementById('adminNotificationsListArea').style.display = 'block';
+    renderAdminLitigiousSchoolsNotifications();
+}
+
+function renderAdminLitigiousSchoolsNotifications() {
+    const container = document.getElementById('adminLitigiousSchoolsMessagesContainer');
+    const schoolsWithMessages = (appData.schools || []).filter(s => s.chatMessages && s.chatMessages.length > 0);
+
+    if(schoolsWithMessages.length === 0) {
+        container.innerHTML = '<p class="text-muted small">Aucun message reçu des écoles litigieuses pour le moment.</p>';
+        return;
+    }
+
+    container.innerHTML = schoolsWithMessages.map(s => `
+        <div class="card mb-3 border-danger">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h6 class="m-0 text-danger fw-bold"><i class="fa fa-school me-2"></i>${s.name} (Code: ${s.secretCode}) - Statut : ${s.paiementStatut}</h6>
+            </div>
+            <div class="card-body bg-white" style="max-height: 200px; overflow-y: auto;">
+                ${s.chatMessages.map(m => `
+                    <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : 'bg-light me-4 border'}">
+                        <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
+                        <div class="small">${m.text}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="card-footer bg-light p-2">
+                <div class="input-group input-group-sm mb-2">
+                    <input type="text" id="adminReplyInput_${s.id}" class="form-control" placeholder="Répondre à cette école...">
+                    <button class="btn btn-success" type="button" onclick="sendAdminReply('${s.id}', 'écrit')"><i class="fa fa-paper-plane me-1"></i> Répondre (Écrit)</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm flex-fill" type="button" onclick="sendAdminReply('${s.id}', 'audio')"><i class="fa fa-microphone me-1"></i> Audio Direct</button>
+                    <button class="btn btn-outline-success btn-sm flex-fill" type="button" onclick="sendAdminReply('${s.id}', 'appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function sendAdminReply(schoolId, type) {
+    const s = (appData.schools || []).find(x => x.id === schoolId);
+    if(!s) return;
+    const input = document.getElementById(`adminReplyInput_${s.id}`);
+    let text = input.value.trim();
+
+    if(type === 'audio') {
+        text = "[Réponse Audio Admin Central]";
+    } else if(type === 'appel') {
+        text = "[Appel Direct Admin Central en cours...]";
+    }
+
+    if(!text && type === 'écrit') return;
+
+    if(!s.chatMessages) s.chatMessages = [];
+    s.chatMessages.push({
+        sender: 'admin',
+        text: text,
+        type: type,
+        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    });
+
+    saveData();
+    input.value = '';
+    renderAdminLitigiousSchoolsNotifications();
+    alert("Réponse transmise à l'école avec succès !");
+}
+// FIN DE LA LOGIQUE AJOUTÉE
 
 // FONCTIONS DE LA MODALE DE CONSULTATION DE FICHIER SÉCURISÉE
 function openFileViewerModal(fileUrl, fileType) {
@@ -1580,7 +1775,6 @@ function promptLoginCode(id) {
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
     
-    // VÉRIFICATION STRICTE : BLOQUÉ ET NON OUVRABLE SI NON PAYÉ OU DATE D'ÉCHÉANCE DÉPASSÉE
     const aujourdHui = new Date().toISOString().split('T')[0];
     if ((s.dateEcheancePaiement && aujourdHui > s.dateEcheancePaiement) || (s.paiementStatut && s.paiementStatut !== "A jour")) {
         alert(`ÉCOLE BLOQUÉE ET NON OUVRABLE !\n\nL'établissement "${s.name}" n'est pas à jour de ses cotisations ou sa date limite d'abonnement (${s.dateEcheancePaiement || 'Non définie'}) est dépassée.\n\nAccès refusé.`);
@@ -1627,7 +1821,6 @@ function promptCentralDeleteSchool(id) {
 }
 
 function openSchoolDashboard(id) {
-    // DOUBLE SÉCURITÉ LORS DE L'OUVERTURE DIRECTE
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
     const aujourdHui = new Date().toISOString().split('T')[0];
