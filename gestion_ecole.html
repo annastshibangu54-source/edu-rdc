@@ -1580,10 +1580,10 @@ function promptLoginCode(id) {
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
     
-    // VÉRIFICATION AUTOMATIQUE DU BLOCAGE POUR NON-PAIEMENT À L'ADMIN CENTRAL
+    // VÉRIFICATION STRICTE : BLOQUÉ ET NON OUVRABLE SI NON PAYÉ OU DATE D'ÉCHÉANCE DÉPASSÉE
     const aujourdHui = new Date().toISOString().split('T')[0];
-    if (s.dateEcheancePaiement && aujourdHui > s.dateEcheancePaiement && s.paiementStatut !== "A jour") {
-        alert(`ACCÈS BLOQUÉ PAR L'ADMINISTRATION CENTRALE !\n\nL'établissement "${s.name}" a dépassé la date limite de paiement fixée au ${s.dateEcheancePaiement} sans s'acquitter de sa contribution.\n\nVeuillez contacter l'Administrateur Central pour régulariser votre situation et débloquer immédiatement votre accès.`);
+    if ((s.dateEcheancePaiement && aujourdHui > s.dateEcheancePaiement) || (s.paiementStatut && s.paiementStatut !== "A jour")) {
+        alert(`ÉCOLE BLOQUÉE ET NON OUVRABLE !\n\nL'établissement "${s.name}" n'est pas à jour de ses cotisations ou sa date limite d'abonnement (${s.dateEcheancePaiement || 'Non définie'}) est dépassée.\n\nAccès refusé.`);
         return;
     }
 
@@ -1627,12 +1627,19 @@ function promptCentralDeleteSchool(id) {
 }
 
 function openSchoolDashboard(id) {
+    // DOUBLE SÉCURITÉ LORS DE L'OUVERTURE DIRECTE
+    const s = appData.schools.find(x => x.id === id);
+    if(!s) return;
+    const aujourdHui = new Date().toISOString().split('T')[0];
+    if ((s.dateEcheancePaiement && aujourdHui > s.dateEcheancePaiement) || (s.paiementStatut && s.paiementStatut !== "A jour")) {
+        alert(`ÉCOLE BLOQUÉE ET NON OUVRABLE !\n\nL'établissement "${s.name}" ne peut pas être ouvert car son abonnement ou sa date limite de paiement (${s.dateEcheancePaiement || 'Non définie'}) n'est pas respecté.`);
+        return;
+    }
+
     activeSchoolId = id;
     unlockedClasses = {}; 
     teachersUnlocked = false; 
     unlockedStudentClasses = {}; 
-    const s = appData.schools.find(x => x.id === id);
-    if(!s) return;
     document.getElementById('dashSchoolTitle').innerText = s.name;
     document.getElementById('dashSchoolSub').innerText = s.province + ' | ' + s.commune + ' (' + s.address + ')';
     document.getElementById('dashSchoolLogo').src = s.logoUrl || 'https://via.placeholder.com/70';
