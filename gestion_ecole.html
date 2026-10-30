@@ -1693,10 +1693,10 @@ function renderAdminLitigiousSchoolsNotifications() {
                 <div id="adminCallAlert_${s.id}" class="badge bg-danger p-2" style="display:none;"><i class="fa fa-phone-volume fa-shake me-1"></i> APPEL EN COURS (Sonnerie) <button class="btn btn-sm btn-light py-0 ms-2 fw-bold text-dark" onclick="adminDecrocherAppel('${s.id}')">Décrocher</button></div>
             </div>
             <div class="card-body bg-white" style="max-height: 200px; overflow-y: auto;" id="adminMsgBox_${s.id}">
-                ${s.chatMessages.map(m => {
+                ${s.chatMessages.map((m, mIdx) => {
                     let contentHtml = '';
                     if(m.type === 'audio') {
-                        contentHtml = `<audio controls src="${m.text}" style="max-width:220px; height:35px;"></audio>`;
+                        contentHtml = `<audio controls src="${m.text}" style="max-width:220px; height:35px;" preload="auto"></audio>`;
                     } else {
                         contentHtml = `<div class="small">${m.text}</div>`;
                     }
@@ -1704,6 +1704,9 @@ function renderAdminLitigiousSchoolsNotifications() {
                         <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : 'bg-light me-4 border'}">
                             <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
                             ${contentHtml}
+                            <div class="mt-1 d-flex gap-2 justify-content-end no-print">
+                                <button class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size:11px;" onclick="supprimerMessageAdmin('${s.id}', ${mIdx})"><i class="fa fa-trash me-1"></i> Supprimer message</button>
+                            </div>
                         </div>
                     `;
                 }).join('')}
@@ -1718,10 +1721,30 @@ function renderAdminLitigiousSchoolsNotifications() {
                     <button class="btn btn-secondary btn-sm flex-fill" type="button" id="btnAdminStopRecord_${s.id}" onclick="arreterEnregistrementAudioAdmin('${s.id}')" disabled><i class="fa fa-stop me-1"></i> Stop & Envoyer Voix</button>
                     <button class="btn btn-outline-success btn-sm flex-fill" type="button" onclick="sendAdminReply('${s.id}', 'appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
                 </div>
-                <audio id="adminAudioPlayback_${s.id}" controls class="w-100 mt-2" style="display:none;"></audio>
+                <audio id="adminAudioPlayback_${s.id}" controls class="w-100 mt-2" style="display:none;" preload="auto"></audio>
+                <div class="mt-2 text-end">
+                    <button class="btn btn-sm btn-secondary fw-bold" onclick="fermerPanelAdminNotification()"><i class="fa fa-times me-1"></i> Fermer</button>
+                </div>
             </div>
         </div>
     `).join('');
+}
+
+function supprimerMessageAdmin(schoolId, messageIndex) {
+    const s = (appData.schools || []).find(x => x.id === schoolId);
+    if(s && s.chatMessages) {
+        if(confirm("Voulez-vous vraiment supprimer ce message ?")) {
+            s.chatMessages.splice(messageIndex, 1);
+            saveData();
+            renderAdminLitigiousSchoolsNotifications();
+            alert("Message supprimé avec succès !");
+        }
+    }
+}
+
+function fermerPanelAdminNotification() {
+    document.getElementById('adminNotificationsListArea').style.display = 'none';
+    document.getElementById('adminCentralNotificationCodeInput').value = '';
 }
 
 let adminMediaRecorder;
