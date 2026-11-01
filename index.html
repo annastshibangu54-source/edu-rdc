@@ -47,6 +47,16 @@
 </head>
 
 <body>
+    <!-- Lecteur Audio Caché et Bouton de Contrôle de l'Hymne National -->
+    <audio id="hymneNationalAudio" preload="auto">
+        <source src="audio/hymen-rdc.mp3" type="audio/mpeg">
+        Votre navigateur ne supporte pas l'élément audio.
+    </audio>
+
+    <div id="hymneControlBtn" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #0d6efd; color: #fff; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);" onclick="toggleHymne()" title="Activer / Couper l'hymne national">
+        <i class="fa fa-music" id="hymneIcon"></i>
+    </div>
+
     <!-- Spinner Start avec logo intégré -->
     <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex flex-column align-items-center justify-content-center" style="z-index: 9999;">
         <div class="position-relative d-flex align-items-center justify-content-center">
@@ -676,6 +686,59 @@
 
         // Constante pour la durée des témoignages (72 heures)
         const EXPIRY_HOURS = 72;
+
+        // Gestion de l'hymne national à l'ouverture et arrêt au défilement (scroll)
+        document.addEventListener("DOMContentLoaded", function() {
+            const audio = document.getElementById('hymneNationalAudio');
+            const icon = document.getElementById('hymneIcon');
+            let hasStoppedOnScroll = false;
+
+            if (audio) {
+                audio.volume = 0.5;
+                let playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Lecture automatique en attente d'interaction utilisateur.");
+                    });
+                }
+
+                // Arrêter dès que l'utilisateur défile vers le bas
+                window.addEventListener('scroll', function() {
+                    if (!hasStoppedOnScroll && window.scrollY > 30) {
+                        if (!audio.paused) {
+                            audio.pause();
+                            audio.currentTime = 0;
+                            if (icon) {
+                                icon.classList.remove('fa-music');
+                                icon.classList.add('fa-volume-mute');
+                            }
+                            hasStoppedOnScroll = true;
+                        }
+                    }
+                });
+            }
+        });
+
+        // Fonction de contrôle manuel via le bouton flottant
+        function toggleHymne() {
+            const audio = document.getElementById('hymneNationalAudio');
+            const icon = document.getElementById('hymneIcon');
+            if (!audio) return;
+
+            if (audio.paused) {
+                audio.play();
+                if (icon) {
+                    icon.classList.remove('fa-volume-mute');
+                    icon.classList.add('fa-music');
+                }
+            } else {
+                audio.pause();
+                if (icon) {
+                    icon.classList.remove('fa-music');
+                    icon.classList.add('fa-volume-mute');
+                }
+            }
+        }
 
         // Récupération synchrone en temps réel depuis Firestore (platformData/mainConfig)
         window.addEventListener('DOMContentLoaded', function() {
