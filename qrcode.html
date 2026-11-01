@@ -382,37 +382,46 @@
             if(!saisieNom) { alert("Veuillez saisir le nom complet de l'école !"); return; }
             if(!saisieSecret) { alert("Veuillez saisir le code secret !"); return; }
             
-            if(!appData.schools) appData.schools = [];
-            
-            let ecoleTrouvee = appData.schools.find(s => s.name && s.name.trim().toUpperCase() === saisieNom);
-            
-            if (!ecoleTrouvee) {
-                alert("École introuvable dans le registre national de gestion ! Veuillez d'abord créer l'école dans la page principale \"gestion_ecole.html\".");
-                return;
-            } else {
-                if (ecoleTrouvee.secretCode && ecoleTrouvee.secretCode.toUpperCase() !== saisieSecret.toUpperCase()) {
-                    alert("Code secret incorrect pour cette école !");
-                    return;
+            // Récupération directe et fraîche depuis Firebase au moment du clic pour garantir l'exactitude des données
+            db.collection("platformData").doc("mainConfig").get().then((doc) => {
+                if (doc.exists) {
+                    appData = doc.data();
                 }
-            }
+                if(!appData.schools) appData.schools = [];
 
-            currentSchoolId = ecoleTrouvee.id;
-            currentSchoolName = ecoleTrouvee.name;
-            currentSchoolYear = ecoleTrouvee.activeYear || "2025-2026";
-            base64SchoolLogo = ecoleTrouvee.logoUrl || "";
+                let ecoleTrouvee = appData.schools.find(s => s.name && s.name.trim().toUpperCase() === saisieNom);
+                
+                if (!ecoleTrouvee) {
+                    alert("École introuvable dans le registre national de gestion ! Veuillez d'abord créer l'école dans la page principale \"gestion_ecole.html\".");
+                    return;
+                } else {
+                    if (ecoleTrouvee.secretCode && ecoleTrouvee.secretCode.toUpperCase() !== saisieSecret.toUpperCase()) {
+                        alert("Code secret incorrect pour cette école !");
+                        return;
+                    }
+                }
 
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('cardGeneratorSection').style.display = 'block';
-            document.getElementById('lockedSchoolTitle').innerText = currentSchoolName + " (" + currentSchoolYear + ")";
-            document.getElementById('viewSchoolNameTitle').innerText = currentSchoolName;
-            
-            if(base64SchoolLogo) {
-                document.getElementById('viewSchoolLogoHeader').src = base64SchoolLogo;
-                document.getElementById('cardPreview').style.setProperty('--bg-school-logo', `url('${base64SchoolLogo}')`);
-            }
+                currentSchoolId = ecoleTrouvee.id;
+                currentSchoolName = ecoleTrouvee.name;
+                currentSchoolYear = ecoleTrouvee.activeYear || "2025-2026";
+                base64SchoolLogo = ecoleTrouvee.logoUrl || "";
 
-            window.mettreAJour();
-            chargerRepertoireCartes();
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('cardGeneratorSection').style.display = 'block';
+                document.getElementById('lockedSchoolTitle').innerText = currentSchoolName + " (" + currentSchoolYear + ")";
+                document.getElementById('viewSchoolNameTitle').innerText = currentSchoolName;
+                
+                if(base64SchoolLogo) {
+                    document.getElementById('viewSchoolLogoHeader').src = base64SchoolLogo;
+                    document.getElementById('cardPreview').style.setProperty('--bg-school-logo', `url('${base64SchoolLogo}')`);
+                }
+
+                window.mettreAJour();
+                chargerRepertoireCartes();
+            }).catch((error) => {
+                console.error("Erreur de connexion Firebase:", error);
+                alert("Erreur de connexion avec la base de données. Vérifiez votre connexion Internet.");
+            });
         };
 
         window.chargerPhoto = function(event) {
