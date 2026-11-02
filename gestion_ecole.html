@@ -1794,6 +1794,7 @@ function renderSchoolChatMessages() {
             </div>
         `;
     }).join('');
+    // Correction pour forcer le défilement vers le bas des messages
     container.scrollTop = container.scrollHeight;
 }
 
@@ -1865,6 +1866,12 @@ function renderAdminLitigiousSchoolsNotifications() {
         </div>
     `;
     }).join('');
+    
+    // Forcer le défilement vers le bas pour chaque boîte de message admin
+    schoolsWithMessages.forEach(s => {
+        const box = document.getElementById(`adminMsgBox_${s.id}`);
+        if(box) box.scrollTop = box.scrollHeight;
+    });
 }
 
 function supprimerMessageAdmin(schoolId, messageIndex) {
