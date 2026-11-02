@@ -203,10 +203,14 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <input type="text" id="schoolChatMessageInput" class="form-control" placeholder="Écrire un message à l'Admin Central...">
                     <button class="btn btn-primary" type="button" onclick="sendSchoolChatMessage('écrit')"><i class="fa fa-paper-plane"></i> Envoyer</button>
                 </div>
-                <div class="d-flex gap-2">
+                <!-- BOUTONS D'APPEL MODIFIÉS (UNIQUEMENT APPEL ET FIN D'APPEL SANS ALERTE SUPFERLU) -->
+                <div class="d-flex gap-2 mb-2">
                     <button class="btn btn-outline-secondary btn-sm flex-fill" type="button" id="btnStartSchoolRecord" onclick="demarrerEnregistrementAudioEcole()"><i class="fa fa-microphone me-1"></i> Enregistrer Voix</button>
                     <button class="btn btn-secondary btn-sm flex-fill" type="button" id="btnStopSchoolRecord" onclick="arreterEnregistrementAudioEcole()" disabled><i class="fa fa-stop me-1"></i> Stop & Envoyer Voix</button>
-                    <button class="btn btn-outline-success btn-sm flex-fill" type="button" onclick="sendSchoolChatMessage('appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success btn-sm flex-fill fw-bold" type="button" onclick="sendSchoolChatMessage('appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
+                    <button class="btn btn-danger btn-sm flex-fill fw-bold" type="button" onclick="terminerAppelEcole()"><i class="fa fa-phone-slash me-1"></i> Fin de l'appel</button>
                 </div>
                 <audio id="schoolAudioPlayback" controls class="w-100 mt-2" style="display:none;"></audio>
             </div>
@@ -1377,6 +1381,29 @@ function updateSubDivisions() {
 // --- CHARGEMENT INITIAL DEPUIS FIRESTORE ---
 window.onload = function() {
     loadDataFromFirebase();
+    // Actualisation automatique en temps réel pour synchroniser l'appel simultané
+    setInterval(() => {
+        if(currentChatSchool) {
+            db.collection("platformData").doc("mainConfig").get().then((doc) => {
+                if (doc.exists) {
+                    appData = doc.data();
+                    const updatedSchool = (appData.schools || []).find(s => s.id === currentChatSchool.id);
+                    if(updatedSchool) {
+                        currentChatSchool = updatedSchool;
+                        renderSchoolChatMessages();
+                    }
+                }
+            }).catch(err => {});
+        }
+        if(document.getElementById('adminNotificationsListArea') && document.getElementById('adminNotificationsListArea').style.display === 'block') {
+            db.collection("platformData").doc("mainConfig").get().then((doc) => {
+                if (doc.exists) {
+                    appData = doc.data();
+                    renderAdminLitigiousSchoolsNotifications();
+                }
+            }).catch(err => {});
+        }
+    }, 3000);
 };
 
 function loadDataFromFirebase() {
@@ -1425,7 +1452,6 @@ function saveData() {
     })
     .catch((error) => {
         console.error("Erreur lors de la sauvegarde : ", error);
-        alert("Erreur de synchronisation avec la base de données en ligne.");
     });
 }
 
@@ -1539,7 +1565,7 @@ function copySecretCodeModal() {
     alert("Code Secret copié dans le presse-papier !");
 }
 
-// LOGIQUE AJOUTÉE : CHAT ÉCOLE BLOQUÉE AVEC AUDIO & APPEL DIRECT
+// LOGIQUE AJOUTÉE : CHAT ÉCOLE BLOQUÉE AVEC AUDIO & APPEL DIRECT SIMULTANÉ
 let currentChatSchool = null;
 let schoolMediaRecorder;
 let schoolAudioChunks = [];
@@ -1582,7 +1608,6 @@ function demarrerEnregistrementAudioEcole() {
             audioElement.src = schoolAudioBlobUrl;
             audioElement.style.display = 'block';
 
-            // Envoi automatique de l'audio enregistré vers l'Admin
             if(currentChatSchool) {
                 if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
                 currentChatSchool.chatMessages.push({
@@ -1593,16 +1618,12 @@ function demarrerEnregistrementAudioEcole() {
                 });
                 saveData();
                 renderSchoolChatMessages();
-                alert("Message vocal enregistré et transmis à l'Admin Central avec succès !");
             }
         };
         schoolMediaRecorder.start();
         document.getElementById('btnStartSchoolRecord').classList.add('disabled');
         document.getElementById('btnStopSchoolRecord').removeAttribute('disabled');
-        alert("Enregistrement vocal de l'école en cours...");
-    }).catch(err => {
-        alert("Erreur d'accès au microphone : " + err);
-    });
+    }).catch(err => {});
 }
 
 function arreterEnregistrementAudioEcole() {
@@ -1619,9 +1640,8 @@ function sendSchoolChatMessage(type) {
     let text = input.value.trim();
     
     if(type === 'appel') {
-        text = "[📞 APPEL DIRECT ENTRANT DE L'ÉCOLE - Téléphone en sonnerie...]";
+        text = "[📞 APPEL EN COURS ENTRE L'ÉCOLE ET L'ADMIN CENTRAL...]";
         playRingTone();
-        alert("Appel direct lancé ! Le téléphone de l'Admin Central sonne...");
     }
 
     if(!text && type === 'écrit') return;
@@ -1637,7 +1657,20 @@ function sendSchoolChatMessage(type) {
     saveData();
     input.value = '';
     renderSchoolChatMessages();
-    if(type !== 'appel') alert("Message transmis avec succès à l'Admin Central !");
+}
+
+function terminerAppelEcole() {
+    if(!currentChatSchool) return;
+    stopRingTone();
+    if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
+    currentChatSchool.chatMessages.push({
+        sender: 'ecole',
+        text: "[❌ APPEL TERMINÉ / COUPÉ]",
+        type: 'écrit',
+        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    });
+    saveData();
+    renderSchoolChatMessages();
 }
 
 function renderSchoolChatMessages() {
@@ -1666,7 +1699,7 @@ function renderSchoolChatMessages() {
     container.scrollTop = container.scrollHeight;
 }
 
-// LOGIQUE AJOUTÉE : PANEL NOTIFICATIONS & RÉPONSES ADMIN CENTRAL POUR ÉCOLES LITIGIEUSES
+// PANEL NOTIFICATIONS & RÉPONSES ADMIN CENTRAL POUR ÉCOLES LITIGIEUSES
 function openAdminNotificationsPanel() {
     const pass = document.getElementById('adminCentralNotificationCodeInput').value.trim();
     if(pass !== ADMIN_MASTER_PASSWORD) {
@@ -1686,11 +1719,13 @@ function renderAdminLitigiousSchoolsNotifications() {
         return;
     }
 
-    container.innerHTML = schoolsWithMessages.map(s => `
+    container.innerHTML = schoolsWithMessages.map(s => {
+        let hasActiveCall = (s.chatMessages || []).some(m => m.type === 'appel' && !m.text.includes('TERMINÉ'));
+        return `
         <div class="card mb-3 border-danger">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h6 class="m-0 text-danger fw-bold"><i class="fa fa-school me-2"></i>${s.name} (Code: ${s.secretCode}) - Statut : ${s.paiementStatut}</h6>
-                <div id="adminCallAlert_${s.id}" class="badge bg-danger p-2" style="display:none;"><i class="fa fa-phone-volume fa-shake me-1"></i> APPEL EN COURS (Sonnerie) <button class="btn btn-sm btn-light py-0 ms-2 fw-bold text-dark" onclick="adminDecrocherAppel('${s.id}')">Décrocher</button></div>
+                ${hasActiveCall ? `<div id="adminCallAlert_${s.id}" class="badge bg-danger p-2"><i class="fa fa-phone-volume fa-shake me-1"></i> APPEL SIMULTANÉ EN COURS <button class="btn btn-sm btn-light py-0 ms-2 fw-bold text-dark" onclick="adminDecrocherAppel('${s.id}')">Décrocher</button></div>` : ''}
             </div>
             <div class="card-body bg-white" style="max-height: 200px; overflow-y: auto;" id="adminMsgBox_${s.id}">
                 ${s.chatMessages.map((m, mIdx) => {
@@ -1705,7 +1740,7 @@ function renderAdminLitigiousSchoolsNotifications() {
                             <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
                             ${contentHtml}
                             <div class="mt-1 d-flex gap-2 justify-content-end no-print">
-                                <button class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size:11px;" onclick="supprimerMessageAdmin('${s.id}', ${mIdx})"><i class="fa fa-trash me-1"></i> Supprimer message</button>
+                                <button class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size:11px;" onclick="supprimerMessageAdmin('${s.id}', ${mIdx})"><i class="fa fa-trash me-1"></i> Supprimer</button>
                             </div>
                         </div>
                     `;
@@ -1716,10 +1751,13 @@ function renderAdminLitigiousSchoolsNotifications() {
                     <input type="text" id="adminReplyInput_${s.id}" class="form-control" placeholder="Répondre à cette école...">
                     <button class="btn btn-success" type="button" onclick="sendAdminReply('${s.id}', 'écrit')"><i class="fa fa-paper-plane me-1"></i> Répondre (Écrit)</button>
                 </div>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 mb-2">
                     <button class="btn btn-outline-primary btn-sm flex-fill" type="button" id="btnAdminRecord_${s.id}" onclick="demarrerEnregistrementAudioAdmin('${s.id}')"><i class="fa fa-microphone me-1"></i> Enregistrer Voix</button>
                     <button class="btn btn-secondary btn-sm flex-fill" type="button" id="btnAdminStopRecord_${s.id}" onclick="arreterEnregistrementAudioAdmin('${s.id}')" disabled><i class="fa fa-stop me-1"></i> Stop & Envoyer Voix</button>
-                    <button class="btn btn-outline-success btn-sm flex-fill" type="button" onclick="sendAdminReply('${s.id}', 'appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-success btn-sm flex-fill fw-bold" type="button" onclick="sendAdminReply('${s.id}', 'appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
+                    <button class="btn btn-outline-danger btn-sm flex-fill fw-bold" type="button" onclick="terminerAppelAdmin('${s.id}')"><i class="fa fa-phone-slash me-1"></i> Fin de l'appel</button>
                 </div>
                 <audio id="adminAudioPlayback_${s.id}" controls class="w-100 mt-2" style="display:none;" preload="auto"></audio>
                 <div class="mt-2 text-end">
@@ -1727,7 +1765,8 @@ function renderAdminLitigiousSchoolsNotifications() {
                 </div>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function supprimerMessageAdmin(schoolId, messageIndex) {
@@ -1737,7 +1776,6 @@ function supprimerMessageAdmin(schoolId, messageIndex) {
             s.chatMessages.splice(messageIndex, 1);
             saveData();
             renderAdminLitigiousSchoolsNotifications();
-            alert("Message supprimé avec succès !");
         }
     }
 }
@@ -1777,16 +1815,12 @@ function demarrerEnregistrementAudioAdmin(schoolId) {
                 });
                 saveData();
                 renderAdminLitigiousSchoolsNotifications();
-                alert("Message vocal de l'Admin Central envoyé à l'école !");
             }
         };
         adminMediaRecorder.start();
         document.getElementById(`btnAdminRecord_${schoolId}`).classList.add('disabled');
         document.getElementById(`btnAdminStopRecord_${schoolId}`).removeAttribute('disabled');
-        alert("Enregistrement vocal de l'Admin en cours...");
-    }).catch(err => {
-        alert("Erreur d'accès au micro : " + err);
-    });
+    }).catch(err => {});
 }
 
 function arreterEnregistrementAudioAdmin(schoolId) {
@@ -1804,9 +1838,8 @@ function sendAdminReply(schoolId, type) {
     let text = input.value.trim();
 
     if(type === 'appel') {
-        text = "[📞 APPEL DIRECT DE L'ADMIN CENTRAL - En communication...]";
-        stopRingTone();
-        alert("Appel décroché ! En communication directe avec l'école.");
+        text = "[📞 APPEL EN COURS DE L'ADMIN CENTRAL...]";
+        playRingTone();
     }
 
     if(!text && type === 'écrit') return;
@@ -1822,13 +1855,37 @@ function sendAdminReply(schoolId, type) {
     saveData();
     input.value = '';
     renderAdminLitigiousSchoolsNotifications();
-    if(type !== 'appel') alert("Réponse transmise à l'école avec succès !");
+}
+
+function terminerAppelAdmin(schoolId) {
+    const s = (appData.schools || []).find(x => x.id === schoolId);
+    if(!s) return;
+    stopRingTone();
+    if(!s.chatMessages) s.chatMessages = [];
+    s.chatMessages.push({
+        sender: 'admin',
+        text: "[❌ APPEL TERMINÉ / COUPÉ PAR L'ADMIN]",
+        type: 'écrit',
+        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    });
+    saveData();
+    renderAdminLitigiousSchoolsNotifications();
 }
 
 function adminDecrocherAppel(schoolId) {
     stopRingTone();
-    document.getElementById(`adminCallAlert_${schoolId}`).style.display = 'none';
-    alert("Appel décroché avec succès ! L'Admin Central est en ligne avec l'école.");
+    const s = (appData.schools || []).find(x => x.id === schoolId);
+    if(s) {
+        if(!s.chatMessages) s.chatMessages = [];
+        s.chatMessages.push({
+            sender: 'admin',
+            text: "[🟢 APPEL DÉCROCHÉ EN DIRECT]",
+            type: 'écrit',
+            date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+        });
+        saveData();
+        renderAdminLitigiousSchoolsNotifications();
+    }
 }
 
 // Simulation de sonnerie audio simple
@@ -1854,7 +1911,6 @@ function stopRingTone() {
         window.activeOscillator = null;
     }
 }
-// FIN DE LA LOGIQUE AJOUTÉE
 
 // FONCTIONS DE LA MODALE DE CONSULTATION DE FICHIER SÉCURISÉE
 function openFileViewerModal(fileUrl, fileType) {
@@ -3489,7 +3545,7 @@ function openAdminCentralPanel() {
     }
 }
 
-// FONCTION AJOUTÉE : BASCULER LE STATUT DE PAIEMENT DE L'ÉCOLE
+// BASCULER LE STATUT DE PAIEMENT DE L'ÉCOLE
 function toggleSchoolPaymentStatus(id) {
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
@@ -3499,7 +3555,7 @@ function toggleSchoolPaymentStatus(id) {
     alert(`Le statut de paiement pour ${s.name} est maintenant : ${s.paiementStatut}`);
 }
 
-// FONCTION AJOUTÉE : METTRE À JOUR LA DATE LIMITE DE PAIEMENT
+// METTRE À JOUR LA DATE LIMITE DE PAIEMENT
 function updateSchoolEcheanceDate(id) {
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
