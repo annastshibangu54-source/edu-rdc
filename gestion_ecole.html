@@ -136,7 +136,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   </div>
 </div>
 
-<!-- MODALE D'APPEL ENTRANT INTERACTIF (AJOUTÉE) -->
+<!-- MODALE D'APPEL ENTRANT INTERACTIF (CORRIGÉE & ROBUSTE) -->
 <div id="incomingCallModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 99999;">
   <div class="card text-center p-4 shadow-lg border-primary" style="width: 350px; background: #fff; border-radius: 15px;">
     <div class="mb-3">
@@ -226,7 +226,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                     <input type="text" id="schoolChatMessageInput" class="form-control" placeholder="Écrire un message à l'Admin Central...">
                     <button class="btn btn-primary" type="button" onclick="sendSchoolChatMessage('écrit')"><i class="fa fa-paper-plane"></i> Envoyer</button>
                 </div>
-                <!-- BOUTONS D'APPEL MODIFIÉS (UNIQUEMENT APPEL ET FIN D'APPEL SANS ALERTE SUPFERLU) -->
+                <!-- BOUTONS D'APPEL MODIFIÉS (UNIQUEMENT APPEL ET FIN D'APPEL) -->
                 <div class="d-flex gap-2 mb-2">
                     <button class="btn btn-outline-secondary btn-sm flex-fill" type="button" id="btnStartSchoolRecord" onclick="demarrerEnregistrementAudioEcole()"><i class="fa fa-microphone me-1"></i> Enregistrer Voix</button>
                     <button class="btn btn-secondary btn-sm flex-fill" type="button" id="btnStopSchoolRecord" onclick="arreterEnregistrementAudioEcole()" disabled><i class="fa fa-stop me-1"></i> Stop & Envoyer Voix</button>
@@ -702,7 +702,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 
-<!-- FRAIS & FACTURATION (CAISSE & PAIEMENT MODIFIÉ SELON VOS INSTRUCTIONS) -->
+<!-- FRAIS & FACTURATION (CAISSE & PAIEMENT MODIFIÉ) -->
 <div class="tab-pane" id="tab-frais">
 <h5 class="text-primary fw-bold mb-3">Caisse & Paiement</h5>
 <form id="formPaymentCustom" onsubmit="handleSaveCaissePaymentCustom(event)" class="row g-2 mb-3 no-print bg-light p-3 rounded">
@@ -832,7 +832,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 </div>
 
-<!-- PRESENCES (MODIFIÉ SELON VOS INSTRUCTIONS) -->
+<!-- PRESENCES -->
 <div class="tab-pane" id="tab-presences">
 <h5 class="text-primary fw-bold mb-3">Gestion de Présence</h5>
 
@@ -856,7 +856,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   <input type="text" id="presJourDate" class="form-control form-control-sm" readonly>
 </div>
 
-<!-- Champs Élève : Présent, Absent, Malade -->
+<!-- Champs Élève -->
 <div class="col-md-2 pres-fields-eleve d-flex align-items-end">
   <select id="presStatutEleve" class="form-select form-select-sm">
     <option value="Présent">Présent(e)</option>
@@ -865,7 +865,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   </select>
 </div>
 
-<!-- Champs Enseignant / Admin : Heure d'arrivée, Heure de départ -->
+<!-- Champs Enseignant / Admin -->
 <div class="col-md-2 pres-fields-staff" style="display:none;">
   <label class="form-label fw-bold small">Arrivée :</label>
   <input type="time" id="presHeureArrivee" class="form-control form-control-sm">
@@ -1595,13 +1595,12 @@ function copySecretCodeModal() {
     alert("Code Secret copié dans le presse-papier !");
 }
 
-// LOGIQUE AJOUTÉE : CHAT ÉCOLE BLOQUÉE AVEC AUDIO & APPEL DIRECT SIMULTANÉ
+// LOGIQUE CORRIGÉE : AUDIO & APPEL INTERACTIF SANS PLANTAGE
 let currentChatSchool = null;
 let schoolMediaRecorder;
 let schoolAudioChunks = [];
 let schoolAudioBlobUrl = null;
 
-// Gestion de la sonnerie interactive et des boutons d'appel entrant
 let audioCtx = null;
 let ringInterval = null;
 
@@ -1651,10 +1650,23 @@ function refuserOuRaccrocherAppel() {
         ringInterval = null;
     }
     if (audioCtx) {
-        audioCtx.close();
+        audioCtx.close().catch(() => {});
         audioCtx = null;
     }
     document.getElementById('incomingCallModal').style.display = 'none';
+    
+    // Nettoyage complet et propre pour éviter le blocage
+    if(currentChatSchool) {
+        if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
+        currentChatSchool.chatMessages.push({
+            sender: 'system',
+            text: "[❌ APPEL COUPÉ ET FERMÉ PROPREMENT]",
+            type: 'écrit',
+            date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+        });
+        saveData();
+        renderSchoolChatMessages();
+    }
 }
 
 function openBlockedSchoolChat() {
@@ -1776,8 +1788,8 @@ function renderSchoolChatMessages() {
         }
 
         return `
-            <div class="mb-2 p-2 rounded ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
-                <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
+            <div class="mb-2 p-2 rounded ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary' : m.sender === 'system' ? 'bg-secondary text-white text-center' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
+                <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : m.sender === 'system' ? 'Système' : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
                 ${contentHtml}
             </div>
         `;
@@ -1806,7 +1818,7 @@ function renderAdminLitigiousSchoolsNotifications() {
     }
 
     container.innerHTML = schoolsWithMessages.map(s => {
-        let hasActiveCall = (s.chatMessages || []).some(m => m.type === 'appel' && !m.text.includes('TERMINÉ'));
+        let hasActiveCall = (s.chatMessages || []).some(m => m.type === 'appel' && !m.text.includes('TERMINÉ') && !m.text.includes('COUPÉ'));
         return `
         <div class="card mb-3 border-danger">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
@@ -1822,8 +1834,8 @@ function renderAdminLitigiousSchoolsNotifications() {
                         contentHtml = `<div class="small">${m.text}</div>`;
                     }
                     return `
-                        <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : 'bg-light me-4 border'}">
-                            <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
+                        <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : m.sender === 'system' ? 'bg-secondary text-white text-center' : 'bg-light me-4 border'}">
+                            <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : m.sender === 'system' ? 'Système' : s.name} (${m.date})</div>
                             ${contentHtml}
                             <div class="mt-1 d-flex gap-2 justify-content-end no-print">
                                 <button class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size:11px;" onclick="supprimerMessageAdmin('${s.id}', ${mIdx})"><i class="fa fa-trash me-1"></i> Supprimer</button>
@@ -3171,9 +3183,7 @@ function renderPeriodicBulletin() {
     `;
 }
 
-// ==========================================
-// FONCTIONS CAISSE & PAIEMENT (SUR MESURE)
-// ==========================================
+// CAISSE & PAIEMENT
 function refreshPaymentOptionsCustom() {
     updateCaissePersonOptions();
     const now = new Date();
@@ -3303,7 +3313,7 @@ function deleteCaisseCustomItem(idx) {
     }
 }
 
-// 7.2 NOUVEAU : SIMULATION MOBILE MONEY
+// SIMULATION MOBILE MONEY
 function refreshMobileMoneyOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -3364,9 +3374,7 @@ function deleteMomoItem(idx) {
 }
 
 
-// ==========================================
-// FONCTIONS PRÉSENCES (SUR MESURE)
-// ==========================================
+// PRÉSENCES
 function refreshPresenceOptionsCustom() {
     updatePresencePersonOptions();
     const now = new Date();
@@ -3475,7 +3483,7 @@ function deletePresenceCustomItem(idx) {
     }
 }
 
-// 9.1 DISCIPLINE
+// DISCIPLINE
 function refreshDisciplineOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const year = s.activeYear || "2025-2026";
@@ -3509,7 +3517,7 @@ function renderDisciplineTable() {
     document.getElementById('disciplineTableBody').innerHTML = (s.yearsData[year].discipline || []).map((d, idx) => `<tr><td>${d.studentName}</td><td>${d.obs}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="s.yearsData['${year}'].discipline.splice(${idx},1);saveData();renderDisciplineTable();"><i class="fa fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted">Aucune sanction</td></tr>';
 }
 
-// 11. COMMUNICATION
+// COMMUNICATION
 function handleSaveCommunication() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     const message = document.getElementById('announcementText').value;
@@ -3542,7 +3550,7 @@ function deleteSchoolCommunication(idx) {
     }
 }
 
-// 12. EMPLOI
+// EMPLOI
 function openJobApplicationSection() {
     const sel = document.getElementById('jobSchoolSelect');
     sel.innerHTML = appData.schools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
@@ -3607,7 +3615,6 @@ function openAdminCentralPanel() {
     }
 }
 
-// BASCULER LE STATUT DE PAIEMENT DE L'ÉCOLE
 function toggleSchoolPaymentStatus(id) {
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
@@ -3617,7 +3624,6 @@ function toggleSchoolPaymentStatus(id) {
     alert(`Le statut de paiement pour ${s.name} est maintenant : ${s.paiementStatut}`);
 }
 
-// METTRE À JOUR LA DATE LIMITE DE PAIEMENT
 function updateSchoolEcheanceDate(id) {
     const s = appData.schools.find(x => x.id === id);
     if(!s) return;
@@ -3737,7 +3743,7 @@ function saveStudentCardData() {
     document.getElementById('cardPhotoPreview').src = "https://via.placeholder.com/80";
     if(document.getElementById('cardStudentSelect')) document.getElementById('cardStudentSelect').value = '';
 
-    alert("Carte enregistrée avec succès et ajoutée à la liste des cartes ! La zone active a été vidée pour une nouvelle carte.");
+    alert("Carte enregistrée avec succès et ajoutée à la liste des cartes !");
 }
 
 function renderSavedCardsTable() {
@@ -3794,7 +3800,7 @@ function openDirectRegistrationModal() {
     promptLoginCode(appData.schools[0].id);
 }
 
-// 1. Armoiries & Devise
+// Armoiries & Devise
 function refreshArmoiriesOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -3830,7 +3836,7 @@ function handleSaveArmoiries(e) {
     }
 }
 
-// 2. Palmarès & Mérite Académique
+// Palmarès & Mérite Académique
 function refreshPalmaresOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -3916,7 +3922,7 @@ function renderPalmaresTable() {
     `;
 }
 
-// 3. Courriers Entrants / Sortants
+// Courriers Entrants / Sortants
 function refreshCourrierOptions() {
     renderCourriersTable();
     const today = new Date().toISOString().split('T')[0];
@@ -3995,7 +4001,7 @@ function deleteCourrier(idx) {
     }
 }
 
-// 4. Stockage / GED des Dossiers
+// Stockage / GED des Dossiers
 function refreshDossiersStorageOptions() {
     updateDossierPersonOptions();
     renderDossiersStorageTable();
@@ -4102,7 +4108,7 @@ function deleteDossierDocument(idx) {
     }
 }
 
-// 5. CALENDRIER SCOLAIRE
+// CALENDRIER SCOLAIRE
 function handleSaveCalendrierScolaire(e) {
     e.preventDefault();
     const s = appData.schools.find(x => x.id === activeSchoolId);
@@ -4148,7 +4154,7 @@ function deleteCalendrierItem(idx) {
     }
 }
 
-// 6. HORAIRES DES COURS
+// HORAIRES DES COURS
 function refreshHoraireOptions() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -4215,7 +4221,7 @@ function deleteHoraireItem(idx) {
     }
 }
 
-// 7.3 STATISTIQUES & TABLEAU DE BORD ANALYTIQUE
+// STATISTIQUES & TABLEAU DE BORD ANALYTIQUE
 function renderStatistiquesDashboard() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -4263,7 +4269,7 @@ function renderStatistiquesDashboard() {
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 </script>
 
-<!-- Script JavaScript de Bootstrap indispensable pour ouvrir le menu mobile (les 3 barres) -->
+<!-- Script JavaScript de Bootstrap indispensable -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
