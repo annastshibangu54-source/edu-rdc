@@ -1595,7 +1595,7 @@ function copySecretCodeModal() {
     alert("Code Secret copié dans le presse-papier !");
 }
 
-// LOGIQUE CORRIGÉE : AUDIO & APPEL INTERACTIF SANS PLANTAGE
+// LOGIQUE CORRIGÉE : AUDIO & APPEL INTERACTIF WEBRTC ROBUSTE SANS PLANTAGE
 let currentChatSchool = null;
 let schoolMediaRecorder;
 let schoolAudioChunks = [];
@@ -1603,6 +1603,9 @@ let schoolAudioBlobUrl = null;
 
 let audioCtx = null;
 let ringInterval = null;
+
+let peerConnection = null;
+const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 function demarrerSonnerieEntrante(nomAppelant) {
     document.getElementById('incomingCallerName').innerText = nomAppelant || "Appel Entrant";
@@ -1642,6 +1645,22 @@ function decrocherAppelEntrant() {
     }
     document.getElementById('callActiveActions').style.display = 'none';
     document.getElementById('callConnectedStatus').style.display = 'block';
+
+    // Initialisation WebRTC peer connection pour connexion audio en direct
+    try {
+        peerConnection = new RTCPeerConnection(rtcConfig);
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+            peerConnection.ontrack = event => {
+                const remoteAudio = document.createElement('audio');
+                remoteAudio.srcObject = event.streams[0];
+                remoteAudio.autoplay = true;
+                document.body.appendChild(remoteAudio);
+            };
+        }).catch(err => console.error("Accès micro refusé ou non supporté en HTTP:", err));
+    } catch(e) {
+        console.error("Erreur initialisation WebRTC:", e);
+    }
 }
 
 function refuserOuRaccrocherAppel() {
@@ -1652,6 +1671,10 @@ function refuserOuRaccrocherAppel() {
     if (audioCtx) {
         audioCtx.close().catch(() => {});
         audioCtx = null;
+    }
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
     }
     document.getElementById('incomingCallModal').style.display = 'none';
     
@@ -1700,28 +1723,53 @@ function demarrerEnregistrementAudioEcole() {
         };
         schoolMediaRecorder.onstop = () => {
             const audioBlob = new Blob(schoolAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
-            schoolAudioBlobUrl = URL.createObjectURL(audioBlob);
             
-            const audioElement = document.getElementById('schoolAudioPlayback');
-            audioElement.src = schoolAudioBlobUrl;
-            audioElement.style.display = 'block';
+            // Upload direct vers Firebase Storage pour synchronisation cloud garantie
+            const storageRef = storage.ref().child('audios/' + Date.now() + '.webm');
+            storageRef.put(audioBlob).then(snapshot => {
+                snapshot.ref.getDownloadURL().then(downloadURL => {
+                    schoolAudioBlobUrl = downloadURL;
+                    
+                    const audioElement = document.getElementById('schoolAudioPlayback');
+                    audioElement.src = schoolAudioBlobUrl;
+                    audioElement.style.display = 'block';
 
-            if(currentChatSchool) {
-                if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
-                currentChatSchool.chatMessages.push({
-                    sender: 'ecole',
-                    text: schoolAudioBlobUrl,
-                    type: 'audio',
-                    date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                    if(currentChatSchool) {
+                        if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
+                        currentChatSchool.chatMessages.push({
+                            sender: 'ecole',
+                            text: schoolAudioBlobUrl,
+                            type: 'audio',
+                            date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                        });
+                        saveData();
+                        renderSchoolChatMessages();
+                    }
                 });
-                saveData();
-                renderSchoolChatMessages();
-            }
+            }).catch(err => {
+                // Fallback local blob URL si Firebase Storage non disponible
+                schoolAudioBlobUrl = URL.createObjectURL(audioBlob);
+                const audioElement = document.getElementById('schoolAudioPlayback');
+                audioElement.src = schoolAudioBlobUrl;
+                audioElement.style.display = 'block';
+
+                if(currentChatSchool) {
+                    if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
+                    currentChatSchool.chatMessages.push({
+                        sender: 'ecole',
+                        text: schoolAudioBlobUrl,
+                        type: 'audio',
+                        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                    });
+                    saveData();
+                    renderSchoolChatMessages();
+                }
+            });
         };
         schoolMediaRecorder.start();
         document.getElementById('btnStartSchoolRecord').classList.add('disabled');
         document.getElementById('btnStopSchoolRecord').removeAttribute('disabled');
-    }).catch(err => {});
+    }).catch(err => alert("Erreur d'accès au microphone. Assurez-vous d'utiliser HTTPS ou localhost."));
 }
 
 function arreterEnregistrementAudioEcole() {
@@ -1903,29 +1951,54 @@ function demarrerEnregistrementAudioAdmin(schoolId) {
         };
         adminMediaRecorder.onstop = () => {
             const audioBlob = new Blob(adminAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
-            adminAudioBlobUrl = URL.createObjectURL(audioBlob);
             
-            const audioElement = document.getElementById(`adminAudioPlayback_${schoolId}`);
-            audioElement.src = adminAudioBlobUrl;
-            audioElement.style.display = 'block';
+            // Upload direct vers Firebase Storage pour synchronisation cloud garantie
+            const storageRef = storage.ref().child('audios/' + Date.now() + '.webm');
+            storageRef.put(audioBlob).then(snapshot => {
+                snapshot.ref.getDownloadURL().then(downloadURL => {
+                    adminAudioBlobUrl = downloadURL;
+                    
+                    const audioElement = document.getElementById(`adminAudioPlayback_${schoolId}`);
+                    audioElement.src = adminAudioBlobUrl;
+                    audioElement.style.display = 'block';
 
-            const s = (appData.schools || []).find(x => x.id === schoolId);
-            if(s) {
-                if(!s.chatMessages) s.chatMessages = [];
-                s.chatMessages.push({
-                    sender: 'admin',
-                    text: adminAudioBlobUrl,
-                    type: 'audio',
-                    date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                    const s = (appData.schools || []).find(x => x.id === schoolId);
+                    if(s) {
+                        if(!s.chatMessages) s.chatMessages = [];
+                        s.chatMessages.push({
+                            sender: 'admin',
+                            text: adminAudioBlobUrl,
+                            type: 'audio',
+                            date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                        });
+                        saveData();
+                        renderAdminLitigiousSchoolsNotifications();
+                    }
                 });
-                saveData();
-                renderAdminLitigiousSchoolsNotifications();
-            }
+            }).catch(err => {
+                adminAudioBlobUrl = URL.createObjectURL(audioBlob);
+                const audioElement = document.getElementById(`adminAudioPlayback_${schoolId}`);
+                audioElement.src = adminAudioBlobUrl;
+                audioElement.style.display = 'block';
+
+                const s = (appData.schools || []).find(x => x.id === schoolId);
+                if(s) {
+                    if(!s.chatMessages) s.chatMessages = [];
+                    s.chatMessages.push({
+                        sender: 'admin',
+                        text: adminAudioBlobUrl,
+                        type: 'audio',
+                        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                    });
+                    saveData();
+                    renderAdminLitigiousSchoolsNotifications();
+                }
+            });
         };
         adminMediaRecorder.start();
         document.getElementById(`btnAdminRecord_${schoolId}`).classList.add('disabled');
         document.getElementById(`btnAdminStopRecord_${schoolId}`).removeAttribute('disabled');
-    }).catch(err => {});
+    }).catch(err => alert("Erreur d'accès au microphone."));
 }
 
 function arreterEnregistrementAudioAdmin(schoolId) {
