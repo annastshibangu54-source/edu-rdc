@@ -1842,7 +1842,6 @@ function renderSchoolChatMessages() {
             </div>
         `;
     }).join('');
-    // Correction pour forcer le défilement vers le bas des messages
     container.scrollTop = container.scrollHeight;
 }
 
@@ -1915,7 +1914,6 @@ function renderAdminLitigiousSchoolsNotifications() {
     `;
     }).join('');
     
-    // Forcer le défilement vers le bas pour chaque boîte de message admin
     schoolsWithMessages.forEach(s => {
         const box = document.getElementById(`adminMsgBox_${s.id}`);
         if(box) box.scrollTop = box.scrollHeight;
@@ -1952,7 +1950,6 @@ function demarrerEnregistrementAudioAdmin(schoolId) {
         adminMediaRecorder.onstop = () => {
             const audioBlob = new Blob(adminAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
             
-            // Upload direct vers Firebase Storage pour synchronisation cloud garantie
             const storageRef = storage.ref().child('audios/' + Date.now() + '.webm');
             storageRef.put(audioBlob).then(snapshot => {
                 snapshot.ref.getDownloadURL().then(downloadURL => {
@@ -2066,7 +2063,6 @@ function adminDecrocherAppel(schoolId) {
     }
 }
 
-// FONCTIONS DE LA MODALE DE CONSULTATION DE FICHIER SÉCURISÉE
 function openFileViewerModal(fileUrl, fileType) {
     const contentArea = document.getElementById('fileViewerContentArea');
     if (!fileUrl) {
