@@ -195,7 +195,16 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
                 <span><i class="fa fa-comments me-2"></i>Canal de Discussion Direct - <span id="chatSchoolNameDisplay">École</span> & Admin Central</span>
                 <button class="btn btn-sm btn-light text-danger fw-bold py-0" onclick="closeBlockedSchoolChat()"><i class="fa fa-times"></i></button>
             </div>
-            <div class="card-body bg-white" style="max-height: 250px; overflow-y: auto;" id="blockedSchoolMessagesContainer">
+            <!-- CONTRÔLES DE SÉLECTION / SUPPRESSION MULTIPLE -->
+            <div class="bg-light p-2 border-bottom d-flex justify-content-between align-items-center">
+                <div class="form-check m-0">
+                    <input class="form-check-input" type="checkbox" id="selectAllSchoolMsgs" onclick="toggleSelectAllSchoolMessages(this)">
+                    <label class="form-check-label small fw-bold" for="selectAllSchoolMsgs">Tout sélectionner</label>
+                </div>
+                <button class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size: 11px;" onclick="deleteSelectedSchoolMessages()"><i class="fa fa-trash me-1"></i> Supprimer la sélection</button>
+            </div>
+            <!-- ZONE DE DÉFILEMENT HAUT/BAS (SCROLL) -->
+            <div class="card-body bg-white" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column;" id="blockedSchoolMessagesContainer">
                 <!-- Messages injectés -->
             </div>
             <div class="card-footer bg-light p-2">
@@ -821,7 +830,7 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
 </div>
 
 <div class="col-md-4">
-  <label class="form-label fw-bold small">Nom / Personne :</label>
+  <label class="form-label fw-bold small">Nom & Personne :</label>
   <select id="presPersonSelect" class="form-select form-select-sm" required></select>
 </div>
 
@@ -1599,7 +1608,6 @@ function toggleSchoolVoiceRecording() {
     const timerElem = document.getElementById('schoolRecordTimer');
 
     if (!activeMediaRecorder || activeMediaRecorder.state === "inactive") {
-        // Démarrage de l'enregistrement avec affichage de l'état en direct
         activeAudioChunks = [];
         navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
             activeMediaRecorder = new MediaRecorder(stream);
@@ -1638,7 +1646,6 @@ function toggleSchoolVoiceRecording() {
 
         }).catch(() => alert("Impossible d'accéder au microphone."));
     } else {
-        // Arrêt de l'enregistrement et envoi direct au destinataire
         activeMediaRecorder.stop();
         activeMediaRecorder.stream.getTracks().forEach(track => track.stop());
         clearInterval(recordingTimerInterval);
@@ -1688,10 +1695,9 @@ function renderSchoolChatMessages() {
         container.innerHTML = '<p class="text-muted small text-center my-2">Aucun message. Envoyez votre préoccupation ou note vocale à l\'Admin Central.</p>';
         return;
     }
-    container.innerHTML = msgs.map(m => {
+    container.innerHTML = msgs.map((m, mIdx) => {
         let contentHtml = '';
         if(m.type === 'audio') {
-            // L'Admin Central ou l'école clique pour l'ouvrir, le télécharger et l'écouter même plus tard
             contentHtml = `
                 <div class="mt-1">
                     <audio controls src="${m.text}" style="max-width:220px; height:35px;" preload="auto"></audio>
@@ -1702,13 +1708,48 @@ function renderSchoolChatMessages() {
         }
 
         return `
-            <div class="mb-2 p-2 rounded ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
-                <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
-                ${contentHtml}
+            <div class="mb-2 p-2 rounded d-flex align-items-start gap-2 ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary justify-content-end' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
+                <input type="checkbox" class="form-check-input school-msg-checkbox mt-1" data-index="${mIdx}">
+                <div class="flex-grow-1">
+                    <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
+                    ${contentHtml}
+                </div>
+                <button class="btn btn-sm btn-outline-danger py-0 px-1" style="font-size:11px;" onclick="supprimerMessageEcole('${mIdx}')" title="Supprimer ce message"><i class="fa fa-trash"></i></button>
             </div>
         `;
     }).join('');
     container.scrollTop = container.scrollHeight;
+}
+
+function toggleSelectAllSchoolMessages(masterCheckbox) {
+    const checkboxes = document.querySelectorAll('.school-msg-checkbox');
+    checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+}
+
+function supprimerMessageEcole(mIdx) {
+    if(!currentChatSchool) return;
+    if(confirm("Voulez-vous supprimer ce message / audio ?")) {
+        currentChatSchool.chatMessages.splice(mIdx, 1);
+        saveData();
+        renderSchoolChatMessages();
+    }
+}
+
+function deleteSelectedSchoolMessages() {
+    if(!currentChatSchool || !currentChatSchool.chatMessages) return;
+    const checkboxes = document.querySelectorAll('.school-msg-checkbox:checked');
+    if(checkboxes.length === 0) {
+        alert("Veuillez sélectionner au moins un message ou audio à supprimer.");
+        return;
+    }
+    if(confirm(`Voulez-vous vraiment supprimer les ${checkboxes.length} message(s) sélectionné(s) ?`)) {
+        let indicesToRemove = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index'))).sort((a,b) => b-a);
+        indicesToRemove.forEach(idx => {
+            currentChatSchool.chatMessages.splice(idx, 1);
+        });
+        saveData();
+        renderSchoolChatMessages();
+    }
 }
 
 // PANEL NOTIFICATIONS & RÉPONSES ADMIN CENTRAL (VICE VERSA AVEC VOCAL INTÉGRÉ)
@@ -1737,6 +1778,14 @@ function renderAdminLitigiousSchoolsNotifications() {
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h6 class="m-0 text-danger fw-bold"><i class="fa fa-school me-2"></i>${s.name} (Code: ${s.secretCode}) - Statut : ${s.paiementStatut}</h6>
             </div>
+            <!-- CONTRÔLES SUPPRESSION MULTIPLE ADMIN -->
+            <div class="bg-light p-2 border-bottom d-flex justify-content-between align-items-center">
+                <div class="form-check m-0">
+                    <input class="form-check-input" type="checkbox" id="selectAllAdminMsgs_${s.id}" onclick="toggleSelectAllAdminMessages('${s.id}', this)">
+                    <label class="form-check-label small fw-bold" for="selectAllAdminMsgs_${s.id}">Tout sélectionner</label>
+                </div>
+                <button class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size: 11px;" onclick="deleteSelectedAdminMessages('${s.id}')"><i class="fa fa-trash me-1"></i> Supprimer la sélection</button>
+            </div>
             <div class="card-body bg-white" style="max-height: 200px; overflow-y: auto;" id="adminMsgBox_${s.id}">
                 ${s.chatMessages.map((m, mIdx) => {
                     let contentHtml = '';
@@ -1750,11 +1799,14 @@ function renderAdminLitigiousSchoolsNotifications() {
                         contentHtml = `<div class="small">${m.text}</div>`;
                     }
                     return `
-                        <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : 'bg-light me-4 border'}">
-                            <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
-                            ${contentHtml}
+                        <div class="mb-2 p-2 rounded d-flex align-items-start gap-2 ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4 justify-content-end' : 'bg-light me-4 border'}">
+                            <input type="checkbox" class="form-check-input admin-msg-checkbox_${s.id} mt-1" data-index="${mIdx}">
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
+                                ${contentHtml}
+                            </div>
                             <div class="mt-1 d-flex gap-2 justify-content-end no-print">
-                                <button class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size:11px;" onclick="supprimerMessageAdmin('${s.id}', ${mIdx})"><i class="fa fa-trash me-1"></i> Supprimer</button>
+                                <button class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size:11px;" onclick="supprimerMessageAdmin('${s.id}', ${mIdx})"><i class="fa fa-trash"></i></button>
                             </div>
                         </div>
                     `;
@@ -1784,6 +1836,29 @@ function renderAdminLitigiousSchoolsNotifications() {
         const box = document.getElementById(`adminMsgBox_${s.id}`);
         if(box) box.scrollTop = box.scrollHeight;
     });
+}
+
+function toggleSelectAllAdminMessages(schoolId, masterCheckbox) {
+    const checkboxes = document.querySelectorAll(`.admin-msg-checkbox_${schoolId}`);
+    checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+}
+
+function deleteSelectedAdminMessages(schoolId) {
+    const s = (appData.schools || []).find(x => x.id === schoolId);
+    if(!s || !s.chatMessages) return;
+    const checkboxes = document.querySelectorAll(`.admin-msg-checkbox_${schoolId}:checked`);
+    if(checkboxes.length === 0) {
+        alert("Veuillez sélectionner au moins un message ou audio à supprimer.");
+        return;
+    }
+    if(confirm(`Voulez-vous vraiment supprimer les ${checkboxes.length} message(s) sélectionné(s) ?`)) {
+        let indicesToRemove = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index'))).sort((a,b) => b-a);
+        indicesToRemove.forEach(idx => {
+            s.chatMessages.splice(idx, 1);
+        });
+        saveData();
+        renderAdminLitigiousSchoolsNotifications();
+    }
 }
 
 let adminActiveMediaRecorder = null;
