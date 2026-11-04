@@ -136,29 +136,6 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
   </div>
 </div>
 
-<!-- MODALE D'APPEL ENTRANT INTERACTIF (CORRIGÉE & ROBUSTE) -->
-<div id="incomingCallModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 99999;">
-  <div class="card text-center p-4 shadow-lg border-primary" style="width: 350px; background: #fff; border-radius: 15px;">
-    <div class="mb-3">
-      <i class="fa fa-phone-volume fa-3x text-primary fa-bounce"></i>
-    </div>
-    <h4 class="fw-bold mb-1" id="incomingCallerName">Admin Central</h4>
-    <p class="text-muted small mb-4">Appel vocal en direct...</p>
-    
-    <div id="callActiveActions" class="d-flex justify-content-center gap-3">
-      <button class="btn btn-success btn-lg rounded-circle p-3 text-white fw-bold" onclick="decrocherAppelEntrant()" title="Décrocher">
-        <i class="fa fa-phone fa-2x"></i>
-      </button>
-      <button class="btn btn-danger btn-lg rounded-circle p-3 text-white fw-bold" onclick="refuserOuRaccrocherAppel()" title="Raccrocher">
-        <i class="fa fa-phone-slash fa-2x"></i>
-      </button>
-    </div>
-    <div id="callConnectedStatus" class="mt-3 text-success fw-bold" style="display: none;">
-      <i class="fa fa-circle fa-beat me-1"></i> Appel en cours (Connecté)
-    </div>
-  </div>
-</div>
-
 <!-- HEADER -->
 <div class="container-fluid bg-primary py-5 mb-5 no-print">
 <div class="container py-5 text-center">
@@ -224,18 +201,15 @@ body { background:#f3f4f6; font-family: 'Nunito', sans-serif; color:#1f2937; }
             <div class="card-footer bg-light p-2">
                 <div class="input-group input-group-sm mb-2">
                     <input type="text" id="schoolChatMessageInput" class="form-control" placeholder="Écrire un message à l'Admin Central...">
-                    <button class="btn btn-primary" type="button" onclick="sendSchoolChatMessage('écrit')"><i class="fa fa-paper-plane"></i> Envoyer</button>
+                    <button class="btn btn-primary" type="button" onclick="sendSchoolChatMessage()"><i class="fa fa-paper-plane"></i></button>
                 </div>
-                <!-- BOUTONS D'APPEL MODIFIÉS (UNIQUEMENT APPEL ET FIN D'APPEL) -->
-                <div class="d-flex gap-2 mb-2">
-                    <button class="btn btn-outline-secondary btn-sm flex-fill" type="button" id="btnStartSchoolRecord" onclick="demarrerEnregistrementAudioEcole()"><i class="fa fa-microphone me-1"></i> Enregistrer Voix</button>
-                    <button class="btn btn-secondary btn-sm flex-fill" type="button" id="btnStopSchoolRecord" onclick="arreterEnregistrementAudioEcole()" disabled><i class="fa fa-stop me-1"></i> Stop & Envoyer Voix</button>
+                <!-- BOUTON UNIQUE "ENREGISTRÉ VOÏCE" AVEC ENREGISTREMENT EN DIRECT ET FLÈCHE D'ENVOI DIRECTE -->
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-primary btn-sm flex-fill fw-bold" type="button" id="btnSchoolRecordVoice" onclick="toggleSchoolVoiceRecording()">
+                        <i class="fa fa-microphone me-1 text-danger fa-beat" id="schoolMicIcon" style="display:none;"></i> <span id="schoolRecordBtnText">🎙️ Enregistrer Voix</span>
+                    </button>
+                    <span id="schoolRecordTimer" class="small text-danger fw-bold" style="display:none;">00:00</span>
                 </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-success btn-sm flex-fill fw-bold" type="button" onclick="sendSchoolChatMessage('appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
-                    <button class="btn btn-danger btn-sm flex-fill fw-bold" type="button" onclick="terminerAppelEcole()"><i class="fa fa-phone-slash me-1"></i> Fin de l'appel</button>
-                </div>
-                <audio id="schoolAudioPlayback" controls class="w-100 mt-2" style="display:none;"></audio>
             </div>
         </div>
     </div>
@@ -1404,7 +1378,6 @@ function updateSubDivisions() {
 // --- CHARGEMENT INITIAL DEPUIS FIRESTORE ---
 window.onload = function() {
     loadDataFromFirebase();
-    // Actualisation automatique en temps réel pour synchroniser l'appel simultané
     setInterval(() => {
         if(currentChatSchool) {
             db.collection("platformData").doc("mainConfig").get().then((doc) => {
@@ -1414,13 +1387,6 @@ window.onload = function() {
                     if(updatedSchool) {
                         currentChatSchool = updatedSchool;
                         renderSchoolChatMessages();
-                        
-                        // Détection automatique d'un appel entrant non terminé pour déclencher la modale
-                        const messages = currentChatSchool.chatMessages || [];
-                        const dernierMsg = messages[messages.length - 1];
-                        if(dernierMsg && dernierMsg.type === 'appel' && dernierMsg.sender === 'admin' && !dernierMsg.text.includes('TERMINÉ')) {
-                            demarrerSonnerieEntrante("Admin Central");
-                        }
                     }
                 }
             }).catch(err => {});
@@ -1595,102 +1561,14 @@ function copySecretCodeModal() {
     alert("Code Secret copié dans le presse-papier !");
 }
 
-// LOGIQUE CORRIGÉE : AUDIO & APPEL INTERACTIF WEBRTC ROBUSTE SANS PLANTAGE
+// ==========================================
+// GESTION VOCALE & MESSAGERIE (VICE VERSA)
+// ==========================================
 let currentChatSchool = null;
-let schoolMediaRecorder;
-let schoolAudioChunks = [];
-let schoolAudioBlobUrl = null;
-
-let audioCtx = null;
-let ringInterval = null;
-
-let peerConnection = null;
-const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-
-function demarrerSonnerieEntrante(nomAppelant) {
-    document.getElementById('incomingCallerName').innerText = nomAppelant || "Appel Entrant";
-    document.getElementById('incomingCallModal').style.display = 'flex';
-    document.getElementById('callActiveActions').style.display = 'flex';
-    document.getElementById('callConnectedStatus').style.display = 'none';
-
-    if (ringInterval) return;
-
-    try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        ringInterval = setInterval(() => {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(480, audioCtx.currentTime + 0.3);
-            
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.8);
-        }, 1200);
-    } catch(e) {
-        console.error("Erreur audio:", e);
-    }
-}
-
-function decrocherAppelEntrant() {
-    if (ringInterval) {
-        clearInterval(ringInterval);
-        ringInterval = null;
-    }
-    document.getElementById('callActiveActions').style.display = 'none';
-    document.getElementById('callConnectedStatus').style.display = 'block';
-
-    // Initialisation WebRTC peer connection pour connexion audio en direct
-    try {
-        peerConnection = new RTCPeerConnection(rtcConfig);
-        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
-            peerConnection.ontrack = event => {
-                const remoteAudio = document.createElement('audio');
-                remoteAudio.srcObject = event.streams[0];
-                remoteAudio.autoplay = true;
-                document.body.appendChild(remoteAudio);
-            };
-        }).catch(err => console.error("Accès micro refusé ou non supporté en HTTP:", err));
-    } catch(e) {
-        console.error("Erreur initialisation WebRTC:", e);
-    }
-}
-
-function refuserOuRaccrocherAppel() {
-    if (ringInterval) {
-        clearInterval(ringInterval);
-        ringInterval = null;
-    }
-    if (audioCtx) {
-        audioCtx.close().catch(() => {});
-        audioCtx = null;
-    }
-    if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
-    }
-    document.getElementById('incomingCallModal').style.display = 'none';
-    
-    // Nettoyage complet et propre pour éviter le blocage
-    if(currentChatSchool) {
-        if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
-        currentChatSchool.chatMessages.push({
-            sender: 'system',
-            text: "[❌ APPEL COUPÉ ET FERMÉ PROPREMENT]",
-            type: 'écrit',
-            date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-        });
-        saveData();
-        renderSchoolChatMessages();
-    }
-}
+let activeMediaRecorder = null;
+let activeAudioChunks = [];
+let recordingTimerInterval = null;
+let recordingSeconds = 0;
 
 function openBlockedSchoolChat() {
     const code = document.getElementById('blockedSchoolSecretCodeInput').value.trim();
@@ -1714,89 +1592,86 @@ function closeBlockedSchoolChat() {
     currentChatSchool = null;
 }
 
-function demarrerEnregistrementAudioEcole() {
-    schoolAudioChunks = [];
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-        schoolMediaRecorder = new MediaRecorder(stream);
-        schoolMediaRecorder.ondataavailable = event => {
-            schoolAudioChunks.push(event.data);
-        };
-        schoolMediaRecorder.onstop = () => {
-            const audioBlob = new Blob(schoolAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
+// BOUTON UNIQUE "ENREGISTRÉ VOÏCE" AVEC AFFICHAGE EN DIRECT ET ENVOI DIRECT
+function toggleSchoolVoiceRecording() {
+    const btnText = document.getElementById('schoolRecordBtnText');
+    const micIcon = document.getElementById('schoolMicIcon');
+    const timerElem = document.getElementById('schoolRecordTimer');
+
+    if (!activeMediaRecorder || activeMediaRecorder.state === "inactive") {
+        // Démarrage de l'enregistrement avec affichage de l'état en direct
+        activeAudioChunks = [];
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            activeMediaRecorder = new MediaRecorder(stream);
             
-            // Upload direct vers Firebase Storage pour synchronisation cloud garantie
-            const storageRef = storage.ref().child('audios/' + Date.now() + '.webm');
-            storageRef.put(audioBlob).then(snapshot => {
-                snapshot.ref.getDownloadURL().then(downloadURL => {
-                    schoolAudioBlobUrl = downloadURL;
-                    
-                    const audioElement = document.getElementById('schoolAudioPlayback');
-                    audioElement.src = schoolAudioBlobUrl;
-                    audioElement.style.display = 'block';
+            activeMediaRecorder.ondataavailable = event => {
+                activeAudioChunks.push(event.data);
+            };
 
-                    if(currentChatSchool) {
-                        if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
-                        currentChatSchool.chatMessages.push({
-                            sender: 'ecole',
-                            text: schoolAudioBlobUrl,
-                            type: 'audio',
-                            date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                        });
-                        saveData();
-                        renderSchoolChatMessages();
-                    }
-                });
-            }).catch(err => {
-                // Fallback local blob URL si Firebase Storage non disponible
-                schoolAudioBlobUrl = URL.createObjectURL(audioBlob);
-                const audioElement = document.getElementById('schoolAudioPlayback');
-                audioElement.src = schoolAudioBlobUrl;
-                audioElement.style.display = 'block';
-
-                if(currentChatSchool) {
-                    if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
-                    currentChatSchool.chatMessages.push({
-                        sender: 'ecole',
-                        text: schoolAudioBlobUrl,
-                        type: 'audio',
-                        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+            activeMediaRecorder.onstop = () => {
+                const audioBlob = new Blob(activeAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
+                
+                const storageRef = storage.ref().child('audios/' + Date.now() + '.webm');
+                storageRef.put(audioBlob).then(snapshot => {
+                    snapshot.ref.getDownloadURL().then(downloadURL => {
+                        envoyerMessageVocalDirect(downloadURL);
                     });
-                    saveData();
-                    renderSchoolChatMessages();
-                }
-            });
-        };
-        schoolMediaRecorder.start();
-        document.getElementById('btnStartSchoolRecord').classList.add('disabled');
-        document.getElementById('btnStopSchoolRecord').removeAttribute('disabled');
-    }).catch(err => alert("Erreur d'accès au microphone. Assurez-vous d'utiliser HTTPS ou localhost."));
-}
+                }).catch(() => {
+                    const localUrl = URL.createObjectURL(audioBlob);
+                    envoyerMessageVocalDirect(localUrl);
+                });
+            };
 
-function arreterEnregistrementAudioEcole() {
-    if(schoolMediaRecorder) {
-        schoolMediaRecorder.stop();
-        document.getElementById('btnStartSchoolRecord').classList.remove('disabled');
-        document.getElementById('btnStopSchoolRecord').setAttribute('disabled', 'true');
+            activeMediaRecorder.start();
+            btnText.innerText = "🛑 Arrêter & Envoyer Voix";
+            micIcon.style.display = "inline-block";
+            timerElem.style.display = "inline-block";
+            recordingSeconds = 0;
+            timerElem.innerText = "00:00";
+            
+            recordingTimerInterval = setInterval(() => {
+                recordingSeconds++;
+                let mins = Math.floor(recordingSeconds / 60).toString().padStart(2, '0');
+                let secs = (recordingSeconds % 60).toString().padStart(2, '0');
+                timerElem.innerText = `${mins}:${secs}`;
+            }, 1000);
+
+        }).catch(() => alert("Impossible d'accéder au microphone."));
+    } else {
+        // Arrêt de l'enregistrement et envoi direct au destinataire
+        activeMediaRecorder.stop();
+        activeMediaRecorder.stream.getTracks().forEach(track => track.stop());
+        clearInterval(recordingTimerInterval);
+        btnText.innerText = "🎙️ Enregistrer Voix";
+        micIcon.style.display = "none";
+        timerElem.style.display = "none";
     }
 }
 
-function sendSchoolChatMessage(type) {
+function envoyerMessageVocalDirect(audioUrl) {
+    if(!currentChatSchool) return;
+    if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
+    currentChatSchool.chatMessages.push({
+        sender: 'ecole',
+        text: audioUrl,
+        type: 'audio',
+        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    });
+    saveData();
+    renderSchoolChatMessages();
+}
+
+function sendSchoolChatMessage() {
     if(!currentChatSchool) return;
     const input = document.getElementById('schoolChatMessageInput');
     let text = input.value.trim();
-    
-    if(type === 'appel') {
-        text = "[📞 APPEL EN COURS ENTRE L'ÉCOLE ET L'ADMIN CENTRAL...]";
-        demarrerSonnerieEntrante(currentChatSchool.name);
-    }
-
-    if(!text && type === 'écrit') return;
+    if(!text) return;
 
     if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
     currentChatSchool.chatMessages.push({
         sender: 'ecole',
         text: text,
-        type: type,
+        type: 'écrit',
         date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     });
 
@@ -1805,39 +1680,30 @@ function sendSchoolChatMessage(type) {
     renderSchoolChatMessages();
 }
 
-function terminerAppelEcole() {
-    if(!currentChatSchool) return;
-    refuserOuRaccrocherAppel();
-    if(!currentChatSchool.chatMessages) currentChatSchool.chatMessages = [];
-    currentChatSchool.chatMessages.push({
-        sender: 'ecole',
-        text: "[❌ APPEL TERMINÉ / COUPÉ]",
-        type: 'écrit',
-        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    });
-    saveData();
-    renderSchoolChatMessages();
-}
-
 function renderSchoolChatMessages() {
     if(!currentChatSchool) return;
     const container = document.getElementById('blockedSchoolMessagesContainer');
     const msgs = currentChatSchool.chatMessages || [];
     if(msgs.length === 0) {
-        container.innerHTML = '<p class="text-muted small text-center my-2">Aucun message. Envoyez votre préoccupation à l\'Admin Central.</p>';
+        container.innerHTML = '<p class="text-muted small text-center my-2">Aucun message. Envoyez votre préoccupation ou note vocale à l\'Admin Central.</p>';
         return;
     }
     container.innerHTML = msgs.map(m => {
         let contentHtml = '';
         if(m.type === 'audio') {
-            contentHtml = `<audio controls src="${m.text}" style="max-width:220px; height:35px;"></audio>`;
+            // L'Admin Central ou l'école clique pour l'ouvrir, le télécharger et l'écouter même plus tard
+            contentHtml = `
+                <div class="mt-1">
+                    <audio controls src="${m.text}" style="max-width:220px; height:35px;" preload="auto"></audio>
+                    <div><a href="${m.text}" target="_blank" download="voix.webm" class="small text-primary"><i class="fa fa-download me-1"></i> Télécharger l'audio</a></div>
+                </div>`;
         } else {
             contentHtml = `<div class="small mt-1">${m.text}</div>`;
         }
 
         return `
-            <div class="mb-2 p-2 rounded ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary' : m.sender === 'system' ? 'bg-secondary text-white text-center' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
-                <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : m.sender === 'system' ? 'Système' : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
+            <div class="mb-2 p-2 rounded ${m.sender === 'ecole' ? 'bg-light text-end ms-4 border-start border-3 border-primary' : 'bg-warning bg-opacity-25 me-4 border-start border-3 border-danger'}">
+                <div class="small fw-bold text-dark">${m.sender === 'ecole' ? currentChatSchool.name : 'Admin Central'} <span class="text-muted fw-normal">(${m.date})</span></div>
                 ${contentHtml}
             </div>
         `;
@@ -1845,7 +1711,7 @@ function renderSchoolChatMessages() {
     container.scrollTop = container.scrollHeight;
 }
 
-// PANEL NOTIFICATIONS & RÉPONSES ADMIN CENTRAL POUR ÉCOLES LITIGIEUSES
+// PANEL NOTIFICATIONS & RÉPONSES ADMIN CENTRAL (VICE VERSA AVEC VOCAL INTÉGRÉ)
 function openAdminNotificationsPanel() {
     const pass = document.getElementById('adminCentralNotificationCodeInput').value.trim();
     if(pass !== ADMIN_MASTER_PASSWORD) {
@@ -1866,24 +1732,26 @@ function renderAdminLitigiousSchoolsNotifications() {
     }
 
     container.innerHTML = schoolsWithMessages.map(s => {
-        let hasActiveCall = (s.chatMessages || []).some(m => m.type === 'appel' && !m.text.includes('TERMINÉ') && !m.text.includes('COUPÉ'));
         return `
         <div class="card mb-3 border-danger">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h6 class="m-0 text-danger fw-bold"><i class="fa fa-school me-2"></i>${s.name} (Code: ${s.secretCode}) - Statut : ${s.paiementStatut}</h6>
-                ${hasActiveCall ? `<div id="adminCallAlert_${s.id}" class="badge bg-danger p-2"><i class="fa fa-phone-volume fa-shake me-1"></i> APPEL SIMULTANÉ EN COURS <button class="btn btn-sm btn-light py-0 ms-2 fw-bold text-dark" onclick="adminDecrocherAppel('${s.id}')">Décrocher</button></div>` : ''}
             </div>
             <div class="card-body bg-white" style="max-height: 200px; overflow-y: auto;" id="adminMsgBox_${s.id}">
                 ${s.chatMessages.map((m, mIdx) => {
                     let contentHtml = '';
                     if(m.type === 'audio') {
-                        contentHtml = `<audio controls src="${m.text}" style="max-width:220px; height:35px;" preload="auto"></audio>`;
+                        contentHtml = `
+                            <div class="mt-1">
+                                <audio controls src="${m.text}" style="max-width:220px; height:35px;" preload="auto"></audio>
+                                <div><a href="${m.text}" target="_blank" download="voix.webm" class="small text-primary"><i class="fa fa-download me-1"></i> Télécharger l'audio</a></div>
+                            </div>`;
                     } else {
                         contentHtml = `<div class="small">${m.text}</div>`;
                     }
                     return `
-                        <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : m.sender === 'system' ? 'bg-secondary text-white text-center' : 'bg-light me-4 border'}">
-                            <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : m.sender === 'system' ? 'Système' : s.name} (${m.date})</div>
+                        <div class="mb-2 p-2 rounded ${m.sender === 'admin' ? 'bg-primary text-white text-end ms-4' : 'bg-light me-4 border'}">
+                            <div class="small fw-bold">${m.sender === 'admin' ? 'Admin Central' : s.name} (${m.date})</div>
                             ${contentHtml}
                             <div class="mt-1 d-flex gap-2 justify-content-end no-print">
                                 <button class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size:11px;" onclick="supprimerMessageAdmin('${s.id}', ${mIdx})"><i class="fa fa-trash me-1"></i> Supprimer</button>
@@ -1895,17 +1763,15 @@ function renderAdminLitigiousSchoolsNotifications() {
             <div class="card-footer bg-light p-2">
                 <div class="input-group input-group-sm mb-2">
                     <input type="text" id="adminReplyInput_${s.id}" class="form-control" placeholder="Répondre à cette école...">
-                    <button class="btn btn-success" type="button" onclick="sendAdminReply('${s.id}', 'écrit')"><i class="fa fa-paper-plane me-1"></i> Répondre (Écrit)</button>
+                    <button class="btn btn-success" type="button" onclick="sendAdminReply('${s.id}')"><i class="fa fa-paper-plane me-1"></i> Envoyer</button>
                 </div>
-                <div class="d-flex gap-2 mb-2">
-                    <button class="btn btn-outline-primary btn-sm flex-fill" type="button" id="btnAdminRecord_${s.id}" onclick="demarrerEnregistrementAudioAdmin('${s.id}')"><i class="fa fa-microphone me-1"></i> Enregistrer Voix</button>
-                    <button class="btn btn-secondary btn-sm flex-fill" type="button" id="btnAdminStopRecord_${s.id}" onclick="arreterEnregistrementAudioAdmin('${s.id}')" disabled><i class="fa fa-stop me-1"></i> Stop & Envoyer Voix</button>
+                <!-- BOUTON VOCAL ADMIN CENTRAL ENREGISTREMENT DIRECT -->
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <button class="btn btn-outline-secondary btn-sm flex-fill fw-bold" type="button" id="btnAdminRecord_${s.id}" onclick="toggleAdminVoiceRecording('${s.id}')">
+                        <i class="fa fa-microphone me-1 text-danger fa-beat" id="adminMicIcon_${s.id}" style="display:none;"></i> <span id="adminRecordBtnText_${s.id}">🎙️ Enregistrer Voix</span>
+                    </button>
+                    <span id="adminRecordTimer_${s.id}" class="small text-danger fw-bold" style="display:none;">00:00</span>
                 </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-success btn-sm flex-fill fw-bold" type="button" onclick="sendAdminReply('${s.id}', 'appel')"><i class="fa fa-phone-alt me-1"></i> Appel Direct</button>
-                    <button class="btn btn-outline-danger btn-sm flex-fill fw-bold" type="button" onclick="terminerAppelAdmin('${s.id}')"><i class="fa fa-phone-slash me-1"></i> Fin de l'appel</button>
-                </div>
-                <audio id="adminAudioPlayback_${s.id}" controls class="w-100 mt-2" style="display:none;" preload="auto"></audio>
                 <div class="mt-2 text-end">
                     <button class="btn btn-sm btn-secondary fw-bold" onclick="fermerPanelAdminNotification()"><i class="fa fa-times me-1"></i> Fermer</button>
                 </div>
@@ -1918,6 +1784,78 @@ function renderAdminLitigiousSchoolsNotifications() {
         const box = document.getElementById(`adminMsgBox_${s.id}`);
         if(box) box.scrollTop = box.scrollHeight;
     });
+}
+
+let adminActiveMediaRecorder = null;
+let adminActiveAudioChunks = [];
+let adminTimerInterval = null;
+let adminSeconds = 0;
+
+function toggleAdminVoiceRecording(schoolId) {
+    const btnText = document.getElementById(`adminRecordBtnText_${schoolId}`);
+    const micIcon = document.getElementById(`adminMicIcon_${schoolId}`);
+    const timerElem = document.getElementById(`adminRecordTimer_${schoolId}`);
+
+    if (!adminActiveMediaRecorder || adminActiveMediaRecorder.state === "inactive") {
+        adminActiveAudioChunks = [];
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            adminActiveMediaRecorder = new MediaRecorder(stream);
+            
+            adminActiveMediaRecorder.ondataavailable = event => {
+                adminActiveAudioChunks.push(event.data);
+            };
+
+            adminActiveMediaRecorder.onstop = () => {
+                const audioBlob = new Blob(adminActiveAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
+                
+                const storageRef = storage.ref().child('audios/' + Date.now() + '.webm');
+                storageRef.put(audioBlob).then(snapshot => {
+                    snapshot.ref.getDownloadURL().then(downloadURL => {
+                        envoyerMessageVocalAdminDirect(schoolId, downloadURL);
+                    });
+                }).catch(() => {
+                    const localUrl = URL.createObjectURL(audioBlob);
+                    envoyerMessageVocalAdminDirect(schoolId, localUrl);
+                });
+            };
+
+            adminActiveMediaRecorder.start();
+            btnText.innerText = "🛑 Arrêter & Envoyer Voix";
+            micIcon.style.display = "inline-block";
+            timerElem.style.display = "inline-block";
+            adminSeconds = 0;
+            timerElem.innerText = "00:00";
+            
+            adminTimerInterval = setInterval(() => {
+                adminSeconds++;
+                let mins = Math.floor(adminSeconds / 60).toString().padStart(2, '0');
+                let secs = (adminSeconds % 60).toString().padStart(2, '0');
+                timerElem.innerText = `${mins}:${secs}`;
+            }, 1000);
+
+        }).catch(() => alert("Impossible d'accéder au microphone."));
+    } else {
+        adminActiveMediaRecorder.stop();
+        adminActiveMediaRecorder.stream.getTracks().forEach(track => track.stop());
+        clearInterval(adminTimerInterval);
+        btnText.innerText = "🎙️ Enregistrer Voix";
+        micIcon.style.display = "none";
+        timerElem.style.display = "none";
+    }
+}
+
+function envoyerMessageVocalAdminDirect(schoolId, audioUrl) {
+    const s = (appData.schools || []).find(x => x.id === schoolId);
+    if(!s) return;
+    if(!s.chatMessages) s.chatMessages = [];
+    s.chatMessages.push({
+        sender: 'admin',
+        text: audioUrl,
+        type: 'audio',
+        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    });
+    saveData();
+    renderAdminLitigiousSchoolsNotifications();
 }
 
 function supprimerMessageAdmin(schoolId, messageIndex) {
@@ -1936,131 +1874,24 @@ function fermerPanelAdminNotification() {
     document.getElementById('adminCentralNotificationCodeInput').value = '';
 }
 
-let adminMediaRecorder;
-let adminAudioChunks = [];
-let adminAudioBlobUrl = null;
-
-function demarrerEnregistrementAudioAdmin(schoolId) {
-    adminAudioChunks = [];
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-        adminMediaRecorder = new MediaRecorder(stream);
-        adminMediaRecorder.ondataavailable = event => {
-            adminAudioChunks.push(event.data);
-        };
-        adminMediaRecorder.onstop = () => {
-            const audioBlob = new Blob(adminAudioChunks, { 'type': 'audio/ogg; codecs=opus' });
-            
-            const storageRef = storage.ref().child('audios/' + Date.now() + '.webm');
-            storageRef.put(audioBlob).then(snapshot => {
-                snapshot.ref.getDownloadURL().then(downloadURL => {
-                    adminAudioBlobUrl = downloadURL;
-                    
-                    const audioElement = document.getElementById(`adminAudioPlayback_${schoolId}`);
-                    audioElement.src = adminAudioBlobUrl;
-                    audioElement.style.display = 'block';
-
-                    const s = (appData.schools || []).find(x => x.id === schoolId);
-                    if(s) {
-                        if(!s.chatMessages) s.chatMessages = [];
-                        s.chatMessages.push({
-                            sender: 'admin',
-                            text: adminAudioBlobUrl,
-                            type: 'audio',
-                            date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                        });
-                        saveData();
-                        renderAdminLitigiousSchoolsNotifications();
-                    }
-                });
-            }).catch(err => {
-                adminAudioBlobUrl = URL.createObjectURL(audioBlob);
-                const audioElement = document.getElementById(`adminAudioPlayback_${schoolId}`);
-                audioElement.src = adminAudioBlobUrl;
-                audioElement.style.display = 'block';
-
-                const s = (appData.schools || []).find(x => x.id === schoolId);
-                if(s) {
-                    if(!s.chatMessages) s.chatMessages = [];
-                    s.chatMessages.push({
-                        sender: 'admin',
-                        text: adminAudioBlobUrl,
-                        type: 'audio',
-                        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                    });
-                    saveData();
-                    renderAdminLitigiousSchoolsNotifications();
-                }
-            });
-        };
-        adminMediaRecorder.start();
-        document.getElementById(`btnAdminRecord_${schoolId}`).classList.add('disabled');
-        document.getElementById(`btnAdminStopRecord_${schoolId}`).removeAttribute('disabled');
-    }).catch(err => alert("Erreur d'accès au microphone."));
-}
-
-function arreterEnregistrementAudioAdmin(schoolId) {
-    if(adminMediaRecorder) {
-        adminMediaRecorder.stop();
-        document.getElementById(`btnAdminRecord_${schoolId}`).classList.remove('disabled');
-        document.getElementById(`btnAdminStopRecord_${schoolId}`).setAttribute('disabled', 'true');
-    }
-}
-
-function sendAdminReply(schoolId, type) {
+function sendAdminReply(schoolId) {
     const s = (appData.schools || []).find(x => x.id === schoolId);
     if(!s) return;
     const input = document.getElementById(`adminReplyInput_${s.id}`);
     let text = input.value.trim();
-
-    if(type === 'appel') {
-        text = "[📞 APPEL EN COURS DE L'ADMIN CENTRAL...]";
-        demarrerSonnerieEntrante("Admin Central");
-    }
-
-    if(!text && type === 'écrit') return;
+    if(!text) return;
 
     if(!s.chatMessages) s.chatMessages = [];
     s.chatMessages.push({
         sender: 'admin',
         text: text,
-        type: type,
+        type: 'écrit',
         date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     });
 
     saveData();
     input.value = '';
     renderAdminLitigiousSchoolsNotifications();
-}
-
-function terminerAppelAdmin(schoolId) {
-    const s = (appData.schools || []).find(x => x.id === schoolId);
-    if(!s) return;
-    refuserOuRaccrocherAppel();
-    if(!s.chatMessages) s.chatMessages = [];
-    s.chatMessages.push({
-        sender: 'admin',
-        text: "[❌ APPEL TERMINÉ / COUPÉ PAR L'ADMIN]",
-        type: 'écrit',
-        date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    });
-    saveData();
-    renderAdminLitigiousSchoolsNotifications();
-}
-
-function adminDecrocherAppel(schoolId) {
-    refuserOuRaccrocherAppel();
-    const s = (appData.schools || []).find(x => x.id === schoolId);
-    if(s) {
-        if(!s.chatMessages) s.chatMessages = [];
-        s.chatMessages.push({
-            sender: 'admin',
-            text: "[🟢 APPEL DÉCROCHÉ EN DIRECT]",
-            type: 'écrit',
-            date: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-        });
-        saveData();
-        renderAdminLitigiousSchoolsNotifications();
-    }
 }
 
 function openFileViewerModal(fileUrl, fileType) {
@@ -2113,7 +1944,7 @@ function renderPortalAnnouncements() {
     if(!container) return;
     let allComms = [];
     if(appData.schools) {
-        appData.schools.forEach((s, sIdx) => {
+        appData.schools.forEach((s) => {
             if(s.communications && s.communications.length > 0) {
                 s.communications.forEach((c, cIdx) => {
                     allComms.push({ schoolId: s.id, schoolName: s.name, date: c.date, message: c.message, cIdx });
@@ -2488,7 +2319,7 @@ function renderClassesTable() {
                                 </thead>
                                 <tbody>
                                     ${
-                                        classStudents.length > 0 ? classStudents.map((st, idx) => `
+                                        classStudents.length > 0 ? classStudents.map((st) => `
                                             <tr>
                                                 <td><b>${st.mat}</b></td>
                                                 <td>${esc(st.name)}</td>
@@ -2671,13 +2502,6 @@ function loginAsTeacher(code, classe) {
 }
 
 // 4. ELEVES
-function refreshStudentOptions() {
-    renderStudentsSection();
-}
-function handleSaveStudent(e) {
-    e.preventDefault();
-}
-
 function renderStudentsSection() {
     const s = appData.schools.find(x => x.id === activeSchoolId);
     if(!s) return;
@@ -2729,7 +2553,7 @@ function renderStudentsSection() {
                                 </thead>
                                 <tbody>
                                     ${
-                                        classStudents.length > 0 ? classStudents.map((st, idx) => `
+                                        classStudents.length > 0 ? classStudents.map((st) => `
                                             <tr>
                                                 <td><b>${st.mat}</b></td>
                                                 <td>${esc(st.name)}</td>
